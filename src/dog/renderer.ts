@@ -1,11 +1,11 @@
 import { rgba } from "../core/color";
 import { CellGrid, paintGrid } from "../core/grid";
 import { clamp, hash3 } from "../math";
-import { resolvePalette, type Palette, type PaletteName } from "../palette";
+import { resolvePalette, type Palette, type PaletteChoice } from "../palette";
 import type { Ball, Dog, DogWorld } from "./world";
 
 export interface DogRendererOptions {
-  palette?: PaletteName | Palette;
+  palette?: PaletteChoice;
   columns?: number;
   maxCells?: number;
   calm?: boolean;

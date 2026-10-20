@@ -1,5 +1,7 @@
 export type RGB = [number, number, number];
 export type PaletteName = "abyss" | "neon" | "mono" | "paper";
+/** A named palette, a full custom palette, or the host's colour scheme. */
+export type PaletteChoice = PaletteName | "auto" | Palette;
 
 /**
  * Semantic colours for a scene. The shark body still gets its species tint;
@@ -102,7 +104,17 @@ export const PALETTES: Record<PaletteName, Palette> = {
   },
 };
 
-export function resolvePalette(palette?: PaletteName | Palette): Palette {
+export function resolvePalette(palette?: PaletteChoice): Palette {
   if (!palette) return PALETTES.abyss;
+  if (palette === "auto") {
+    if (
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-color-scheme: light)").matches
+    ) {
+      return PALETTES.paper;
+    }
+    return PALETTES.abyss;
+  }
   return typeof palette === "string" ? (PALETTES[palette] ?? PALETTES.abyss) : palette;
 }

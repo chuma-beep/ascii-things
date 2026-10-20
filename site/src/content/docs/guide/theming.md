@@ -21,12 +21,12 @@ Four palettes ship with every scene:
 <AsciiDog palette="mono" />
 ```
 
-`palette` accepts a built-in name or a full `Palette` object. The default is `"abyss"`.
+`palette` accepts a built-in name, `"auto"`, or a full `Palette` object. The default is
+`"abyss"`.
 
-:::note
-`palette="auto"` is on the roadmap but is **not** in `0.4.0`. To follow the operating system,
-read `prefers-color-scheme` in your app and pass `"paper"` or `"abyss"`.
-:::
+`"auto"` follows the host's colour scheme: `paper` when `prefers-color-scheme: light`
+matches, `abyss` otherwise. It is resolved when the scene is created, so remount the scene
+if the OS theme changes while it is running. On the server it resolves to `abyss`.
 
 ## What a palette controls
 
@@ -98,7 +98,8 @@ and needs numeric RGB for blending. Treat a custom palette as a JS constant, not
 on every render.
 
 `resolvePalette()` is exported for adapter authors. It returns the matching built-in palette,
-your object unchanged, or `abyss` for an unknown name.
+the host-appropriate palette for `"auto"`, your object unchanged, or `abyss` for an unknown
+name.
 
 ```ts
 import { PALETTES, resolvePalette } from "ascii-things/sharks";

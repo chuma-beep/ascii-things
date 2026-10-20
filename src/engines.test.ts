@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createDog, DogEngine } from "./dog";
 import { createJellyfish, JellyfishEngine } from "./jellyfish";
+import { PALETTES, resolvePalette } from "./palette";
 import { createRobots, RobotEngine } from "./robots";
 import { OceanEngine } from "./sharks";
 
@@ -108,22 +109,26 @@ describe("engine migration", () => {
       {
         engine: new OceanEngine(makeCanvas() as unknown as HTMLCanvasElement, { seed: 3 }),
         scene: "sharks",
+        action: "splash" as const,
       },
       {
         engine: new RobotEngine(makeCanvas() as unknown as HTMLCanvasElement, { seed: 3 }),
         scene: "robots",
+        action: "dispatch" as const,
       },
       {
         engine: new JellyfishEngine(makeCanvas() as unknown as HTMLCanvasElement, { seed: 3 }),
         scene: "jellyfish",
+        action: "shockwave" as const,
       },
       {
         engine: new DogEngine(makeCanvas() as unknown as HTMLCanvasElement, { seed: 3 }),
         scene: "dog",
+        action: "throwBall" as const,
       },
     ];
 
-    for (const { engine, scene } of cases) {
+    for (const { engine, scene, action } of cases) {
       const stats = engine.getStats();
       expect(stats.cells, scene).toBeGreaterThan(0);
       expect(stats.columns, scene).toBeGreaterThan(0);
@@ -135,8 +140,10 @@ describe("engine migration", () => {
         calm: true,
         paused: true,
         fontFamily: "monospace",
+        adaptiveQuality: false,
       });
       expect(engine.getStats().cells, scene).toBeGreaterThan(0);
+      engine.trigger(action, 120, 90);
       engine.pause();
       engine.resume();
       engine.setOptions({ paused: false });
@@ -145,6 +152,11 @@ describe("engine migration", () => {
 
     expect(observers).toHaveLength(8);
     expect(observers.every((observer) => observer.disconnected)).toBe(true);
+  });
+
+  it("resolves auto palettes from the host colour scheme", () => {
+    expect(resolvePalette("auto")).toBe(PALETTES.abyss);
+    expect(resolvePalette("paper")).toBe(PALETTES.paper);
   });
 
   it("keeps the public create functions and shark roster back-compat", () => {

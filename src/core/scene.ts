@@ -1,4 +1,4 @@
-import type { Palette, PaletteName } from "../palette";
+import type { PaletteChoice } from "../palette";
 
 /** Fields shared by every scene's options. */
 export interface SceneOptions {
@@ -14,10 +14,12 @@ export interface SceneOptions {
   maxDpr?: number;
   /** Adaptive quality cap. Default 16,000 cells. */
   maxCells?: number;
+  /** Reduce backing-store resolution when frames run slow. Default true. */
+  adaptiveQuality?: boolean;
   /** Disable decorative shimmer, blinking, and sparks. */
   calm?: boolean;
   /** Colour theme, or a full custom palette. */
-  palette?: PaletteName | Palette;
+  palette?: PaletteChoice;
   /** If set, the canvas becomes role="img" with this label. */
   label?: string;
   /** Start with the clock stopped. Default false. */
@@ -35,12 +37,17 @@ export interface SceneStats {
   rows: number;
 }
 
+/** The signature interaction each scene exposes. */
+export type SceneAction = "splash" | "dispatch" | "shockwave" | "throwBall";
+
 /** The lifecycle surface shared by every engine. */
 export interface SceneHandle<S extends SceneStats = SceneStats> {
   pause(): void;
   resume(): void;
   resize(): void;
   setOptions(options: Partial<SceneOptions>): void;
+  /** Trigger the scene's signature action at canvas-local coordinates. */
+  trigger(action: SceneAction, x: number, y: number): void;
   getStats(): S;
   destroy(): void;
 }

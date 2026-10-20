@@ -397,13 +397,14 @@ handle.
 | Option | Type | Default | |
 |---|---|---|---|
 | `sharks` | `{ kind, size }[]` | four classics | `classic`, `hammerhead`, `zebra`, `tiger`, `greathammer`, `mako`, `thresher`, `nurse` |
-| `palette` | `"abyss" \| "neon" \| "mono" \| "paper" \| Palette` | `"abyss"` | Custom palettes accepted |
+| `palette` | `PaletteChoice` | `"abyss"` | Name, `"auto"`, or a custom palette |
 | `seed` | `number` | random | Same seed + size = same scene |
 | `columns` | `number` | `124` | Art-direction target; cells stay 8–13 px |
 | `density` | `number` | `1` | Fish population multiplier |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
 | `interactive` | `boolean` | `true` | Pointer flee + click splash |
 | `maxDpr` | `number` | `2` | Backing-store cap |
+| `adaptiveQuality` | `boolean` | `true` | Lowers DPR when frames stay slow |
 | `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
 | `calm` | `boolean` | `false` | Disables shimmer and glints |
 | `sharkScale` | `number` | `1` | Shark length multiplier |
@@ -416,12 +417,13 @@ handle.
 |---|---|---|---|
 | `robots` | `{ kind, size }[]` | mixed fleet | `scout`, `hauler`, `sentinel` |
 | `count` | `number` | scales with area | Fleet size when `robots` is omitted |
-| `palette` | `"abyss" \| "neon" \| "mono" \| "paper" \| Palette` | `"abyss"` | Custom palettes accepted |
+| `palette` | `PaletteChoice` | `"abyss"` | Name, `"auto"`, or a custom palette |
 | `seed` | `number` | random | Same seed + size = same floor |
 | `columns` | `number` | `150` | Art-direction target; cells stay 8–13 px |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
 | `interactive` | `boolean` | `true` | Pointer avoidance + click to dispatch |
 | `maxDpr` | `number` | `2` | Backing-store cap |
+| `adaptiveQuality` | `boolean` | `true` | Lowers DPR when frames stay slow |
 | `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
 | `calm` | `boolean` | `false` | Disables beacons, sparks, and scan shimmer |
 | `scale` | `number` | `1` | Robot size multiplier |
@@ -434,12 +436,13 @@ handle.
 |---|---|---|---|
 | `jellies` | `{ kind, size }[]` | mixed bloom | `moon`, `lion`, `box`, `atolla`, `crystal` |
 | `count` | `number` | scales with area | Bloom size when `jellies` is omitted |
-| `palette` | `"abyss" \| "neon" \| "mono" \| "paper" \| Palette` | `"abyss"` | Custom palettes accepted |
+| `palette` | `PaletteChoice` | `"abyss"` | Name, `"auto"`, or a custom palette |
 | `seed` | `number` | random | Same seed + size = same bloom |
 | `columns` | `number` | `140` | Art-direction target; cells stay 8–13 px |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
 | `interactive` | `boolean` | `true` | Pointer current + click shockwave |
 | `maxDpr` | `number` | `2` | Backing-store cap |
+| `adaptiveQuality` | `boolean` | `true` | Lowers DPR when frames stay slow |
 | `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
 | `calm` | `boolean` | `false` | Disables shimmer, twinkle, and pulse flicker |
 | `scale` | `number` | `1` | Jellyfish size multiplier |
@@ -452,12 +455,13 @@ handle.
 |---|---|---|---|
 | `dogs` | `{ size }[]` | responsive | Sizes are relative |
 | `count` | `number` | scales with width (1–3) | Dog count when `dogs` is omitted |
-| `palette` | `"abyss" \| "neon" \| "mono" \| "paper" \| Palette` | `"abyss"` | Custom palettes accepted |
+| `palette` | `PaletteChoice` | `"abyss"` | Name, `"auto"`, or a custom palette |
 | `seed` | `number` | random | Same seed + size = same yard |
 | `columns` | `number` | `150` | Art-direction target; cells stay 8–13 px |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
 | `interactive` | `boolean` | `true` | Pointer tracking + click to throw the ball |
 | `maxDpr` | `number` | `2` | Backing-store cap |
+| `adaptiveQuality` | `boolean` | `true` | Lowers DPR when frames stay slow |
 | `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
 | `calm` | `boolean` | `false` | Disables sparks, beacons, and tail flicker |
 | `scale` | `number` | `1` | Dog size multiplier |
@@ -465,10 +469,25 @@ handle.
 | `label` | `string` | — | Adds `role="img"` + `aria-label` |
 | `onEvent` | `(e) => void` | — | `{ kind: "ball" \| "nudge" \| "charge" \| "low" \| "sit", x, y, id }` |
 
+`PaletteChoice` is a built-in name, `"auto"`, or a full `Palette` object.
+`"auto"` resolves to `paper` under a light host colour scheme and `abyss`
+otherwise, at scene creation.
+
 ## Lifecycle
 
 `pause()`, `resume()`, `setOptions(partial)`, `resize()`, `getStats()`,
-`destroy()`.
+`destroy()`, plus the scene's signature action:
+
+| Scene | Method | `trigger()` action |
+|---|---|---|
+| Sharks | `splash(x, y)` | `"splash"` |
+| Robots | `dispatch(x, y)` | `"dispatch"` |
+| Jellyfish | `shockwave(x, y)` | `"shockwave"` |
+| Dog | `throwBall(x, y)` | `"throwBall"` |
+
+`trigger(action, x, y)` is the uniform handle method exposed through React
+`onReady` and the custom element's `ascii-ready` event. Coordinates are
+canvas-local pixels. Actions are ignored under reduced motion.
 
 ## Accessibility
 

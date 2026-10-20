@@ -27,17 +27,25 @@ declarations and subpath exports.
 - Explicit subpath exports and type declarations.
 - MIT license, with credit to the original `ascii-sharks` project.
 
-## Unreleased / planned
+## 0.5.0 (unreleased)
 
-The next milestones are tracked in `PLAN.md`. They are **not** part of 0.4.0:
+The next minor release is additive; no existing option or method changes shape.
 
-- `palette="auto"`, `aspectRatio`, `paused`, and `onReady` React props.
-- Scene handle methods for scripted interaction across all four scenes.
-- Adaptive frame-time quality.
-- A published `0.5.0` with provenance, visual regression tests, and accessibility checks.
+- Shared `SceneOptions`, `SceneStats`, `SceneHandle`, and `SceneAction` types.
+- `paused` and `fontFamily` on every scene.
+- React `id`, `aspectRatio`, and `onReady(scene)`.
+- Custom-element `paused`, `font-family`, `aspect-ratio`, and the bubbling `ascii-ready`
+  event carrying the live handle.
+- `palette="auto"` follows the host colour scheme, resolving to `paper` or `abyss` at
+  creation.
+- Adaptive quality lowers the backing-store scale under sustained slow frames;
+  `adaptiveQuality={false}` opts out.
+- Uniform `trigger(action, x, y)` plus named actions: `splash`, `dispatch`, `shockwave`, and
+  `throwBall`.
 
-This docs site was added as part of the Phase 3 work. It documents the shipped API so it does
-not promise features before they exist.
+Release publication, provenance, visual regression baselines, and the accessibility matrix
+remain on the `0.5.0` checklist. This docs site is part of the Phase 3 work and documents the
+`main` branch alongside the latest published API.
 
 ## Versioning
 

@@ -1,3 +1,4 @@
+import type { SceneAction } from "../core/scene";
 import { SceneRuntime } from "../core/runtime";
 import type { AsciiDogOptions } from "./options";
 import { DogRenderer } from "./renderer";
@@ -49,6 +50,7 @@ export class DogEngine {
       speed: options.speed,
       interactive: options.interactive,
       maxDpr: options.maxDpr,
+      adaptiveQuality: options.adaptiveQuality,
       label: options.label,
       paused: options.paused,
       fontFamily: options.fontFamily,
@@ -75,6 +77,11 @@ export class DogEngine {
     this.runtime.renderIfIdle();
   }
 
+  /** Trigger the scene's signature action. */
+  trigger(action: SceneAction, x: number, y: number) {
+    if (action === "throwBall") this.throwBall(x, y);
+  }
+
   /** Live-update palette, speed, dogs, quality, and label. */
   setOptions(partial: AsciiDogOptions) {
     this.options = { ...this.options, ...partial };
@@ -82,6 +89,8 @@ export class DogEngine {
     if (partial.speed !== undefined) this.runtime.setSpeed(partial.speed);
     if (partial.interactive !== undefined) this.runtime.setInteractive(partial.interactive);
     if (partial.maxDpr !== undefined) this.runtime.setMaxDpr(partial.maxDpr);
+    if (partial.adaptiveQuality !== undefined)
+      this.runtime.setAdaptiveQuality(partial.adaptiveQuality);
     if (partial.label !== undefined) this.runtime.setLabel(partial.label);
     if (partial.paused !== undefined) this.runtime.setPaused(partial.paused);
     if (partial.fontFamily !== undefined) this.runtime.setFontFamily(partial.fontFamily);

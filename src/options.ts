@@ -1,4 +1,4 @@
-import type { Palette, PaletteName } from "./palette";
+import type { PaletteChoice } from "./palette";
 import type { SharkSpec, WorldEvent } from "./world";
 
 export interface AsciiSharksOptions {
@@ -18,10 +18,12 @@ export interface AsciiSharksOptions {
   maxDpr?: number;
   /** Adaptive quality cap. Default 16,000 cells. */
   maxCells?: number;
+  /** Reduce backing-store resolution when frames run slow. Default true. */
+  adaptiveQuality?: boolean;
   /** Disable the 2.4 Hz shimmer and fish glints. */
   calm?: boolean;
   /** Colour theme, or a full custom palette. Default "abyss". */
-  palette?: PaletteName | Palette;
+  palette?: PaletteChoice;
   /** Shark length multiplier. Default 1. */
   sharkScale?: number;
   /** Start with the clock stopped. Default false. */

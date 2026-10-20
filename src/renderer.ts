@@ -8,7 +8,7 @@
  */
 import { CellGrid, paintGrid } from "./core/grid";
 import { clamp, hash3, smoothstep } from "./math";
-import { resolvePalette, type Palette, type PaletteName } from "./palette";
+import { resolvePalette, type Palette, type PaletteChoice } from "./palette";
 import { SHARK_NODES, type Shark, type SharkKind, type World, type WorldEvent } from "./world";
 
 const ALPHA_LEVELS = 6;
@@ -253,7 +253,7 @@ function inTriangle(
 }
 
 export interface RendererOptions {
-  palette?: PaletteName | Palette;
+  palette?: PaletteChoice;
   /** Art-direction target for the number of columns. */
   columns?: number;
   /** Adaptive quality cap. */

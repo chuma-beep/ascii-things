@@ -3,8 +3,8 @@ title: API reference
 description: Every shared option, scene extra, engine method, event, and statistic in ascii-things 0.4.0.
 ---
 
-This reference describes the shipped **0.4.0** API. Roadmap items are marked in the guides but
-are not listed here as available options.
+This reference tracks `main`. The latest published release is **0.4.0**; additions landing in
+**0.5.0** are included here and called out inline.
 
 ## Package exports
 
@@ -20,8 +20,8 @@ are not listed here as available options.
 | `ascii-things/ui` | `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, `AsciiSceneTabs`, `AsciiDogHero` |
 | `ascii-things/ui.css` | UI stylesheet |
 
-`PALETTES`, `resolvePalette`, `Palette`, `PaletteName`, and `RGB` are exported from the scene
-entries and from the root entry.
+`PALETTES`, `resolvePalette`, `Palette`, `PaletteName`, `PaletteChoice`, and `RGB` are
+exported from the scene entries and from the root entry.
 
 ## Shared options
 
@@ -29,12 +29,13 @@ Every `create*` factory and React wrapper accepts these.
 
 | Option | Type | Default | |
 | --- | --- | --- | --- |
-| `palette` | `PaletteName \| Palette` | `"abyss"` | Built-in name or full palette object |
+| `palette` | `PaletteChoice` | `"abyss"` | Built-in name, `"auto"`, or a full palette object (0.5.0 adds `"auto"`) |
 | `seed` | `number` | random | Same seed + size = same world |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
 | `columns` | `number` | per scene | Art-direction target |
 | `maxCells` | `number` | `16000` | Grid cap |
 | `maxDpr` | `number` | `2` | Backing-store pixel-ratio cap |
+| `adaptiveQuality` | `boolean` | `true` | Lower DPR when frames stay slow (0.5.0) |
 | `calm` | `boolean` | `false` | Disables flicker and sparkle |
 | `interactive` | `boolean` | `true` | Pointer input |
 | `label` | `string` | — | Makes the canvas `role="img"` |
@@ -42,7 +43,9 @@ Every `create*` factory and React wrapper accepts these.
 | `fontFamily` | `string` | canvas CSS | Override the canvas font stack |
 | `onEvent` | `(event) => void` | — | Scene-specific events |
 
-`PaletteName` is `"abyss" | "neon" | "mono" | "paper"`. See
+`PaletteName` is `"abyss" | "neon" | "mono" | "paper"`. `PaletteChoice` adds `"auto"` and a
+custom `Palette`. `"auto"` resolves to `paper` when the host prefers a light colour scheme and
+`abyss` otherwise; it is resolved when the scene is created. See
 [Theming](/guide/theming/) for the `Palette` shape.
 
 ## Scene extras
@@ -153,17 +156,25 @@ const scene = createSharks(canvas, options);
 | `resize()` | `void` | Force a size/DPR read |
 | `setOptions(partial)` | `void` | Update the listed options live |
 | `getStats()` | scene stats | Frame timing and population |
+| `trigger(action, x, y)` | `void` | Uniform action entry point for every scene |
 | `destroy()` | `void` | Remove observers, listeners, and state |
 
-`DogEngine` adds:
+### Scene actions
 
-| Method | Returns | |
+| Scene | Method | `trigger()` action |
 | --- | --- | --- |
-| `throwBall(x, y)` | `void` | Throw from canvas-local pixels; ignored under reduced motion |
+| Sharks | `splash(x, y)` | `"splash"` |
+| Robots | `dispatch(x, y)` | `"dispatch"` |
+| Jellyfish | `shockwave(x, y)` | `"shockwave"` |
+| Dog | `throwBall(x, y)` | `"throwBall"` |
+
+Coordinates are canvas-local pixels. Actions are ignored under reduced motion. The same
+methods are available on React handles from `onReady` and custom-element handles from
+`ascii-ready` (0.5.0).
 
 `setOptions` accepts a partial option object. Structural fields (`seed`, roster, `density`,
-`count`, `scale`, `spread`) rebuild the world. Palette, speed, columns, max cells, calm,
-interactive, max DPR, label, and event handlers update without rebuilding.
+`count`, `scale`, `spread`) rebuild the world. Palette, speed, columns, max cells, max DPR,
+adaptive quality, calm, interactive, label, and event handlers update without rebuilding.
 
 The scene classes are also exported (`OceanEngine`, `RobotEngine`, `JellyfishEngine`,
 `DogEngine`) for advanced use, but `create*` is the stable surface.

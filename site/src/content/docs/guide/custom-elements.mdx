@@ -67,12 +67,13 @@ default. Boolean attributes are true when present, unless the value is `"false"`
 
 | Attribute | Type | Notes |
 | --- | --- | --- |
-| `palette` | name | `abyss`, `neon`, `mono`, `paper` |
+| `palette` | name | `abyss`, `neon`, `mono`, `paper`, or `auto` |
 | `seed` | number | Same seed and size produce the same world |
 | `speed` | number | `0` freezes |
 | `columns` | number | Art-direction target |
 | `max-cells` | number | Quality cap, default `16000` |
 | `max-dpr` | number | Backing-store cap, default `2` |
+| `adaptive-quality` | boolean | Lower DPR when frames stay slow, default `true` |
 | `calm` | boolean | Disables flicker and sparkle |
 | `interactive` | boolean | Pointer input, true by default |
 | `paused` | boolean | Starts with the scene clock stopped |
@@ -169,8 +170,12 @@ yard.addEventListener("ascii-ready", (event) => {
 ```
 
 The element itself still has no `onEvent` attribute. Use the handle to call
-`pause()`, `resume()`, `resize()`, `setOptions()`, `getStats()`, `throwBall()`, or
+`pause()`, `resume()`, `resize()`, `setOptions()`, `getStats()`, `trigger()`, or
 `destroy()`, or use the vanilla factory when you already own the canvas.
+
+`trigger(action, x, y)` takes `"splash"` for sharks, `"dispatch"` for robots,
+`"shockwave"` for jellyfish, and `"throwBall"` for the dog. The same actions are also
+available as named methods (`splash`, `dispatch`, `shockwave`, `throwBall`).
 
 ```ts
 import { createDog } from "ascii-things/dog";

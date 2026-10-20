@@ -14,6 +14,7 @@ mostly the number of cells and the device pixel ratio.
 | `columns` | `124` sharks, `150` robots, `140` jellyfish, `150` dog | Target column count |
 | `maxCells` | `16000` | Caps the grid; cell size grows instead of exploding the count |
 | `maxDpr` | `2` | Caps backing-store resolution |
+| `adaptiveQuality` | `true` | Lowers DPR when frames stay slow |
 | `simulation` | fixed 60 Hz | Up to 4 steps per frame |
 | `calm` | `false` | Removes flicker and sparkle work |
 
@@ -74,8 +75,12 @@ scene.destroy();
 `pause()` cancels the loop and clears queued events. `resume()` restarts the clock.
 `destroy()` disconnects observers, removes pointer listeners, and clears the world.
 
-React wrappers handle teardown on unmount. They do not expose `pause()` in `0.4.0`; use the
-vanilla engine if you need manual control.
+React wrappers handle teardown on unmount. Use `onReady` to keep the handle for manual
+control:
+
+```tsx
+<AsciiDog onReady={(scene) => scene.pause()} />
+```
 
 ## Freeze instead of pause
 
@@ -129,11 +134,19 @@ accept one redraw after load. The scene is not blank in the meantime; it uses th
 
 ## Adaptive quality
 
-Frame-time adaptive quality is on the roadmap, not in `0.4.0`. The shipped controls are
-`maxCells`, `maxDpr`, `columns`, `calm`, `interactive`, and pause/resume.
+Adaptive quality is on by default. When smoothed frame time stays above 20 ms, the runtime
+reduces the backing-store scale in 25% steps down to half resolution, then restores it after
+a sustained recovery. It never drops below 1× DPR, and it respects `maxDpr`.
 
-If you need a simple host-side adaptation today, measure `frameMs` yourself and lower
-`columns` or `maxCells` through `setOptions()` when it stays above your budget.
+Turn it off when you need deterministic pixels or already manage quality yourself:
+
+```tsx
+<AsciiDog adaptiveQuality={false} maxDpr={1} />
+```
+
+The other quality controls are `maxCells`, `maxDpr`, `columns`, `calm`, `interactive`, and
+pause/resume. You can still lower `columns` or `maxCells` through `setOptions()` for a
+coarser, host-owned policy.
 
 ## Layout stability
 

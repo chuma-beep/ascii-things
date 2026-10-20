@@ -1,11 +1,11 @@
 import { rgba } from "../core/color";
 import { CellGrid, paintGrid } from "../core/grid";
 import { angleDiff, hash3 } from "../math";
-import { resolvePalette, type Palette, type PaletteName } from "../palette";
+import { resolvePalette, type Palette, type PaletteChoice } from "../palette";
 import type { Robot, RobotKind, RobotWorld } from "./world";
 
 export interface RobotRendererOptions {
-  palette?: PaletteName | Palette;
+  palette?: PaletteChoice;
   columns?: number;
   maxCells?: number;
   calm?: boolean;

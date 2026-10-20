@@ -1,7 +1,8 @@
+import type { SceneAction } from "../core/scene";
 import { SceneRuntime } from "../core/runtime";
 import type { AsciiRobotsOptions } from "./options";
 import { RobotRenderer } from "./renderer";
-import { RobotWorld } from "./world";
+import { RobotWorld, type Robot } from "./world";
 
 export interface RobotStats {
   fps: number;
@@ -47,6 +48,7 @@ export class RobotEngine {
       speed: options.speed,
       interactive: options.interactive,
       maxDpr: options.maxDpr,
+      adaptiveQuality: options.adaptiveQuality,
       label: options.label,
       paused: options.paused,
       fontFamily: options.fontFamily,
@@ -65,6 +67,20 @@ export class RobotEngine {
     this.runtime.resume();
   }
 
+  /** Dispatch a robot to a point from a UI control, in canvas-local pixels. */
+  dispatch(x: number, y: number): Robot | null {
+    if (this.runtime.prefersReducedMotion) return null;
+    const robot = this.world.dispatch(x, y);
+    this.runtime.flushEvents();
+    this.runtime.renderIfIdle();
+    return robot;
+  }
+
+  /** Trigger the scene's signature action. */
+  trigger(action: SceneAction, x: number, y: number) {
+    if (action === "dispatch") this.dispatch(x, y);
+  }
+
   /** Live-update palette, speed, fleet, quality, and label. */
   setOptions(partial: AsciiRobotsOptions) {
     this.options = { ...this.options, ...partial };
@@ -72,6 +88,8 @@ export class RobotEngine {
     if (partial.speed !== undefined) this.runtime.setSpeed(partial.speed);
     if (partial.interactive !== undefined) this.runtime.setInteractive(partial.interactive);
     if (partial.maxDpr !== undefined) this.runtime.setMaxDpr(partial.maxDpr);
+    if (partial.adaptiveQuality !== undefined)
+      this.runtime.setAdaptiveQuality(partial.adaptiveQuality);
     if (partial.label !== undefined) this.runtime.setLabel(partial.label);
     if (partial.paused !== undefined) this.runtime.setPaused(partial.paused);
     if (partial.fontFamily !== undefined) this.runtime.setFontFamily(partial.fontFamily);

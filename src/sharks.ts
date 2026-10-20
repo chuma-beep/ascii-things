@@ -9,5 +9,5 @@ export {
   type WorldOptions,
 } from "./world";
 export { createRng, type Rng } from "./rng";
-export { PALETTES, resolvePalette, type Palette, type PaletteName } from "./palette";
+export { PALETTES, resolvePalette, type Palette, type PaletteChoice } from "./palette";
 export type { AsciiSharksOptions } from "./options";

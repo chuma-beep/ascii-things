@@ -1,3 +1,4 @@
+import type { SceneAction } from "../core/scene";
 import { SceneRuntime } from "../core/runtime";
 import type { AsciiJellyfishOptions } from "./options";
 import { JellyfishRenderer } from "./renderer";
@@ -48,6 +49,7 @@ export class JellyfishEngine {
       speed: options.speed,
       interactive: options.interactive,
       maxDpr: options.maxDpr,
+      adaptiveQuality: options.adaptiveQuality,
       label: options.label,
       paused: options.paused,
       fontFamily: options.fontFamily,
@@ -66,6 +68,19 @@ export class JellyfishEngine {
     this.runtime.resume();
   }
 
+  /** Send a current ring from a UI control, in canvas-local pixels. */
+  shockwave(x: number, y: number) {
+    if (this.runtime.prefersReducedMotion) return;
+    this.world.shockwave(x, y);
+    this.runtime.flushEvents();
+    this.runtime.renderIfIdle();
+  }
+
+  /** Trigger the scene's signature action. */
+  trigger(action: SceneAction, x: number, y: number) {
+    if (action === "shockwave") this.shockwave(x, y);
+  }
+
   /** Live-update palette, speed, bloom, quality, and label. */
   setOptions(partial: AsciiJellyfishOptions) {
     this.options = { ...this.options, ...partial };
@@ -73,6 +88,8 @@ export class JellyfishEngine {
     if (partial.speed !== undefined) this.runtime.setSpeed(partial.speed);
     if (partial.interactive !== undefined) this.runtime.setInteractive(partial.interactive);
     if (partial.maxDpr !== undefined) this.runtime.setMaxDpr(partial.maxDpr);
+    if (partial.adaptiveQuality !== undefined)
+      this.runtime.setAdaptiveQuality(partial.adaptiveQuality);
     if (partial.label !== undefined) this.runtime.setLabel(partial.label);
     if (partial.paused !== undefined) this.runtime.setPaused(partial.paused);
     if (partial.fontFamily !== undefined) this.runtime.setFontFamily(partial.fontFamily);

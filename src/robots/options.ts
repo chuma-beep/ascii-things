@@ -1,4 +1,4 @@
-import type { Palette, PaletteName } from "../palette";
+import type { PaletteChoice } from "../palette";
 import type { RobotSpec, RobotWorldEvent } from "./world";
 
 export interface AsciiRobotsOptions {
@@ -18,10 +18,12 @@ export interface AsciiRobotsOptions {
   maxDpr?: number;
   /** Adaptive quality cap. Default 16,000 cells. */
   maxCells?: number;
+  /** Reduce backing-store resolution when frames run slow. Default true. */
+  adaptiveQuality?: boolean;
   /** Disable blinking, sparks, and scan shimmer. */
   calm?: boolean;
   /** Colour theme, or a full custom palette. Default "abyss". */
-  palette?: PaletteName | Palette;
+  palette?: PaletteChoice;
   /** Robot size multiplier. Default 1. */
   scale?: number;
   /** Start with the clock stopped. Default false. */

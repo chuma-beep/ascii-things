@@ -65,20 +65,43 @@ export function AsciiSharks({
     };
   }, [structuralKey]);
 
-  const { palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent } = options;
+  const {
+    palette,
+    speed,
+    columns,
+    maxCells,
+    adaptiveQuality,
+    calm,
+    label,
+    paused,
+    fontFamily,
+    onEvent,
+  } = options;
   useEffect(() => {
     engineRef.current?.setOptions({
       palette,
       speed,
       columns,
       maxCells,
+      adaptiveQuality,
       calm,
       label,
       paused,
       fontFamily,
       onEvent,
     });
-  }, [palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent]);
+  }, [
+    palette,
+    speed,
+    columns,
+    maxCells,
+    adaptiveQuality,
+    calm,
+    label,
+    paused,
+    fontFamily,
+    onEvent,
+  ]);
 
   return (
     <canvas
@@ -151,20 +174,43 @@ export function AsciiRobots({
     };
   }, [structuralKey]);
 
-  const { palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent } = options;
+  const {
+    palette,
+    speed,
+    columns,
+    maxCells,
+    adaptiveQuality,
+    calm,
+    label,
+    paused,
+    fontFamily,
+    onEvent,
+  } = options;
   useEffect(() => {
     engineRef.current?.setOptions({
       palette,
       speed,
       columns,
       maxCells,
+      adaptiveQuality,
       calm,
       label,
       paused,
       fontFamily,
       onEvent,
     });
-  }, [palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent]);
+  }, [
+    palette,
+    speed,
+    columns,
+    maxCells,
+    adaptiveQuality,
+    calm,
+    label,
+    paused,
+    fontFamily,
+    onEvent,
+  ]);
 
   return (
     <canvas
@@ -237,20 +283,43 @@ export function AsciiJellyfish({
     };
   }, [structuralKey]);
 
-  const { palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent } = options;
+  const {
+    palette,
+    speed,
+    columns,
+    maxCells,
+    adaptiveQuality,
+    calm,
+    label,
+    paused,
+    fontFamily,
+    onEvent,
+  } = options;
   useEffect(() => {
     engineRef.current?.setOptions({
       palette,
       speed,
       columns,
       maxCells,
+      adaptiveQuality,
       calm,
       label,
       paused,
       fontFamily,
       onEvent,
     });
-  }, [palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent]);
+  }, [
+    palette,
+    speed,
+    columns,
+    maxCells,
+    adaptiveQuality,
+    calm,
+    label,
+    paused,
+    fontFamily,
+    onEvent,
+  ]);
 
   return (
     <canvas
@@ -324,20 +393,43 @@ export function AsciiDog({
     };
   }, [structuralKey]);
 
-  const { palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent } = options;
+  const {
+    palette,
+    speed,
+    columns,
+    maxCells,
+    adaptiveQuality,
+    calm,
+    label,
+    paused,
+    fontFamily,
+    onEvent,
+  } = options;
   useEffect(() => {
     engineRef.current?.setOptions({
       palette,
       speed,
       columns,
       maxCells,
+      adaptiveQuality,
       calm,
       label,
       paused,
       fontFamily,
       onEvent,
     });
-  }, [palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent]);
+  }, [
+    palette,
+    speed,
+    columns,
+    maxCells,
+    adaptiveQuality,
+    calm,
+    label,
+    paused,
+    fontFamily,
+    onEvent,
+  ]);
 
   return (
     <canvas

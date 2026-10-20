@@ -6,6 +6,7 @@ export interface RuntimeOptions {
   speed?: number;
   interactive?: boolean;
   maxDpr?: number;
+  adaptiveQuality?: boolean;
   label?: string;
   paused?: boolean;
   fontFamily?: string;
@@ -76,6 +77,10 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
   private speed: number;
   private interactive: boolean;
   private maxDpr: number | undefined;
+  private adaptiveQuality: boolean;
+  private qualityScale = 1;
+  private slowFrames = 0;
+  private fastFrames = 0;
   private label: string | undefined;
   private fontFamily: string | undefined;
   private frameMs = 16.7;
@@ -88,6 +93,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     this.speed = Math.max(0, config.speed ?? 1);
     this.interactive = config.interactive ?? true;
     this.maxDpr = config.maxDpr;
+    this.adaptiveQuality = config.adaptiveQuality ?? true;
     this.label = config.label;
     this.fontFamily = config.fontFamily;
     this.paused = config.paused ?? false;
@@ -160,7 +166,8 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     const { canvas, renderer, world } = this.config;
     const rect = canvas.getBoundingClientRect();
     if (rect.width < 1 || rect.height < 1) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, this.maxDpr ?? 2);
+    const baseDpr = Math.min(window.devicePixelRatio || 1, this.maxDpr ?? 2);
+    const dpr = Math.max(Math.min(1, baseDpr), baseDpr * this.qualityScale);
     renderer.resize(rect.width, rect.height, dpr);
     world.resize(rect.width, rect.height, renderer.cellWidth, renderer.cellHeight);
     if (this.reducedMotion.matches) this.drawStill();
@@ -181,6 +188,15 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
 
   setMaxDpr(maxDpr: number | undefined) {
     this.maxDpr = maxDpr;
+  }
+
+  setAdaptiveQuality(enabled: boolean) {
+    this.adaptiveQuality = enabled;
+    if (enabled || this.qualityScale === 1) return;
+    this.qualityScale = 1;
+    this.slowFrames = 0;
+    this.fastFrames = 0;
+    this.resize();
   }
 
   setLabel(label: string | undefined) {
@@ -280,6 +296,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     const raw = Math.min(0.1, (now - this.last) / 1000);
     this.last = now;
     this.frameMs += (raw * 1000 - this.frameMs) * 0.1;
+    this.adaptQuality();
 
     const step = this.timing === "scaled" ? FIXED_STEP * this.speed : FIXED_STEP;
     this.acc += raw * this.speed;
@@ -295,6 +312,31 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     this.renderer.render(this.world, this.timing === "scaled" ? raw * this.speed : raw);
     this.raf = requestAnimationFrame(this.frame);
   };
+
+  /** Give up a little backing-store resolution when frames stay slow. */
+  private adaptQuality() {
+    if (!this.adaptiveQuality || this.reducedMotion.matches || this.paused) return;
+
+    if (this.frameMs > 20) {
+      this.slowFrames++;
+      this.fastFrames = 0;
+    } else if (this.frameMs < 17.5) {
+      this.fastFrames++;
+      this.slowFrames = 0;
+    } else {
+      return;
+    }
+
+    if (this.slowFrames >= 30 && this.qualityScale > 0.5) {
+      this.qualityScale = Math.max(0.5, this.qualityScale - 0.25);
+      this.slowFrames = 0;
+      this.resize();
+    } else if (this.fastFrames >= 180 && this.qualityScale < 1) {
+      this.qualityScale = Math.min(1, this.qualityScale + 0.25);
+      this.fastFrames = 0;
+      this.resize();
+    }
+  }
 
   /** Reduced motion: let the scene settle, then show a single frame. */
   private drawStill() {

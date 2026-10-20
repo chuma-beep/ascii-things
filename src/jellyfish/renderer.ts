@@ -1,11 +1,11 @@
 import { rgba } from "../core/color";
 import { CellGrid, paintGrid } from "../core/grid";
 import { clamp, hash3, TAU } from "../math";
-import { resolvePalette, type Palette, type PaletteName, type RGB } from "../palette";
+import { resolvePalette, type Palette, type PaletteChoice, type RGB } from "../palette";
 import { KIND_CONFIG, type Jellyfish, type JellyfishKind, type JellyfishWorld } from "./world";
 
 export interface JellyfishRendererOptions {
-  palette?: PaletteName | Palette;
+  palette?: PaletteChoice;
   columns?: number;
   maxCells?: number;
   calm?: boolean;

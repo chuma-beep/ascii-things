@@ -1,3 +1,4 @@
+import type { SceneAction } from "./core/scene";
 import { SceneRuntime } from "./core/runtime";
 import type { AsciiSharksOptions } from "./options";
 import { AsciiRenderer, type RendererOptions } from "./renderer";
@@ -49,6 +50,7 @@ export class OceanEngine {
       speed: opts.speed,
       interactive: opts.interactive,
       maxDpr: opts.maxDpr,
+      adaptiveQuality: opts.adaptiveQuality,
       label: opts.label,
       paused: opts.paused,
       fontFamily: opts.fontFamily,
@@ -67,6 +69,19 @@ export class OceanEngine {
     this.runtime.resume();
   }
 
+  /** Splash the water from a UI control, in canvas-local pixels. */
+  splash(x: number, y: number) {
+    if (this.runtime.prefersReducedMotion) return;
+    this.world.splash(x, y);
+    this.runtime.flushEvents();
+    this.runtime.renderIfIdle();
+  }
+
+  /** Trigger the scene's signature action. */
+  trigger(action: SceneAction, x: number, y: number) {
+    if (action === "splash") this.splash(x, y);
+  }
+
   /** Live-update palette, speed, density, roster, quality, and label. */
   setOptions(partial: AsciiSharksOptions) {
     this.options = { ...this.options, ...partial };
@@ -74,6 +89,8 @@ export class OceanEngine {
     if (partial.speed !== undefined) this.runtime.setSpeed(partial.speed);
     if (partial.interactive !== undefined) this.runtime.setInteractive(partial.interactive);
     if (partial.maxDpr !== undefined) this.runtime.setMaxDpr(partial.maxDpr);
+    if (partial.adaptiveQuality !== undefined)
+      this.runtime.setAdaptiveQuality(partial.adaptiveQuality);
     if (partial.label !== undefined) this.runtime.setLabel(partial.label);
     if (partial.paused !== undefined) this.runtime.setPaused(partial.paused);
     if (partial.fontFamily !== undefined) this.runtime.setFontFamily(partial.fontFamily);
