@@ -6,7 +6,7 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
   // Cloudflare Pages serves the static build from site/dist.
   // Swap `site` if the docs move to a custom domain.
-  site: "https://ascii-things.pages.dev",
+  site: "https://ascii-things-docs.pages.dev",
   output: "static",
   vite: {
     resolve: {
