@@ -291,6 +291,7 @@ export class AsciiDogElement extends AsciiSceneElement {
     "calm",
     "interactive",
     "dogs",
+    "spread",
     "label",
   ];
 
@@ -312,11 +313,19 @@ export class AsciiDogElement extends AsciiSceneElement {
           })
       : undefined;
 
+    const spreadAttr = this.getAttribute("spread");
+    const spreadValues = spreadAttr?.split(",").map((part) => Number(part.trim()));
+    const spread =
+      spreadValues?.length === 2 && spreadValues.every((value) => Number.isFinite(value))
+        ? ([spreadValues[0], spreadValues[1]] as [number, number])
+        : undefined;
+
     return {
       dogs,
       count: this.num("count"),
       seed: this.num("seed"),
       scale: this.num("scale"),
+      spread,
       speed: this.num("speed"),
       columns: this.num("columns"),
       maxCells: this.num("max-cells"),

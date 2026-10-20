@@ -72,6 +72,8 @@ export interface DogWorldOptions {
   count?: number;
   seed?: number;
   scale?: number;
+  /** Normalized band (0–1 of width) where the pack starts. */
+  spread?: [number, number];
 }
 
 const LOW_BATTERY = 18;
@@ -147,7 +149,8 @@ export class DogWorld {
       options.seed !== undefined ||
       options.count !== undefined ||
       options.dogs !== undefined ||
-      options.scale !== undefined
+      options.scale !== undefined ||
+      options.spread !== undefined
     ) {
       this.reset();
     }
@@ -222,7 +225,8 @@ export class DogWorld {
   private makeDog(spec: DogSpec, index: number, total = 1): Dog {
     const sizeScale = clamp(spec.size ?? 1, 0.55, 1.8);
     const length = this.dogLength(sizeScale);
-    const spacing = total <= 1 ? 0.5 : 0.28 + (index / (total - 1)) * 0.44;
+    const [lo, hi] = this.options.spread ?? [0.28, 0.72];
+    const spacing = total <= 1 ? (lo + hi) / 2 : lo + (index / (total - 1)) * (hi - lo);
     const x = clamp(
       this.width * spacing + this.rng.range(-18, 18),
       this.edge(),

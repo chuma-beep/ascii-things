@@ -24,6 +24,8 @@ export interface AsciiDogOptions {
   palette?: PaletteName | Palette;
   /** Dog size multiplier. Default 1. */
   scale?: number;
+  /** Normalized start band across the width, e.g. [0.68, 0.68]. */
+  spread?: [number, number];
   /** If set, the canvas becomes role="img" with this label. */
   label?: string;
   /** Called when the ball is thrown, nudged, the dog sits, or charges. */

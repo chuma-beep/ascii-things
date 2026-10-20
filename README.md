@@ -281,7 +281,15 @@ Jellyfish attributes: `palette`, `seed`, `count`, `speed`, `columns`,
 `max-cells`, `max-dpr`, `calm`, `interactive`, `jellies`, `scale`, `label`.
 
 Dog attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
-`max-dpr`, `calm`, `interactive`, `dogs`, `scale`, `label`.
+`max-dpr`, `calm`, `interactive`, `dogs`, `spread`, `scale`, `label`.
+
+## Examples
+
+- **Landing page** ([index.html](index.html)) — the library site with a live dog
+  hero, scene gallery, install snippets, and design notes.
+- [Playground](examples/playground/) — the query-string demo for every scene.
+- [Dog + input](examples/dog-input/) — a focused landing-page hero with the
+  robot dog behind a real prompt. Type a command and the dog fetches the ball.
 
 ## Shark options
 
@@ -352,6 +360,7 @@ Dog attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
 | `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
 | `calm` | `boolean` | `false` | Disables sparks, beacons, and tail flicker |
 | `scale` | `number` | `1` | Dog size multiplier |
+| `spread` | `[number, number]` | `[0.28, 0.72]` | Normalized start band; one dog uses its midpoint |
 | `label` | `string` | — | Adds `role="img"` + `aria-label` |
 | `onEvent` | `(e) => void` | — | `{ kind: "ball" \| "nudge" \| "charge" \| "low" \| "sit", x, y, id }` |
 
@@ -377,20 +386,22 @@ npm test
 npm run build      # ESM + d.ts in dist/
 ```
 
-The demo reads its options from the query string, so you can test without
-editing code:
+The root URL is the landing page. The query-string playground lives at
+`/examples/playground/` and reads its options from the URL, so you can test
+without editing code:
 
 ```text
-http://localhost:5173/?palette=paper
-http://localhost:5173/?palette=neon&seed=7&density=0.6
-http://localhost:5173/?sharks=thresher,hammerhead,mako,nurse&sharkScale=1.2
-http://localhost:5173/?scene=robots&palette=paper&seed=7&count=8
-http://localhost:5173/?scene=robots&palette=neon&robots=scout:1,hauler:1.2,sentinel:1
-http://localhost:5173/?scene=jellyfish&palette=abyss&seed=3
-http://localhost:5173/?scene=jellyfish&palette=neon&jellies=moon:1.15,atolla:1.05,box:0.9
-http://localhost:5173/?scene=dog&palette=paper&seed=7&count=2
-http://localhost:5173/?scene=dog&palette=neon&dogs=1,1.15&scale=1.1
-http://localhost:5173/?calm=1&interactive=0
+http://localhost:5173/
+http://localhost:5173/examples/playground/?palette=paper
+http://localhost:5173/examples/playground/?palette=neon&seed=7&density=0.6
+http://localhost:5173/examples/playground/?sharks=thresher,hammerhead,mako,nurse&sharkScale=1.2
+http://localhost:5173/examples/playground/?scene=robots&palette=paper&seed=7&count=8
+http://localhost:5173/examples/playground/?scene=robots&palette=neon&robots=scout:1,hauler:1.2,sentinel:1
+http://localhost:5173/examples/playground/?scene=jellyfish&palette=abyss&seed=3
+http://localhost:5173/examples/playground/?scene=jellyfish&palette=neon&jellies=moon:1.15,atolla:1.05,box:0.9
+http://localhost:5173/examples/playground/?scene=dog&palette=paper&seed=7&count=2
+http://localhost:5173/examples/playground/?scene=dog&palette=neon&dogs=1,1.15&scale=1.1
+http://localhost:5173/examples/playground/?calm=1&interactive=0
 ```
 
 The scene is exposed as `window.asciiScene` in the demo:

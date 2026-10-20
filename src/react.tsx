@@ -214,6 +214,7 @@ export function AsciiDog({
     count: options.count,
     seed: options.seed,
     scale: options.scale,
+    spread: options.spread,
   });
 
   useEffect(() => {

@@ -1,20 +1,314 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Living ASCII scenes for the web: a shark tank, a robot factory floor, and a jellyfish bloom." />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ascii-things — living ASCII scenes for the web</title>
+    <meta
+      name="description"
+      content="Living ASCII scenes you can drop behind any UI: a shark tank, a robot floor, a jellyfish bloom, and a robot dog. Zero dependencies. One canvas. MIT."
+    />
+    <meta name="theme-color" content="#070809" />
     <link rel="icon" href="data:," />
-    <title>ascii-things — living ASCII scenes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@600&display=swap" rel="stylesheet" />
-    <style>
-      html, body { margin: 0; height: 100%; background: #000; }
-      canvas { display: block; width: 100vw; height: 100vh; font-family: "Geist Mono", ui-monospace, Menlo, monospace; }
-    </style>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/landing.css" />
+    <script type="module" src="/landing.ts"></script>
   </head>
   <body>
-    <canvas aria-hidden="true"></canvas>
-    <script type="module" src="/demo.ts"></script>
+    <header class="site-header">
+      <a class="brand" href="#top">ascii-things<span>®</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#scenes">Scenes</a>
+        <a href="#install">Install</a>
+        <a href="/examples/playground/">Playground ↗</a>
+      </nav>
+      <div class="header-end">
+        <span class="version">v0.4.0</span>
+        <a class="github" href="https://github.com/chuma-beep/ascii-things">GitHub ↗</a>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-art">
+          <canvas id="hero-canvas" aria-hidden="true"></canvas>
+        </div>
+        <div class="hero-shade"></div>
+
+        <div class="hero-copy">
+          <p class="eyebrow"><i class="live-dot"></i> LIVING ASCII SCENES · v0.4.0</p>
+          <h1 id="hero-title">Your interface,<br /><em>but alive.</em></h1>
+          <p class="hero-lede">
+            Drop a shark tank, a robot floor, a jellyfish bloom, or one very good robot
+            dog behind your UI. Zero dependencies. One canvas.
+          </p>
+
+          <div class="install-pill">
+            <span class="prompt-caret">$</span>
+            <code id="install-command">npm i ascii-things</code>
+            <button class="copy" type="button" data-copy="npm i ascii-things">copy</button>
+          </div>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="#scenes">Explore the scenes</a>
+            <a class="button button-ghost" href="https://github.com/chuma-beep/ascii-things"
+              >Read the source ↗</a
+            >
+          </div>
+
+          <div class="try-scene">
+            <p class="try-label">TRY THE SCENE <span>· click, type, or throw</span></p>
+            <form id="prompt" class="prompt">
+              <label class="sr-only" for="command">Tell the dog what to fetch</label>
+              <span class="prompt-caret">›</span>
+              <input
+                id="command"
+                name="command"
+                type="text"
+                autocomplete="off"
+                maxlength="72"
+                placeholder="Tell the dog what to fetch…"
+                required
+              />
+              <button type="submit">THROW ↵</button>
+            </form>
+            <div class="prompt-meta" aria-live="polite">
+              <span id="echo">yard@04 · awaiting command</span>
+              <span id="reply">UNIT 01 · IDLE · BALL READY</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="hero-status" aria-hidden="true">
+          <div><span>CELLS</span><strong id="stat-cells">8,640</strong></div>
+          <div><span>UNITS</span><strong id="stat-dogs">01</strong></div>
+          <div><span>STATE</span><strong id="stat-state">SNIFF</strong></div>
+          <div><span>FPS</span><strong id="stat-fps">60</strong></div>
+        </aside>
+
+        <a class="scroll-cue" href="#scenes">SCROLL ↓</a>
+      </section>
+
+      <section id="scenes" class="section scenes" aria-labelledby="scenes-title">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="eyebrow">01 / HABITATS</p>
+            <h2 id="scenes-title">Four scenes.<br />One tiny runtime.</h2>
+            <p class="section-lede">
+              Each one is a small ecosystem, not a looped animation. Seeded, themeable,
+              and capped so it stays fast on a real page.
+            </p>
+          </div>
+
+          <div class="scene-grid">
+            <article class="scene-card">
+              <div class="scene-preview">
+                <canvas data-scene="sharks" aria-hidden="true"></canvas>
+                <span class="scene-index">01</span>
+              </div>
+              <div class="scene-body">
+                <div class="scene-title-row">
+                  <h3>Shark tank</h3>
+                  <a href="/examples/playground/?scene=sharks" aria-label="Open shark tank"
+                    >OPEN ↗</a
+                  >
+                </div>
+                <p>Schools, hunts, panic, and settles. Eight sharks, five fish species.</p>
+                <span class="scene-meta">BOIDS · PURSUIT · WAKE</span>
+              </div>
+            </article>
+
+            <article class="scene-card">
+              <div class="scene-preview">
+                <canvas data-scene="robots" aria-hidden="true"></canvas>
+                <span class="scene-index">02</span>
+              </div>
+              <div class="scene-body">
+                <div class="scene-title-row">
+                  <h3>Robot floor</h3>
+                  <a href="/examples/playground/?scene=robots" aria-label="Open robot floor"
+                    >OPEN ↗</a
+                  >
+                </div>
+                <p>A working factory floor. Patrols, jobs, charging bays, low batteries.</p>
+                <span class="scene-meta">STATES · DOCKS · DISPATCH</span>
+              </div>
+            </article>
+
+            <article class="scene-card">
+              <div class="scene-preview">
+                <canvas data-scene="jellyfish" aria-hidden="true"></canvas>
+                <span class="scene-index">03</span>
+              </div>
+              <div class="scene-body">
+                <div class="scene-title-row">
+                  <h3>Jellyfish bloom</h3>
+                  <a href="/examples/playground/?scene=jellyfish" aria-label="Open jellyfish bloom"
+                    >OPEN ↗</a
+                  >
+                </div>
+                <p>Five kinds of bell, drifting on a live current. Click to send a shockwave.</p>
+                <span class="scene-meta">PULSE · CURRENT · GLOW</span>
+              </div>
+            </article>
+
+            <article class="scene-card">
+              <div class="scene-preview">
+                <canvas data-scene="dog" aria-hidden="true"></canvas>
+                <span class="scene-index">04</span>
+              </div>
+              <div class="scene-body">
+                <div class="scene-title-row">
+                  <h3>Robot dog</h3>
+                  <a href="/examples/playground/?scene=dog" aria-label="Open robot dog">OPEN ↗</a>
+                </div>
+                <p>A test yard with a ball, a dock, and a very good quadruped.</p>
+                <span class="scene-meta">GAIT · FETCH · CHARGE</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="install" class="section install" aria-labelledby="install-title">
+        <div class="wrap install-grid">
+          <div class="install-copy">
+            <p class="eyebrow">02 / INTEGRATE</p>
+            <h2 id="install-title">One install.<br />Anywhere you render.</h2>
+            <p class="section-lede">
+              React, plain HTML, Astro, Vue, Svelte, or a static page. Canvas in, life out.
+              The host app keeps its own UI.
+            </p>
+            <ul class="check-list">
+              <li>Zero runtime dependencies</li>
+              <li>ESM, tree-shakeable subpath exports</li>
+              <li>Optional React ≥ 18 peer</li>
+              <li>Works with your design system — or ours</li>
+            </ul>
+          </div>
+
+          <div class="code-card">
+            <div class="code-tabs" role="tablist" aria-label="Integration examples">
+              <button type="button" class="code-tab" role="tab" data-tab="react" aria-selected="true">
+                React
+              </button>
+              <button type="button" class="code-tab" role="tab" data-tab="html" aria-selected="false">
+                HTML
+              </button>
+              <button type="button" class="code-tab" role="tab" data-tab="vanilla" aria-selected="false">
+                Vanilla
+              </button>
+              <button class="code-copy" type="button" data-copy-code>copy</button>
+            </div>
+
+            <pre class="code-panel" data-panel="react"><code><span class="tok-key">import</span> { AsciiDog } <span class="tok-key">from</span> <span class="tok-str">"ascii-things/react"</span>;
+
+<span class="tok-key">export function</span> <span class="tok-fn">Hero</span>() {
+  <span class="tok-key">return</span> (
+    <span class="tok-tag">&lt;AsciiDog</span>
+      <span class="tok-attr">palette</span>=<span class="tok-str">"abyss"</span>
+      <span class="tok-attr">seed</span>={7}
+      <span class="tok-attr">spread</span>={[0.68, 0.68]}
+      <span class="tok-attr">label</span>=<span class="tok-str">"A live ASCII robot dog test yard"</span>
+    <span class="tok-tag">/&gt;</span>
+  );
+}</code></pre>
+
+            <pre class="code-panel" data-panel="html" hidden><code><span class="tok-tag">&lt;script</span> <span class="tok-attr">type</span>=<span class="tok-str">"module"</span>
+  <span class="tok-attr">src</span>=<span class="tok-str">"https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"</span><span class="tok-tag">&gt;&lt;/script&gt;</span>
+
+<span class="tok-tag">&lt;ascii-dog</span>
+  <span class="tok-attr">palette</span>=<span class="tok-str">"abyss"</span>
+  <span class="tok-attr">seed</span>=<span class="tok-str">"7"</span>
+  <span class="tok-attr">spread</span>=<span class="tok-str">"0.68,0.68"</span>
+  <span class="tok-attr">style</span>=<span class="tok-str">"height: 420px"</span>
+<span class="tok-tag">&gt;&lt;/ascii-dog&gt;</span></code></pre>
+
+            <pre class="code-panel" data-panel="vanilla" hidden><code><span class="tok-key">import</span> { createDog } <span class="tok-key">from</span> <span class="tok-str">"ascii-things/dog"</span>;
+
+<span class="tok-key">const</span> scene = <span class="tok-fn">createDog</span>(canvas, {
+  palette: <span class="tok-str">"abyss"</span>,
+  seed: <span class="tok-num">7</span>,
+  count: <span class="tok-num">1</span>,
+  spread: [<span class="tok-num">0.68</span>, <span class="tok-num">0.68</span>],
+  interactive: <span class="tok-num">true</span>,
+});
+
+scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="tok-num">0.55</span>, canvas.clientHeight * <span class="tok-num">0.5</span>);</code></pre>
+
+            <p class="code-note">Same API in every scene. Swap the import and the options.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section features" aria-labelledby="features-title">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="eyebrow">03 / WHY IT FEELS ALIVE</p>
+            <h2 id="features-title">Small simulations.<br />Serious defaults.</h2>
+          </div>
+          <div class="feature-grid">
+            <article class="feature">
+              <span class="feature-num">01</span>
+              <h3>Zero dependencies</h3>
+              <p>One canvas, no WebGL, no image pipeline. The whole runtime is yours to read.</p>
+            </article>
+            <article class="feature">
+              <span class="feature-num">02</span>
+              <h3>Deterministic</h3>
+              <p>Seed the world and it plays the same way twice. Screenshot it, test it, ship it.</p>
+            </article>
+            <article class="feature">
+              <span class="feature-num">03</span>
+              <h3>Themeable</h3>
+              <p>Abyss, paper, neon, mono, or a palette of your own. The scene follows your ink.</p>
+            </article>
+            <article class="feature">
+              <span class="feature-num">04</span>
+              <h3>Accessible defaults</h3>
+              <p>Reduced motion settles the world. Decorative canvases stay out of the a11y tree.</p>
+            </article>
+            <article class="feature">
+              <span class="feature-num">05</span>
+              <h3>Built for 60fps</h3>
+              <p>Cell caps and adaptive columns keep 4K pages from turning into a particle furnace.</p>
+            </article>
+            <article class="feature">
+              <span class="feature-num">06</span>
+              <h3>MIT, forever</h3>
+              <p>Use it in a portfolio, a product, or a pitch deck. No seat counts, no watermark.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="manifesto" aria-label="Design principle">
+        <div class="wrap">
+          <p class="eyebrow">THE PRINCIPLE</p>
+          <p class="manifesto-line">Not an animation.<br /><em>A habitat.</em></p>
+          <p class="manifesto-sub">
+            Every scene runs on its own small rules. No two loads are quite the same.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-top">
+        <a class="brand" href="#top">ascii-things<span>®</span></a>
+        <p>Living ASCII for the web. Built from the original ascii-sharks.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://www.npmjs.com/package/ascii-things">npm ↗</a>
+        <a href="https://github.com/chuma-beep/ascii-things">GitHub ↗</a>
+        <a href="/examples/playground/">Playground ↗</a>
+        <a href="https://github.com/chuma-beep/ascii-things/blob/main/LICENSE">MIT</a>
+      </div>
+    </footer>
   </body>
 </html>

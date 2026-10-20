@@ -53,6 +53,7 @@ export class DogEngine {
       count: options.count,
       seed: options.seed,
       scale: options.scale,
+      spread: options.spread,
     });
     this.renderer = new DogRenderer(canvas, {
       palette: options.palette,
@@ -97,6 +98,14 @@ export class DogEngine {
     this.schedule();
   }
 
+  /** Throw the ball from a UI control, in canvas-local pixels. */
+  throwBall(x: number, y: number) {
+    if (this.reducedMotion.matches) return;
+    this.world.throwBall(x, y);
+    this.flushEvents();
+    if (!this.raf) this.renderer.render(this.world, STEP);
+  }
+
   /** Live-update palette, speed, dogs, quality, and label. */
   setOptions(partial: AsciiDogOptions) {
     const wasInteractive = this.interactive;
@@ -123,13 +132,15 @@ export class DogEngine {
       partial.dogs !== undefined ||
       partial.count !== undefined ||
       partial.seed !== undefined ||
-      partial.scale !== undefined;
+      partial.scale !== undefined ||
+      partial.spread !== undefined;
     if (structural) {
       this.world.setOptions({
         dogs: partial.dogs,
         count: partial.count,
         seed: partial.seed,
         scale: partial.scale,
+        spread: partial.spread,
       });
     }
 

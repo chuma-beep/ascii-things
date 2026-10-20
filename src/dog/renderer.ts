@@ -196,7 +196,6 @@ export class DogRenderer {
     for (const dog of [...world.dogs].sort((a, b) => a.length - b.length)) {
       this.drawDog(dog, world.time);
     }
-    this.drawOverlay(world);
     if (world.dock.owner != null) this.drawCable(world);
     this.drawSparks(world);
   }
@@ -543,21 +542,6 @@ export class DogRenderer {
       const d = ((cx - dog.x) / rx) ** 2 + ((cy - dog.y) / ry) ** 2;
       if (d <= 1) ctx.fillRect(cx - this.cw / 2, cy - this.ch / 2, this.cw, this.ch);
     });
-  }
-
-  private drawOverlay(world: DogWorld) {
-    const { ctx, ch, cw } = this;
-    const dog = world.dogs[0];
-    if (!dog) return;
-    ctx.font = `600 ${Math.round(ch * 0.48)}px ${this.fontFamily}`;
-    ctx.textAlign = "left";
-    ctx.fillStyle = rgba(this.palette.edge, 0.4);
-    ctx.fillText(
-      `UNIT ${String(dog.id).padStart(2, "0")}  ·  ${dog.state.toUpperCase()}  ·  ${Math.round(dog.battery)}%`,
-      cw * 1.5,
-      ch * 5.1,
-    );
-    ctx.textAlign = "center";
   }
 
   private drawSparks(world: DogWorld) {
