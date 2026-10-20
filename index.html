@@ -193,20 +193,52 @@
           </div>
 
           <div class="code-card">
-            <div class="code-tabs" role="tablist" aria-label="Integration examples">
-              <button type="button" class="code-tab" role="tab" data-tab="react" aria-selected="true">
-                React
-              </button>
-              <button type="button" class="code-tab" role="tab" data-tab="html" aria-selected="false">
-                HTML
-              </button>
-              <button type="button" class="code-tab" role="tab" data-tab="vanilla" aria-selected="false">
-                Vanilla
-              </button>
+            <div class="code-tabs">
+              <div class="code-tablist" role="tablist" aria-label="Integration examples">
+                <button
+                  type="button"
+                  class="code-tab"
+                  role="tab"
+                  id="tab-react"
+                  aria-controls="panel-react"
+                  data-tab="react"
+                  aria-selected="true"
+                >
+                  React
+                </button>
+                <button
+                  type="button"
+                  class="code-tab"
+                  role="tab"
+                  id="tab-html"
+                  aria-controls="panel-html"
+                  data-tab="html"
+                  aria-selected="false"
+                >
+                  HTML
+                </button>
+                <button
+                  type="button"
+                  class="code-tab"
+                  role="tab"
+                  id="tab-vanilla"
+                  aria-controls="panel-vanilla"
+                  data-tab="vanilla"
+                  aria-selected="false"
+                >
+                  Vanilla
+                </button>
+              </div>
               <button class="code-copy" type="button" data-copy-code>copy</button>
             </div>
 
-            <pre class="code-panel" data-panel="react"><code><span class="tok-key">import</span> { AsciiDog } <span class="tok-key">from</span> <span class="tok-str">"ascii-things/react"</span>;
+            <pre
+              class="code-panel"
+              id="panel-react"
+              role="tabpanel"
+              aria-labelledby="tab-react"
+              data-panel="react"
+            ><code><span class="tok-key">import</span> { AsciiDog } <span class="tok-key">from</span> <span class="tok-str">"ascii-things/react"</span>;
 
 <span class="tok-key">export function</span> <span class="tok-fn">Hero</span>() {
   <span class="tok-key">return</span> (
@@ -219,7 +251,14 @@
   );
 }</code></pre>
 
-            <pre class="code-panel" data-panel="html" hidden><code><span class="tok-tag">&lt;script</span> <span class="tok-attr">type</span>=<span class="tok-str">"module"</span>
+            <pre
+              class="code-panel"
+              id="panel-html"
+              role="tabpanel"
+              aria-labelledby="tab-html"
+              data-panel="html"
+              hidden
+            ><code><span class="tok-tag">&lt;script</span> <span class="tok-attr">type</span>=<span class="tok-str">"module"</span>
   <span class="tok-attr">src</span>=<span class="tok-str">"https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"</span><span class="tok-tag">&gt;&lt;/script&gt;</span>
 
 <span class="tok-tag">&lt;ascii-dog</span>
@@ -229,7 +268,14 @@
   <span class="tok-attr">style</span>=<span class="tok-str">"height: 420px"</span>
 <span class="tok-tag">&gt;&lt;/ascii-dog&gt;</span></code></pre>
 
-            <pre class="code-panel" data-panel="vanilla" hidden><code><span class="tok-key">import</span> { createDog } <span class="tok-key">from</span> <span class="tok-str">"ascii-things/dog"</span>;
+            <pre
+              class="code-panel"
+              id="panel-vanilla"
+              role="tabpanel"
+              aria-labelledby="tab-vanilla"
+              data-panel="vanilla"
+              hidden
+            ><code><span class="tok-key">import</span> { createDog } <span class="tok-key">from</span> <span class="tok-str">"ascii-things/dog"</span>;
 
 <span class="tok-key">const</span> scene = <span class="tok-fn">createDog</span>(canvas, {
   palette: <span class="tok-str">"abyss"</span>,

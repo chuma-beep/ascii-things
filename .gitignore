@@ -4,3 +4,6 @@ coverage
 .DS_Store
 .astro
 .wrangler
+playwright-report
+test-results
+blob-report

@@ -685,6 +685,11 @@ button {
   border-bottom: 1px solid var(--line);
 }
 
+.code-tablist {
+  display: flex;
+  align-items: center;
+}
+
 .code-tab {
   padding: 13px 18px;
   border: 0;

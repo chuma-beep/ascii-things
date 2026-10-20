@@ -241,34 +241,59 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
           </div>
 
           <div class="code-card">
-            <div class="code-tabs" role="tablist" aria-label="Integration examples">
-              <button
-                type="button"
-                class="code-tab"
-                role="tab"
-                data-tab="react"
-                aria-selected="true">React</button
-              >
-              <button
-                type="button"
-                class="code-tab"
-                role="tab"
-                data-tab="html"
-                aria-selected="false">HTML</button
-              >
-              <button
-                type="button"
-                class="code-tab"
-                role="tab"
-                data-tab="vanilla"
-                aria-selected="false">Vanilla</button
-              >
+            <div class="code-tabs">
+              <div class="code-tablist" role="tablist" aria-label="Integration examples">
+                <button
+                  type="button"
+                  class="code-tab"
+                  role="tab"
+                  id="tab-react"
+                  aria-controls="panel-react"
+                  data-tab="react"
+                  aria-selected="true">React</button
+                >
+                <button
+                  type="button"
+                  class="code-tab"
+                  role="tab"
+                  id="tab-html"
+                  aria-controls="panel-html"
+                  data-tab="html"
+                  aria-selected="false">HTML</button
+                >
+                <button
+                  type="button"
+                  class="code-tab"
+                  role="tab"
+                  id="tab-vanilla"
+                  aria-controls="panel-vanilla"
+                  data-tab="vanilla"
+                  aria-selected="false">Vanilla</button
+                >
+              </div>
               <button class="code-copy" type="button" data-copy-code>copy</button>
             </div>
 
-            <pre class="code-panel" data-panel="react"><code set:html={reactSnippet} /></pre>
-            <pre class="code-panel" data-panel="html" hidden><code set:html={htmlSnippet} /></pre>
-            <pre class="code-panel" data-panel="vanilla" hidden><code set:html={vanillaSnippet} /></pre>
+            <pre
+              class="code-panel"
+              id="panel-react"
+              role="tabpanel"
+              aria-labelledby="tab-react"
+              data-panel="react"><code set:html={reactSnippet} /></pre>
+            <pre
+              class="code-panel"
+              id="panel-html"
+              role="tabpanel"
+              aria-labelledby="tab-html"
+              data-panel="html"
+              hidden><code set:html={htmlSnippet} /></pre>
+            <pre
+              class="code-panel"
+              id="panel-vanilla"
+              role="tabpanel"
+              aria-labelledby="tab-vanilla"
+              data-panel="vanilla"
+              hidden><code set:html={vanillaSnippet} /></pre>
             <p class="code-note">Same API in every scene. Swap the import and the options.</p>
           </div>
         </div>
