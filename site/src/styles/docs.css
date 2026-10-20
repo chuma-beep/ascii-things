@@ -306,3 +306,9 @@ h4 {
     flex: 1;
   }
 }
+
+/* Notices are flat surface cards; remove Starlight's left accent rail. */
+.sl-markdown-content .starlight-aside {
+  border-inline-start: 0;
+  border-left: 0;
+}
