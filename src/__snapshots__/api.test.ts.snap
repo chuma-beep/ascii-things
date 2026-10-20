@@ -1,0 +1,76 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`public API surface > matches the frozen export names 1`] = `
+{
+  "dog": [
+    "DogEngine",
+    "DogRenderer",
+    "DogWorld",
+    "createDog",
+  ],
+  "element": [
+    "AsciiDogElement",
+    "AsciiJellyfishElement",
+    "AsciiRobotsElement",
+    "AsciiSharksElement",
+  ],
+  "index": [
+    "AsciiRenderer",
+    "DogEngine",
+    "DogRenderer",
+    "DogWorld",
+    "JellyfishEngine",
+    "JellyfishRenderer",
+    "JellyfishWorld",
+    "OceanEngine",
+    "PALETTES",
+    "RobotEngine",
+    "RobotRenderer",
+    "RobotWorld",
+    "World",
+    "createDog",
+    "createJellyfish",
+    "createRng",
+    "createRobots",
+    "createSharks",
+    "paintGrid",
+    "resolvePalette",
+  ],
+  "jellyfish": [
+    "JellyfishEngine",
+    "JellyfishRenderer",
+    "JellyfishWorld",
+    "createJellyfish",
+  ],
+  "react": [
+    "AsciiDog",
+    "AsciiJellyfish",
+    "AsciiOcean",
+    "AsciiRobots",
+    "AsciiSharks",
+  ],
+  "robots": [
+    "RobotEngine",
+    "RobotRenderer",
+    "RobotWorld",
+    "createRobots",
+  ],
+  "sharks": [
+    "AsciiRenderer",
+    "OceanEngine",
+    "PALETTES",
+    "World",
+    "createRng",
+    "createSharks",
+    "paintGrid",
+    "resolvePalette",
+  ],
+  "ui": [
+    "AsciiDogHero",
+    "AsciiPrompt",
+    "AsciiReadout",
+    "AsciiSceneTabs",
+    "AsciiStage",
+  ],
+}
+`;

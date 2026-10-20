@@ -489,6 +489,13 @@ otherwise, at scene creation.
 `onReady` and the custom element's `ascii-ready` event. Coordinates are
 canvas-local pixels. Actions are ignored under reduced motion.
 
+## 1.0 migration
+
+1.0 freezes the documented scene, React, custom-element, and UI APIs. The
+[0.5 → 1.0 migration guide](MIGRATION.md) covers the compatibility promise,
+shared handle, actions, palettes, SSR behavior, and the public export table.
+It ships inside the package.
+
 ## Accessibility
 
 The canvas is decorative (`aria-hidden="true"`) unless you pass `label`. Under
