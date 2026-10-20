@@ -4,7 +4,14 @@
 .ascii-prompt,
 .ascii-readout,
 .ascii-tabs,
-.ascii-dog-hero {
+.ascii-dog-hero,
+.ascii-scene-hero,
+.ascii-button,
+.ascii-toolbar,
+.ascii-toggle,
+.ascii-panel,
+.ascii-status,
+.ascii-divider {
   --ascii-font: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --ascii-bg: #070809;
   --ascii-panel: #0b0d0f;
@@ -15,7 +22,7 @@
   --ascii-line-soft: rgba(236, 232, 223, 0.08);
   --ascii-accent: #ff7a1a;
   --ascii-accent-soft: rgba(255, 122, 26, 0.14);
-  --ascii-radius: 2px;
+  --ascii-radius: 0;
   box-sizing: border-box;
   color: var(--ascii-ink);
   font-family: var(--ascii-font);
@@ -25,7 +32,14 @@
 .ascii-prompt *,
 .ascii-readout *,
 .ascii-tabs *,
-.ascii-dog-hero * {
+.ascii-dog-hero *,
+.ascii-scene-hero *,
+.ascii-button *,
+.ascii-toolbar *,
+.ascii-toggle *,
+.ascii-panel *,
+.ascii-status *,
+.ascii-divider * {
   box-sizing: border-box;
 }
 
@@ -480,5 +494,395 @@
   .ascii-prompt-action,
   .ascii-tab {
     transition-duration: 0.01ms;
+  }
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.ascii-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--ascii-line);
+  border-radius: var(--ascii-radius);
+  background: transparent;
+  color: var(--ascii-ink);
+  font: inherit;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.ascii-button:hover {
+  border-color: var(--ascii-ink);
+}
+
+.ascii-button-solid {
+  border-color: var(--ascii-accent);
+  background: var(--ascii-accent);
+  color: #090a0b;
+}
+
+.ascii-button-solid:hover {
+  border-color: #ff9147;
+  background: #ff9147;
+}
+
+.ascii-button-quiet {
+  padding: 0 8px;
+  border-color: transparent;
+  color: var(--ascii-muted);
+}
+
+.ascii-button-quiet:hover {
+  border-color: transparent;
+  color: var(--ascii-ink);
+}
+
+.ascii-button-sm {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 8px;
+}
+
+.ascii-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* ---------------------------------------------------------------- toolbar */
+
+.ascii-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ----------------------------------------------------------------- toggle */
+
+.ascii-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ascii-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ascii-toggle-track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 18px;
+  border: 1px solid var(--ascii-line);
+  border-radius: 999px;
+  background: var(--ascii-panel);
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.ascii-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ascii-faint);
+  transition:
+    left 160ms ease,
+    background 160ms ease;
+}
+
+.ascii-toggle[aria-checked="true"] .ascii-toggle-track {
+  border-color: var(--ascii-accent);
+  background: var(--ascii-accent-soft);
+}
+
+.ascii-toggle[aria-checked="true"] .ascii-toggle-thumb {
+  left: 18px;
+  background: var(--ascii-accent);
+}
+
+.ascii-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.ascii-toggle-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.ascii-toggle-label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.ascii-toggle-hint {
+  color: var(--ascii-faint);
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+/* ------------------------------------------------------------------ panel */
+
+.ascii-panel {
+  overflow: hidden;
+  border: 1px solid var(--ascii-line);
+  border-radius: var(--ascii-radius);
+  background: var(--ascii-panel);
+}
+
+.ascii-panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--ascii-line-soft);
+}
+
+.ascii-panel-heading {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ascii-panel-eyebrow {
+  color: var(--ascii-accent);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.ascii-panel-title {
+  margin: 0;
+  color: var(--ascii-ink);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.ascii-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ascii-panel-body {
+  padding: 18px;
+}
+
+.ascii-panel-body-none {
+  padding: 0;
+}
+
+.ascii-panel-body-sm {
+  padding: 12px;
+}
+
+.ascii-panel-body-lg {
+  padding: 24px;
+}
+
+.ascii-panel-footer {
+  padding: 12px 18px;
+  border-top: 1px solid var(--ascii-line-soft);
+  color: var(--ascii-muted);
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+/* ----------------------------------------------------------------- status */
+
+.ascii-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ascii-faint);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.ascii-status-dot {
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ascii-status-label {
+  color: var(--ascii-muted);
+}
+
+.ascii-status-value {
+  color: var(--ascii-ink);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.ascii-status-accent {
+  color: var(--ascii-accent);
+}
+
+.ascii-status-success {
+  color: #8fd694;
+}
+
+.ascii-status-warning {
+  color: #e6c35c;
+}
+
+.ascii-status-pulse .ascii-status-dot {
+  animation: ascii-status-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes ascii-status-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px var(--ascii-accent-soft);
+  }
+  50% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+
+/* ---------------------------------------------------------------- divider */
+
+.ascii-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ascii-faint);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.ascii-divider::before,
+.ascii-divider::after {
+  flex: 1;
+  height: 1px;
+  background: var(--ascii-line);
+  content: "";
+}
+
+.ascii-divider-label {
+  flex: 0 0 auto;
+}
+
+.ascii-divider-vertical {
+  flex-direction: column;
+  align-self: stretch;
+  width: 1px;
+  min-height: 24px;
+  gap: 0;
+  background: var(--ascii-line);
+}
+
+.ascii-divider-vertical::before,
+.ascii-divider-vertical::after {
+  display: none;
+}
+
+/* -------------------------------------------------------------- scene hero */
+
+.ascii-scene-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(30px, 5vw, 72px);
+  align-items: center;
+  width: 100%;
+  padding: clamp(28px, 5vw, 64px);
+  overflow: hidden;
+  border: 1px solid var(--ascii-line);
+  border-radius: var(--ascii-radius);
+  background:
+    radial-gradient(circle at 82% 24%, var(--ascii-accent-soft), transparent 36%),
+    var(--ascii-bg);
+}
+
+.ascii-scene-hero-copy {
+  min-width: 0;
+}
+
+.ascii-scene-hero-title {
+  margin: 0 0 22px;
+  color: var(--ascii-ink);
+  font-size: clamp(2.5rem, 5.2vw, 5.4rem);
+  font-weight: 500;
+  letter-spacing: -0.07em;
+  line-height: 0.9;
+}
+
+.ascii-scene-hero-title em {
+  color: var(--ascii-accent);
+  font-style: normal;
+}
+
+.ascii-scene-hero-lede {
+  max-width: 42ch;
+  margin: 0 0 28px;
+  color: var(--ascii-muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.ascii-scene-hero-stage {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .ascii-scene-hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .ascii-scene-hero-title {
+    font-size: clamp(2.4rem, 10vw, 4.6rem);
+  }
+}
+
+@media (max-width: 560px) {
+  .ascii-scene-hero {
+    gap: 26px;
+    padding: 22px;
+  }
+
+  .ascii-scene-hero-title {
+    font-size: clamp(2.2rem, 13vw, 3.6rem);
+  }
+
+  .ascii-scene-hero-lede {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ascii-status-pulse .ascii-status-dot {
+    animation: none;
   }
 }

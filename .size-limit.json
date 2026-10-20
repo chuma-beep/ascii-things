@@ -44,7 +44,7 @@
   {
     "name": "ui",
     "path": "dist/ui.js",
-    "limit": "25 kB",
+    "limit": "35 kB",
     "gzip": true
   }
 ]

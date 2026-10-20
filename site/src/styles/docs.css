@@ -89,13 +89,13 @@ h4 {
 
 .sl-markdown-content :not(pre) > code {
   border: 1px solid var(--sl-color-hairline-light);
-  border-radius: 2px;
+  border-radius: 0;
   padding: 0.1em 0.35em;
   letter-spacing: -0.01em;
 }
 
 .sl-markdown-content pre {
-  border-radius: 2px;
+  border-radius: 0;
 }
 
 .sl-markdown-content table {
@@ -109,7 +109,7 @@ h4 {
 }
 
 .sl-markdown-content .card {
-  border-radius: 2px;
+  border-radius: 0;
 }
 
 /* --------------------------------------------------------------- demos */
@@ -140,7 +140,7 @@ h4 {
   min-height: 42px;
   padding: 0 14px;
   border: 1px solid var(--sl-color-hairline);
-  border-radius: 2px;
+  border-radius: 0;
   background: transparent;
   color: var(--sl-color-gray-3);
   font: inherit;
@@ -273,7 +273,7 @@ h4 {
   width: 82px;
   padding: 5px 8px;
   border: 1px solid var(--sl-color-hairline);
-  border-radius: 2px;
+  border-radius: 0;
   background: transparent;
   color: var(--sl-color-white);
   font: inherit;

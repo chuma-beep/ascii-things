@@ -66,11 +66,22 @@ exports[`public API surface > matches the frozen export names 1`] = `
     "resolvePalette",
   ],
   "ui": [
+    "AsciiButton",
+    "AsciiDivider",
     "AsciiDogHero",
+    "AsciiJellyfishHero",
+    "AsciiPanel",
     "AsciiPrompt",
     "AsciiReadout",
+    "AsciiRobotHero",
+    "AsciiSceneHero",
     "AsciiSceneTabs",
+    "AsciiSharkHero",
     "AsciiStage",
+    "AsciiStatus",
+    "AsciiToggle",
+    "AsciiToolbar",
+    "useAsciiScene",
   ],
 }
 `;

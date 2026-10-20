@@ -8,8 +8,9 @@ import DogHeroIsland from "@components/DogHeroIsland";
 import SceneDemo from "@components/SceneDemo";
 
 The `ascii-things/ui` entry is an optional React layer around the scenes. It is not a design
-system: it is a small set of components for the chrome a scene usually needs — a framed stage,
-a command input, a live readout, and palette tabs.
+system: it is a composable set of primitives for the chrome a scene usually needs — framed
+stages, command inputs, live readouts, scene tabs, panels, toolbars, status readouts, and
+ready-made scene heroes.
 
 It has no runtime dependencies of its own. It expects React 18+.
 
@@ -21,7 +22,8 @@ It has no runtime dependencies of its own. It expects React 18+.
 import "ascii-things/ui.css";
 ```
 
-All five components use the same CSS custom properties. Import the stylesheet from your app
+All components use the same CSS custom properties. Containers are square by default;
+set `--ascii-radius` on a wrapper if your host needs rounding. Import the stylesheet from your app
 shell or root layout, not from every component.
 
 ## Components
@@ -190,6 +192,136 @@ export function Hero() {
 
 It sets `label` to `"A live ASCII robot dog test yard"` unless you pass one.
 
+## Hook and primitives
+
+### useAsciiScene
+
+`useAsciiScene` owns the canvas lifecycle, live option updates, ready handle, and stats
+sampling for any scene. Use it when the built-in heroes are too opinionated.
+
+```tsx
+import { createDog } from "ascii-things/dog";
+import { useAsciiScene } from "ascii-things/ui";
+
+function Scene() {
+  const { canvasRef, scene, stats } = useAsciiScene({
+    create: createDog,
+    options: { palette: "auto", seed: 7 },
+    onReady: (handle) => handle.trigger("throwBall", 240, 180),
+  });
+
+  return <canvas ref={canvasRef} aria-label="A live ASCII dog" />;
+}
+```
+
+The hook returns `canvasRef`, the current `scene` handle, the latest `stats`, and a
+manual `refresh()` function. `remountKey` forces a fresh world when structural options
+change.
+
+### AsciiButton
+
+```tsx
+<AsciiButton variant="solid" size="md">Wake</AsciiButton>
+<AsciiButton variant="ghost">Settle</AsciiButton>
+<AsciiButton variant="quiet" size="sm">Reset</AsciiButton>
+```
+
+Variants: `solid`, `ghost`, `quiet`. Sizes: `sm`, `md`. The component forwards button
+attributes and a ref.
+
+### AsciiToolbar
+
+```tsx
+<AsciiToolbar label="Scene controls">
+  <AsciiButton>Wake</AsciiButton>
+  <AsciiToggle checked={calm} onCheckedChange={setCalm} label="Calm mode" />
+</AsciiToolbar>
+```
+
+A `role="toolbar"` flex row for related controls. Pass `label` for an accessible name.
+
+### AsciiToggle
+
+```tsx
+<AsciiToggle
+  checked={calm}
+  onCheckedChange={setCalm}
+  label="Calm mode"
+  hint="Settles the scene"
+/>
+```
+
+A real `role="switch"` button with `aria-checked`, a label, and optional hint. The
+track and thumb stay circular even though containers are square.
+
+### AsciiPanel
+
+```tsx
+<AsciiPanel
+  eyebrow="Control surface"
+  heading="Calm the yard."
+  actions={<AsciiStatus label="Mode" value="LIVE" tone="success" pulse live />}
+  footer="Square containers. Round indicators. One policy."
+>
+  <AsciiToolbar label="Scene controls">...</AsciiToolbar>
+</AsciiPanel>
+```
+
+`padding` accepts `none`, `sm`, `md`, or `lg`. Header, actions, body, and footer are
+all optional.
+
+### AsciiStatus
+
+```tsx
+<AsciiStatus label="Scene" value="Robot dog" tone="accent" />
+<AsciiStatus label="Motion" value="Running" tone="success" pulse live />
+```
+
+Tones: `neutral`, `accent`, `success`, `warning`. `pulse` animates the dot; `live`
+adds `aria-live="polite"`.
+
+### AsciiDivider
+
+```tsx
+<AsciiDivider />
+<AsciiDivider label="State" />
+<AsciiDivider orientation="vertical" />
+```
+
+Horizontal by default. Vertical dividers work inside toolbars and flex rows.
+
+## Scene heroes
+
+`AsciiSceneHero` is the generic version of the dog hero. It selects the right engine,
+action, copy, readout, and stage for any scene.
+
+```tsx
+import { AsciiSceneHero } from "ascii-things/ui";
+
+<AsciiSceneHero
+  scene="sharks"
+  options={{ palette: "abyss", seed: 11, density: 0.8 }}
+  eyebrow="PRESET / SHARKS"
+  title={<>One hero. <em>Any habitat.</em></>}
+/>
+```
+
+The prompt action maps to `splash` for sharks, `dispatch` for robots, `shockwave` for
+jellyfish, and `throwBall` for the dog. `onCommand` receives the submitted text;
+`onReady` receives the scene handle.
+
+Presets are available when you want the default copy:
+
+```tsx
+import { AsciiSharkHero, AsciiRobotHero, AsciiJellyfishHero } from "ascii-things/ui";
+
+<AsciiSharkHero options={{ palette: "paper", seed: 3 }} />
+<AsciiRobotHero options={{ palette: "neon", count: 6 }} />
+<AsciiJellyfishHero options={{ palette: "abyss", count: 4 }} />
+```
+
+`AsciiDogHero` remains available with its own dog-specific copy and ball interaction.
+
 ## Compose your own layout
 
 The dog hero is only a recipe. Every piece is exported separately.
@@ -270,7 +402,7 @@ The UI layer uses CSS variables, not Tailwind. Set them on `:root` or on a wrapp
   --ascii-line-soft: rgba(236, 232, 223, 0.08);
   --ascii-accent-soft: rgba(255, 122, 26, 0.14);
   --ascii-font: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --ascii-radius: 2px;
+  --ascii-radius: 0;
 }
 ```
 

@@ -1,17 +1,28 @@
 "use client";
 
 import {
+  forwardRef,
   useEffect,
   useId,
   useRef,
   useState,
+  type ButtonHTMLAttributes,
   type CSSProperties,
   type FormEvent,
+  type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
+  type RefObject,
 } from "react";
 import { createDog } from "./dog";
+import { createJellyfish } from "./jellyfish";
+import { createRobots } from "./robots";
+import { createSharks } from "./sharks";
+import type { SceneAction, SceneHandle, SceneOptions, SceneReady, SceneStats } from "./core/scene";
 import type { AsciiDogOptions, DogStats, DogWorldEvent } from "./dog";
+import type { AsciiJellyfishOptions } from "./jellyfish/options";
+import type { AsciiSharksOptions } from "./options";
+import type { AsciiRobotsOptions } from "./robots/options";
 
 export type { AsciiDogOptions, DogStats, DogWorldEvent };
 
@@ -473,4 +484,510 @@ export function AsciiDogHero({
       </AsciiStage>
     </section>
   );
+}
+
+/* ------------------------------------------------------------------------- */
+/* Hooks                                                                      */
+/* ------------------------------------------------------------------------- */
+
+export interface UseAsciiSceneOptions<
+  S extends SceneStats = SceneStats,
+  O extends SceneOptions = SceneOptions,
+> {
+  /** Scene factory, usually one of `createSharks`, `createRobots`, `createJellyfish`, `createDog`. */
+  create: (canvas: HTMLCanvasElement, options: O) => SceneHandle<S>;
+  options: O;
+  /** Change this when a structural scene option changes and the engine must be recreated. */
+  remountKey?: string;
+  onReady?: SceneReady<S>;
+}
+
+export interface UseAsciiSceneResult<S extends SceneStats = SceneStats> {
+  canvasRef: RefObject<HTMLCanvasElement | null>;
+  scene: SceneHandle<S> | null;
+  stats: S | null;
+  refresh: () => void;
+}
+
+/**
+ * Owns a canvas scene for a React component: construction, teardown, live
+ * options, a 500ms stats sample, and the ready handle.
+ */
+export function useAsciiScene<
+  S extends SceneStats = SceneStats,
+  O extends SceneOptions = SceneOptions,
+>({
+  create,
+  options,
+  remountKey = "",
+  onReady,
+}: UseAsciiSceneOptions<S, O>): UseAsciiSceneResult<S> {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const sceneRef = useRef<SceneHandle<S> | null>(null);
+  const optionsRef = useRef(options);
+  const createRef = useRef(create);
+  const onReadyRef = useRef(onReady);
+  const [scene, setScene] = useState<SceneHandle<S> | null>(null);
+  const [stats, setStats] = useState<S | null>(null);
+
+  optionsRef.current = options;
+  createRef.current = create;
+  onReadyRef.current = onReady;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const engine = createRef.current(canvas, optionsRef.current);
+    sceneRef.current = engine;
+    setScene(engine);
+    setStats(engine.getStats());
+    onReadyRef.current?.(engine);
+
+    const timer = window.setInterval(() => setStats(engine.getStats()), 500);
+    return () => {
+      window.clearInterval(timer);
+      engine.destroy();
+      if (sceneRef.current === engine) sceneRef.current = null;
+    };
+  }, [remountKey]);
+
+  useEffect(() => {
+    sceneRef.current?.setOptions(options);
+  }, [options]);
+
+  return {
+    canvasRef,
+    scene,
+    stats,
+    refresh: () => {
+      if (sceneRef.current) setStats(sceneRef.current.getStats());
+    },
+  };
+}
+
+/* ------------------------------------------------------------------------- */
+/* Primitives                                                                 */
+/* ------------------------------------------------------------------------- */
+
+export type AsciiButtonVariant = "solid" | "ghost" | "quiet";
+export type AsciiButtonSize = "sm" | "md";
+
+export interface AsciiButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: AsciiButtonVariant;
+  size?: AsciiButtonSize;
+}
+
+export const AsciiButton = forwardRef<HTMLButtonElement, AsciiButtonProps>(function AsciiButton(
+  { variant = "ghost", size = "md", type = "button", className, ...props },
+  ref,
+) {
+  return (
+    <button
+      ref={ref}
+      type={type}
+      className={cx("ascii-button", `ascii-button-${variant}`, `ascii-button-${size}`, className)}
+      {...props}
+    />
+  );
+});
+
+export interface AsciiToolbarProps extends HTMLAttributes<HTMLDivElement> {
+  label?: string;
+}
+
+export function AsciiToolbar({ label, className, ...props }: AsciiToolbarProps) {
+  return (
+    <div
+      {...props}
+      role="toolbar"
+      aria-label={label ?? (props["aria-label"] as string | undefined)}
+      className={cx("ascii-toolbar", className)}
+    />
+  );
+}
+
+export interface AsciiToggleProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange"> {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  label: ReactNode;
+  hint?: ReactNode;
+}
+
+export function AsciiToggle({
+  checked,
+  onCheckedChange,
+  label,
+  hint,
+  className,
+  onClick,
+  ...props
+}: AsciiToggleProps) {
+  return (
+    <button
+      {...props}
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={typeof label === "string" ? label : undefined}
+      className={cx("ascii-toggle", className)}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) onCheckedChange(!checked);
+      }}
+    >
+      <span className="ascii-toggle-track" aria-hidden="true">
+        <span className="ascii-toggle-thumb" />
+      </span>
+      <span className="ascii-toggle-copy">
+        <span className="ascii-toggle-label">{label}</span>
+        {hint ? <small className="ascii-toggle-hint">{hint}</small> : null}
+      </span>
+    </button>
+  );
+}
+
+export type AsciiPanelPadding = "none" | "sm" | "md" | "lg";
+
+export interface AsciiPanelProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
+  eyebrow?: ReactNode;
+  heading?: ReactNode;
+  actions?: ReactNode;
+  footer?: ReactNode;
+  padding?: AsciiPanelPadding;
+  children?: ReactNode;
+}
+
+export function AsciiPanel({
+  eyebrow,
+  heading,
+  actions,
+  footer,
+  padding = "md",
+  className,
+  children,
+  ...props
+}: AsciiPanelProps) {
+  const hasHeader = Boolean(eyebrow || heading || actions);
+  return (
+    <section {...props} className={cx("ascii-panel", className)}>
+      {hasHeader ? (
+        <header className="ascii-panel-header">
+          <div className="ascii-panel-heading">
+            {eyebrow ? <span className="ascii-panel-eyebrow">{eyebrow}</span> : null}
+            {heading ? <h3 className="ascii-panel-title">{heading}</h3> : null}
+          </div>
+          {actions ? <div className="ascii-panel-actions">{actions}</div> : null}
+        </header>
+      ) : null}
+      <div className={cx("ascii-panel-body", padding !== "md" && `ascii-panel-body-${padding}`)}>
+        {children}
+      </div>
+      {footer ? <footer className="ascii-panel-footer">{footer}</footer> : null}
+    </section>
+  );
+}
+
+export type AsciiStatusTone = "neutral" | "accent" | "success" | "warning";
+
+export interface AsciiStatusProps extends HTMLAttributes<HTMLSpanElement> {
+  label: ReactNode;
+  value?: ReactNode;
+  tone?: AsciiStatusTone;
+  pulse?: boolean;
+  live?: boolean;
+}
+
+export function AsciiStatus({
+  label,
+  value,
+  tone = "neutral",
+  pulse = false,
+  live = false,
+  className,
+  ...props
+}: AsciiStatusProps) {
+  return (
+    <span
+      {...props}
+      aria-live={live ? "polite" : undefined}
+      className={cx(
+        "ascii-status",
+        `ascii-status-${tone}`,
+        pulse && "ascii-status-pulse",
+        className,
+      )}
+    >
+      <i className="ascii-status-dot" aria-hidden="true" />
+      <span className="ascii-status-label">{label}</span>
+      {value ? <strong className="ascii-status-value">{value}</strong> : null}
+    </span>
+  );
+}
+
+export interface AsciiDividerProps extends HTMLAttributes<HTMLDivElement> {
+  orientation?: "horizontal" | "vertical";
+  label?: ReactNode;
+}
+
+export function AsciiDivider({
+  orientation = "horizontal",
+  label,
+  className,
+  ...props
+}: AsciiDividerProps) {
+  return (
+    // biome-ignore lint/a11y/useSemanticElements: optional labels need a container element.
+    <div
+      {...props}
+      role="separator"
+      aria-orientation={orientation}
+      className={cx("ascii-divider", `ascii-divider-${orientation}`, className)}
+    >
+      {label ? <span className="ascii-divider-label">{label}</span> : null}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------------- */
+/* Scene heroes                                                               */
+/* ------------------------------------------------------------------------- */
+
+export type AsciiSceneKind = "sharks" | "robots" | "jellyfish" | "dog";
+
+export type AsciiSceneOptionsByKind = {
+  sharks: AsciiSharksOptions;
+  robots: AsciiRobotsOptions;
+  jellyfish: AsciiJellyfishOptions;
+  dog: AsciiDogOptions;
+};
+
+interface SceneCopy {
+  eyebrow: string;
+  title: ReactNode;
+  lede: string;
+  promptLabel: string;
+  placeholder: string;
+  actionLabel: string;
+  stageLabel: string;
+  replies: string[];
+}
+
+const SCENE_COPY: Record<AsciiSceneKind, SceneCopy> = {
+  sharks: {
+    eyebrow: "SHARK TANK / REEF 01",
+    title: (
+      <>
+        A small <em>ocean.</em>
+      </>
+    ),
+    lede: "A reef that schools, hunts, panics, and settles. Touch the water and watch the wake move through it.",
+    promptLabel: "Make a ripple",
+    placeholder: "Type a ripple…",
+    actionLabel: "Splash",
+    stageLabel: "SHARKS / OPEN WATER",
+    replies: ["WAKE RELEASED", "CURRENT DISTURBED", "SCHOOL SCATTERED", "SURFACE BROKEN"],
+  },
+  robots: {
+    eyebrow: "FACTORY FLOOR / BAY 02",
+    title: (
+      <>
+        A floor that <em>works.</em>
+      </>
+    ),
+    lede: "Patrols, jobs, charging docks, and low batteries. Dispatch a unit and watch the floor rebalance.",
+    promptLabel: "Dispatch a unit",
+    placeholder: "Assign a job…",
+    actionLabel: "Dispatch",
+    stageLabel: "ROBOTS / NIGHT SHIFT",
+    replies: ["UNIT DISPATCHED", "JOB QUEUED", "BAY REBALANCED", "SHIFT LOG UPDATED"],
+  },
+  jellyfish: {
+    eyebrow: "JELLYFISH BLOOM / DRIFT 03",
+    title: (
+      <>
+        A quiet <em>bloom.</em>
+      </>
+    ),
+    lede: "Bells pulse on a live current. Send a shockwave through the water and watch the bloom answer.",
+    promptLabel: "Send a shockwave",
+    placeholder: "Disturb the current…",
+    actionLabel: "Pulse",
+    stageLabel: "JELLYFISH / DEEP CURRENT",
+    replies: ["SHOCKWAVE SENT", "CURRENT PULSED", "BLOOM SHIFTED", "PRESSURE CHANGED"],
+  },
+  dog: {
+    eyebrow: "ROBOT DOG / TEST YARD",
+    title: (
+      <>
+        A good dog.
+        <br />
+        <em>Go get it.</em>
+      </>
+    ),
+    lede: "A test yard with a ball, a dock, and one very good quadruped. Type a command and throw.",
+    promptLabel: "Tell the dog what to fetch",
+    placeholder: "Tell the dog what to fetch…",
+    actionLabel: "Throw",
+    stageLabel: "ROBOT DOG / TEST YARD",
+    replies: [
+      "VECTOR LOCKED · UNIT 01 ON IT",
+      "BALL AWAY · FETCHING",
+      "COMMAND RECEIVED",
+      "GOOD BOY",
+    ],
+  },
+};
+
+const SCENE_ACTIONS: Record<AsciiSceneKind, SceneAction> = {
+  sharks: "splash",
+  robots: "dispatch",
+  jellyfish: "shockwave",
+  dog: "throwBall",
+};
+
+const EMPTY_OPTIONS: SceneOptions = {};
+
+const SCENE_FACTORIES: Record<
+  AsciiSceneKind,
+  (canvas: HTMLCanvasElement, options: SceneOptions) => SceneHandle
+> = {
+  sharks: (canvas, options) =>
+    createSharks(canvas, options as AsciiSharksOptions) as unknown as SceneHandle,
+  robots: (canvas, options) =>
+    createRobots(canvas, options as AsciiRobotsOptions) as unknown as SceneHandle,
+  jellyfish: (canvas, options) =>
+    createJellyfish(canvas, options as AsciiJellyfishOptions) as unknown as SceneHandle,
+  dog: (canvas, options) => createDog(canvas, options as AsciiDogOptions) as unknown as SceneHandle,
+};
+
+function sceneKey(kind: AsciiSceneKind, options: SceneOptions): string {
+  const value = options as Record<string, unknown>;
+  switch (kind) {
+    case "sharks":
+      return JSON.stringify([value.seed, value.density, value.sharks, value.sharkScale]);
+    case "robots":
+      return JSON.stringify([value.seed, value.count, value.robots, value.scale]);
+    case "jellyfish":
+      return JSON.stringify([value.seed, value.count, value.jellies, value.scale]);
+    default:
+      return JSON.stringify([value.seed, value.count, value.dogs, value.scale, value.spread]);
+  }
+}
+
+export interface AsciiSceneHeroProps<K extends AsciiSceneKind = AsciiSceneKind> {
+  scene: K;
+  options?: AsciiSceneOptionsByKind[K];
+  eyebrow?: ReactNode;
+  title?: ReactNode;
+  lede?: ReactNode;
+  promptLabel?: string;
+  placeholder?: string;
+  actionLabel?: string;
+  stageLabel?: ReactNode;
+  status?: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+  onCommand?: (value: string) => void;
+  onReady?: SceneReady;
+}
+
+export function AsciiSceneHero<K extends AsciiSceneKind>({
+  scene: kind,
+  options,
+  eyebrow,
+  title,
+  lede,
+  promptLabel,
+  placeholder,
+  actionLabel,
+  stageLabel,
+  status,
+  className,
+  style,
+  onCommand,
+  onReady,
+}: AsciiSceneHeroProps<K>) {
+  const copy = SCENE_COPY[kind];
+  const resolvedOptions = (options ?? EMPTY_OPTIONS) as SceneOptions;
+  const { canvasRef, scene, stats } = useAsciiScene({
+    create: SCENE_FACTORIES[kind],
+    options: resolvedOptions,
+    remountKey: sceneKey(kind, resolvedOptions),
+    onReady,
+  });
+  const [echo, setEcho] = useState("yard@01 · awaiting command");
+  const [reply, setReply] = useState("READY");
+
+  const handleSubmit = (value: string) => {
+    const hash = fnv1a(value);
+    setEcho(`> ${value}`);
+    setReply(copy.replies[hash % copy.replies.length] ?? "READY");
+    onCommand?.(value);
+
+    const canvas = canvasRef.current;
+    if (!canvas || !scene) return;
+    const x = canvas.clientWidth * (0.2 + ((hash % 1000) / 1000) * 0.6);
+    const y = canvas.clientHeight * 0.7;
+    scene.trigger(SCENE_ACTIONS[kind], x, y);
+  };
+
+  const readout = [
+    { label: "CELLS", value: stats ? stats.cells.toLocaleString("en-US") : "—" },
+    { label: "GRID", value: stats ? `${stats.columns}×${stats.rows}` : "—" },
+    { label: "FPS", value: stats ? String(Math.round(stats.fps)) : "—" },
+    { label: "MODE", value: stats ? "LIVE" : "BOOT" },
+  ];
+
+  return (
+    <section className={cx("ascii-scene-hero", className)} style={style}>
+      <div className="ascii-scene-hero-copy">
+        <p className="ascii-kicker">
+          <i />
+          {eyebrow ?? copy.eyebrow}
+        </p>
+        <h2 className="ascii-scene-hero-title">{title ?? copy.title}</h2>
+        <p className="ascii-scene-hero-lede">{lede ?? copy.lede}</p>
+        <AsciiPrompt
+          label={promptLabel ?? copy.promptLabel}
+          placeholder={placeholder ?? copy.placeholder}
+          actionLabel={actionLabel ?? copy.actionLabel}
+          status={reply}
+          hint={echo}
+          onSubmit={handleSubmit}
+        />
+      </div>
+      <AsciiStage
+        className="ascii-scene-hero-stage"
+        label={stageLabel ?? copy.stageLabel}
+        status={status ?? "LIVE"}
+        aspectRatio="4 / 3"
+        footer={<AsciiReadout items={readout} ariaLabel="Live scene statistics" />}
+      >
+        <canvas
+          ref={canvasRef}
+          className={`ascii-things ascii-${kind}`}
+          role="img"
+          aria-label={`A live ASCII ${kind} scene`}
+        />
+      </AsciiStage>
+    </section>
+  );
+}
+
+export type AsciiSharkHeroProps = Omit<AsciiSceneHeroProps<"sharks">, "scene">;
+export type AsciiRobotHeroProps = Omit<AsciiSceneHeroProps<"robots">, "scene">;
+export type AsciiJellyfishHeroProps = Omit<AsciiSceneHeroProps<"jellyfish">, "scene">;
+
+export function AsciiSharkHero(props: AsciiSharkHeroProps) {
+  return <AsciiSceneHero scene="sharks" {...props} />;
+}
+
+export function AsciiRobotHero(props: AsciiRobotHeroProps) {
+  return <AsciiSceneHero scene="robots" {...props} />;
+}
+
+export function AsciiJellyfishHero(props: AsciiJellyfishHeroProps) {
+  return <AsciiSceneHero scene="jellyfish" {...props} />;
 }

@@ -1,7 +1,20 @@
 import { StrictMode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AsciiDog } from "../../src/react";
-import { AsciiDogHero, AsciiPrompt, AsciiReadout, AsciiSceneTabs, AsciiStage } from "../../src/ui";
+import {
+  AsciiButton,
+  AsciiDivider,
+  AsciiDogHero,
+  AsciiPanel,
+  AsciiPrompt,
+  AsciiReadout,
+  AsciiSceneHero,
+  AsciiSceneTabs,
+  AsciiStage,
+  AsciiStatus,
+  AsciiToggle,
+  AsciiToolbar,
+} from "../../src/ui";
 import type { PaletteName } from "../../src/palette";
 import "../../src/ui.css";
 import "./style.css";
@@ -17,6 +30,7 @@ function App() {
   const [palette, setPalette] = useState<PaletteName>("abyss");
   const [lastCommand, setLastCommand] = useState("—");
   const [promptStatus, setPromptStatus] = useState("AWAITING COMMAND");
+  const [calm, setCalm] = useState(false);
 
   return (
     <div className="ui-page">
@@ -29,7 +43,7 @@ function App() {
           <a href="/examples/playground/">Playground ↗</a>
           <a href="https://github.com/chuma-beep/ascii-things">GitHub ↗</a>
         </nav>
-        <span className="ui-version">ui / 0.4.0</span>
+        <span className="ui-version">ui / 1.0.0-rc.0</span>
       </header>
 
       <main className="ui-wrap">
@@ -68,6 +82,7 @@ function App() {
           palette="abyss"
           seed={7}
           dogs={[{ size: 1.15 }]}
+          calm={calm}
           spread={[0.68, 0.68]}
           onCommand={(command) => setLastCommand(command)}
         />
@@ -163,10 +178,84 @@ function App() {
           </div>
         </section>
 
+        <section className="ui-section" aria-labelledby="primitives-title">
+          <div className="ui-wrap">
+            <div className="ui-section-head">
+              <div>
+                <p className="ui-kicker">Primitives / 03</p>
+                <h2 id="primitives-title">Borrow the parts.</h2>
+              </div>
+              <p>
+                Panels, controls, status, and dividers share the same tokens and square corners as
+                the scene chrome. Only live indicators stay round.
+              </p>
+            </div>
+
+            <AsciiPanel
+              eyebrow="Control surface"
+              heading="Calm the yard."
+              actions={
+                <AsciiStatus
+                  label="Mode"
+                  value={calm ? "CALM" : "LIVE"}
+                  tone={calm ? "neutral" : "success"}
+                  pulse={!calm}
+                  live
+                />
+              }
+              footer="Square containers. Round indicators. One policy."
+            >
+              <AsciiToolbar label="Scene controls">
+                <AsciiToggle
+                  checked={calm}
+                  onCheckedChange={setCalm}
+                  label="Calm mode"
+                  hint="Settles the dog"
+                />
+                <AsciiDivider orientation="vertical" />
+                <AsciiButton variant="solid" onClick={() => setCalm(false)}>
+                  Wake
+                </AsciiButton>
+                <AsciiButton variant="ghost" onClick={() => setCalm(true)}>
+                  Settle
+                </AsciiButton>
+                <AsciiButton variant="quiet" onClick={() => setCalm(false)}>
+                  Reset
+                </AsciiButton>
+              </AsciiToolbar>
+              <AsciiDivider label="State" />
+              <div className="ui-status-row">
+                <AsciiStatus label="Scene" value="Robot dog" tone="accent" />
+                <AsciiStatus
+                  label="Motion"
+                  value={calm ? "Settled" : "Running"}
+                  tone={calm ? "neutral" : "success"}
+                />
+              </div>
+            </AsciiPanel>
+
+            <div className="ui-scene-gap">
+              <AsciiSceneHero
+                scene="sharks"
+                eyebrow="PRESET / SHARKS"
+                title={
+                  <>
+                    One hero.
+                    <br />
+                    <em>Any habitat.</em>
+                  </>
+                }
+                lede="The generic scene hero swaps the simulation, copy, action, and readout without changing the surrounding UI."
+                options={{ palette: "abyss", seed: 11, density: 0.8 }}
+              />
+            </div>
+          </div>
+        </section>
+
         <section className="ui-section ui-section-last" aria-labelledby="install-title">
           <div className="ui-section-head">
             <div>
-              <p className="ui-kicker">Install / 03</p>
+              <p className="ui-kicker">Install / 04</p>
               <h2 id="install-title">One import. Your chrome.</h2>
             </div>
             <p>
