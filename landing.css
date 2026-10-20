@@ -321,7 +321,9 @@ button {
   transition:
     background 160ms ease,
     border-color 160ms ease,
-    color 160ms ease;
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 .button.primary {
@@ -333,6 +335,13 @@ button {
 .button.primary:hover {
   background: #ff9147;
   border-color: #ff9147;
+  box-shadow: 0 8px 24px rgba(255, 122, 26, 0.22);
+  transform: translateY(-2px);
+}
+
+.button.primary:active {
+  box-shadow: none;
+  transform: translateY(0);
 }
 
 .button.ghost:hover {
