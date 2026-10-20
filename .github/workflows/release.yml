@@ -23,8 +23,27 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  guard:
+    name: Block prerelease publishing
+    runs-on: ubuntu-latest
+    outputs:
+      prerelease: ${{ steps.check.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [[ "$version" == *-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
   release:
     name: Version or publish
+    needs: guard
+    if: needs.guard.outputs.prerelease != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 

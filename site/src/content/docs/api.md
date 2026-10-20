@@ -1,9 +1,9 @@
 ---
 title: API reference
-description: Every shared option, scene extra, engine method, event, and statistic in ascii-things 0.5.0.
+description: Every shared option, scene extra, engine method, event, and statistic in ascii-things 1.0.0-rc.0.
 ---
 
-This reference tracks `main` and the current **0.5.0** release.
+This reference tracks `main` and the current **1.0.0-rc.0** release.
 
 ## Package exports
 

@@ -3,9 +3,19 @@ title: Changelog
 description: Release notes for ascii-things.
 ---
 
+## 1.0.0-rc.0
+
+The current release candidate. No runtime behavior changes since 0.5.0.
+
+**API freeze**
+
+- Frozen public runtime, type, and subpath export surface.
+- Added `MIGRATION.md` with the 0.5 → 1.0 upgrade guide.
+- Added runtime export snapshots, type-surface contract tests, and server-render smoke tests.
+
 ## 0.5.0
 
-The current release. Additive to 0.4.0; no existing option or method changes shape.
+The prior release. Additive to 0.4.0; no existing option or method changes shape.
 
 **Shared API**
 
