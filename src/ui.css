@@ -314,6 +314,11 @@
     background 160ms ease;
 }
 
+/* Host prose styles often add sibling margins; tabs must stay flush. */
+.ascii-tabs .ascii-tab {
+  margin: 0;
+}
+
 .ascii-tab:last-child {
   border-right: 0;
 }
