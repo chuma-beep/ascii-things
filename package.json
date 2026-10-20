@@ -13,7 +13,8 @@
   },
   "type": "module",
   "sideEffects": [
-    "./dist/element.js"
+    "./dist/element.js",
+    "./dist/ui.css"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -52,7 +53,12 @@
     "./element": {
       "types": "./dist/element.d.ts",
       "import": "./dist/element.js"
-    }
+    },
+    "./ui": {
+      "types": "./dist/ui.d.ts",
+      "import": "./dist/ui.js"
+    },
+    "./ui.css": "./dist/ui.css"
   },
   "keywords": [
     "ascii",
@@ -67,7 +73,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsup",
+    "build": "tsup && node scripts/copy-ui-css.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "prepublishOnly": "npm run typecheck && npm run test && npm run build"

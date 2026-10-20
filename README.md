@@ -24,6 +24,9 @@ t'                            ''XSSS8SSX%XX8#.    %XSX%
 bloom, and a robot dog test yard, drawn as glyphs on a canvas. Zero runtime
 dependencies. MIT.
 
+The optional `ascii-things/ui` subpath adds a framed stage, command input, live
+readout, and scene tabs for React hosts.
+
 Each scene is a small artificial-life simulation, not a looped animation. Sharks
 hunt fish that spread alarm through the school. Robots patrol, scan, haul cargo,
 and queue for a charging bay. Jellyfish pulse through a current, trailing
@@ -226,6 +229,87 @@ default, and clean up on unmount. `palette`, `speed`, `columns`, `maxCells`,
 `jellies`, `dogs`, `seed`, `density`, `count`, `sharkScale`, `scale`) remount
 the scene when they change.
 
+## UI components
+
+`ascii-things/ui` is an optional, zero-dependency React layer for the interface
+around a scene: a framed stage, command input, live readout, and scene tabs.
+It uses plain CSS variables, not Tailwind. Import the stylesheet once.
+
+```tsx
+import { AsciiDogHero } from "ascii-things/ui";
+import "ascii-things/ui.css";
+
+export function Hero() {
+  return <AsciiDogHero palette="abyss" seed={7} />;
+}
+```
+
+The recipe wires the dog, prompt, stage, and live stats together. To compose
+your own layout, use the pieces directly:
+
+```tsx
+import { useState } from "react";
+import { AsciiDog } from "ascii-things/react";
+import {
+  AsciiPrompt,
+  AsciiReadout,
+  AsciiSceneTabs,
+  AsciiStage,
+} from "ascii-things/ui";
+import "ascii-things/ui.css";
+
+export function Yard() {
+  const [palette, setPalette] = useState<"abyss" | "paper" | "neon" | "mono">("abyss");
+
+  return (
+    <div>
+      <AsciiSceneTabs
+        scenes={[
+          { id: "abyss", label: "Abyss", meta: "night" },
+          { id: "paper", label: "Paper", meta: "day" },
+          { id: "neon", label: "Neon", meta: "loud" },
+          { id: "mono", label: "Mono", meta: "quiet" },
+        ]}
+        value={palette}
+        onChange={(id) => setPalette(id as typeof palette)}
+      />
+
+      <AsciiStage
+        label="ROBOT DOG / TEST YARD"
+        status="LIVE"
+        aspectRatio="4 / 3"
+        footer={
+          <AsciiReadout
+            items={[
+              { label: "SCENE", value: "DOG" },
+              { label: "PALETTE", value: palette.toUpperCase() },
+            ]}
+          />
+        }
+      >
+        <AsciiDog palette={palette} seed={7} />
+      </AsciiStage>
+
+      <AsciiPrompt
+        label="Tell the dog what to fetch"
+        placeholder="Throw the ball…"
+        actionLabel="Throw"
+        status="Awaiting command"
+        onSubmit={(command) => console.log(command)}
+      />
+    </div>
+  );
+}
+```
+
+Components: `AsciiDogHero`, `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, and
+`AsciiSceneTabs`. Theme them with `--ascii-accent`, `--ascii-bg`, `--ascii-ink`,
+`--ascii-font`, and `--ascii-radius`. The components are framework-light React,
+so they work beside shadcn: keep shadcn `Input`/`Button` for page chrome, or put
+your own controls over `AsciiStage` and use only the scene beneath.
+
+See the [UI example](examples/ui/) for the full composition.
+
 ## HTML custom element
 
 ```html
@@ -288,6 +372,8 @@ Dog attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
 - **Landing page** ([index.html](index.html)) — the library site with a live dog
   hero, scene gallery, install snippets, and design notes.
 - [Playground](examples/playground/) — the query-string demo for every scene.
+- [UI layer](examples/ui/) — first-party React components composing the dog,
+  stage, prompt, readout, and palette tabs.
 - [Dog + input](examples/dog-input/) — a focused landing-page hero with the
   robot dog behind a real prompt. Type a command and the dog fetches the ball.
 

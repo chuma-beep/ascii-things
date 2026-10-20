@@ -8,6 +8,7 @@ export default defineConfig({
     jellyfish: "src/jellyfish/index.ts",
     dog: "src/dog/index.ts",
     react: "src/react.tsx",
+    ui: "src/ui.tsx",
     element: "src/element.ts",
   },
   format: ["esm"],
