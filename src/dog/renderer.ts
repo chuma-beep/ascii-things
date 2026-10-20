@@ -1,6 +1,7 @@
+import { rgba } from "../core/color";
+import { CellGrid, paintGrid } from "../core/grid";
 import { clamp, hash3 } from "../math";
-import { paintGrid } from "../renderer";
-import { resolvePalette, type Palette, type PaletteName, type RGB } from "../palette";
+import { resolvePalette, type Palette, type PaletteName } from "../palette";
 import type { Ball, Dog, DogWorld } from "./world";
 
 export interface DogRendererOptions {
@@ -9,8 +10,6 @@ export interface DogRendererOptions {
   maxCells?: number;
   calm?: boolean;
 }
-
-const rgba = ([r, g, b]: RGB, a: number) => `rgba(${r},${g},${b},${a})`;
 
 const distToSegment = (px: number, py: number, ax: number, ay: number, bx: number, by: number) => {
   const dx = bx - ax;
@@ -24,58 +23,14 @@ const distToSegment = (px: number, py: number, ax: number, ay: number, bx: numbe
  * Draws a robot dog test range: grid, ground marks, cones, a charging pad,
  * a ball, and procedural quadruped silhouettes with a trotting gait.
  */
-export class DogRenderer {
-  private ctx: CanvasRenderingContext2D;
-  private bg: HTMLCanvasElement;
-  private dpr = 1;
-  private width = 0;
-  private height = 0;
-  private cw = 12;
-  private ch = 18;
-  private cols = 0;
-  private rows = 0;
-  private fontFamily = "ui-monospace, Menlo, monospace";
-  private columns = 150;
-  private maxCells = 16000;
+export class DogRenderer extends CellGrid {
   private calm = false;
   private palette: Palette = resolvePalette();
 
-  constructor(
-    private canvas: HTMLCanvasElement,
-    options: DogRendererOptions = {},
-  ) {
-    const ctx = canvas.getContext("2d", { alpha: false });
-    if (!ctx) throw new Error("2D canvas unavailable");
-    this.ctx = ctx;
-    this.bg = document.createElement("canvas");
+  constructor(canvas: HTMLCanvasElement, options: DogRendererOptions = {}) {
+    super(canvas, { columns: options.columns ?? 150, maxCells: options.maxCells });
     this.palette = resolvePalette(options.palette);
-    this.columns = options.columns ?? 150;
-    this.maxCells = options.maxCells ?? 16000;
     this.calm = options.calm ?? false;
-  }
-
-  get cellWidth() {
-    return this.cw;
-  }
-
-  get cellHeight() {
-    return this.ch;
-  }
-
-  get cellCount() {
-    return this.cols * this.rows;
-  }
-
-  get columnCount() {
-    return this.cols;
-  }
-
-  get rowCount() {
-    return this.rows;
-  }
-
-  setFontFamily(family: string) {
-    if (family) this.fontFamily = family;
   }
 
   setOptions(options: DogRendererOptions) {
@@ -83,103 +38,78 @@ export class DogRenderer {
       this.palette = resolvePalette(options.palette);
       if (this.width > 0) this.paintBackground();
     }
-    if (options.columns !== undefined) this.columns = Math.max(24, options.columns);
-    if (options.maxCells !== undefined) this.maxCells = Math.max(0, options.maxCells);
+    this.setGridOptions({ columns: options.columns, maxCells: options.maxCells });
     if (options.calm !== undefined) this.calm = options.calm;
   }
 
   resize(width: number, height: number, dpr: number) {
-    this.width = width;
-    this.height = height;
-    this.dpr = dpr;
-
-    let cw = clamp(Math.round(width / Math.max(24, this.columns)), 8, 13);
-    let ch = Math.round(cw * 1.45);
-    let cols = Math.ceil(width / cw);
-    let rows = Math.ceil(height / ch);
-    while (this.maxCells > 0 && cols * rows > this.maxCells && cw < 64) {
-      cw++;
-      ch = Math.round(cw * 1.45);
-      cols = Math.ceil(width / cw);
-      rows = Math.ceil(height / ch);
-    }
-    this.cw = cw;
-    this.ch = ch;
-    this.cols = cols;
-    this.rows = rows;
-
-    this.canvas.width = Math.round(width * dpr);
-    this.canvas.height = Math.round(height * dpr);
-    this.bg.width = this.canvas.width;
-    this.bg.height = this.canvas.height;
+    super.resize(width, height, dpr);
     this.paintBackground();
   }
 
   private paintBackground() {
-    const g = this.bg.getContext("2d");
-    if (!g) return;
-    const { width: W, height: H, dpr, cw, ch } = this;
-    g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    g.fillStyle = this.palette.background;
-    g.fillRect(0, 0, W, H);
+    this.paintBackdrop(
+      this.palette.background,
+      (g, { width: W, height: H, dpr, cellWidth: cw, cellHeight: ch }) => {
+        const wash = g.createLinearGradient(0, 0, 0, H);
+        wash.addColorStop(0, rgba(this.palette.wake, 0.04));
+        wash.addColorStop(0.68, "rgba(0,0,0,0)");
+        wash.addColorStop(1, rgba(this.palette.edge, 0.045));
+        g.fillStyle = wash;
+        g.fillRect(0, 0, W, H);
 
-    const wash = g.createLinearGradient(0, 0, 0, H);
-    wash.addColorStop(0, rgba(this.palette.wake, 0.04));
-    wash.addColorStop(0.68, "rgba(0,0,0,0)");
-    wash.addColorStop(1, rgba(this.palette.edge, 0.045));
-    g.fillStyle = wash;
-    g.fillRect(0, 0, W, H);
+        g.globalAlpha = 0.55;
+        paintGrid(g, W, H, cw, ch, dpr, this.palette.grid);
+        g.globalAlpha = 1;
 
-    g.globalAlpha = 0.55;
-    paintGrid(g, W, H, cw, ch, dpr, this.palette.grid);
-    g.globalAlpha = 1;
+        // A faded target pad anchors the empty middle of the yard.
+        const ground = H * 0.73;
+        const rx = Math.min(W * 0.18, 260);
+        const ry = Math.min(H * 0.07, 58);
+        g.strokeStyle = rgba(this.palette.edge, 0.13);
+        g.lineWidth = 1;
+        g.setLineDash([cw * 0.7, cw * 0.7]);
+        g.beginPath();
+        g.ellipse(W * 0.5, ground, rx, ry, 0, 0, Math.PI * 2);
+        g.stroke();
+        g.beginPath();
+        g.ellipse(W * 0.5, ground, rx * 0.62, ry * 0.62, 0, 0, Math.PI * 2);
+        g.stroke();
+        g.setLineDash([]);
+        g.beginPath();
+        g.moveTo(W * 0.5 - rx * 1.08, ground);
+        g.lineTo(W * 0.5 + rx * 1.08, ground);
+        g.moveTo(W * 0.5, ground - ry * 1.35);
+        g.lineTo(W * 0.5, ground + ry * 0.4);
+        g.stroke();
+        g.font = `700 ${Math.round(ch * 1.05)}px ${this.fontFamily}`;
+        g.textAlign = "center";
+        g.textBaseline = "middle";
+        g.fillStyle = rgba(this.palette.edge, 0.14);
+        g.fillText("TEST 04", W * 0.5, ground - ry * 1.75);
 
-    // A faded target pad anchors the empty middle of the yard.
-    const ground = H * 0.73;
-    const rx = Math.min(W * 0.18, 260);
-    const ry = Math.min(H * 0.07, 58);
-    g.strokeStyle = rgba(this.palette.edge, 0.13);
-    g.lineWidth = 1;
-    g.setLineDash([cw * 0.7, cw * 0.7]);
-    g.beginPath();
-    g.ellipse(W * 0.5, ground, rx, ry, 0, 0, Math.PI * 2);
-    g.stroke();
-    g.beginPath();
-    g.ellipse(W * 0.5, ground, rx * 0.62, ry * 0.62, 0, 0, Math.PI * 2);
-    g.stroke();
-    g.setLineDash([]);
-    g.beginPath();
-    g.moveTo(W * 0.5 - rx * 1.08, ground);
-    g.lineTo(W * 0.5 + rx * 1.08, ground);
-    g.moveTo(W * 0.5, ground - ry * 1.35);
-    g.lineTo(W * 0.5, ground + ry * 0.4);
-    g.stroke();
-    g.font = `700 ${Math.round(ch * 1.05)}px ${this.fontFamily}`;
-    g.textAlign = "center";
-    g.textBaseline = "middle";
-    g.fillStyle = rgba(this.palette.edge, 0.14);
-    g.fillText("TEST 04", W * 0.5, ground - ry * 1.75);
+        // Faint range signage, large enough to read at a glance but not compete.
+        g.font = `700 ${Math.round(ch * 1.65)}px ${this.fontFamily}`;
+        g.textAlign = "left";
+        g.textBaseline = "top";
+        g.fillStyle = rgba(this.palette.edge, 0.12);
+        g.fillText("RANGE 04", cw * 1.5, ch * 1.5);
 
-    // Faint range signage, large enough to read at a glance but not compete.
-    g.font = `700 ${Math.round(ch * 1.65)}px ${this.fontFamily}`;
-    g.textAlign = "left";
-    g.textBaseline = "top";
-    g.fillStyle = rgba(this.palette.edge, 0.12);
-    g.fillText("RANGE 04", cw * 1.5, ch * 1.5);
+        g.font = `600 ${Math.round(ch * 0.62)}px ${this.fontFamily}`;
+        g.fillStyle = rgba(this.palette.edge, 0.2);
+        g.fillText("ROBOTIC QUADRUPED TEST YARD", cw * 1.6, ch * 3.5);
 
-    g.font = `600 ${Math.round(ch * 0.62)}px ${this.fontFamily}`;
-    g.fillStyle = rgba(this.palette.edge, 0.2);
-    g.fillText("ROBOTIC QUADRUPED TEST YARD", cw * 1.6, ch * 3.5);
-
-    // Vertical panel seams in the back wall.
-    g.strokeStyle = rgba(this.palette.edge, 0.055);
-    g.lineWidth = 1;
-    for (let x = cw * 8; x < W; x += cw * 12) {
-      g.beginPath();
-      g.moveTo(x, 0);
-      g.lineTo(x, H * 0.57);
-      g.stroke();
-    }
+        // Vertical panel seams in the back wall.
+        g.strokeStyle = rgba(this.palette.edge, 0.055);
+        g.lineWidth = 1;
+        for (let x = cw * 8; x < W; x += cw * 12) {
+          g.beginPath();
+          g.moveTo(x, 0);
+          g.lineTo(x, H * 0.57);
+          g.stroke();
+        }
+      },
+    );
   }
 
   render(world: DogWorld, _dt: number) {
@@ -648,23 +578,5 @@ export class DogRenderer {
       ctx.fillStyle = this.palette.textOnBody;
       ctx.fillText(glyph, x, y);
     });
-  }
-
-  private forEachCell(
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    fn: (col: number, row: number, edge: boolean) => void,
-  ) {
-    const c0 = Math.max(0, Math.floor(x / this.cw));
-    const r0 = Math.max(0, Math.floor(y / this.ch));
-    const c1 = Math.min(this.cols - 1, Math.floor((x + w) / this.cw));
-    const r1 = Math.min(this.rows - 1, Math.floor((y + h) / this.ch));
-    for (let row = r0; row <= r1; row++) {
-      for (let col = c0; col <= c1; col++) {
-        fn(col, row, col === c0 || col === c1 || row === r0 || row === r1);
-      }
-    }
   }
 }

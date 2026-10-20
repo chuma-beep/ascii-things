@@ -1,6 +1,7 @@
-import { angleDiff, clamp, hash3 } from "../math";
-import { paintGrid } from "../renderer";
-import { resolvePalette, type Palette, type PaletteName, type RGB } from "../palette";
+import { rgba } from "../core/color";
+import { CellGrid, paintGrid } from "../core/grid";
+import { angleDiff, hash3 } from "../math";
+import { resolvePalette, type Palette, type PaletteName } from "../palette";
 import type { Robot, RobotKind, RobotWorld } from "./world";
 
 export interface RobotRendererOptions {
@@ -12,64 +13,18 @@ export interface RobotRendererOptions {
 
 const KIND_SCAN_HALF: Record<RobotKind, number> = { scout: 0.4, hauler: 0.3, sentinel: 0.58 };
 
-const rgba = ([r, g, b]: RGB, a: number) => `rgba(${r},${g},${b},${a})`;
-
 /**
  * Draws the robot floor: grid, bays, crates, scan cones, and tracked rovers.
  * The glyph grid matches the shark scene so the two can sit side by side.
  */
-export class RobotRenderer {
-  private ctx: CanvasRenderingContext2D;
-  private bg: HTMLCanvasElement;
-  private dpr = 1;
-  private width = 0;
-  private height = 0;
-  private cw = 12;
-  private ch = 18;
-  private cols = 0;
-  private rows = 0;
-  private fontFamily = "ui-monospace, Menlo, monospace";
-  private columns = 124;
-  private maxCells = 16000;
+export class RobotRenderer extends CellGrid {
   private calm = false;
   private palette: Palette = resolvePalette();
 
-  constructor(
-    private canvas: HTMLCanvasElement,
-    options: RobotRendererOptions = {},
-  ) {
-    const ctx = canvas.getContext("2d", { alpha: false });
-    if (!ctx) throw new Error("2D canvas unavailable");
-    this.ctx = ctx;
-    this.bg = document.createElement("canvas");
+  constructor(canvas: HTMLCanvasElement, options: RobotRendererOptions = {}) {
+    super(canvas, { columns: options.columns ?? 150, maxCells: options.maxCells });
     this.palette = resolvePalette(options.palette);
-    this.columns = options.columns ?? 150;
-    this.maxCells = options.maxCells ?? 16000;
     this.calm = options.calm ?? false;
-  }
-
-  get cellWidth() {
-    return this.cw;
-  }
-
-  get cellHeight() {
-    return this.ch;
-  }
-
-  get cellCount() {
-    return this.cols * this.rows;
-  }
-
-  get columnCount() {
-    return this.cols;
-  }
-
-  get rowCount() {
-    return this.rows;
-  }
-
-  setFontFamily(family: string) {
-    if (family) this.fontFamily = family;
   }
 
   setOptions(options: RobotRendererOptions) {
@@ -77,61 +32,36 @@ export class RobotRenderer {
       this.palette = resolvePalette(options.palette);
       if (this.width > 0) this.paintBackground();
     }
-    if (options.columns !== undefined) this.columns = Math.max(24, options.columns);
-    if (options.maxCells !== undefined) this.maxCells = Math.max(0, options.maxCells);
+    this.setGridOptions({ columns: options.columns, maxCells: options.maxCells });
     if (options.calm !== undefined) this.calm = options.calm;
   }
 
   resize(width: number, height: number, dpr: number) {
-    this.width = width;
-    this.height = height;
-    this.dpr = dpr;
-
-    const targetColumns = Math.max(24, this.columns);
-    let cw = clamp(Math.round(width / targetColumns), 8, 13);
-    let ch = Math.round(cw * 1.45);
-    let cols = Math.ceil(width / cw);
-    let rows = Math.ceil(height / ch);
-    while (this.maxCells > 0 && cols * rows > this.maxCells && cw < 64) {
-      cw++;
-      ch = Math.round(cw * 1.45);
-      cols = Math.ceil(width / cw);
-      rows = Math.ceil(height / ch);
-    }
-    this.cw = cw;
-    this.ch = ch;
-    this.cols = cols;
-    this.rows = rows;
-
-    this.canvas.width = Math.round(width * dpr);
-    this.canvas.height = Math.round(height * dpr);
-    this.bg.width = this.canvas.width;
-    this.bg.height = this.canvas.height;
+    super.resize(width, height, dpr);
     this.paintBackground();
   }
 
   private paintBackground() {
-    const g = this.bg.getContext("2d");
-    if (!g) return;
-    const { width: W, height: H, dpr, cw, ch } = this;
-    g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    g.fillStyle = this.palette.background;
-    g.fillRect(0, 0, W, H);
-    paintGrid(g, W, H, cw, ch, dpr, this.palette.grid);
+    this.paintBackdrop(
+      this.palette.background,
+      (g, { width: W, height: H, dpr, cellWidth: cw, cellHeight: ch }) => {
+        paintGrid(g, W, H, cw, ch, dpr, this.palette.grid);
 
-    // Faint lane markings, like a factory floor.
-    g.strokeStyle = rgba(this.palette.edge, 0.16);
-    g.lineWidth = 1;
-    g.setLineDash([cw * 2, cw * 2]);
-    g.beginPath();
-    g.moveTo(0, H * 0.66);
-    g.lineTo(W, H * 0.66);
-    g.stroke();
-    g.beginPath();
-    g.moveTo(0, H * 0.34);
-    g.lineTo(W, H * 0.34);
-    g.stroke();
-    g.setLineDash([]);
+        // Faint lane markings, like a factory floor.
+        g.strokeStyle = rgba(this.palette.edge, 0.16);
+        g.lineWidth = 1;
+        g.setLineDash([cw * 2, cw * 2]);
+        g.beginPath();
+        g.moveTo(0, H * 0.66);
+        g.lineTo(W, H * 0.66);
+        g.stroke();
+        g.beginPath();
+        g.moveTo(0, H * 0.34);
+        g.lineTo(W, H * 0.34);
+        g.stroke();
+        g.setLineDash([]);
+      },
+    );
   }
 
   render(world: RobotWorld, _dt: number) {
@@ -326,24 +256,6 @@ export class RobotRenderer {
         const y = dock.y + Math.sin(a) * dock.h * 0.28;
         this.ctx.fillStyle = rgba(this.palette.wake, 0.35 + 0.3 * Math.sin(a * 1.7));
         this.ctx.fillText(i % 2 === 0 ? "*" : "+", x, y);
-      }
-    }
-  }
-
-  private forEachCell(
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    fn: (col: number, row: number, edge: boolean, lastCol: number, lastRow: number) => void,
-  ) {
-    const c0 = Math.max(0, Math.floor(x / this.cw));
-    const r0 = Math.max(0, Math.floor(y / this.ch));
-    const c1 = Math.min(this.cols - 1, Math.floor((x + w) / this.cw));
-    const r1 = Math.min(this.rows - 1, Math.floor((y + h) / this.ch));
-    for (let row = r0; row <= r1; row++) {
-      for (let col = c0; col <= c1; col++) {
-        fn(col, row, col === c0 || col === c1 || row === r0 || row === r1, c1, r1);
       }
     }
   }

@@ -1,5 +1,6 @@
+import { rgba } from "../core/color";
+import { CellGrid, paintGrid } from "../core/grid";
 import { clamp, hash3, TAU } from "../math";
-import { paintGrid } from "../renderer";
 import { resolvePalette, type Palette, type PaletteName, type RGB } from "../palette";
 import { KIND_CONFIG, type Jellyfish, type JellyfishKind, type JellyfishWorld } from "./world";
 
@@ -10,65 +11,19 @@ export interface JellyfishRendererOptions {
   calm?: boolean;
 }
 
-const rgba = ([r, g, b]: RGB, a: number) => `rgba(${r},${g},${b},${a})`;
-
 /**
  * Draws a bloom of jellyfish: a deep-water backdrop, drifting plankton,
  * pulsing bioluminescent rings, translucent bells, and trailing tentacles.
  * The glyph grid matches the other ascii-things scenes.
  */
-export class JellyfishRenderer {
-  private ctx: CanvasRenderingContext2D;
-  private bg: HTMLCanvasElement;
-  private dpr = 1;
-  private width = 0;
-  private height = 0;
-  private cw = 12;
-  private ch = 18;
-  private cols = 0;
-  private rows = 0;
-  private fontFamily = "ui-monospace, Menlo, monospace";
-  private columns = 140;
-  private maxCells = 16000;
+export class JellyfishRenderer extends CellGrid {
   private calm = false;
   private palette: Palette = resolvePalette();
 
-  constructor(
-    private canvas: HTMLCanvasElement,
-    options: JellyfishRendererOptions = {},
-  ) {
-    const ctx = canvas.getContext("2d", { alpha: false });
-    if (!ctx) throw new Error("2D canvas unavailable");
-    this.ctx = ctx;
-    this.bg = document.createElement("canvas");
+  constructor(canvas: HTMLCanvasElement, options: JellyfishRendererOptions = {}) {
+    super(canvas, { columns: options.columns ?? 140, maxCells: options.maxCells });
     this.palette = resolvePalette(options.palette);
-    this.columns = options.columns ?? 140;
-    this.maxCells = options.maxCells ?? 16000;
     this.calm = options.calm ?? false;
-  }
-
-  get cellWidth() {
-    return this.cw;
-  }
-
-  get cellHeight() {
-    return this.ch;
-  }
-
-  get cellCount() {
-    return this.cols * this.rows;
-  }
-
-  get columnCount() {
-    return this.cols;
-  }
-
-  get rowCount() {
-    return this.rows;
-  }
-
-  setFontFamily(family: string) {
-    if (family) this.fontFamily = family;
   }
 
   setOptions(options: JellyfishRendererOptions) {
@@ -76,73 +31,47 @@ export class JellyfishRenderer {
       this.palette = resolvePalette(options.palette);
       if (this.width > 0) this.paintBackground();
     }
-    if (options.columns !== undefined) this.columns = Math.max(24, options.columns);
-    if (options.maxCells !== undefined) this.maxCells = Math.max(0, options.maxCells);
+    this.setGridOptions({ columns: options.columns, maxCells: options.maxCells });
     if (options.calm !== undefined) this.calm = options.calm;
   }
 
   resize(width: number, height: number, dpr: number) {
-    this.width = width;
-    this.height = height;
-    this.dpr = dpr;
-
-    const targetColumns = Math.max(24, this.columns);
-    let cw = clamp(Math.round(width / targetColumns), 8, 13);
-    let ch = Math.round(cw * 1.45);
-    let cols = Math.ceil(width / cw);
-    let rows = Math.ceil(height / ch);
-    while (this.maxCells > 0 && cols * rows > this.maxCells && cw < 64) {
-      cw++;
-      ch = Math.round(cw * 1.45);
-      cols = Math.ceil(width / cw);
-      rows = Math.ceil(height / ch);
-    }
-    this.cw = cw;
-    this.ch = ch;
-    this.cols = cols;
-    this.rows = rows;
-
-    this.canvas.width = Math.round(width * dpr);
-    this.canvas.height = Math.round(height * dpr);
-    this.bg.width = this.canvas.width;
-    this.bg.height = this.canvas.height;
+    super.resize(width, height, dpr);
     this.paintBackground();
   }
 
   private paintBackground() {
-    const g = this.bg.getContext("2d");
-    if (!g) return;
-    const { width: W, height: H, dpr, cw, ch } = this;
-    g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    g.fillStyle = this.palette.background;
-    g.fillRect(0, 0, W, H);
+    this.paintBackdrop(
+      this.palette.background,
+      (g, { width: W, height: H, dpr, cellWidth: cw, cellHeight: ch }) => {
+        // A depth gradient: lighter water at the surface, colder below.
+        const grad = g.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, rgba(this.palette.wake, this.palette.dark ? 0.055 : 0.025));
+        grad.addColorStop(0.55, rgba(this.palette.wake, 0));
+        grad.addColorStop(1, rgba(this.palette.heat, this.palette.dark ? 0.026 : 0.012));
+        g.fillStyle = grad;
+        g.fillRect(0, 0, W, H);
 
-    // A depth gradient: lighter water at the surface, colder below.
-    const grad = g.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, rgba(this.palette.wake, this.palette.dark ? 0.055 : 0.025));
-    grad.addColorStop(0.55, rgba(this.palette.wake, 0));
-    grad.addColorStop(1, rgba(this.palette.heat, this.palette.dark ? 0.026 : 0.012));
-    g.fillStyle = grad;
-    g.fillRect(0, 0, W, H);
+        // Sparse light shafts falling through the water.
+        for (let i = 0; i < 5; i++) {
+          const x = W * (0.1 + i * 0.21) + Math.sin(i * 2.3) * W * 0.03;
+          const top = W * 0.035;
+          const bottom = W * 0.08;
+          g.beginPath();
+          g.moveTo(x, 0);
+          g.lineTo(x + top, 0);
+          g.lineTo(x + bottom + H * 0.28, H);
+          g.lineTo(x + H * 0.22, H);
+          g.closePath();
+          g.fillStyle = rgba(this.palette.wake, this.palette.dark ? 0.02 : 0.012);
+          g.fill();
+        }
 
-    // Sparse light shafts falling through the water.
-    for (let i = 0; i < 5; i++) {
-      const x = W * (0.1 + i * 0.21) + Math.sin(i * 2.3) * W * 0.03;
-      const top = W * 0.035;
-      const bottom = W * 0.08;
-      g.beginPath();
-      g.moveTo(x, 0);
-      g.lineTo(x + top, 0);
-      g.lineTo(x + bottom + H * 0.28, H);
-      g.lineTo(x + H * 0.22, H);
-      g.closePath();
-      g.fillStyle = rgba(this.palette.wake, this.palette.dark ? 0.02 : 0.012);
-      g.fill();
-    }
-
-    g.globalAlpha = 0.42;
-    paintGrid(g, W, H, cw, ch, dpr, this.palette.grid);
-    g.globalAlpha = 1;
+        g.globalAlpha = 0.42;
+        paintGrid(g, W, H, cw, ch, dpr, this.palette.grid);
+        g.globalAlpha = 1;
+      },
+    );
   }
 
   render(world: JellyfishWorld, _dt: number) {
@@ -397,23 +326,5 @@ export class JellyfishRenderer {
     const angle = Math.atan2(v, u);
     const index = Math.floor(((angle + Math.PI) / TAU) * 6) % 6;
     return ["'", "'", "-", "|", "+", "|"][index];
-  }
-
-  private forEachCell(
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    fn: (col: number, row: number, edge: boolean) => void,
-  ) {
-    const c0 = Math.max(0, Math.floor(x / this.cw));
-    const r0 = Math.max(0, Math.floor(y / this.ch));
-    const c1 = Math.min(this.cols - 1, Math.floor((x + w) / this.cw));
-    const r1 = Math.min(this.rows - 1, Math.floor((y + h) / this.ch));
-    for (let row = r0; row <= r1; row++) {
-      for (let col = c0; col <= c1; col++) {
-        fn(col, row, col === c0 || col === c1 || row === r0 || row === r1);
-      }
-    }
   }
 }

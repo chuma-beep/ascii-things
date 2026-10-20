@@ -6,6 +6,7 @@
  *   4. sharks rasterised cell-by-cell with supersampled edges: grey blocks
  *      shaded by the light, dense glyphs, and shimmering accent colours
  */
+import { CellGrid, paintGrid } from "./core/grid";
 import { clamp, hash3, smoothstep } from "./math";
 import { resolvePalette, type Palette, type PaletteName } from "./palette";
 import { SHARK_NODES, type Shark, type SharkKind, type World, type WorldEvent } from "./world";
@@ -262,46 +263,9 @@ export interface RendererOptions {
   onEvent?: (event: WorldEvent) => void;
 }
 
-/** Visible cell grid, snapped to device pixels. Shared with the sidebar backdrop. */
-export function paintGrid(
-  g: CanvasRenderingContext2D,
-  W: number,
-  H: number,
-  cw: number,
-  ch: number,
-  dpr: number,
-  color = "rgba(255,255,255,0.055)",
-) {
-  g.setTransform(1, 0, 0, 1, 0, 0);
-  g.strokeStyle = color;
-  g.lineWidth = 1;
-  g.beginPath();
-  for (let c = 0; c <= Math.ceil(W / cw); c++) {
-    const x = Math.round(c * cw * dpr) + 0.5;
-    g.moveTo(x, 0);
-    g.lineTo(x, H * dpr);
-  }
-  for (let r = 0; r <= Math.ceil(H / ch); r++) {
-    const y = Math.round(r * ch * dpr) + 0.5;
-    g.moveTo(0, y);
-    g.lineTo(W * dpr, y);
-  }
-  g.stroke();
-}
+export { paintGrid };
 
-export class AsciiRenderer {
-  private ctx: CanvasRenderingContext2D;
-  private bg: HTMLCanvasElement;
-  private dpr = 1;
-  private width = 0;
-  private height = 0;
-  private cw = 12;
-  private ch = 18;
-  private cols = 0;
-  private rows = 0;
-  private fontFamily = "ui-monospace, Menlo, monospace";
-  private columns = 124;
-  private maxCells = 16000;
+export class AsciiRenderer extends CellGrid {
   private calm = false;
   private palette: Palette = resolvePalette();
   private onEvent?: (event: WorldEvent) => void;
@@ -347,44 +311,12 @@ export class AsciiRenderer {
   private fishBuckets: number[][] = FISH_ALPHAS.map(() => []);
   private fishStyles = FISH_ALPHAS.map((a) => `rgba(230,238,255,${a})`);
 
-  constructor(
-    private canvas: HTMLCanvasElement,
-    options: RendererOptions = {},
-  ) {
-    const ctx = canvas.getContext("2d", { alpha: false });
-    if (!ctx) throw new Error("2D canvas unavailable");
-    this.ctx = ctx;
-    this.bg = document.createElement("canvas");
+  constructor(canvas: HTMLCanvasElement, options: RendererOptions = {}) {
+    super(canvas, { columns: options.columns, maxCells: options.maxCells });
     this.palette = resolvePalette(options.palette);
-    this.columns = options.columns ?? 124;
-    this.maxCells = options.maxCells ?? 16000;
     this.calm = options.calm ?? false;
     this.onEvent = options.onEvent;
     this.applyPalette();
-  }
-
-  get cellWidth() {
-    return this.cw;
-  }
-
-  get cellHeight() {
-    return this.ch;
-  }
-
-  get cellCount() {
-    return this.cols * this.rows;
-  }
-
-  get columnCount() {
-    return this.cols;
-  }
-
-  get rowCount() {
-    return this.rows;
-  }
-
-  setFontFamily(family: string) {
-    if (family) this.fontFamily = family;
   }
 
   setOptions(options: RendererOptions) {
@@ -392,8 +324,7 @@ export class AsciiRenderer {
       this.palette = resolvePalette(options.palette);
       this.applyPalette();
     }
-    if (options.columns !== undefined) this.columns = Math.max(24, options.columns);
-    if (options.maxCells !== undefined) this.maxCells = Math.max(0, options.maxCells);
+    this.setGridOptions({ columns: options.columns, maxCells: options.maxCells });
     if (options.calm !== undefined) this.calm = options.calm;
     if (options.onEvent !== undefined) this.onEvent = options.onEvent;
   }
@@ -412,33 +343,7 @@ export class AsciiRenderer {
   }
 
   resize(width: number, height: number, dpr: number) {
-    this.width = width;
-    this.height = height;
-    this.dpr = dpr;
-
-    // Keep glyphs at a readable size (8–13 px) at normal viewports. Only
-    // when the cell budget would be exceeded do we grow the cell, which is
-    // what keeps 4K from exploding to 33k cells.
-    const targetColumns = Math.max(24, this.columns);
-    let cw = clamp(Math.round(width / targetColumns), 8, 13);
-    let ch = Math.round(cw * 1.45);
-    let cols = Math.ceil(width / cw);
-    let rows = Math.ceil(height / ch);
-    while (this.maxCells > 0 && cols * rows > this.maxCells && cw < 64) {
-      cw++;
-      ch = Math.round(cw * 1.45);
-      cols = Math.ceil(width / cw);
-      rows = Math.ceil(height / ch);
-    }
-    this.cw = cw;
-    this.ch = ch;
-    this.cols = cols;
-    this.rows = rows;
-
-    this.canvas.width = Math.round(width * dpr);
-    this.canvas.height = Math.round(height * dpr);
-    this.bg.width = this.canvas.width;
-    this.bg.height = this.canvas.height;
+    super.resize(width, height, dpr);
 
     const n = this.cols * this.rows;
     this.dotKind = new Uint8Array(n);
@@ -469,13 +374,12 @@ export class AsciiRenderer {
   }
 
   private paintBackground() {
-    const g = this.bg.getContext("2d");
-    if (!g) return;
-    const { width: W, height: H, dpr, cw, ch } = this;
-    g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    g.fillStyle = this.palette.background;
-    g.fillRect(0, 0, W, H);
-    paintGrid(g, W, H, cw, ch, dpr, this.palette.grid);
+    this.paintBackdrop(
+      this.palette.background,
+      (g, { width: W, height: H, dpr, cellWidth, cellHeight }) => {
+        paintGrid(g, W, H, cellWidth, cellHeight, dpr, this.palette.grid);
+      },
+    );
   }
 
   render(world: World, dt: number) {
@@ -505,13 +409,6 @@ export class AsciiRenderer {
   }
 
   // ── simulation → field ──────────────────────────────────────────────
-
-  private cellIndex(x: number, y: number) {
-    const c = Math.floor(x / this.cw);
-    const r = Math.floor(y / this.ch);
-    if (c < 0 || r < 0 || c >= this.cols || r >= this.rows) return -1;
-    return r * this.cols + c;
-  }
 
   private stamp(field: Float32Array, x: number, y: number, radius: number, amount: number) {
     const c0 = Math.floor(x / this.cw);
