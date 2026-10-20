@@ -1,10 +1,4 @@
-import {
-  createDog,
-  createJellyfish,
-  createRobots,
-  createSharks,
-  type DogEngine,
-} from "./src";
+import { createDog, createJellyfish, createRobots, createSharks, type DogEngine } from "./src";
 
 type CardEngine =
   | ReturnType<typeof createSharks>
@@ -212,7 +206,8 @@ codeCopy?.addEventListener("click", async () => {
 
 const installCopy = document.querySelector<HTMLButtonElement>(".install-pill button");
 installCopy?.addEventListener("click", async () => {
-  const command = document.querySelector<HTMLElement>("#install-command")?.textContent ?? "npm i ascii-things";
+  const command =
+    document.querySelector<HTMLElement>("#install-command")?.textContent ?? "npm i ascii-things";
   if (await copyText(command)) flash(installCopy, "COPIED");
 });
 

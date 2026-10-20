@@ -34,7 +34,10 @@ export class RobotRenderer {
   private calm = false;
   private palette: Palette = resolvePalette();
 
-  constructor(private canvas: HTMLCanvasElement, options: RobotRendererOptions = {}) {
+  constructor(
+    private canvas: HTMLCanvasElement,
+    options: RobotRendererOptions = {},
+  ) {
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) throw new Error("2D canvas unavailable");
     this.ctx = ctx;
@@ -169,7 +172,7 @@ export class RobotRenderer {
           const bottom = (row + 0.5) * this.ch > y0 + dock.h - this.ch;
           glyph = (left || right) && (top || bottom) ? "+" : left || right ? "|" : "-";
         } else if (active) {
-          glyph = ((Math.floor(world.time * 3 + col) % 4) === 0 && !this.calm) ? "*" : "+";
+          glyph = Math.floor(world.time * 3 + col) % 4 === 0 && !this.calm ? "*" : "+";
         }
         this.ctx.fillStyle = rgba(this.palette.wake, edge ? 0.42 : active ? 0.62 : 0.26);
         this.ctx.fillText(glyph, cx, cy);
@@ -190,7 +193,11 @@ export class RobotRenderer {
       this.forEachCell(x0, y0, crate.w, crate.h, (col, row, edge) => {
         const h = hash3(col, row, 17);
         this.ctx.fillStyle = edge ? rgba(this.palette.edge, 0.48) : this.palette.fish[2];
-        this.ctx.fillText(edge ? "+" : h > 0.8 ? "=" : h > 0.42 ? "#" : "%", (col + 0.5) * this.cw, (row + 0.5) * this.ch);
+        this.ctx.fillText(
+          edge ? "+" : h > 0.8 ? "=" : h > 0.42 ? "#" : "%",
+          (col + 0.5) * this.cw,
+          (row + 0.5) * this.ch,
+        );
       });
     }
   }
@@ -243,7 +250,8 @@ export class RobotRenderer {
 
       const edge = Math.abs(lx) > L / 2 - edgePad || Math.abs(ly) > W / 2 - edgePad;
       const sensor = lx > L * 0.26 && lx < L * 0.46 && Math.abs(ly) < W * 0.24;
-      const cargo = r.kind === "hauler" && lx < -L * 0.1 && lx > -L * 0.45 && Math.abs(ly) < W * 0.3;
+      const cargo =
+        r.kind === "hauler" && lx < -L * 0.1 && lx > -L * 0.45 && Math.abs(ly) < W * 0.3;
       const seam = Math.abs(ly) < Math.min(W * 0.08, ch * 0.35);
       let fill = this.palette.fish[4];
       let ink = this.palette.textOnBody;
@@ -272,7 +280,7 @@ export class RobotRenderer {
     });
 
     // Direction chevron at the snout, so a still frame reads as "moving".
-    const dir = Math.abs(cos) > Math.abs(sin) ? (cos > 0 ? ">" : "<") : (sin > 0 ? "v" : "^");
+    const dir = Math.abs(cos) > Math.abs(sin) ? (cos > 0 ? ">" : "<") : sin > 0 ? "v" : "^";
     ctx.fillStyle = rgba(this.palette.wake, r.state === "charge" ? 0.55 : 0.95);
     ctx.fillText(dir, r.x + cos * L * 0.62, r.y + sin * L * 0.62);
 
@@ -281,11 +289,12 @@ export class RobotRenderer {
     const ay = r.y - sin * L * 0.4 + cos * W * 0.55;
     const low = r.battery <= 26;
     const blinkOn = this.calm || Math.sin(time * 8 + r.blink) > 0;
-    ctx.fillStyle = r.state === "charge"
-      ? rgba(this.palette.wake, 0.95)
-      : low
-        ? rgba(this.palette.heat, blinkOn ? 0.95 : 0.25)
-        : rgba(this.palette.wake, 0.75);
+    ctx.fillStyle =
+      r.state === "charge"
+        ? rgba(this.palette.wake, 0.95)
+        : low
+          ? rgba(this.palette.heat, blinkOn ? 0.95 : 0.25)
+          : rgba(this.palette.wake, 0.75);
     ctx.fillText(r.state === "charge" ? "+" : "o", ax, ay);
     ctx.fillStyle = rgba(this.palette.edge, 0.45);
     ctx.fillText("'", ax - Math.sin(r.heading) * ch, ay + Math.cos(r.heading) * ch);
@@ -339,5 +348,3 @@ export class RobotRenderer {
     }
   }
 }
-
-

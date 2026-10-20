@@ -132,7 +132,8 @@ export class RobotEngine {
       });
     }
 
-    if (structural || partial.columns !== undefined || partial.maxCells !== undefined) this.resize();
+    if (structural || partial.columns !== undefined || partial.maxCells !== undefined)
+      this.resize();
     if (partial.speed !== undefined) this.schedule();
     if (!this.raf) this.renderer.render(this.world, STEP);
   }

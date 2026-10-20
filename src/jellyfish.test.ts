@@ -11,9 +11,9 @@ describe("JellyfishWorld", () => {
   it("is deterministic for a seed", () => {
     const a = makeWorld(11);
     const b = makeWorld(11);
-    expect(
-      a.jellies.map((j) => [j.kind, j.x, j.y, j.radius, j.depth, j.phase]),
-    ).toEqual(b.jellies.map((j) => [j.kind, j.x, j.y, j.radius, j.depth, j.phase]));
+    expect(a.jellies.map((j) => [j.kind, j.x, j.y, j.radius, j.depth, j.phase])).toEqual(
+      b.jellies.map((j) => [j.kind, j.x, j.y, j.radius, j.depth, j.phase]),
+    );
     expect(a.plankton.map((p) => [p.x, p.y, p.depth])).toEqual(
       b.plankton.map((p) => [p.x, p.y, p.depth]),
     );

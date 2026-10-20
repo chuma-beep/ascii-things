@@ -276,7 +276,12 @@ export function AsciiSceneTabs({
   };
 
   return (
-    <div className={cx("ascii-tabs", className)} style={style} role="tablist" aria-label={ariaLabel}>
+    <div
+      className={cx("ascii-tabs", className)}
+      style={style}
+      role="tablist"
+      aria-label={ariaLabel}
+    >
       {scenes.map((scene, index) => {
         const selected = scene.id === value;
         return (
@@ -358,11 +363,7 @@ export function AsciiDogHero({
   onCommand,
   ...dogProps
 }: AsciiDogHeroProps) {
-  const {
-    label = "A live ASCII robot dog test yard",
-    onEvent,
-    ...engineOptions
-  } = dogProps;
+  const { label = "A live ASCII robot dog test yard", onEvent, ...engineOptions } = dogProps;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<ReturnType<typeof createDog> | null>(null);
   const optionsRef = useRef(engineOptions);
@@ -468,12 +469,7 @@ export function AsciiDogHero({
         aspectRatio="4 / 3"
         footer={<AsciiReadout items={readout} ariaLabel="Live scene statistics" />}
       >
-        <canvas
-          ref={canvasRef}
-          className="ascii-things ascii-dog"
-          role="img"
-          aria-label={label}
-        />
+        <canvas ref={canvasRef} className="ascii-things ascii-dog" role="img" aria-label={label} />
       </AsciiStage>
     </section>
   );

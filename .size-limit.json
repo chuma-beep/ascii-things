@@ -1,0 +1,50 @@
+[
+  {
+    "name": "sharks",
+    "path": "dist/sharks.js",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "robots",
+    "path": "dist/robots.js",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "jellyfish",
+    "path": "dist/jellyfish.js",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "dog",
+    "path": "dist/dog.js",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "all scenes",
+    "path": "dist/index.js",
+    "limit": "50 kB",
+    "gzip": true
+  },
+  {
+    "name": "react",
+    "path": "dist/react.js",
+    "limit": "35 kB",
+    "gzip": true
+  },
+  {
+    "name": "element",
+    "path": "dist/element.js",
+    "limit": "35 kB",
+    "gzip": true
+  },
+  {
+    "name": "ui",
+    "path": "dist/ui.js",
+    "limit": "25 kB",
+    "gzip": true
+  }
+]

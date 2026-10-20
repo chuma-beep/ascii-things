@@ -104,5 +104,5 @@ export const PALETTES: Record<PaletteName, Palette> = {
 
 export function resolvePalette(palette?: PaletteName | Palette): Palette {
   if (!palette) return PALETTES.abyss;
-  return typeof palette === "string" ? PALETTES[palette] ?? PALETTES.abyss : palette;
+  return typeof palette === "string" ? (PALETTES[palette] ?? PALETTES.abyss) : palette;
 }

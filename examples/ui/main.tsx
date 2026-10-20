@@ -1,13 +1,7 @@
 import { StrictMode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AsciiDog } from "../../src/react";
-import {
-  AsciiDogHero,
-  AsciiPrompt,
-  AsciiReadout,
-  AsciiSceneTabs,
-  AsciiStage,
-} from "../../src/ui";
+import { AsciiDogHero, AsciiPrompt, AsciiReadout, AsciiSceneTabs, AsciiStage } from "../../src/ui";
 import type { PaletteName } from "../../src/palette";
 import "../../src/ui.css";
 import "./style.css";
@@ -40,15 +34,17 @@ function App() {
 
       <main className="ui-wrap">
         <section className="ui-intro">
-          <p className="ui-kicker"><i /> First-party UI / no Tailwind required</p>
+          <p className="ui-kicker">
+            <i /> First-party UI / no Tailwind required
+          </p>
           <h1>
             Bring your own interface.
             <br />
             <em>Or use ours.</em>
           </h1>
           <p className="ui-lede">
-            A small set of React components for framing scenes, capturing commands,
-            and reading live state. CSS variables in, your design system out.
+            A small set of React components for framing scenes, capturing commands, and reading live
+            state. CSS variables in, your design system out.
           </p>
           <div className="ui-badges">
             <span>React 18+</span>
@@ -83,8 +79,8 @@ function App() {
               <h2 id="pieces-title">Compose it your way.</h2>
             </div>
             <p>
-              Use the recipe, or assemble a stage, prompt, readout, and tabs
-              yourself. Every component is controlled where it matters.
+              Use the recipe, or assemble a stage, prompt, readout, and tabs yourself. Every
+              component is controlled where it matters.
             </p>
           </div>
 
@@ -131,8 +127,8 @@ function App() {
                 />
               </AsciiStage>
               <p className="ui-note">
-                Tabs are keyboard-navigable. Palette changes update the live engine
-                without recreating the world.
+                Tabs are keyboard-navigable. Palette changes update the live engine without
+                recreating the world.
               </p>
             </article>
 
@@ -153,14 +149,16 @@ function App() {
                 onSubmit={(value) => setPromptStatus(`QUEUED · ${value.toUpperCase()}`)}
               />
               <p className="ui-note">
-                Uncontrolled by default, controlled when you pass <code>value</code>.
-                The status line is a polite live region.
+                Uncontrolled by default, controlled when you pass <code>value</code>. The status
+                line is a polite live region.
               </p>
-              <pre className="ui-code"><code>{`<AsciiPrompt
+              <pre className="ui-code">
+                <code>{`<AsciiPrompt
   label="Command the unit"
   onSubmit={handleCommand}
   status={status}
-/>`}</code></pre>
+/>`}</code>
+              </pre>
             </article>
           </div>
         </section>
@@ -172,13 +170,14 @@ function App() {
               <h2 id="install-title">One import. Your chrome.</h2>
             </div>
             <p>
-              The UI subpath ships as React source compiled to ESM. Import the CSS
-              once, then let your host app own the page.
+              The UI subpath ships as React source compiled to ESM. Import the CSS once, then let
+              your host app own the page.
             </p>
           </div>
 
           <div className="ui-install-grid">
-            <pre className="ui-code ui-code-large"><code>{`import {
+            <pre className="ui-code ui-code-large">
+              <code>{`import {
   AsciiDogHero,
   AsciiStage,
   AsciiPrompt,
@@ -187,14 +186,15 @@ function App() {
 } from "ascii-things/ui";
 import "ascii-things/ui.css";
 
-<AsciiDogHero palette="abyss" seed={7} />`}</code></pre>
+<AsciiDogHero palette="abyss" seed={7} />`}</code>
+            </pre>
             <div className="ui-recipe">
               <p className="ui-kicker">With shadcn</p>
               <h3>Use your Input and Button.</h3>
               <p>
-                Keep <code>AsciiStage</code> and <code>AsciiDog</code>, then pass
-                your own controls through the stage overlay or below it. shadcn is
-                copy-paste code, so it never becomes a runtime dependency.
+                Keep <code>AsciiStage</code> and <code>AsciiDog</code>, then pass your own controls
+                through the stage overlay or below it. shadcn is copy-paste code, so it never
+                becomes a runtime dependency.
               </p>
               <a className="ui-link" href="/examples/dog-input/">
                 Open the shadcn-style recipe ↗

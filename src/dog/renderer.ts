@@ -40,7 +40,10 @@ export class DogRenderer {
   private calm = false;
   private palette: Palette = resolvePalette();
 
-  constructor(private canvas: HTMLCanvasElement, options: DogRendererOptions = {}) {
+  constructor(
+    private canvas: HTMLCanvasElement,
+    options: DogRendererOptions = {},
+  ) {
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) throw new Error("2D canvas unavailable");
     this.ctx = ctx;
@@ -239,20 +242,26 @@ export class DogRenderer {
   private drawCones(world: DogWorld) {
     const { ctx, ch } = this;
     for (const cone of world.cones) {
-      this.forEachCell(cone.x - cone.w, world.groundY - cone.h - ch, cone.w * 2, cone.h + ch, (col, row) => {
-        const cx = (col + 0.5) * this.cw;
-        const cy = (row + 0.5) * this.ch;
-        const v = (world.groundY - cy) / cone.h;
-        if (v < 0 || v > 1) return;
-        const half = (1 - v) * cone.w * 0.5;
-        const u = Math.abs(cx - cone.x);
-        if (u > half) return;
-        const edge = u > half - this.cw * 0.55;
-        ctx.fillStyle = edge
-          ? rgba(this.palette.heatHot, 0.75)
-          : rgba(this.palette.heatHot, 0.22 + v * 0.12);
-        ctx.fillText(edge ? (cx < cone.x ? "/" : "\\") : "%", cx, cy);
-      });
+      this.forEachCell(
+        cone.x - cone.w,
+        world.groundY - cone.h - ch,
+        cone.w * 2,
+        cone.h + ch,
+        (col, row) => {
+          const cx = (col + 0.5) * this.cw;
+          const cy = (row + 0.5) * this.ch;
+          const v = (world.groundY - cy) / cone.h;
+          if (v < 0 || v > 1) return;
+          const half = (1 - v) * cone.w * 0.5;
+          const u = Math.abs(cx - cone.x);
+          if (u > half) return;
+          const edge = u > half - this.cw * 0.55;
+          ctx.fillStyle = edge
+            ? rgba(this.palette.heatHot, 0.75)
+            : rgba(this.palette.heatHot, 0.22 + v * 0.12);
+          ctx.fillText(edge ? (cx < cone.x ? "/" : "\\") : "%", cx, cy);
+        },
+      );
       ctx.fillStyle = rgba(this.palette.heatHot, 0.6);
       ctx.fillRect(cone.x - cone.w * 0.55, world.groundY - 2, cone.w * 1.1, 2);
     }
@@ -292,7 +301,15 @@ export class DogRenderer {
     const shadow = this.palette.dark ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.12)";
     ctx.fillStyle = shadow;
     ctx.beginPath();
-    ctx.ellipse(ball.x, ball.y + ball.radius * 0.88, ball.radius * 0.9, ball.radius * 0.28, 0, 0, Math.PI * 2);
+    ctx.ellipse(
+      ball.x,
+      ball.y + ball.radius * 0.88,
+      ball.radius * 0.9,
+      ball.radius * 0.28,
+      0,
+      0,
+      Math.PI * 2,
+    );
     ctx.fill();
 
     for (let i = 1; i <= 3; i++) {
@@ -302,20 +319,26 @@ export class DogRenderer {
       ctx.fillText("·", x, y);
     }
 
-    this.forEachCell(ball.x - ball.radius, ball.y - ball.radius, ball.radius * 2, ball.radius * 2, (col, row) => {
-      const cx = (col + 0.5) * this.cw;
-      const cy = (row + 0.5) * this.ch;
-      const d = Math.hypot(cx - ball.x, cy - ball.y);
-      if (d > ball.radius) return;
-      const edge = d > ball.radius - this.cw * 0.7;
-      const stripe = Math.sin(Math.atan2(cy - ball.y, cx - ball.x) * 2 + ball.spin) > 0.45;
-      ctx.fillStyle = edge
-        ? rgba(this.palette.edge, 0.8)
-        : stripe
-          ? rgba(this.palette.heatHot, 0.88)
-          : rgba(this.palette.heatHot, 0.5);
-      ctx.fillText(edge ? "*" : stripe ? "@" : "o", cx, cy);
-    });
+    this.forEachCell(
+      ball.x - ball.radius,
+      ball.y - ball.radius,
+      ball.radius * 2,
+      ball.radius * 2,
+      (col, row) => {
+        const cx = (col + 0.5) * this.cw;
+        const cy = (row + 0.5) * this.ch;
+        const d = Math.hypot(cx - ball.x, cy - ball.y);
+        if (d > ball.radius) return;
+        const edge = d > ball.radius - this.cw * 0.7;
+        const stripe = Math.sin(Math.atan2(cy - ball.y, cx - ball.x) * 2 + ball.spin) > 0.45;
+        ctx.fillStyle = edge
+          ? rgba(this.palette.edge, 0.8)
+          : stripe
+            ? rgba(this.palette.heatHot, 0.88)
+            : rgba(this.palette.heatHot, 0.5);
+        ctx.fillText(edge ? "*" : stripe ? "@" : "o", cx, cy);
+      },
+    );
   }
 
   private drawDog(dog: Dog, time: number) {
@@ -383,8 +406,16 @@ export class DogRenderer {
         knee.y = dog.y - H * 0.42;
       }
       this.bone(hip, knee, L * 0.055, spec.near ? this.palette.fish[3] : this.palette.fish[2], "@");
-      this.bone(knee, { x: footX, y: footY }, L * 0.045, spec.near ? this.palette.fish[3] : this.palette.fish[2], "@");
-      this.ctx.fillStyle = spec.near ? rgba(this.palette.edge, 0.85) : rgba(this.palette.edge, 0.55);
+      this.bone(
+        knee,
+        { x: footX, y: footY },
+        L * 0.045,
+        spec.near ? this.palette.fish[3] : this.palette.fish[2],
+        "@",
+      );
+      this.ctx.fillStyle = spec.near
+        ? rgba(this.palette.edge, 0.85)
+        : rgba(this.palette.edge, 0.55);
       this.ctx.fillText("#", footX, footY - this.ch * 0.25);
       this.ctx.fillStyle = rgba(this.palette.wake, 0.7);
       this.ctx.fillText("o", knee.x, knee.y);
@@ -437,15 +468,16 @@ export class DogRenderer {
       if (Math.abs(lx) > L * 0.5 || ly < -H * 0.5 || ly > bottom) return;
       const corner = Math.min(L * 0.09, H * 0.16);
       if (
-        (Math.abs(lx) > L * 0.5 - corner && Math.abs(ly) > H * 0.5 - corner) &&
-        (Math.abs(lx) - (L * 0.5 - corner)) / corner + (Math.abs(ly) - (H * 0.5 - corner)) / corner > 1
+        Math.abs(lx) > L * 0.5 - corner &&
+        Math.abs(ly) > H * 0.5 - corner &&
+        (Math.abs(lx) - (L * 0.5 - corner)) / corner +
+          (Math.abs(ly) - (H * 0.5 - corner)) / corner >
+          1
       ) {
         return;
       }
       const edge =
-        Math.abs(lx) > L * 0.5 - L * 0.055 ||
-        ly < -H * 0.5 + H * 0.08 ||
-        ly > bottom - H * 0.08;
+        Math.abs(lx) > L * 0.5 - L * 0.055 || ly < -H * 0.5 + H * 0.08 || ly > bottom - H * 0.08;
       const seam = Math.abs(lx) < L * 0.015 || Math.abs(Math.abs(lx) - L * 0.23) < L * 0.008;
       const spine = ly < -H * 0.28 && Math.abs(lx) < L * 0.3;
       let glyph = edge ? "#" : seam ? "%" : spine ? "=" : "@";
@@ -478,7 +510,14 @@ export class DogRenderer {
     }
   }
 
-  private drawHead(dog: Dog, head: { x: number; y: number }, L: number, H: number, sniff: number, time: number) {
+  private drawHead(
+    dog: Dog,
+    head: { x: number; y: number },
+    L: number,
+    H: number,
+    sniff: number,
+    time: number,
+  ) {
     const { ctx } = this;
     const dir = dog.heading;
     const hw = L * 0.24;
@@ -495,7 +534,15 @@ export class DogRenderer {
     const earX = head.x - dir * hw * 0.25;
     const earY = head.y - hh * 0.62;
     const earLift = dog.state === "alert" ? hh * 0.28 : 0;
-    this.panel(earX, earY - earLift * 0.5, hw * 0.2, hh * 0.5 + earLift, this.palette.fish[2], "#", "^");
+    this.panel(
+      earX,
+      earY - earLift * 0.5,
+      hw * 0.2,
+      hh * 0.5 + earLift,
+      this.palette.fish[2],
+      "#",
+      "^",
+    );
 
     const eyeX = head.x + dir * hw * 0.38;
     const eyeY = head.y - hh * 0.12 + sniff * hh * 0.18;
@@ -571,7 +618,8 @@ export class DogRenderer {
     this.forEachCell(cx - w / 2, cy - h / 2, w, h, (col, row) => {
       const x = (col + 0.5) * this.cw;
       const y = (row + 0.5) * this.ch;
-      const edge = Math.abs(x - cx) > w / 2 - this.cw * 0.55 || Math.abs(y - cy) > h / 2 - this.ch * 0.55;
+      const edge =
+        Math.abs(x - cx) > w / 2 - this.cw * 0.55 || Math.abs(y - cy) > h / 2 - this.ch * 0.55;
       ctx.fillStyle = fill;
       ctx.fillRect(x - this.cw / 2, y - this.ch / 2, this.cw, this.ch);
       ctx.fillStyle = this.palette.textOnBody;

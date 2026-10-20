@@ -213,16 +213,17 @@ export class RobotWorld {
   }
 
   private makeCrates(): Crate[] {
-    const specs = this.width < 760
-      ? [
-          [0.2, 0.3, 0.16, 0.12],
-          [0.72, 0.24, 0.14, 0.1],
-        ]
-      : [
-          [0.17, 0.28, 0.13, 0.11],
-          [0.7, 0.2, 0.11, 0.09],
-          [0.44, 0.5, 0.14, 0.12],
-        ];
+    const specs =
+      this.width < 760
+        ? [
+            [0.2, 0.3, 0.16, 0.12],
+            [0.72, 0.24, 0.14, 0.1],
+          ]
+        : [
+            [0.17, 0.28, 0.13, 0.11],
+            [0.7, 0.2, 0.11, 0.09],
+            [0.44, 0.5, 0.14, 0.12],
+          ];
     return specs.map(([x, y, w, h]) => ({
       x: this.width * x + this.rng.range(-12, 12),
       y: this.height * y + this.rng.range(-10, 10),
@@ -242,7 +243,9 @@ export class RobotWorld {
       const tx = this.rng.range(margin, Math.max(margin + 1, this.width - margin));
       const ty = this.rng.range(margin, Math.max(margin + 1, this.height * 0.68));
       if (this.insideCrate(tx, ty, length * 0.7)) continue;
-      const crowded = this.robots.some((r) => Math.hypot(r.x - tx, r.y - ty) < (r.length + length) * 0.9);
+      const crowded = this.robots.some(
+        (r) => Math.hypot(r.x - tx, r.y - ty) < (r.length + length) * 0.9,
+      );
       if (crowded) continue;
       x = tx;
       y = ty;
@@ -489,10 +492,19 @@ export class RobotWorld {
         const top = r.y - (c.y - c.h / 2);
         const bottom = c.y + c.h / 2 - r.y;
         const m = Math.min(left, right, top, bottom);
-        if (m === left) { ox = -1; oy = 0; }
-        else if (m === right) { ox = 1; oy = 0; }
-        else if (m === top) { ox = 0; oy = -1; }
-        else { ox = 0; oy = 1; }
+        if (m === left) {
+          ox = -1;
+          oy = 0;
+        } else if (m === right) {
+          ox = 1;
+          oy = 0;
+        } else if (m === top) {
+          ox = 0;
+          oy = -1;
+        } else {
+          ox = 0;
+          oy = 1;
+        }
         d = 1;
       }
       if (d < minD) {

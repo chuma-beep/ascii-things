@@ -33,7 +33,10 @@ export class JellyfishRenderer {
   private calm = false;
   private palette: Palette = resolvePalette();
 
-  constructor(private canvas: HTMLCanvasElement, options: JellyfishRendererOptions = {}) {
+  constructor(
+    private canvas: HTMLCanvasElement,
+    options: JellyfishRendererOptions = {},
+  ) {
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) throw new Error("2D canvas unavailable");
     this.ctx = ctx;
@@ -278,8 +281,7 @@ export class JellyfishRenderer {
       const hem = 0.05 + 0.025 * (0.5 + 0.5 * Math.cos(u * Math.PI * 5 + jelly.id));
       const edge = q > 0.82 || v > bottom - hem;
       const rim = q > 0.52 && q < 0.62 && v > 0.06;
-      const canal =
-        Math.abs(Math.sin(Math.atan2(v, u) * 2)) < 0.09 && q > 0.14 && q < 0.76;
+      const canal = Math.abs(Math.sin(Math.atan2(v, u) * 2)) < 0.09 && q > 0.14 && q < 0.76;
       const grain = hash3(col, row, jelly.id);
 
       let glyph = grain > 0.78 ? "+" : grain > 0.42 ? ":" : "-";

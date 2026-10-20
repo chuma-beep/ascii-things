@@ -88,7 +88,16 @@ const DRAIN_IDLE = 0.32;
  */
 export class DogWorld {
   dogs: Dog[] = [];
-  ball: Ball = { x: 0, y: 0, vx: 0, vy: 0, radius: 10, active: false, spin: 0, chasePending: false };
+  ball: Ball = {
+    x: 0,
+    y: 0,
+    vx: 0,
+    vy: 0,
+    radius: 10,
+    active: false,
+    spin: 0,
+    chasePending: false,
+  };
   dock: DogDock = { x: 0, y: 0, w: 100, h: 18, owner: null };
   cones: DogCone[] = [];
   pointer: DogPointer = { x: 0, y: 0, active: false };
@@ -290,11 +299,7 @@ export class DogWorld {
     dog.poseSniff += (sniffTarget - dog.poseSniff) * Math.min(1, dt * 5);
 
     const moving = dog.state === "walk" || dog.state === "trot" || dog.state === "chase";
-    dog.battery = clamp(
-      dog.battery - dt * (moving ? DRAIN_MOVING : DRAIN_IDLE),
-      0,
-      100,
-    );
+    dog.battery = clamp(dog.battery - dt * (moving ? DRAIN_MOVING : DRAIN_IDLE), 0, 100);
 
     if (dog.battery <= LOW_BATTERY && dog.state !== "charge") {
       if (!dog.low) {
@@ -360,7 +365,11 @@ export class DogWorld {
     const dx = target - dog.x;
     if (Math.abs(dx) < 3) return true;
     dog.heading = dx < 0 ? -1 : 1;
-    dog.x = clamp(dog.x + dog.heading * Math.min(Math.abs(dx), speed * dt), this.edge(), this.width - this.edge());
+    dog.x = clamp(
+      dog.x + dog.heading * Math.min(Math.abs(dx), speed * dt),
+      this.edge(),
+      this.width - this.edge(),
+    );
     return false;
   }
 

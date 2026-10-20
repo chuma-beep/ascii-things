@@ -32,7 +32,6 @@ const RIDGE_GLYPHS = "@8%";
 const EDGE_HEAVY = ":;";
 const EDGE_LIGHT = ".',`";
 
-
 const FLAG_BODY = 1;
 const FLAG_EDGE = 2;
 const FLAG_FIN = 3;
@@ -235,8 +234,14 @@ const SHAPES: Record<SharkKind, SharkShape> = {
 const KINDS = Object.keys(SHAPES) as SharkKind[];
 
 function inTriangle(
-  px: number, py: number,
-  ax: number, ay: number, bx: number, by: number, cx: number, cy: number,
+  px: number,
+  py: number,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
+  cx: number,
+  cy: number,
 ) {
   const d1 = (px - bx) * (ay - by) - (ax - bx) * (py - by);
   const d2 = (px - cx) * (by - cy) - (bx - cx) * (py - cy);
@@ -342,7 +347,10 @@ export class AsciiRenderer {
   private fishBuckets: number[][] = FISH_ALPHAS.map(() => []);
   private fishStyles = FISH_ALPHAS.map((a) => `rgba(230,238,255,${a})`);
 
-  constructor(private canvas: HTMLCanvasElement, options: RendererOptions = {}) {
+  constructor(
+    private canvas: HTMLCanvasElement,
+    options: RendererOptions = {},
+  ) {
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) throw new Error("2D canvas unavailable");
     this.ctx = ctx;
@@ -648,11 +656,17 @@ export class AsciiRenderer {
         shade = 0;
       } else if (s > shape.gills[0] && s < shape.gills[1] && across > 0.58) {
         // Five gill slits.
-        if (Math.floor(((s - shape.gills[0]) / (shape.gills[1] - shape.gills[0])) * 5) % 2 === 0) shade *= 0.45;
+        if (Math.floor(((s - shape.gills[0]) / (shape.gills[1] - shape.gills[0])) * 5) % 2 === 0)
+          shade *= 0.45;
       } else if (s < 0.05) {
         // Pale snout tip.
         shade = Math.max(shade, 0.7);
-      } else if (shape === SHAPES.zebra && s > 0.08 && s < 0.55 && (across < 0.1 || Math.abs(across - 0.6) < 0.08)) {
+      } else if (
+        shape === SHAPES.zebra &&
+        s > 0.08 &&
+        s < 0.55 &&
+        (across < 0.1 || Math.abs(across - 0.6) < 0.08)
+      ) {
         // Zebra sharks carry pale ridges down the back.
         shade = Math.max(shade, 0.8);
       } else if (this.marked(s, a * bestSign, L, across)) {
@@ -668,7 +682,10 @@ export class AsciiRenderer {
     if (
       inTriangle(u, a, L * p0, 0, L * p1, 0, L * p2, tip) &&
       // Falcate (sickle) fins get a concave trailing edge.
-      !(shape.falcate && inTriangle(u, a, L * p1, 0, L * (p1 + (p2 - p1) * 0.33), tip * 0.55, L * p2, tip))
+      !(
+        shape.falcate &&
+        inTriangle(u, a, L * p1, 0, L * (p1 + (p2 - p1) * 0.33), tip * 0.55, L * p2, tip)
+      )
     ) {
       this.hitFlag = this.marked(s, a * bestSign, L, 0) ? FLAG_MARK : FLAG_FIN;
       this.hitShade = 0.38 + 0.22 * (1 - clamp(a / tip, 0, 1));
@@ -716,7 +733,20 @@ export class AsciiRenderer {
    * Fully covered cells become solid skin; partial cells become edge glyphs.
    */
   private rasterizeSharks(sharks: Shark[], t: number) {
-    const { sharkFlag, sharkShade, sharkKey, sharkDepth, sharkKind, sharkShadow, spine, arc, cw, ch, cols, rows } = this;
+    const {
+      sharkFlag,
+      sharkShade,
+      sharkKey,
+      sharkDepth,
+      sharkKind,
+      sharkShadow,
+      spine,
+      arc,
+      cw,
+      ch,
+      cols,
+      rows,
+    } = this;
     sharkFlag.fill(0);
     sharkShadow.fill(0);
 
@@ -800,7 +830,8 @@ export class AsciiRenderer {
 
           const i = r * cols + c;
           // Body-anchored key so each glyph rides along with the skin.
-          const key = (hash3(Math.round(s * 52), Math.round(v / (cw * 0.9)), sh.id) * 4294967295) >>> 0;
+          const key =
+            (hash3(Math.round(s * 52), Math.round(v / (cw * 0.9)), sh.id) * 4294967295) >>> 0;
           sharkKey[i] = key;
           sharkDepth[i] = sh.depth;
           sharkKind[i] = kindIndex;
@@ -822,7 +853,8 @@ export class AsciiRenderer {
   }
 
   private drawSharks(t: number) {
-    const { ctx, cols, rows, cw, ch, sharkFlag, sharkShade, sharkKey, sharkDepth, sharkKind } = this;
+    const { ctx, cols, rows, cw, ch, sharkFlag, sharkShade, sharkKey, sharkDepth, sharkKind } =
+      this;
     const n = cols * rows;
     for (let i = 0; i < n; i++) {
       const flag = sharkFlag[i];
@@ -950,7 +982,21 @@ export class AsciiRenderer {
    * Dots are bucketed by colour/alpha so each bucket is one fillStyle.
    */
   private drawDots(t: number) {
-    const { ctx, cols, rows, cw, ch, dotKind, dotPhase, dotFreq, energy, sharkFlag, sharkShadow, fishStamp, frameId } = this;
+    const {
+      ctx,
+      cols,
+      rows,
+      cw,
+      ch,
+      dotKind,
+      dotPhase,
+      dotFreq,
+      energy,
+      sharkFlag,
+      sharkShadow,
+      fishStamp,
+      frameId,
+    } = this;
     const { bucketOf, bucketOrder, bucketCounts } = this;
     const n = cols * rows;
     const SKIP = bucketCounts.length - 1;
@@ -972,10 +1018,12 @@ export class AsciiRenderer {
         const row = (i / cols) | 0;
         // Dots stay bright and crisp; the twinkle is a gentle breathe, not a fade.
         const twinkle = 0.5 + 0.5 * Math.sin(t * dotFreq[i] + dotPhase[i]);
-        const caustic = 0.85 + 0.15 * Math.sin(col * 0.11 + t * 0.35) * Math.sin(row * 0.17 - t * 0.27);
+        const caustic =
+          0.85 + 0.15 * Math.sin(col * 0.11 + t * 0.35) * Math.sin(row * 0.17 - t * 0.27);
         let v = clamp((0.55 + 0.45 * twinkle) * caustic + e * 2, 0, 1);
         if (sharkShadow[i]) v *= 0.2;
-        bucket = (kind - 1) * ALPHA_LEVELS + clamp(Math.floor(v * ALPHA_LEVELS), 0, ALPHA_LEVELS - 1);
+        bucket =
+          (kind - 1) * ALPHA_LEVELS + clamp(Math.floor(v * ALPHA_LEVELS), 0, ALPHA_LEVELS - 1);
       }
       bucketOf[i] = bucket;
       bucketCounts[bucket]++;
@@ -1005,7 +1053,12 @@ export class AsciiRenderer {
         const col = i % cols;
         const row = (i / cols) | 0;
         // Sit the dot low-right in its cell, as in the reference.
-        ctx.fillRect(Math.round(col * cw + cw * 0.66 - size / 2), Math.round(row * ch + ch * 0.64 - size / 2), size, size);
+        ctx.fillRect(
+          Math.round(col * cw + cw * 0.66 - size / 2),
+          Math.round(row * ch + ch * 0.64 - size / 2),
+          size,
+          size,
+        );
       }
     }
   }

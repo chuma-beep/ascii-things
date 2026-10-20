@@ -26,9 +26,7 @@ const ROBOT_KINDS: RobotKind[] = ["scout", "hauler", "sentinel"];
 const JELLY_KINDS: JellyfishKind[] = ["moon", "lion", "box", "atolla", "crystal"];
 
 const Base: typeof HTMLElement =
-  typeof HTMLElement !== "undefined"
-    ? HTMLElement
-    : (class {} as unknown as typeof HTMLElement);
+  typeof HTMLElement !== "undefined" ? HTMLElement : (class {} as unknown as typeof HTMLElement);
 
 interface SceneEngine {
   destroy(): void;
@@ -248,9 +246,7 @@ export class AsciiJellyfishElement extends AsciiSceneElement {
           .map((entry) => {
             const [kind, size] = entry.split(":");
             return {
-              kind: JELLY_KINDS.includes(kind as JellyfishKind)
-                ? (kind as JellyfishKind)
-                : "moon",
+              kind: JELLY_KINDS.includes(kind as JellyfishKind) ? (kind as JellyfishKind) : "moon",
               size: size ? Number(size) || 1 : 1,
             };
           })

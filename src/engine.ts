@@ -134,7 +134,8 @@ export class OceanEngine {
       });
     }
 
-    if (structural || partial.columns !== undefined || partial.maxCells !== undefined) this.resize();
+    if (structural || partial.columns !== undefined || partial.maxCells !== undefined)
+      this.resize();
     if (partial.speed !== undefined) this.schedule();
   }
 

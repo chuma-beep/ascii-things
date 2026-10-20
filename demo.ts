@@ -109,7 +109,16 @@ if (params.get("scene") === "dog") {
 } else {
   const sharks: SharkSpec[] | undefined = parseSpecs(
     params.get("sharks"),
-    ["classic", "hammerhead", "zebra", "tiger", "greathammer", "mako", "thresher", "nurse"] as const,
+    [
+      "classic",
+      "hammerhead",
+      "zebra",
+      "tiger",
+      "greathammer",
+      "mako",
+      "thresher",
+      "nurse",
+    ] as const,
     0.1,
   );
   scene = createSharks(canvas, {

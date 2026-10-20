@@ -19,7 +19,15 @@ import { pickSpecies, SPECIES } from "./species";
 
 export const SHARK_NODES = 20;
 
-export type SharkKind = "classic" | "hammerhead" | "zebra" | "tiger" | "greathammer" | "mako" | "thresher" | "nurse";
+export type SharkKind =
+  | "classic"
+  | "hammerhead"
+  | "zebra"
+  | "tiger"
+  | "greathammer"
+  | "mako"
+  | "thresher"
+  | "nurse";
 
 /** Which sharks to put in the water; size is relative to the biggest. */
 export type SharkSpec = { kind: SharkKind; size: number };
@@ -229,13 +237,15 @@ export class World {
     // Smaller (farther) sharks draw first so the big one swims over them.
     this.sharks.sort((a, b) => a.length - b.length);
 
-    const total =
-      this.fishCount ?? clamp(Math.round(((W * H) / 4400) * this.density), 20, 340);
+    const total = this.fishCount ?? clamp(Math.round(((W * H) / 4400) * this.density), 20, 340);
     this.fish = [];
     while (this.fish.length < total) {
       const species = pickSpecies(this.rng.next);
       const sp = SPECIES[species];
-      const size = Math.min(this.rng.int(sp.schoolSize[0], sp.schoolSize[1]), total - this.fish.length);
+      const size = Math.min(
+        this.rng.int(sp.schoolSize[0], sp.schoolSize[1]),
+        total - this.fish.length,
+      );
       const millDir: 1 | -1 = this.rng.next() < 0.5 ? 1 : -1;
       const cx = this.rng.range(W * 0.06, W * 0.94);
       const cy = this.rng.range(H * 0.08, H * 0.92);
