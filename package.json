@@ -117,6 +117,7 @@
     "@axe-core/playwright": "^4.14.0",
     "@biomejs/biome": "^2.5.15",
     "@changesets/cli": "^2.31.1",
+    "@fontsource/geist-mono": "^5.3.0",
     "@playwright/test": "^1.64.1",
     "@size-limit/esbuild": "^12.1.0",
     "@size-limit/file": "^12.1.0",

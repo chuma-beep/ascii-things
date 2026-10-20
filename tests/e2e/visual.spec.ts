@@ -1,7 +1,11 @@
-import { expect, test, waitForFonts, waitForScene } from "./fixtures";
+import { expect, installVisualFont, test, waitForFonts, waitForScene } from "./fixtures";
 
 test.describe("visual baselines", () => {
   test.use({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
+
+  test.beforeEach(async ({ page }) => {
+    await installVisualFont(page);
+  });
 
   test("landing hero", async ({ page }) => {
     await page.goto("/");

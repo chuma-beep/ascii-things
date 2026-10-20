@@ -1,4 +1,6 @@
 import { test as base, expect, type Page } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 export interface SceneStats {
   fps: number;
@@ -46,6 +48,52 @@ export async function waitForFonts(page: Page) {
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
+}
+
+/**
+ * Visual tests need one font raster regardless of which system fonts are
+ * installed. Load the brand face from the dev dependency and apply it to page
+ * text only. Canvas keeps its normal stack so the scene snapshots stay stable.
+ */
+export async function installVisualFont(page: Page) {
+  const files = join(process.cwd(), "node_modules/@fontsource/geist-mono/files");
+  const faces = [400, 500, 600, 700]
+    .map((weight) => {
+      const data = readFileSync(join(files, `geist-mono-latin-${weight}-normal.woff2`)).toString(
+        "base64",
+      );
+      return `@font-face {
+        font-family: "Geist Mono Test";
+        font-style: normal;
+        font-weight: ${weight};
+        font-display: block;
+        src: url(data:font/woff2;base64,${data}) format("woff2");
+      }`;
+    })
+    .join("\n");
+
+  await page.addInitScript(
+    (css) => {
+      const apply = () => {
+        const style = document.createElement("style");
+        style.dataset.testFont = "true";
+        style.textContent = css;
+        document.head.append(style);
+      };
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", apply, { once: true });
+      } else {
+        apply();
+      }
+    },
+    `${faces}
+    body :not(canvas) {
+      font-family: "Geist Mono Test", monospace !important;
+    }
+    canvas {
+      font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important;
+    }`,
+  );
 }
 
 export async function waitForScene(page: Page, timeout = 15_000) {
