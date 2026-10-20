@@ -10,12 +10,18 @@ import { JellyfishEngine } from "./jellyfish/engine";
 import type { AsciiJellyfishOptions } from "./jellyfish/options";
 import { DogEngine } from "./dog/engine";
 import type { AsciiDogOptions } from "./dog/options";
+import type { SceneHandle } from "./core/scene";
 
 export interface AsciiSharksProps extends AsciiSharksOptions {
   className?: string;
   style?: CSSProperties;
+  id?: string;
   width?: number | string;
   height?: number | string;
+  /** Sets CSS aspect-ratio and lets height follow it. */
+  aspectRatio?: number | string;
+  /** Called after the engine is created, including after remounts. */
+  onReady?: (scene: SceneHandle) => void;
 }
 
 /**
@@ -26,6 +32,9 @@ export interface AsciiSharksProps extends AsciiSharksOptions {
 export function AsciiSharks({
   className,
   style,
+  id,
+  aspectRatio,
+  onReady,
   width = "100%",
   height = "100%",
   ...options
@@ -34,6 +43,8 @@ export function AsciiSharks({
   const engineRef = useRef<OceanEngine | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
 
   const structuralKey = JSON.stringify({
     sharks: options.sharks,
@@ -47,25 +58,43 @@ export function AsciiSharks({
     if (!canvas) return;
     const engine = new OceanEngine(canvas, optionsRef.current);
     engineRef.current = engine;
+    onReadyRef.current?.(engine as unknown as SceneHandle);
     return () => {
       engine.destroy();
       engineRef.current = null;
     };
   }, [structuralKey]);
 
-  const { palette, speed, columns, maxCells, calm, label, onEvent } = options;
+  const { palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent } = options;
   useEffect(() => {
-    engineRef.current?.setOptions({ palette, speed, columns, maxCells, calm, label, onEvent });
-  }, [palette, speed, columns, maxCells, calm, label, onEvent]);
+    engineRef.current?.setOptions({
+      palette,
+      speed,
+      columns,
+      maxCells,
+      calm,
+      label,
+      paused,
+      fontFamily,
+      onEvent,
+    });
+  }, [palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent]);
 
   return (
     <canvas
+      id={id}
       ref={canvasRef}
       className={["ascii-things", "ascii-sharks", className].filter(Boolean).join(" ")}
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-      style={{ display: "block", width, height, ...style }}
+      style={{
+        display: "block",
+        width,
+        height: aspectRatio ? "auto" : height,
+        ...(aspectRatio ? { aspectRatio } : null),
+        ...style,
+      }}
     />
   );
 }
@@ -73,8 +102,13 @@ export function AsciiSharks({
 export interface AsciiRobotsProps extends AsciiRobotsOptions {
   className?: string;
   style?: CSSProperties;
+  id?: string;
   width?: number | string;
   height?: number | string;
+  /** Sets CSS aspect-ratio and lets height follow it. */
+  aspectRatio?: number | string;
+  /** Called after the engine is created, including after remounts. */
+  onReady?: (scene: SceneHandle) => void;
 }
 
 /**
@@ -84,6 +118,9 @@ export interface AsciiRobotsProps extends AsciiRobotsOptions {
 export function AsciiRobots({
   className,
   style,
+  id,
+  aspectRatio,
+  onReady,
   width = "100%",
   height = "100%",
   ...options
@@ -92,6 +129,8 @@ export function AsciiRobots({
   const engineRef = useRef<RobotEngine | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
 
   const structuralKey = JSON.stringify({
     robots: options.robots,
@@ -105,25 +144,43 @@ export function AsciiRobots({
     if (!canvas) return;
     const engine = new RobotEngine(canvas, optionsRef.current);
     engineRef.current = engine;
+    onReadyRef.current?.(engine as unknown as SceneHandle);
     return () => {
       engine.destroy();
       engineRef.current = null;
     };
   }, [structuralKey]);
 
-  const { palette, speed, columns, maxCells, calm, label, onEvent } = options;
+  const { palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent } = options;
   useEffect(() => {
-    engineRef.current?.setOptions({ palette, speed, columns, maxCells, calm, label, onEvent });
-  }, [palette, speed, columns, maxCells, calm, label, onEvent]);
+    engineRef.current?.setOptions({
+      palette,
+      speed,
+      columns,
+      maxCells,
+      calm,
+      label,
+      paused,
+      fontFamily,
+      onEvent,
+    });
+  }, [palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent]);
 
   return (
     <canvas
+      id={id}
       ref={canvasRef}
       className={["ascii-things", "ascii-robots", className].filter(Boolean).join(" ")}
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-      style={{ display: "block", width, height, ...style }}
+      style={{
+        display: "block",
+        width,
+        height: aspectRatio ? "auto" : height,
+        ...(aspectRatio ? { aspectRatio } : null),
+        ...style,
+      }}
     />
   );
 }
@@ -131,8 +188,13 @@ export function AsciiRobots({
 export interface AsciiJellyfishProps extends AsciiJellyfishOptions {
   className?: string;
   style?: CSSProperties;
+  id?: string;
   width?: number | string;
   height?: number | string;
+  /** Sets CSS aspect-ratio and lets height follow it. */
+  aspectRatio?: number | string;
+  /** Called after the engine is created, including after remounts. */
+  onReady?: (scene: SceneHandle) => void;
 }
 
 /**
@@ -142,6 +204,9 @@ export interface AsciiJellyfishProps extends AsciiJellyfishOptions {
 export function AsciiJellyfish({
   className,
   style,
+  id,
+  aspectRatio,
+  onReady,
   width = "100%",
   height = "100%",
   ...options
@@ -150,6 +215,8 @@ export function AsciiJellyfish({
   const engineRef = useRef<JellyfishEngine | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
 
   const structuralKey = JSON.stringify({
     jellies: options.jellies,
@@ -163,25 +230,43 @@ export function AsciiJellyfish({
     if (!canvas) return;
     const engine = new JellyfishEngine(canvas, optionsRef.current);
     engineRef.current = engine;
+    onReadyRef.current?.(engine as unknown as SceneHandle);
     return () => {
       engine.destroy();
       engineRef.current = null;
     };
   }, [structuralKey]);
 
-  const { palette, speed, columns, maxCells, calm, label, onEvent } = options;
+  const { palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent } = options;
   useEffect(() => {
-    engineRef.current?.setOptions({ palette, speed, columns, maxCells, calm, label, onEvent });
-  }, [palette, speed, columns, maxCells, calm, label, onEvent]);
+    engineRef.current?.setOptions({
+      palette,
+      speed,
+      columns,
+      maxCells,
+      calm,
+      label,
+      paused,
+      fontFamily,
+      onEvent,
+    });
+  }, [palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent]);
 
   return (
     <canvas
+      id={id}
       ref={canvasRef}
       className={["ascii-things", "ascii-jellyfish", className].filter(Boolean).join(" ")}
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-      style={{ display: "block", width, height, ...style }}
+      style={{
+        display: "block",
+        width,
+        height: aspectRatio ? "auto" : height,
+        ...(aspectRatio ? { aspectRatio } : null),
+        ...style,
+      }}
     />
   );
 }
@@ -189,8 +274,13 @@ export function AsciiJellyfish({
 export interface AsciiDogProps extends AsciiDogOptions {
   className?: string;
   style?: CSSProperties;
+  id?: string;
   width?: number | string;
   height?: number | string;
+  /** Sets CSS aspect-ratio and lets height follow it. */
+  aspectRatio?: number | string;
+  /** Called after the engine is created, including after remounts. */
+  onReady?: (scene: SceneHandle) => void;
 }
 
 /**
@@ -200,6 +290,9 @@ export interface AsciiDogProps extends AsciiDogOptions {
 export function AsciiDog({
   className,
   style,
+  id,
+  aspectRatio,
+  onReady,
   width = "100%",
   height = "100%",
   ...options
@@ -208,6 +301,8 @@ export function AsciiDog({
   const engineRef = useRef<DogEngine | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
 
   const structuralKey = JSON.stringify({
     dogs: options.dogs,
@@ -222,25 +317,43 @@ export function AsciiDog({
     if (!canvas) return;
     const engine = new DogEngine(canvas, optionsRef.current);
     engineRef.current = engine;
+    onReadyRef.current?.(engine as unknown as SceneHandle);
     return () => {
       engine.destroy();
       engineRef.current = null;
     };
   }, [structuralKey]);
 
-  const { palette, speed, columns, maxCells, calm, label, onEvent } = options;
+  const { palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent } = options;
   useEffect(() => {
-    engineRef.current?.setOptions({ palette, speed, columns, maxCells, calm, label, onEvent });
-  }, [palette, speed, columns, maxCells, calm, label, onEvent]);
+    engineRef.current?.setOptions({
+      palette,
+      speed,
+      columns,
+      maxCells,
+      calm,
+      label,
+      paused,
+      fontFamily,
+      onEvent,
+    });
+  }, [palette, speed, columns, maxCells, calm, label, paused, fontFamily, onEvent]);
 
   return (
     <canvas
+      id={id}
       ref={canvasRef}
       className={["ascii-things", "ascii-dog", className].filter(Boolean).join(" ")}
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-      style={{ display: "block", width, height, ...style }}
+      style={{
+        display: "block",
+        width,
+        height: aspectRatio ? "auto" : height,
+        ...(aspectRatio ? { aspectRatio } : null),
+        ...style,
+      }}
     />
   );
 }

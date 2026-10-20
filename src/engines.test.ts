@@ -129,9 +129,17 @@ describe("engine migration", () => {
       expect(stats.columns, scene).toBeGreaterThan(0);
       expect(stats.rows, scene).toBeGreaterThan(0);
       expect(stats.frameMs, scene).toBeGreaterThan(0);
-      engine.setOptions({ columns: 80, palette: "paper", calm: true });
+      engine.setOptions({
+        columns: 80,
+        palette: "paper",
+        calm: true,
+        paused: true,
+        fontFamily: "monospace",
+      });
+      expect(engine.getStats().cells, scene).toBeGreaterThan(0);
       engine.pause();
       engine.resume();
+      engine.setOptions({ paused: false });
       engine.destroy();
     }
 

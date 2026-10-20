@@ -54,8 +54,18 @@ intrinsic aspect ratio in this release.
 </div>
 ```
 
-`className`, `style`, `width`, and `height` are passed through. The component also adds
-`ascii-things` and `ascii-<scene>` classes, which you can target from CSS.
+`id`, `className`, `style`, `width`, `height`, and `aspectRatio` are passed through. The
+component also adds `ascii-things` and `ascii-<scene>` classes, which you can target from CSS.
+
+```tsx
+<AsciiDog palette="abyss" seed={7} aspectRatio="16 / 9" />
+
+<AsciiDog
+  palette="abyss"
+  seed={7}
+  onReady={(scene) => scene.throwBall(600, 360)}
+/>
+```
 
 ```tsx
 <AsciiSharks
@@ -66,10 +76,9 @@ intrinsic aspect ratio in this release.
 />
 ```
 
-:::note
-`aspectRatio` is on the roadmap but is **not** a React prop in `0.4.0`. Use a CSS wrapper
-for now, or `AsciiStage` from `ascii-things/ui`, which accepts `aspectRatio`.
-:::
+`aspectRatio` sets the canvas `aspect-ratio` and switches its height to `auto`. `onReady`
+receives the live `SceneHandle` after each mount, so you can call `throwBall`, `pause`,
+`setOptions`, or read `getStats` without a separate effect.
 
 ## Live and structural props
 

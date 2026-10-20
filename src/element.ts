@@ -40,6 +40,7 @@ abstract class AsciiSceneElement extends Base {
   protected canvas: HTMLCanvasElement | null = null;
   private engine: SceneEngine | null = null;
   private mountQueued = false;
+  private aspectApplied = false;
 
   connectedCallback() {
     this.mount();
@@ -88,7 +89,28 @@ abstract class AsciiSceneElement extends Base {
     }
     this.canvas ??= this.shadowRoot!.querySelector("canvas");
     if (!this.canvas) return;
+    this.applyAspectRatio();
     this.engine = this.createEngine(this.canvas);
+    this.dispatchEvent(
+      new CustomEvent("ascii-ready", {
+        detail: { scene: this.engine },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
+  private applyAspectRatio() {
+    const ratio = this.getAttribute("aspect-ratio");
+    if (ratio) {
+      this.style.aspectRatio = ratio;
+      this.style.height = "auto";
+      this.aspectApplied = true;
+    } else if (this.aspectApplied) {
+      this.style.removeProperty("aspect-ratio");
+      this.style.removeProperty("height");
+      this.aspectApplied = false;
+    }
   }
 }
 
@@ -107,6 +129,9 @@ export class AsciiSharksElement extends AsciiSceneElement {
     "columns",
     "max-cells",
     "max-dpr",
+    "aspect-ratio",
+    "paused",
+    "font-family",
     "calm",
     "interactive",
     "sharks",
@@ -139,11 +164,13 @@ export class AsciiSharksElement extends AsciiSceneElement {
       seed: this.num("seed"),
       density: this.num("density"),
       speed: this.num("speed"),
+      fontFamily: this.getAttribute("font-family") ?? undefined,
       columns: this.num("columns"),
       maxCells: this.num("max-cells"),
       maxDpr: this.num("max-dpr"),
       sharkScale: this.num("shark-scale"),
       calm: this.bool("calm", false),
+      paused: this.bool("paused", false),
       interactive: this.bool("interactive", true),
       palette: (this.getAttribute("palette") as AsciiSharksOptions["palette"]) ?? undefined,
       label: this.getAttribute("label") ?? undefined,
@@ -167,6 +194,9 @@ export class AsciiRobotsElement extends AsciiSceneElement {
     "columns",
     "max-cells",
     "max-dpr",
+    "aspect-ratio",
+    "paused",
+    "font-family",
     "calm",
     "interactive",
     "robots",
@@ -199,10 +229,12 @@ export class AsciiRobotsElement extends AsciiSceneElement {
       seed: this.num("seed"),
       scale: this.num("scale"),
       speed: this.num("speed"),
+      fontFamily: this.getAttribute("font-family") ?? undefined,
       columns: this.num("columns"),
       maxCells: this.num("max-cells"),
       maxDpr: this.num("max-dpr"),
       calm: this.bool("calm", false),
+      paused: this.bool("paused", false),
       interactive: this.bool("interactive", true),
       palette: (this.getAttribute("palette") as AsciiRobotsOptions["palette"]) ?? undefined,
       label: this.getAttribute("label") ?? undefined,
@@ -226,6 +258,9 @@ export class AsciiJellyfishElement extends AsciiSceneElement {
     "columns",
     "max-cells",
     "max-dpr",
+    "aspect-ratio",
+    "paused",
+    "font-family",
     "calm",
     "interactive",
     "jellies",
@@ -258,10 +293,12 @@ export class AsciiJellyfishElement extends AsciiSceneElement {
       seed: this.num("seed"),
       scale: this.num("scale"),
       speed: this.num("speed"),
+      fontFamily: this.getAttribute("font-family") ?? undefined,
       columns: this.num("columns"),
       maxCells: this.num("max-cells"),
       maxDpr: this.num("max-dpr"),
       calm: this.bool("calm", false),
+      paused: this.bool("paused", false),
       interactive: this.bool("interactive", true),
       palette: (this.getAttribute("palette") as AsciiJellyfishOptions["palette"]) ?? undefined,
       label: this.getAttribute("label") ?? undefined,
@@ -284,6 +321,9 @@ export class AsciiDogElement extends AsciiSceneElement {
     "columns",
     "max-cells",
     "max-dpr",
+    "aspect-ratio",
+    "paused",
+    "font-family",
     "calm",
     "interactive",
     "dogs",
@@ -323,10 +363,12 @@ export class AsciiDogElement extends AsciiSceneElement {
       scale: this.num("scale"),
       spread,
       speed: this.num("speed"),
+      fontFamily: this.getAttribute("font-family") ?? undefined,
       columns: this.num("columns"),
       maxCells: this.num("max-cells"),
       maxDpr: this.num("max-dpr"),
       calm: this.bool("calm", false),
+      paused: this.bool("paused", false),
       interactive: this.bool("interactive", true),
       palette: (this.getAttribute("palette") as AsciiDogOptions["palette"]) ?? undefined,
       label: this.getAttribute("label") ?? undefined,

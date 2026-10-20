@@ -38,6 +38,8 @@ Every `create*` factory and React wrapper accepts these.
 | `calm` | `boolean` | `false` | Disables flicker and sparkle |
 | `interactive` | `boolean` | `true` | Pointer input |
 | `label` | `string` | — | Makes the canvas `role="img"` |
+| `paused` | `boolean` | `false` | Start with the scene clock stopped |
+| `fontFamily` | `string` | canvas CSS | Override the canvas font stack |
 | `onEvent` | `(event) => void` | — | Scene-specific events |
 
 `PaletteName` is `"abyss" | "neon" | "mono" | "paper"`. See
@@ -218,16 +220,19 @@ Each wrapper accepts its scene options plus:
 
 | Prop | Type | Default | |
 | --- | --- | --- | --- |
+| `id` | `string` | — | Canvas id |
 | `className` | `string` | — | Extra class on the canvas |
 | `style` | `CSSProperties` | — | Canvas style |
 | `width` | `number \| string` | `"100%"` | Canvas width |
 | `height` | `number \| string` | `"100%"` | Canvas height |
+| `aspectRatio` | `number \| string` | — | Sets `aspect-ratio` and `height: auto` |
+| `onReady` | `(scene: SceneHandle) => void` | — | Fires after engine mount/remount |
 
 The canvas also gets `ascii-things` and `ascii-<scene>` classes, `display: block`, and
 `aria-hidden="true"` unless `label` is set.
 
-Not available in `0.4.0`: `id`, `aria-*`, `data-*`, `ref`, `aspectRatio`, `paused`, `onReady`.
-Use the vanilla engine or `AsciiStage` for those use cases.
+`aria-*`, `data-*`, and `ref` are not forwarded in `0.4.0`. Use the vanilla engine or
+`AsciiStage` when you need to own the canvas element.
 
 ## Custom elements
 

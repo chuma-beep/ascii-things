@@ -118,8 +118,16 @@ Scenes inherit the canvas `font-family` and pass it to the glyph renderer. Set i
 }
 ```
 
-The default is the inherited monospace face. There is no `fontFamily` prop in `0.4.0`; the
-roadmap includes one for convenience.
+The default is the inherited monospace face. You can also set it directly with the React
+`fontFamily` prop or the `font-family` custom-element attribute:
+
+```tsx
+<AsciiDog fontFamily='"IBM Plex Mono", ui-monospace, monospace' />
+```
+
+```html
+<ascii-dog font-family='"IBM Plex Mono", ui-monospace, monospace'></ascii-dog>
+```
 
 ## UI chrome is separate
 

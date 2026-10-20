@@ -24,6 +24,10 @@ export interface AsciiJellyfishOptions {
   palette?: PaletteName | Palette;
   /** Jellyfish size multiplier. Default 1. */
   scale?: number;
+  /** Start with the clock stopped. Default false. */
+  paused?: boolean;
+  /** Font family used for the ASCII canvas. Defaults to the canvas CSS font. */
+  fontFamily?: string;
   /** If set, the canvas becomes role="img" with this label. */
   label?: string;
   /** Called when a jellyfish pulses or the pointer sends a shockwave. */

@@ -75,6 +75,9 @@ default. Boolean attributes are true when present, unless the value is `"false"`
 | `max-dpr` | number | Backing-store cap, default `2` |
 | `calm` | boolean | Disables flicker and sparkle |
 | `interactive` | boolean | Pointer input, true by default |
+| `paused` | boolean | Starts with the scene clock stopped |
+| `font-family` | string | Overrides the drawing font stack |
+| `aspect-ratio` | CSS ratio | Sets the host aspect ratio and `height: auto` |
 | `label` | string | Makes the canvas `role="img"` with this name |
 
 ### Shark attributes
@@ -150,10 +153,24 @@ are not updated in place from HTML.
 
 If you need live `setOptions()` behavior, use the vanilla or React adapter.
 
-## No events or handles
+## Handles and `ascii-ready`
 
-Custom elements expose markup only. There is no `onEvent`, `getStats()`, or `pause()` surface
-on the element itself. For scripted interaction, use the vanilla factory:
+Each element fires a bubbling, composed `ascii-ready` event after it mounts. The event
+detail contains the live scene handle:
+
+```ts
+const yard = document.querySelector("ascii-dog")!;
+
+yard.addEventListener("ascii-ready", (event) => {
+  const scene = event.detail.scene;
+  scene.throwBall(600, 360);
+  scene.pause();
+});
+```
+
+The element itself still has no `onEvent` attribute. Use the handle to call
+`pause()`, `resume()`, `resize()`, `setOptions()`, `getStats()`, `throwBall()`, or
+`destroy()`, or use the vanilla factory when you already own the canvas.
 
 ```ts
 import { createDog } from "ascii-things/dog";

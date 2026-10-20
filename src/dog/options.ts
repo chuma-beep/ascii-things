@@ -26,6 +26,10 @@ export interface AsciiDogOptions {
   scale?: number;
   /** Normalized start band across the width, e.g. [0.68, 0.68]. */
   spread?: [number, number];
+  /** Start with the clock stopped. Default false. */
+  paused?: boolean;
+  /** Font family used for the ASCII canvas. Defaults to the canvas CSS font. */
+  fontFamily?: string;
   /** If set, the canvas becomes role="img" with this label. */
   label?: string;
   /** Called when the ball is thrown, nudged, the dog sits, or charges. */

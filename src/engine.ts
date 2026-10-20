@@ -50,6 +50,8 @@ export class OceanEngine {
       interactive: opts.interactive,
       maxDpr: opts.maxDpr,
       label: opts.label,
+      paused: opts.paused,
+      fontFamily: opts.fontFamily,
       timing: "scaled",
       onPointerDown: (x, y) => this.world.splash(x, y),
     });
@@ -73,6 +75,8 @@ export class OceanEngine {
     if (partial.interactive !== undefined) this.runtime.setInteractive(partial.interactive);
     if (partial.maxDpr !== undefined) this.runtime.setMaxDpr(partial.maxDpr);
     if (partial.label !== undefined) this.runtime.setLabel(partial.label);
+    if (partial.paused !== undefined) this.runtime.setPaused(partial.paused);
+    if (partial.fontFamily !== undefined) this.runtime.setFontFamily(partial.fontFamily);
 
     const rendererUpdate: RendererOptions = {};
     if (partial.palette !== undefined) rendererUpdate.palette = partial.palette;

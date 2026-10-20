@@ -49,6 +49,8 @@ export class JellyfishEngine {
       interactive: options.interactive,
       maxDpr: options.maxDpr,
       label: options.label,
+      paused: options.paused,
+      fontFamily: options.fontFamily,
       onPointerDown: (x, y) => this.world.shockwave(x, y),
       flushEvents: () => this.flushEvents(),
     });
@@ -72,6 +74,8 @@ export class JellyfishEngine {
     if (partial.interactive !== undefined) this.runtime.setInteractive(partial.interactive);
     if (partial.maxDpr !== undefined) this.runtime.setMaxDpr(partial.maxDpr);
     if (partial.label !== undefined) this.runtime.setLabel(partial.label);
+    if (partial.paused !== undefined) this.runtime.setPaused(partial.paused);
+    if (partial.fontFamily !== undefined) this.runtime.setFontFamily(partial.fontFamily);
 
     this.renderer.setOptions({
       palette: partial.palette,

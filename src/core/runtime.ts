@@ -7,6 +7,8 @@ export interface RuntimeOptions {
   interactive?: boolean;
   maxDpr?: number;
   label?: string;
+  paused?: boolean;
+  fontFamily?: string;
 }
 
 /** The small surface a world must expose to the runtime. */
@@ -75,6 +77,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
   private interactive: boolean;
   private maxDpr: number | undefined;
   private label: string | undefined;
+  private fontFamily: string | undefined;
   private frameMs = 16.7;
   private timing: "fixed" | "scaled";
   private onPointerDown?: (x: number, y: number) => void;
@@ -86,11 +89,13 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     this.interactive = config.interactive ?? true;
     this.maxDpr = config.maxDpr;
     this.label = config.label;
+    this.fontFamily = config.fontFamily;
+    this.paused = config.paused ?? false;
     this.timing = config.timing ?? "fixed";
     this.onPointerDown = config.onPointerDown;
     this.flushEventsHandler = config.flushEvents;
 
-    renderer.setFontFamily(getComputedStyle(canvas).fontFamily);
+    renderer.setFontFamily(this.fontFamily ?? getComputedStyle(canvas).fontFamily);
     this.reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     this.resizeObserver = new ResizeObserver(() => this.resize());
@@ -107,22 +112,32 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
 
     this.resize();
     // Canvas text can't trigger a webfont load; once the mono face is in, redraw.
-    document.fonts?.load(`600 16px ${getComputedStyle(canvas).fontFamily}`).then(() => {
-      if (!this.disposed && this.reducedMotion.matches) this.drawStill();
-    });
+    document.fonts
+      ?.load(`600 16px ${this.fontFamily ?? getComputedStyle(canvas).fontFamily}`)
+      .then(() => {
+        if (!this.disposed && this.reducedMotion.matches) this.drawStill();
+      });
     this.schedule();
   }
 
   /** Stop the clock without tearing down the scene (modals, route transitions). */
   pause() {
-    this.paused = true;
-    cancelAnimationFrame(this.raf);
-    this.config.world.events.length = 0;
+    this.setPaused(true);
   }
 
   /** Resume after pause(). */
   resume() {
-    this.paused = false;
+    this.setPaused(false);
+  }
+
+  /** Set the clock state directly. */
+  setPaused(paused: boolean) {
+    this.paused = paused;
+    cancelAnimationFrame(this.raf);
+    if (paused) {
+      this.config.world.events.length = 0;
+      return;
+    }
     this.last = performance.now();
     this.acc = 0;
     this.schedule();
@@ -171,6 +186,12 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
   setLabel(label: string | undefined) {
     this.label = label;
     this.applyLabel();
+  }
+
+  setFontFamily(fontFamily: string | undefined) {
+    this.fontFamily = fontFamily;
+    this.renderer.setFontFamily(fontFamily ?? getComputedStyle(this.config.canvas).fontFamily);
+    if (this.paused || this.reducedMotion.matches) this.renderOnce();
   }
 
   get prefersReducedMotion() {

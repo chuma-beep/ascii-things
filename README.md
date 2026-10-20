@@ -227,9 +227,14 @@ export function Yard() {
 
 The wrappers are client components (`"use client"`), fill their parent by
 default, and clean up on unmount. `palette`, `speed`, `columns`, `maxCells`,
-`calm`, and `label` update live. Structural options (`sharks`, `robots`,
-`jellies`, `dogs`, `seed`, `density`, `count`, `sharkScale`, `scale`) remount
-the scene when they change.
+`calm`, `label`, `paused`, and `fontFamily` update live. Structural options
+(`sharks`, `robots`, `jellies`, `dogs`, `seed`, `density`, `count`,
+`sharkScale`, `scale`) remount the scene when they change.
+
+Each wrapper also accepts `id`, `aspectRatio` (for example `"16 / 9"` or a
+number), and `onReady(scene)`, which fires after the scene engine mounts. Use
+`paused` to start with the clock stopped and `fontFamily` to override the
+canvas font stack.
 
 ## UI components
 
@@ -358,16 +363,24 @@ See the [UI example](examples/ui/) for the full composition.
 ```
 
 Shark attributes: `palette`, `seed`, `density`, `speed`, `columns`, `max-cells`,
-`max-dpr`, `calm`, `interactive`, `sharks`, `shark-scale`, `label`.
+`max-dpr`, `calm`, `interactive`, `sharks`, `shark-scale`, `label`,
+`aspect-ratio`, `paused`, `font-family`.
 
 Robot attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
-`max-dpr`, `calm`, `interactive`, `robots`, `scale`, `label`.
+`max-dpr`, `calm`, `interactive`, `robots`, `scale`, `label`, `aspect-ratio`,
+`paused`, `font-family`.
 
 Jellyfish attributes: `palette`, `seed`, `count`, `speed`, `columns`,
-`max-cells`, `max-dpr`, `calm`, `interactive`, `jellies`, `scale`, `label`.
+`max-cells`, `max-dpr`, `calm`, `interactive`, `jellies`, `scale`, `label`,
+`aspect-ratio`, `paused`, `font-family`.
 
 Dog attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
-`max-dpr`, `calm`, `interactive`, `dogs`, `spread`, `scale`, `label`.
+`max-dpr`, `calm`, `interactive`, `dogs`, `spread`, `scale`, `label`,
+`aspect-ratio`, `paused`, `font-family`.
+
+All four elements dispatch a bubbling, composed `ascii-ready` event after the
+engine mounts. The event detail is `{ scene }`, where `scene` is the engine
+handle.
 
 ## Examples
 
