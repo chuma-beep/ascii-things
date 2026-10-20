@@ -38,7 +38,17 @@ export interface SceneStats {
 }
 
 /** The signature interaction each scene exposes. */
-export type SceneAction = "splash" | "dispatch" | "shockwave" | "throwBall";
+export type SceneAction =
+  | "splash"
+  | "dispatch"
+  | "shockwave"
+  | "throwBall"
+  | "scatter"
+  | "flare"
+  | "crumb"
+  | "feed"
+  | "rush"
+  | "ping";
 
 /** The lifecycle surface shared by every engine. */
 export interface SceneHandle<S extends SceneStats = SceneStats> {

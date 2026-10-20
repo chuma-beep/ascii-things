@@ -1,0 +1,99 @@
+---
+title: Ants
+description: A colony foraging pheromone trails, carrying crumbs back to the nest.
+---
+
+import SceneDemo from "@components/SceneDemo";
+
+Ants leave a pheromone trail between food and the nest. The colony finds the nearest crumb,
+carries it home, and reinforces the paths that work. Dropping a crumb gives the foragers a
+new target.
+
+<SceneDemo client:visible scene="ants" seed={17} columns={110} />
+
+## Behavior
+
+- **Forage** — ants seek the nearest crumb, then return to the nest.
+- **Trail** — successful trips strengthen a decaying pheromone map.
+- **Carry** — a loaded ant moves more slowly and drops food at the nest.
+- **Crumb** — a click adds food at the pointer, up to a small cap.
+- **Calm** — removes trail sparkle and quick direction changes.
+
+## Interaction
+
+Click the canvas to drop a crumb. From code:
+
+```ts
+import { createAnts } from "ascii-things/ants";
+
+const colony = createAnts(canvas, { seed: 17, count: 45 });
+colony.crumb(canvas.clientWidth * 0.7, canvas.clientHeight * 0.4);
+// Equivalent: colony.trigger("crumb", x, y);
+```
+
+`crumb()` is disabled under reduced motion.
+
+## Options
+
+| Option | Type | Default | |
+| --- | --- | --- | --- |
+| `count` | `number` | `44` | Foraging ants |
+| `scale` | `number` | `1` | Scene scale hint, clamped 0.5–2 |
+| `seed` | `number` | random | Reproducible colony |
+| `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
+| `columns` | `number` | `124` | Art-direction target |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer input |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grid cap |
+| `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
+| `calm` | `boolean` | `false` | Remove trail sparkle |
+| `paused` | `boolean` | `false` | Start with the clock stopped |
+| `fontFamily` | `string` | canvas CSS font | Drawing font |
+| `label` | `string` | — | Accessible name |
+| `onEvent` | `(event) => void` | — | Crumb moments |
+
+## Stats
+
+`AntStats` adds `ants`, `food`, and `carrying`:
+
+```ts
+type AntStats = {
+  fps: number;
+  frameMs: number;
+  cells: number;
+  columns: number;
+  rows: number;
+  ants: number;
+  food: number;
+  carrying: number;
+};
+```
+
+`food` is the number of crumbs currently in the world.
+
+## React
+
+```tsx
+import { AsciiAnts } from "ascii-things/react";
+
+<AsciiAnts
+  seed={17}
+  count={45}
+  palette="paper"
+  aspectRatio="16 / 9"
+  label="A live ASCII ant foraging trail"
+/>;
+```
+
+## Plain HTML
+
+```html
+<ascii-ants
+  seed="17"
+  count="45"
+  palette="paper"
+  label="A live ASCII ant foraging trail"
+  style="display: block; width: 100%; height: 420px"
+></ascii-ants>
+```

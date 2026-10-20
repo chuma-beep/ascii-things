@@ -10,6 +10,14 @@ import type { JellyfishKind, JellyfishSpec } from "./jellyfish/world";
 import { DogEngine } from "./dog/engine";
 import type { AsciiDogOptions } from "./dog/options";
 import type { DogSpec } from "./dog/world";
+import { createStarlings } from "./starlings";
+import { createFireflies } from "./fireflies";
+import { createAnts } from "./ants";
+import { createKoi } from "./koi";
+import { createCity } from "./city";
+import { createServers } from "./servers";
+import type { AmbientEngine } from "./ambient/engine";
+import type { AmbientKind, AsciiAmbientOptions } from "./ambient/options";
 
 const SHARK_KINDS: SharkKind[] = [
   "classic",
@@ -384,6 +392,84 @@ export class AsciiDogElement extends AsciiSceneElement {
   }
 }
 
+const AMBIENT_ATTRIBUTES = [
+  "palette",
+  "seed",
+  "count",
+  "scale",
+  "speed",
+  "columns",
+  "max-cells",
+  "max-dpr",
+  "adaptive-quality",
+  "aspect-ratio",
+  "paused",
+  "font-family",
+  "calm",
+  "interactive",
+  "label",
+];
+
+abstract class AsciiAmbientElement extends AsciiSceneElement {
+  static observedAttributes = AMBIENT_ATTRIBUTES;
+
+  protected abstract readonly kind: AmbientKind;
+  protected abstract create(canvas: HTMLCanvasElement, options: AsciiAmbientOptions): AmbientEngine;
+
+  protected createEngine(canvas: HTMLCanvasElement) {
+    return this.create(canvas, this.readOptions());
+  }
+
+  private readOptions(): AsciiAmbientOptions {
+    return {
+      count: this.num("count"),
+      seed: this.num("seed"),
+      scale: this.num("scale"),
+      speed: this.num("speed"),
+      fontFamily: this.getAttribute("font-family") ?? undefined,
+      columns: this.num("columns"),
+      maxCells: this.num("max-cells"),
+      maxDpr: this.num("max-dpr"),
+      adaptiveQuality: this.bool("adaptive-quality", true),
+      calm: this.bool("calm", false),
+      paused: this.bool("paused", false),
+      interactive: this.bool("interactive", true),
+      palette: (this.getAttribute("palette") as AsciiAmbientOptions["palette"]) ?? undefined,
+      label: this.getAttribute("label") ?? undefined,
+    };
+  }
+}
+
+export class AsciiStarlingsElement extends AsciiAmbientElement {
+  protected readonly kind = "starlings" as const;
+  protected create = createStarlings;
+}
+
+export class AsciiFirefliesElement extends AsciiAmbientElement {
+  protected readonly kind = "fireflies" as const;
+  protected create = createFireflies;
+}
+
+export class AsciiAntsElement extends AsciiAmbientElement {
+  protected readonly kind = "ants" as const;
+  protected create = createAnts;
+}
+
+export class AsciiKoiElement extends AsciiAmbientElement {
+  protected readonly kind = "koi" as const;
+  protected create = createKoi;
+}
+
+export class AsciiCityElement extends AsciiAmbientElement {
+  protected readonly kind = "city" as const;
+  protected create = createCity;
+}
+
+export class AsciiServersElement extends AsciiAmbientElement {
+  protected readonly kind = "servers" as const;
+  protected create = createServers;
+}
+
 if (typeof customElements !== "undefined" && !customElements.get("ascii-sharks")) {
   customElements.define("ascii-sharks", AsciiSharksElement);
 }
@@ -395,4 +481,22 @@ if (typeof customElements !== "undefined" && !customElements.get("ascii-jellyfis
 }
 if (typeof customElements !== "undefined" && !customElements.get("ascii-dog")) {
   customElements.define("ascii-dog", AsciiDogElement);
+}
+if (typeof customElements !== "undefined" && !customElements.get("ascii-starlings")) {
+  customElements.define("ascii-starlings", AsciiStarlingsElement);
+}
+if (typeof customElements !== "undefined" && !customElements.get("ascii-fireflies")) {
+  customElements.define("ascii-fireflies", AsciiFirefliesElement);
+}
+if (typeof customElements !== "undefined" && !customElements.get("ascii-ants")) {
+  customElements.define("ascii-ants", AsciiAntsElement);
+}
+if (typeof customElements !== "undefined" && !customElements.get("ascii-koi")) {
+  customElements.define("ascii-koi", AsciiKoiElement);
+}
+if (typeof customElements !== "undefined" && !customElements.get("ascii-city")) {
+  customElements.define("ascii-city", AsciiCityElement);
+}
+if (typeof customElements !== "undefined" && !customElements.get("ascii-servers")) {
+  customElements.define("ascii-servers", AsciiServersElement);
 }

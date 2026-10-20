@@ -8,10 +8,27 @@ import { createSharks } from "ascii-things/sharks";
 import type { OceanStats } from "ascii-things/sharks";
 import { createRobots } from "ascii-things/robots";
 import type { RobotStats } from "ascii-things/robots";
+import { createStarlings } from "ascii-things/starlings";
+import type { StarlingStats } from "ascii-things/starlings";
+import { createFireflies } from "ascii-things/fireflies";
+import { createAnts } from "ascii-things/ants";
+import { createKoi } from "ascii-things/koi";
+import { createCity } from "ascii-things/city";
+import { createServers } from "ascii-things/servers";
 import { AsciiPrompt, AsciiReadout, AsciiSceneTabs, AsciiStage } from "ascii-things/ui";
 import "ascii-things/ui.css";
 
-export type SceneKey = "sharks" | "robots" | "jellyfish" | "dog";
+export type SceneKey =
+  | "sharks"
+  | "robots"
+  | "jellyfish"
+  | "dog"
+  | "starlings"
+  | "fireflies"
+  | "ants"
+  | "koi"
+  | "city"
+  | "servers";
 
 export interface SceneDemoProps {
   /** Which scene to mount. Defaults to the robot dog. */
@@ -27,7 +44,7 @@ export interface SceneDemoProps {
   className?: string;
 }
 
-type DemoStats = Partial<OceanStats & RobotStats & JellyfishStats & DogStats>;
+type DemoStats = Partial<OceanStats & RobotStats & JellyfishStats & DogStats & StarlingStats>;
 
 interface DemoOptions {
   palette?: PaletteName;
@@ -42,6 +59,7 @@ interface DemoEngine {
   getStats(): object;
   destroy(): void;
   throwBall?: (x: number, y: number) => void;
+  trigger?: (action: string, x: number, y: number) => void;
 }
 
 const PALETTES = [
@@ -72,6 +90,36 @@ const SCENES: Record<SceneKey, { label: string; stage: string; interaction: stri
     stage: "ROBOT DOG / TEST YARD",
     interaction: "Click to throw the ball, or type a command below.",
   },
+  starlings: {
+    label: "Starlings",
+    stage: "STARLINGS / EVENING SKY",
+    interaction: "Click to scatter the murmuration.",
+  },
+  fireflies: {
+    label: "Fireflies",
+    stage: "FIREFLIES / DUSK MEADOW",
+    interaction: "Click to flare the meadow.",
+  },
+  ants: {
+    label: "Ants",
+    stage: "ANTS / FORAGE TRAIL",
+    interaction: "Click to drop a crumb on the trail.",
+  },
+  koi: {
+    label: "Koi",
+    stage: "KOI / GARDEN POND",
+    interaction: "Click to feed the pond.",
+  },
+  city: {
+    label: "City",
+    stage: "CITY / NIGHT GRID",
+    interaction: "Click to rush the traffic grid.",
+  },
+  servers: {
+    label: "Servers",
+    stage: "SERVERS / RACK 04",
+    interaction: "Click to ping a rack.",
+  },
 };
 
 const labels: Record<SceneKey, string> = {
@@ -79,6 +127,12 @@ const labels: Record<SceneKey, string> = {
   robots: "A live ASCII robot factory floor",
   jellyfish: "A live ASCII jellyfish bloom",
   dog: "A live ASCII robot dog test yard",
+  starlings: "A live ASCII murmuration of starlings",
+  fireflies: "A live ASCII firefly meadow",
+  ants: "A live ASCII ant foraging trail",
+  koi: "A live ASCII koi pond",
+  city: "A live ASCII city grid at night",
+  servers: "A live ASCII server rack",
 };
 
 function buildEngine(
@@ -112,8 +166,86 @@ function buildEngine(
         dogs: [{ size: 1.15 }],
         spread: [0.62, 0.62],
       }) as unknown as DemoEngine;
+    case "starlings":
+      return createStarlings(canvas, { ...shared, count: 120 }) as unknown as DemoEngine;
+    case "fireflies":
+      return createFireflies(canvas, { ...shared, count: 70 }) as unknown as DemoEngine;
+    case "ants":
+      return createAnts(canvas, { ...shared, count: 45 }) as unknown as DemoEngine;
+    case "koi":
+      return createKoi(canvas, { ...shared, count: 6 }) as unknown as DemoEngine;
+    case "city":
+      return createCity(canvas, shared) as unknown as DemoEngine;
+    case "servers":
+      return createServers(canvas, shared) as unknown as DemoEngine;
   }
 }
+
+const ACTIONS: Record<SceneKey, string> = {
+  sharks: "splash",
+  robots: "dispatch",
+  jellyfish: "shockwave",
+  dog: "throwBall",
+  starlings: "scatter",
+  fireflies: "flare",
+  ants: "crumb",
+  koi: "feed",
+  city: "rush",
+  servers: "ping",
+};
+
+const PROMPTS: Record<SceneKey, { label: string; placeholder: string; action: string }> = {
+  sharks: {
+    label: "Make a ripple",
+    placeholder: "Disturb the water…",
+    action: "Splash",
+  },
+  robots: {
+    label: "Dispatch a unit",
+    placeholder: "Assign a job…",
+    action: "Dispatch",
+  },
+  jellyfish: {
+    label: "Send a shockwave",
+    placeholder: "Disturb the current…",
+    action: "Pulse",
+  },
+  dog: {
+    label: "Tell the dog what to fetch",
+    placeholder: "Throw the ball, ask for a sit…",
+    action: "Throw",
+  },
+  starlings: {
+    label: "Scatter the murmuration",
+    placeholder: "Startle the flock…",
+    action: "Scatter",
+  },
+  fireflies: {
+    label: "Flare the meadow",
+    placeholder: "Call the fireflies…",
+    action: "Flare",
+  },
+  ants: {
+    label: "Drop a crumb",
+    placeholder: "Send the colony foraging…",
+    action: "Crumb",
+  },
+  koi: {
+    label: "Feed the pond",
+    placeholder: "Scatter a handful of food…",
+    action: "Feed",
+  },
+  city: {
+    label: "Rush the traffic",
+    placeholder: "Change the rhythm…",
+    action: "Rush",
+  },
+  servers: {
+    label: "Ping a rack",
+    placeholder: "Send a packet…",
+    action: "Ping",
+  },
+};
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -201,9 +333,10 @@ export default function SceneDemo({
     setEcho(`> ${value}`);
     const canvas = canvasRef.current;
     const engine = engineRef.current;
-    if (!canvas || !engine?.throwBall) return;
+    if (!canvas || !engine?.trigger) return;
     const hash = fnv1a(value);
-    engine.throwBall(
+    engine.trigger(
+      ACTIONS[scene],
       canvas.clientWidth * (0.2 + ((hash % 1000) / 1000) * 0.6),
       canvas.clientHeight * 0.7,
     );
@@ -231,6 +364,54 @@ export default function SceneDemo({
         { label: "CELLS", value: numeric(stats?.cells) },
         { label: "JELLIES", value: numeric(stats?.jellies) },
         { label: "PULSING", value: numeric(stats?.pulsing) },
+        { label: "FPS", value: numeric(stats?.fps) },
+      ];
+    }
+    if (scene === "starlings") {
+      return [
+        { label: "CELLS", value: numeric(stats?.cells) },
+        { label: "BIRDS", value: numeric(stats?.birds) },
+        { label: "PREDATORS", value: numeric(stats?.predators) },
+        { label: "FPS", value: numeric(stats?.fps) },
+      ];
+    }
+    if (scene === "fireflies") {
+      return [
+        { label: "CELLS", value: numeric(stats?.cells) },
+        { label: "FIREFLIES", value: numeric(stats?.fireflies) },
+        { label: "LIT", value: numeric(stats?.lit) },
+        { label: "FPS", value: numeric(stats?.fps) },
+      ];
+    }
+    if (scene === "ants") {
+      return [
+        { label: "CELLS", value: numeric(stats?.cells) },
+        { label: "ANTS", value: numeric(stats?.ants) },
+        { label: "FOOD", value: numeric(stats?.food) },
+        { label: "FPS", value: numeric(stats?.fps) },
+      ];
+    }
+    if (scene === "koi") {
+      return [
+        { label: "CELLS", value: numeric(stats?.cells) },
+        { label: "KOI", value: numeric(stats?.koi) },
+        { label: "RIPPLES", value: numeric(stats?.ripples) },
+        { label: "FPS", value: numeric(stats?.fps) },
+      ];
+    }
+    if (scene === "city") {
+      return [
+        { label: "CELLS", value: numeric(stats?.cells) },
+        { label: "CARS", value: numeric(stats?.cars) },
+        { label: "LIGHTS", value: numeric(stats?.lights) },
+        { label: "FPS", value: numeric(stats?.fps) },
+      ];
+    }
+    if (scene === "servers") {
+      return [
+        { label: "CELLS", value: numeric(stats?.cells) },
+        { label: "RACKS", value: numeric(stats?.servers) },
+        { label: "PACKETS", value: numeric(stats?.packets) },
         { label: "FPS", value: numeric(stats?.fps) },
       ];
     }
@@ -299,17 +480,15 @@ export default function SceneDemo({
         {status}
       </p>
 
-      {scene === "dog" ? (
-        <AsciiPrompt
-          label="Tell the dog what to fetch"
-          placeholder="Throw the ball, ask for a sit…"
-          actionLabel="Throw"
-          status={echo}
-          hint="Enter submits · the dog fetches the ball"
-          disabled={reducedMotion}
-          onSubmit={command}
-        />
-      ) : null}
+      <AsciiPrompt
+        label={PROMPTS[scene].label}
+        placeholder={PROMPTS[scene].placeholder}
+        actionLabel={PROMPTS[scene].action}
+        status={echo}
+        hint={`Enter submits · ${meta.interaction}`}
+        disabled={reducedMotion}
+        onSubmit={command}
+      />
 
       <p className="scene-demo-note">
         Seed <code>{seed}</code>, columns <code>{columns}</code>, and speed <code>{speed}</code> are

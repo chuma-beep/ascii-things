@@ -1,0 +1,97 @@
+---
+title: City
+description: A night grid of traffic, lit windows, and signals that speed up on command.
+---
+
+import SceneDemo from "@components/SceneDemo";
+
+A compact city at night: three rows of buildings, lit windows, and cars wrapping through the
+streets. A click rushes the traffic, briefly speeding up every lane and changing the rhythm of
+the grid.
+
+<SceneDemo client:visible scene="city" seed={23} columns={110} />
+
+## Behavior
+
+- **Skyline** — seeded buildings with a grid of windows.
+- **Traffic** — cars wrap around the streets in alternating directions.
+- **Signals** — window lights and traffic marks blink on their own phases.
+- **Rush** — a click adds a short speed pulse to the whole grid.
+- **Calm** — removes the brightest window flicker.
+
+## Interaction
+
+Click the canvas to rush the traffic. From code:
+
+```ts
+import { createCity } from "ascii-things/city";
+
+const grid = createCity(canvas, { seed: 23, count: 18 });
+grid.rush(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
+// Equivalent: grid.trigger("rush", x, y);
+```
+
+`rush()` is disabled under reduced motion.
+
+## Options
+
+| Option | Type | Default | |
+| --- | --- | --- | --- |
+| `count` | `number` | `18` | Cars in the grid |
+| `scale` | `number` | `1` | Scene scale hint, clamped 0.5–2 |
+| `seed` | `number` | random | Reproducible skyline |
+| `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
+| `columns` | `number` | `124` | Art-direction target |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer input |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grid cap |
+| `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
+| `calm` | `boolean` | `false` | Remove bright window flicker |
+| `paused` | `boolean` | `false` | Start with the clock stopped |
+| `fontFamily` | `string` | canvas CSS font | Drawing font |
+| `label` | `string` | — | Accessible name |
+| `onEvent` | `(event) => void` | — | Rush moments |
+
+## Stats
+
+`CityStats` adds `cars`, `buildings`, and `lights`:
+
+```ts
+type CityStats = {
+  fps: number;
+  frameMs: number;
+  cells: number;
+  columns: number;
+  rows: number;
+  cars: number;
+  buildings: number;
+  lights: number;
+};
+```
+
+## React
+
+```tsx
+import { AsciiCity } from "ascii-things/react";
+
+<AsciiCity
+  seed={23}
+  count={18}
+  palette="neon"
+  aspectRatio="16 / 9"
+  label="A live ASCII city grid at night"
+/>;
+```
+
+## Plain HTML
+
+```html
+<ascii-city
+  seed="23"
+  count="18"
+  palette="neon"
+  label="A live ASCII city grid at night"
+  style="display: block; width: 100%; height: 420px"
+></ascii-city>
+```

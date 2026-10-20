@@ -18,11 +18,23 @@ import { createDog } from "./dog";
 import { createJellyfish } from "./jellyfish";
 import { createRobots } from "./robots";
 import { createSharks } from "./sharks";
+import { createStarlings } from "./starlings";
+import { createFireflies } from "./fireflies";
+import { createAnts } from "./ants";
+import { createKoi } from "./koi";
+import { createCity } from "./city";
+import { createServers } from "./servers";
 import type { SceneAction, SceneHandle, SceneOptions, SceneReady, SceneStats } from "./core/scene";
 import type { AsciiDogOptions, DogStats, DogWorldEvent } from "./dog";
 import type { AsciiJellyfishOptions } from "./jellyfish/options";
 import type { AsciiSharksOptions } from "./options";
 import type { AsciiRobotsOptions } from "./robots/options";
+import type { AsciiStarlingsOptions } from "./starlings/options";
+import type { AsciiFirefliesOptions } from "./fireflies/options";
+import type { AsciiAntsOptions } from "./ants/options";
+import type { AsciiKoiOptions } from "./koi/options";
+import type { AsciiCityOptions } from "./city/options";
+import type { AsciiServersOptions } from "./servers/options";
 
 export type { AsciiDogOptions, DogStats, DogWorldEvent };
 
@@ -754,13 +766,29 @@ export function AsciiDivider({
 /* Scene heroes                                                               */
 /* ------------------------------------------------------------------------- */
 
-export type AsciiSceneKind = "sharks" | "robots" | "jellyfish" | "dog";
+export type AsciiSceneKind =
+  | "sharks"
+  | "robots"
+  | "jellyfish"
+  | "dog"
+  | "starlings"
+  | "fireflies"
+  | "ants"
+  | "koi"
+  | "city"
+  | "servers";
 
 export type AsciiSceneOptionsByKind = {
   sharks: AsciiSharksOptions;
   robots: AsciiRobotsOptions;
   jellyfish: AsciiJellyfishOptions;
   dog: AsciiDogOptions;
+  starlings: AsciiStarlingsOptions;
+  fireflies: AsciiFirefliesOptions;
+  ants: AsciiAntsOptions;
+  koi: AsciiKoiOptions;
+  city: AsciiCityOptions;
+  servers: AsciiServersOptions;
 };
 
 interface SceneCopy {
@@ -838,6 +866,90 @@ const SCENE_COPY: Record<AsciiSceneKind, SceneCopy> = {
       "GOOD BOY",
     ],
   },
+  starlings: {
+    eyebrow: "MURMURATION / DUSK 04",
+    title: (
+      <>
+        A sky that <em>turns.</em>
+      </>
+    ),
+    lede: "A flock folds across the dusk, one bird at a time. Break the formation and watch it find itself again.",
+    promptLabel: "Scatter the flock",
+    placeholder: "Break the formation…",
+    actionLabel: "Scatter",
+    stageLabel: "STARLINGS / OPEN SKY",
+    replies: ["FLOCK BROKEN", "FORMATION SHIFTED", "SKY SCATTERED", "WINGS RESET"],
+  },
+  fireflies: {
+    eyebrow: "MEADOW / NIGHT 05",
+    title: (
+      <>
+        A field that <em>blinks.</em>
+      </>
+    ),
+    lede: "Grass, dusk, and a slow conversation of lights. Flare the meadow and the rhythm changes.",
+    promptLabel: "Flare the meadow",
+    placeholder: "Change the rhythm…",
+    actionLabel: "Flare",
+    stageLabel: "FIREFLIES / NIGHT MEADOW",
+    replies: ["MEADOW FLARED", "SIGNAL SENT", "RHYTHM CHANGED", "LIGHTS ANSWERED"],
+  },
+  ants: {
+    eyebrow: "COLONY / TRAIL 06",
+    title: (
+      <>
+        A trail that <em>thinks.</em>
+      </>
+    ),
+    lede: "Pheromones, food runs, and a nest that keeps count. Drop a crumb and the colony reorganizes.",
+    promptLabel: "Drop a crumb",
+    placeholder: "Leave something behind…",
+    actionLabel: "Crumb",
+    stageLabel: "ANTS / FORAGE LINE",
+    replies: ["CRUMB FOUND", "TRAIL MARKED", "COLONY ROUTED", "NEST COUNTED"],
+  },
+  koi: {
+    eyebrow: "KOI POND / DRIFT 07",
+    title: (
+      <>
+        A pond that <em>answers.</em>
+      </>
+    ),
+    lede: "Slow fish, still water, and ripples that outlive the touch. Feed the pond and watch it gather.",
+    promptLabel: "Feed the koi",
+    placeholder: "Drop a pellet…",
+    actionLabel: "Feed",
+    stageLabel: "KOI / STILL WATER",
+    replies: ["PELLETS DROPPED", "POND STIRRED", "KOI GATHERED", "RIPPLE SENT"],
+  },
+  city: {
+    eyebrow: "CITY GRID / NIGHT 08",
+    title: (
+      <>
+        A city that <em>moves.</em>
+      </>
+    ),
+    lede: "Windows, signals, and traffic on a repeating grid. Call rush hour and the whole block leans in.",
+    promptLabel: "Call rush hour",
+    placeholder: "Change the pace…",
+    actionLabel: "Rush",
+    stageLabel: "CITY / AFTER HOURS",
+    replies: ["RUSH HOUR", "SIGNALS CYCLED", "TRAFFIC SURGED", "GRID SATURATED"],
+  },
+  servers: {
+    eyebrow: "SERVER RACK / BAY 09",
+    title: (
+      <>
+        A rack that <em>answers.</em>
+      </>
+    ),
+    lede: "Fans, LEDs, and packets crossing a cold aisle. Ping the rack and watch the traffic find its target.",
+    promptLabel: "Ping the rack",
+    placeholder: "Send a packet…",
+    actionLabel: "Ping",
+    stageLabel: "SERVERS / COLD AISLE",
+    replies: ["PING ACK", "PACKET ROUTED", "RACK ANSWERED", "LATENCY LOW"],
+  },
 };
 
 const SCENE_ACTIONS: Record<AsciiSceneKind, SceneAction> = {
@@ -845,6 +957,12 @@ const SCENE_ACTIONS: Record<AsciiSceneKind, SceneAction> = {
   robots: "dispatch",
   jellyfish: "shockwave",
   dog: "throwBall",
+  starlings: "scatter",
+  fireflies: "flare",
+  ants: "crumb",
+  koi: "feed",
+  city: "rush",
+  servers: "ping",
 };
 
 const EMPTY_OPTIONS: SceneOptions = {};
@@ -860,6 +978,17 @@ const SCENE_FACTORIES: Record<
   jellyfish: (canvas, options) =>
     createJellyfish(canvas, options as AsciiJellyfishOptions) as unknown as SceneHandle,
   dog: (canvas, options) => createDog(canvas, options as AsciiDogOptions) as unknown as SceneHandle,
+  starlings: (canvas, options) =>
+    createStarlings(canvas, options as AsciiStarlingsOptions) as unknown as SceneHandle,
+  fireflies: (canvas, options) =>
+    createFireflies(canvas, options as AsciiFirefliesOptions) as unknown as SceneHandle,
+  ants: (canvas, options) =>
+    createAnts(canvas, options as AsciiAntsOptions) as unknown as SceneHandle,
+  koi: (canvas, options) => createKoi(canvas, options as AsciiKoiOptions) as unknown as SceneHandle,
+  city: (canvas, options) =>
+    createCity(canvas, options as AsciiCityOptions) as unknown as SceneHandle,
+  servers: (canvas, options) =>
+    createServers(canvas, options as AsciiServersOptions) as unknown as SceneHandle,
 };
 
 function sceneKey(kind: AsciiSceneKind, options: SceneOptions): string {
@@ -871,8 +1000,10 @@ function sceneKey(kind: AsciiSceneKind, options: SceneOptions): string {
       return JSON.stringify([value.seed, value.count, value.robots, value.scale]);
     case "jellyfish":
       return JSON.stringify([value.seed, value.count, value.jellies, value.scale]);
-    default:
+    case "dog":
       return JSON.stringify([value.seed, value.count, value.dogs, value.scale, value.spread]);
+    default:
+      return JSON.stringify([value.seed, value.count, value.scale]);
   }
 }
 
@@ -979,6 +1110,12 @@ export function AsciiSceneHero<K extends AsciiSceneKind>({
 export type AsciiSharkHeroProps = Omit<AsciiSceneHeroProps<"sharks">, "scene">;
 export type AsciiRobotHeroProps = Omit<AsciiSceneHeroProps<"robots">, "scene">;
 export type AsciiJellyfishHeroProps = Omit<AsciiSceneHeroProps<"jellyfish">, "scene">;
+export type AsciiStarlingsHeroProps = Omit<AsciiSceneHeroProps<"starlings">, "scene">;
+export type AsciiFirefliesHeroProps = Omit<AsciiSceneHeroProps<"fireflies">, "scene">;
+export type AsciiAntsHeroProps = Omit<AsciiSceneHeroProps<"ants">, "scene">;
+export type AsciiKoiHeroProps = Omit<AsciiSceneHeroProps<"koi">, "scene">;
+export type AsciiCityHeroProps = Omit<AsciiSceneHeroProps<"city">, "scene">;
+export type AsciiServersHeroProps = Omit<AsciiSceneHeroProps<"servers">, "scene">;
 
 export function AsciiSharkHero(props: AsciiSharkHeroProps) {
   return <AsciiSceneHero scene="sharks" {...props} />;
@@ -990,4 +1127,28 @@ export function AsciiRobotHero(props: AsciiRobotHeroProps) {
 
 export function AsciiJellyfishHero(props: AsciiJellyfishHeroProps) {
   return <AsciiSceneHero scene="jellyfish" {...props} />;
+}
+
+export function AsciiStarlingsHero(props: AsciiStarlingsHeroProps) {
+  return <AsciiSceneHero scene="starlings" {...props} />;
+}
+
+export function AsciiFirefliesHero(props: AsciiFirefliesHeroProps) {
+  return <AsciiSceneHero scene="fireflies" {...props} />;
+}
+
+export function AsciiAntsHero(props: AsciiAntsHeroProps) {
+  return <AsciiSceneHero scene="ants" {...props} />;
+}
+
+export function AsciiKoiHero(props: AsciiKoiHeroProps) {
+  return <AsciiSceneHero scene="koi" {...props} />;
+}
+
+export function AsciiCityHero(props: AsciiCityHeroProps) {
+  return <AsciiSceneHero scene="city" {...props} />;
+}
+
+export function AsciiServersHero(props: AsciiServersHeroProps) {
+  return <AsciiSceneHero scene="servers" {...props} />;
 }

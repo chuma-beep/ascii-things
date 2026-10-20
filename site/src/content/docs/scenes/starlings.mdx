@@ -1,0 +1,96 @@
+---
+title: Starlings
+description: A murmuration that folds around a moving predator and scatters on command.
+---
+
+import SceneDemo from "@components/SceneDemo";
+
+A flock of starlings moves as one body. Cohesion, alignment, and separation keep the
+murmuration together while a predator sweeps across the sky. Clicking pushes the birds away
+from the pointer, producing a fast, elastic scatter.
+
+<SceneDemo client:visible scene="starlings" seed={11} columns={110} />
+
+## Behavior
+
+- **Murmuration** — boids rules keep the flock dense without collapsing into a point.
+- **Predator** — a slow figure-eight sweep pulls a hole through the flock.
+- **Scatter** — a click applies an outward impulse to nearby birds, then the flock reforms.
+- **Calm** — removes the predator highlight and extra motion accents.
+
+The scene is ambient. It does not need to be read to understand the page.
+
+## Interaction
+
+Click the canvas to scatter the flock. From code:
+
+```ts
+import { createStarlings } from "ascii-things/starlings";
+
+const flock = createStarlings(canvas, { seed: 11, count: 120 });
+flock.scatter(canvas.clientWidth * 0.5, canvas.clientHeight * 0.45);
+// Equivalent: flock.trigger("scatter", x, y);
+```
+
+`scatter()` is disabled under reduced motion.
+
+## Options
+
+| Option | Type | Default | |
+| --- | --- | --- | --- |
+| `count` | `number` | `110` | Birds in the flock |
+| `scale` | `number` | `1` | Scene scale hint, clamped 0.5–2 |
+| `seed` | `number` | random | Reproducible flock |
+| `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
+| `columns` | `number` | `124` | Art-direction target |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer input |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grid cap |
+| `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
+| `calm` | `boolean` | `false` | Remove flicker and motion accents |
+| `paused` | `boolean` | `false` | Start with the clock stopped |
+| `fontFamily` | `string` | canvas CSS font | Drawing font |
+| `label` | `string` | — | Accessible name |
+| `onEvent` | `(event) => void` | — | Scatter moments |
+
+## Stats
+
+`StarlingStats` adds `birds` and `predators` to the shared stats:
+
+```ts
+type StarlingStats = {
+  fps: number;
+  frameMs: number;
+  cells: number;
+  columns: number;
+  rows: number;
+  birds: number;
+  predators: number;
+};
+```
+
+## React
+
+```tsx
+import { AsciiStarlings } from "ascii-things/react";
+
+<AsciiStarlings
+  seed={11}
+  count={120}
+  aspectRatio="16 / 9"
+  label="A live ASCII murmuration"
+/>;
+```
+
+## Plain HTML
+
+```html
+<ascii-starlings
+  seed="11"
+  count="120"
+  palette="abyss"
+  label="A live ASCII murmuration"
+  style="display: block; width: 100%; height: 420px"
+></ascii-starlings>
+```

@@ -6,7 +6,13 @@ const SCENES = [
   { id: "sharks", label: "Sharks", meta: "hunt" },
   { id: "robots", label: "Robots", meta: "work" },
   { id: "jellyfish", label: "Jellyfish", meta: "drift" },
-  { id: "dog", label: "Robot dog", meta: "fetch" },
+  { id: "dog", label: "Dog", meta: "fetch" },
+  { id: "starlings", label: "Starlings", meta: "murmur" },
+  { id: "fireflies", label: "Fireflies", meta: "blink" },
+  { id: "ants", label: "Ants", meta: "forage" },
+  { id: "koi", label: "Koi", meta: "feed" },
+  { id: "city", label: "City", meta: "rush" },
+  { id: "servers", label: "Servers", meta: "ping" },
 ] as const;
 
 export default function Playground() {
@@ -16,6 +22,7 @@ export default function Playground() {
   const [speed, setSpeed] = useState(1);
 
   const sceneMeta = SCENES.find((item) => item.id === scene) ?? SCENES[3];
+  const sceneItems = SCENES.map((item) => ({ ...item }));
 
   return (
     <section className="docs-playground" aria-labelledby="playground-title">
@@ -29,7 +36,7 @@ export default function Playground() {
       </p>
 
       <AsciiSceneTabs
-        scenes={SCENES.map((item) => ({ ...item }))}
+        scenes={sceneItems}
         value={scene}
         onChange={(id) => setScene(id as SceneKey)}
         ariaLabel="Playground scene"

@@ -53,6 +53,30 @@
       "types": "./dist/dog.d.ts",
       "import": "./dist/dog.js"
     },
+    "./starlings": {
+      "types": "./dist/starlings.d.ts",
+      "import": "./dist/starlings.js"
+    },
+    "./fireflies": {
+      "types": "./dist/fireflies.d.ts",
+      "import": "./dist/fireflies.js"
+    },
+    "./ants": {
+      "types": "./dist/ants.d.ts",
+      "import": "./dist/ants.js"
+    },
+    "./koi": {
+      "types": "./dist/koi.d.ts",
+      "import": "./dist/koi.js"
+    },
+    "./city": {
+      "types": "./dist/city.d.ts",
+      "import": "./dist/city.js"
+    },
+    "./servers": {
+      "types": "./dist/servers.d.ts",
+      "import": "./dist/servers.js"
+    },
     "./react": {
       "types": "./dist/react.d.ts",
       "import": "./dist/react.js"

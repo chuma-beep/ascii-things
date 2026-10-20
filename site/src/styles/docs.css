@@ -127,7 +127,19 @@ h4 {
 }
 
 .scene-demo-head .ascii-tabs {
-  flex: 1 1 420px;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+}
+
+.scene-demo-head .ascii-tab {
+  flex: 1 1 0;
+  min-width: 76px;
+  padding: 9px 8px;
+  font-size: 8px;
+}
+
+.scene-demo-head .ascii-tab small {
+  font-size: 7px;
 }
 
 .scene-demo-actions {

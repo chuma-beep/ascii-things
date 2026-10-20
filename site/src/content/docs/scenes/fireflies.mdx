@@ -1,0 +1,96 @@
+---
+title: Fireflies
+description: A dusk meadow of drifting fireflies that blink, flare, and settle.
+---
+
+import SceneDemo from "@components/SceneDemo";
+
+Fireflies drift over a dark meadow, each with its own blink rhythm. A click flares the
+nearby insects, briefly turning the meadow into a field of light before the rhythm returns.
+
+<SceneDemo client:visible scene="fireflies" seed={13} columns={110} />
+
+## Behavior
+
+- **Drift** — slow, independent movement with soft turning.
+- **Blink** — each firefly has a phase and rate; the field never blinks in lockstep.
+- **Flare** — a click wakes nearby fireflies, then each one decays back to its own rhythm.
+- **Calm** — removes the brightest flare rings and quickens the settle.
+
+## Interaction
+
+Click the canvas to flare the meadow. From code:
+
+```ts
+import { createFireflies } from "ascii-things/fireflies";
+
+const meadow = createFireflies(canvas, { seed: 13, count: 70 });
+meadow.flare(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
+// Equivalent: meadow.trigger("flare", x, y);
+```
+
+`flare()` is disabled under reduced motion.
+
+## Options
+
+| Option | Type | Default | |
+| --- | --- | --- | --- |
+| `count` | `number` | `70` | Fireflies in the meadow |
+| `scale` | `number` | `1` | Scene scale hint, clamped 0.5–2 |
+| `seed` | `number` | random | Reproducible meadow |
+| `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
+| `columns` | `number` | `124` | Art-direction target |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer input |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grid cap |
+| `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
+| `calm` | `boolean` | `false` | Remove flare rings and fast flicker |
+| `paused` | `boolean` | `false` | Start with the clock stopped |
+| `fontFamily` | `string` | canvas CSS font | Drawing font |
+| `label` | `string` | — | Accessible name |
+| `onEvent` | `(event) => void` | — | Flare moments |
+
+## Stats
+
+`FireflyStats` adds `fireflies` and `lit`:
+
+```ts
+type FireflyStats = {
+  fps: number;
+  frameMs: number;
+  cells: number;
+  columns: number;
+  rows: number;
+  fireflies: number;
+  lit: number;
+};
+```
+
+`lit` counts fireflies currently above a visible flare threshold.
+
+## React
+
+```tsx
+import { AsciiFireflies } from "ascii-things/react";
+
+<AsciiFireflies
+  seed={13}
+  count={70}
+  palette="neon"
+  aspectRatio="16 / 9"
+  label="A live ASCII firefly meadow"
+/>;
+```
+
+## Plain HTML
+
+```html
+<ascii-fireflies
+  seed="13"
+  count="70"
+  palette="neon"
+  label="A live ASCII firefly meadow"
+  style="display: block; width: 100%; height: 420px"
+></ascii-fireflies>
+```

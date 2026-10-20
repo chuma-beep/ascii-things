@@ -10,6 +10,14 @@ import { JellyfishEngine } from "./jellyfish/engine";
 import type { AsciiJellyfishOptions } from "./jellyfish/options";
 import { DogEngine } from "./dog/engine";
 import type { AsciiDogOptions } from "./dog/options";
+import type { AmbientEngine } from "./ambient/engine";
+import type { AmbientKind, AsciiAmbientOptions } from "./ambient/options";
+import { createStarlings } from "./starlings";
+import { createFireflies } from "./fireflies";
+import { createAnts } from "./ants";
+import { createKoi } from "./koi";
+import { createCity } from "./city";
+import { createServers } from "./servers";
 import type { SceneHandle } from "./core/scene";
 
 export interface AsciiSharksProps extends AsciiSharksOptions {
@@ -451,4 +459,148 @@ export function AsciiDog({
 }
 
 /** Back-compat alias for the original demo wrapper. */
+/** Shared props for the ambient scene wrappers. */
+export interface AmbientReactProps extends AsciiAmbientOptions {
+  className?: string;
+  style?: CSSProperties;
+  id?: string;
+  width?: number | string;
+  height?: number | string;
+  aspectRatio?: number | string;
+  onReady?: (scene: SceneHandle) => void;
+}
+
+export type AsciiStarlingsProps = AmbientReactProps;
+export type AsciiFirefliesProps = AmbientReactProps;
+export type AsciiAntsProps = AmbientReactProps;
+export type AsciiKoiProps = AmbientReactProps;
+export type AsciiCityProps = AmbientReactProps;
+export type AsciiServersProps = AmbientReactProps;
+
+type AmbientCreate = (canvas: HTMLCanvasElement, options: AsciiAmbientOptions) => AmbientEngine;
+
+interface AmbientCanvasProps extends AmbientReactProps {
+  kind: AmbientKind;
+  create: AmbientCreate;
+}
+
+function AmbientCanvas({
+  kind,
+  create,
+  className,
+  style,
+  id,
+  width = "100%",
+  height = "100%",
+  aspectRatio,
+  onReady,
+  ...options
+}: AmbientCanvasProps) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const engineRef = useRef<AmbientEngine | null>(null);
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
+
+  const structuralKey = JSON.stringify({
+    seed: options.seed,
+    count: options.count,
+    scale: options.scale,
+  });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const engine = create(canvas, optionsRef.current);
+    engineRef.current = engine;
+    onReadyRef.current?.(engine as unknown as SceneHandle);
+    return () => {
+      engine.destroy();
+      engineRef.current = null;
+    };
+  }, [create, structuralKey]);
+
+  const {
+    palette,
+    speed,
+    columns,
+    maxCells,
+    adaptiveQuality,
+    calm,
+    label,
+    paused,
+    fontFamily,
+    onEvent,
+  } = options;
+
+  useEffect(() => {
+    engineRef.current?.setOptions({
+      palette,
+      speed,
+      columns,
+      maxCells,
+      adaptiveQuality,
+      calm,
+      label,
+      paused,
+      fontFamily,
+      onEvent,
+    });
+  }, [
+    palette,
+    speed,
+    columns,
+    maxCells,
+    adaptiveQuality,
+    calm,
+    label,
+    paused,
+    fontFamily,
+    onEvent,
+  ]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      id={id}
+      className={["ascii-things", `ascii-${kind}`, className].filter(Boolean).join(" ")}
+      role={label ? "img" : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
+      style={{
+        display: "block",
+        width,
+        height: aspectRatio ? "auto" : height,
+        ...(aspectRatio ? { aspectRatio } : null),
+        ...style,
+      }}
+    />
+  );
+}
+
+export function AsciiStarlings(props: AsciiStarlingsProps) {
+  return <AmbientCanvas {...props} kind="starlings" create={createStarlings} />;
+}
+
+export function AsciiFireflies(props: AsciiFirefliesProps) {
+  return <AmbientCanvas {...props} kind="fireflies" create={createFireflies} />;
+}
+
+export function AsciiAnts(props: AsciiAntsProps) {
+  return <AmbientCanvas {...props} kind="ants" create={createAnts} />;
+}
+
+export function AsciiKoi(props: AsciiKoiProps) {
+  return <AmbientCanvas {...props} kind="koi" create={createKoi} />;
+}
+
+export function AsciiCity(props: AsciiCityProps) {
+  return <AmbientCanvas {...props} kind="city" create={createCity} />;
+}
+
+export function AsciiServers(props: AsciiServersProps) {
+  return <AmbientCanvas {...props} kind="servers" create={createServers} />;
+}
+
 export const AsciiOcean = AsciiSharks;

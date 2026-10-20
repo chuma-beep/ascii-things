@@ -1,12 +1,19 @@
 import {
+  createAnts,
+  createCity,
   createDog,
+  createFireflies,
   createJellyfish,
+  createKoi,
   createRobots,
+  createServers,
   createSharks,
+  createStarlings,
   type AsciiDogOptions,
   type AsciiJellyfishOptions,
   type AsciiRobotsOptions,
   type AsciiSharksOptions,
+  type AsciiStarlingsOptions,
   type DogSpec,
   type JellyfishSpec,
   type RobotSpec,
@@ -52,7 +59,13 @@ let scene:
   | ReturnType<typeof createSharks>
   | ReturnType<typeof createRobots>
   | ReturnType<typeof createJellyfish>
-  | ReturnType<typeof createDog>;
+  | ReturnType<typeof createDog>
+  | ReturnType<typeof createStarlings>
+  | ReturnType<typeof createFireflies>
+  | ReturnType<typeof createAnts>
+  | ReturnType<typeof createKoi>
+  | ReturnType<typeof createCity>
+  | ReturnType<typeof createServers>;
 
 if (params.get("scene") === "dog") {
   scene = createDog(canvas, {
@@ -106,6 +119,40 @@ if (params.get("scene") === "dog") {
     calm,
     interactive,
   } satisfies AsciiRobotsOptions);
+} else if (
+  ["starlings", "fireflies", "ants", "koi", "city", "servers"].includes(params.get("scene") ?? "")
+) {
+  const ambient = {
+    count: number("count"),
+    palette: palette ?? undefined,
+    seed: number("seed"),
+    speed: number("speed"),
+    columns: number("columns"),
+    maxCells: number("maxCells"),
+    maxDpr: number("maxDpr"),
+    scale: number("scale"),
+    calm,
+    interactive,
+  } satisfies AsciiStarlingsOptions;
+  switch (params.get("scene")) {
+    case "starlings":
+      scene = createStarlings(canvas, ambient);
+      break;
+    case "fireflies":
+      scene = createFireflies(canvas, ambient);
+      break;
+    case "ants":
+      scene = createAnts(canvas, ambient);
+      break;
+    case "koi":
+      scene = createKoi(canvas, ambient);
+      break;
+    case "city":
+      scene = createCity(canvas, ambient);
+      break;
+    default:
+      scene = createServers(canvas, ambient);
+  }
 } else {
   const sharks: SharkSpec[] | undefined = parseSpecs(
     params.get("sharks"),

@@ -24,9 +24,45 @@
     "gzip": true
   },
   {
+    "name": "starlings",
+    "path": "dist/starlings.js",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "fireflies",
+    "path": "dist/fireflies.js",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "ants",
+    "path": "dist/ants.js",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "koi",
+    "path": "dist/koi.js",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "city",
+    "path": "dist/city.js",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
+    "name": "servers",
+    "path": "dist/servers.js",
+    "limit": "20 kB",
+    "gzip": true
+  },
+  {
     "name": "all scenes",
     "path": "dist/index.js",
-    "limit": "50 kB",
+    "limit": "100 kB",
     "gzip": true
   },
   {
@@ -44,7 +80,7 @@
   {
     "name": "ui",
     "path": "dist/ui.js",
-    "limit": "35 kB",
+    "limit": "45 kB",
     "gzip": true
   }
 ]

@@ -1,8 +1,14 @@
 import {
+  createAnts,
+  createCity,
   createDog,
+  createFireflies,
   createJellyfish,
+  createKoi,
   createRobots,
+  createServers,
   createSharks,
+  createStarlings,
   type DogEngine,
 } from "ascii-things";
 
@@ -10,7 +16,13 @@ type CardEngine =
   | ReturnType<typeof createSharks>
   | ReturnType<typeof createRobots>
   | ReturnType<typeof createJellyfish>
-  | ReturnType<typeof createDog>;
+  | ReturnType<typeof createDog>
+  | ReturnType<typeof createStarlings>
+  | ReturnType<typeof createFireflies>
+  | ReturnType<typeof createAnts>
+  | ReturnType<typeof createKoi>
+  | ReturnType<typeof createCity>
+  | ReturnType<typeof createServers>;
 
 const heroCanvas = document.querySelector<HTMLCanvasElement>("#hero-canvas");
 if (heroCanvas) {
@@ -125,6 +137,72 @@ function startCard(canvas: HTMLCanvasElement) {
         dogs: [{ size: 1.15 }],
         spread: [0.5, 0.5],
         columns: 66,
+        maxCells: 4200,
+        interactive: false,
+        calm: true,
+      });
+      break;
+    case "starlings":
+      engine = createStarlings(canvas, {
+        palette: "abyss",
+        seed: 21,
+        count: 110,
+        columns: 72,
+        maxCells: 4200,
+        interactive: false,
+        calm: true,
+      });
+      break;
+    case "fireflies":
+      engine = createFireflies(canvas, {
+        palette: "abyss",
+        seed: 23,
+        count: 70,
+        columns: 72,
+        maxCells: 4200,
+        interactive: false,
+        calm: true,
+      });
+      break;
+    case "ants":
+      engine = createAnts(canvas, {
+        palette: "abyss",
+        seed: 25,
+        count: 44,
+        columns: 72,
+        maxCells: 4200,
+        interactive: false,
+        calm: true,
+      });
+      break;
+    case "koi":
+      engine = createKoi(canvas, {
+        palette: "abyss",
+        seed: 27,
+        count: 7,
+        columns: 72,
+        maxCells: 4200,
+        interactive: false,
+        calm: true,
+      });
+      break;
+    case "city":
+      engine = createCity(canvas, {
+        palette: "abyss",
+        seed: 29,
+        count: 18,
+        columns: 76,
+        maxCells: 4200,
+        interactive: false,
+        calm: true,
+      });
+      break;
+    case "servers":
+      engine = createServers(canvas, {
+        palette: "abyss",
+        seed: 31,
+        count: 8,
+        columns: 72,
         maxCells: 4200,
         interactive: false,
         calm: true,
