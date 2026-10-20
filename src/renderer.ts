@@ -7,7 +7,8 @@
  *      shaded by the light, dense glyphs, and shimmering accent colours
  */
 import { clamp, hash3, smoothstep } from "./math";
-import { SHARK_NODES, type Shark, type SharkKind, type World } from "./world";
+import { resolvePalette, type Palette, type PaletteName } from "./palette";
+import { SHARK_NODES, type Shark, type SharkKind, type World, type WorldEvent } from "./world";
 
 const ALPHA_LEVELS = 6;
 const FISH_ALPHAS = [0.28, 0.42, 0.58, 0.74, 0.9];
@@ -22,8 +23,6 @@ const DOT_RGB: [number, number, number][] = [
 ];
 const DOT_BASE_ALPHA = [1, 1, 1, 1, 1];
 const WAKE = DOT_RGB.length - 1;
-
-const ACCENTS = ["#e0892c", "#e03a32", "#b44ae0", "#33c8cc", "#3cb54a", "#3150e8", "#d9c14a"];
 
 // Sparse glyphs on bright skin, dense glyphs in shadow, so the texture
 // reinforces the shading instead of fighting it.
@@ -247,10 +246,29 @@ function inTriangle(
   return !(neg && pos);
 }
 
-/** Visible dark-grey cell grid, snapped to device pixels. Shared with the sidebar backdrop. */
-export function paintGrid(g: CanvasRenderingContext2D, W: number, H: number, cw: number, ch: number, dpr: number) {
+export interface RendererOptions {
+  palette?: PaletteName | Palette;
+  /** Art-direction target for the number of columns. */
+  columns?: number;
+  /** Adaptive quality cap. */
+  maxCells?: number;
+  /** Disable shimmer and glints. */
+  calm?: boolean;
+  onEvent?: (event: WorldEvent) => void;
+}
+
+/** Visible cell grid, snapped to device pixels. Shared with the sidebar backdrop. */
+export function paintGrid(
+  g: CanvasRenderingContext2D,
+  W: number,
+  H: number,
+  cw: number,
+  ch: number,
+  dpr: number,
+  color = "rgba(255,255,255,0.055)",
+) {
   g.setTransform(1, 0, 0, 1, 0, 0);
-  g.strokeStyle = "rgba(255,255,255,0.055)";
+  g.strokeStyle = color;
   g.lineWidth = 1;
   g.beginPath();
   for (let c = 0; c <= Math.ceil(W / cw); c++) {
@@ -277,6 +295,11 @@ export class AsciiRenderer {
   private cols = 0;
   private rows = 0;
   private fontFamily = "ui-monospace, Menlo, monospace";
+  private columns = 124;
+  private maxCells = 16000;
+  private calm = false;
+  private palette: Palette = resolvePalette();
+  private onEvent?: (event: WorldEvent) => void;
 
   private dotKind = new Uint8Array(0); // 0 none, 1 blue, 2 green, 3 red, 4 pale
   private dotPhase = new Float32Array(0);
@@ -287,6 +310,8 @@ export class AsciiRenderer {
   private bucketOf = new Uint8Array(0);
   private bucketOrder = new Int32Array(0);
   private bucketCounts = new Int32Array(DOT_RGB.length * ALPHA_LEVELS + 1);
+  private bucketStarts = new Int32Array(DOT_RGB.length * ALPHA_LEVELS + 1);
+  private bucketCursor = new Int32Array(DOT_RGB.length * ALPHA_LEVELS + 1);
   private dotStyles: string[] = [];
 
   private sharkFlag = new Uint8Array(0);
@@ -317,19 +342,17 @@ export class AsciiRenderer {
   private fishBuckets: number[][] = FISH_ALPHAS.map(() => []);
   private fishStyles = FISH_ALPHAS.map((a) => `rgba(230,238,255,${a})`);
 
-  constructor(private canvas: HTMLCanvasElement) {
+  constructor(private canvas: HTMLCanvasElement, options: RendererOptions = {}) {
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) throw new Error("2D canvas unavailable");
     this.ctx = ctx;
     this.bg = document.createElement("canvas");
-
-    for (let c = 0; c < DOT_RGB.length; c++) {
-      const [r, g, b] = DOT_RGB[c];
-      for (let l = 0; l < ALPHA_LEVELS; l++) {
-        const a = (DOT_BASE_ALPHA[c] * (l + 1)) / ALPHA_LEVELS;
-        this.dotStyles.push(`rgba(${r},${g},${b},${a.toFixed(3)})`);
-      }
-    }
+    this.palette = resolvePalette(options.palette);
+    this.columns = options.columns ?? 124;
+    this.maxCells = options.maxCells ?? 16000;
+    this.calm = options.calm ?? false;
+    this.onEvent = options.onEvent;
+    this.applyPalette();
   }
 
   get cellWidth() {
@@ -340,18 +363,69 @@ export class AsciiRenderer {
     return this.ch;
   }
 
+  get cellCount() {
+    return this.cols * this.rows;
+  }
+
+  get columnCount() {
+    return this.cols;
+  }
+
+  get rowCount() {
+    return this.rows;
+  }
+
   setFontFamily(family: string) {
     if (family) this.fontFamily = family;
+  }
+
+  setOptions(options: RendererOptions) {
+    if (options.palette !== undefined) {
+      this.palette = resolvePalette(options.palette);
+      this.applyPalette();
+    }
+    if (options.columns !== undefined) this.columns = Math.max(24, options.columns);
+    if (options.maxCells !== undefined) this.maxCells = Math.max(0, options.maxCells);
+    if (options.calm !== undefined) this.calm = options.calm;
+    if (options.onEvent !== undefined) this.onEvent = options.onEvent;
+  }
+
+  private applyPalette() {
+    this.fishStyles = this.palette.fish.slice() as string[];
+    this.dotStyles = [];
+    for (let c = 0; c < DOT_RGB.length; c++) {
+      const [r, g, b] = c === WAKE ? this.palette.wake : DOT_RGB[c];
+      for (let l = 0; l < ALPHA_LEVELS; l++) {
+        const a = (DOT_BASE_ALPHA[c] * (l + 1)) / ALPHA_LEVELS;
+        this.dotStyles.push(`rgba(${r},${g},${b},${a.toFixed(3)})`);
+      }
+    }
+    if (this.width > 0) this.paintBackground();
   }
 
   resize(width: number, height: number, dpr: number) {
     this.width = width;
     this.height = height;
     this.dpr = dpr;
-    this.cw = clamp(Math.round(width / 124), 8, 13);
-    this.ch = Math.round(this.cw * 1.45);
-    this.cols = Math.ceil(width / this.cw);
-    this.rows = Math.ceil(height / this.ch);
+
+    // Keep glyphs at a readable size (8–13 px) at normal viewports. Only
+    // when the cell budget would be exceeded do we grow the cell, which is
+    // what keeps 4K from exploding to 33k cells.
+    const targetColumns = Math.max(24, this.columns);
+    let cw = clamp(Math.round(width / targetColumns), 8, 13);
+    let ch = Math.round(cw * 1.45);
+    let cols = Math.ceil(width / cw);
+    let rows = Math.ceil(height / ch);
+    while (this.maxCells > 0 && cols * rows > this.maxCells && cw < 64) {
+      cw++;
+      ch = Math.round(cw * 1.45);
+      cols = Math.ceil(width / cw);
+      rows = Math.ceil(height / ch);
+    }
+    this.cw = cw;
+    this.ch = ch;
+    this.cols = cols;
+    this.rows = rows;
 
     this.canvas.width = Math.round(width * dpr);
     this.canvas.height = Math.round(height * dpr);
@@ -378,7 +452,7 @@ export class AsciiRenderer {
     for (let i = 0; i < n; i++) {
       const col = i % this.cols;
       const row = (i / this.cols) | 0;
-      // No ambient dots: the grid stays black. Only the cyan wake lights cells.
+      // No ambient dots: only the wake lights cells.
       this.dotKind[i] = 0;
       this.dotPhase[i] = hash3(col, row, 23) * Math.PI * 2;
       this.dotFreq[i] = 0.3 + hash3(col, row, 37) * 1.1;
@@ -391,9 +465,9 @@ export class AsciiRenderer {
     if (!g) return;
     const { width: W, height: H, dpr, cw, ch } = this;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    g.fillStyle = "#000";
+    g.fillStyle = this.palette.background;
     g.fillRect(0, 0, W, H);
-    paintGrid(g, W, H, cw, ch, dpr);
+    paintGrid(g, W, H, cw, ch, dpr, this.palette.grid);
   }
 
   render(world: World, dt: number) {
@@ -447,6 +521,7 @@ export class AsciiRenderer {
 
   private consumeEvents(world: World) {
     for (const e of world.events) {
+      this.onEvent?.(e);
       if (e.kind === "eat") {
         this.stamp(this.heat, e.x, e.y, 2, 1);
         this.stamp(this.energy, e.x, e.y, 3, 0.9);
@@ -732,7 +807,7 @@ export class AsciiRenderer {
 
           if (centerHit && coverage >= 0.6) {
             sharkFlag[i] = flag;
-            const flicker = (hash3(c, r, Math.floor(t * 6)) - 0.5) * 0.06;
+            const flicker = this.calm ? 0 : (hash3(c, r, Math.floor(t * 6)) - 0.5) * 0.06;
             sharkShade[i] = clamp(shade + flicker, 0, 1);
             const sc = c + shadowDc;
             const sr = r + shadowDr;
@@ -760,19 +835,22 @@ export class AsciiRenderer {
       const shade = sharkShade[i];
       const dim = 0.7 + 0.3 * sharkDepth[i];
       const [tr, tg, tb] = SHAPES[KINDS[sharkKind[i]]].tint;
+      const palette = this.palette;
 
       // Colours re-roll on a staggered clock so the hide shimmers.
-      const tick = Math.floor(t * 2.4 + (key % 997) / 97);
-      const roll = hash3(key, tick, 7);
+      const tick = this.calm ? 0 : Math.floor(t * 2.4 + (key % 997) / 97);
+      const roll = this.calm ? 1 : hash3(key, tick, 7);
 
       if (flag === FLAG_EDGE) {
         // Soft, anti-aliased silhouette: no block, just a light glyph.
         const set = shade >= 0.5 ? EDGE_HEAVY : EDGE_LIGHT;
-        const g = (70 + shade * 80) * dim;
+        const base = palette.dark ? 70 + shade * 80 : 190 - shade * 100;
+        const [er, eg, eb] = palette.edge;
+        const k = base / 170;
         ctx.fillStyle =
           roll < 0.07
-            ? ACCENTS[key % ACCENTS.length]
-            : `rgb(${Math.round(g * tr)},${Math.round(g * tg)},${Math.min(255, Math.round(g * tb + 6))})`;
+            ? palette.accents[key % palette.accents.length]
+            : `rgb(${Math.round(er * k)},${Math.round(eg * k)},${Math.round(eb * k)})`;
         ctx.fillText(set[(key >>> 8) % set.length], x + cw / 2, y + ch / 2 + 1);
         continue;
       }
@@ -780,33 +858,37 @@ export class AsciiRenderer {
       let level: number;
       let glyph: string;
       if (flag === FLAG_RIDGE) {
-        level = 226;
+        level = palette.dark ? 226 : 18;
         glyph = RIDGE_GLYPHS[(key >>> 8) % RIDGE_GLYPHS.length];
       } else if (flag === FLAG_EYE) {
-        level = 12;
+        level = palette.dark ? 12 : 8;
         glyph = "o";
       } else if (flag === FLAG_MARK) {
-        level = 24 + shade * 22;
+        level = palette.dark ? 24 + shade * 22 : 120 + shade * 40;
         glyph = MARK_GLYPHS[(key >>> 8) % MARK_GLYPHS.length];
       } else if (flag === FLAG_FIN) {
-        level = 40 + shade * 120;
+        level = palette.dark ? 40 + shade * 120 : 70 + (1 - shade) * 80;
         glyph = FIN_GLYPHS[(key >>> 8) % FIN_GLYPHS.length];
       } else {
-        level = 46 + shade * 160;
+        level = palette.dark ? 46 + shade * 160 : 24 + (1 - shade) * 120;
         const jitter = ((key >>> 4) % 3) - 1;
         glyph = SKIN_RAMP[clamp(Math.floor((1 - shade) * 8.99) + jitter, 0, SKIN_RAMP.length - 1)];
       }
-      level *= dim;
+      if (palette.dark) level *= dim;
+      else level += (210 - level) * (1 - dim) * 0.8;
       // Tinted per species; the classic tint is a cool blue-grey, like a back seen through deep water.
       ctx.fillStyle = `rgb(${Math.min(255, Math.round(level * tr))},${Math.min(255, Math.round(level * tg))},${Math.min(255, Math.round(level * tb + 4))})`;
       ctx.fillRect(x + 1, y + 1, cw - 1, ch - 1);
 
       let color: string;
-      if (flag === FLAG_EYE) color = "#9aa0ad";
-      else if (flag === FLAG_MARK) color = `rgb(${Math.round(70 * tr)},${Math.round(70 * tg)},${Math.round(70 * tb)})`;
-      else if (roll < 0.09) color = ACCENTS[key % ACCENTS.length];
-      else if (roll < 0.13) color = "#ffffff";
-      else color = shade > 0.55 ? "#0e0f13" : "#1b1d24";
+      if (flag === FLAG_EYE) color = palette.eye;
+      else if (flag === FLAG_MARK) {
+        const [mr, mg, mb] = palette.mark;
+        const k = 0.75 + shade * 0.5;
+        color = `rgb(${Math.round(mr * k)},${Math.round(mg * k)},${Math.round(mb * k)})`;
+      } else if (roll < 0.09) color = palette.accents[key % palette.accents.length];
+      else if (roll < 0.13) color = palette.dark ? "#ffffff" : "#000000";
+      else color = shade > 0.55 ? palette.textOnBody : palette.textOnBodyAlt;
       ctx.fillStyle = color;
       ctx.fillText(glyph, x + cw / 2, y + ch / 2 + 1);
     }
@@ -855,7 +937,9 @@ export class AsciiRenderer {
       if (h < 0.08) continue;
       const col = i % cols;
       const row = (i / cols) | 0;
-      ctx.fillStyle = h > 0.5 ? `rgba(255,120,60,${h.toFixed(2)})` : `rgba(220,40,40,${(h * 1.6).toFixed(2)})`;
+      const [r, g, b] = h > 0.5 ? this.palette.heatHot : this.palette.heat;
+      const a = Math.min(1, h > 0.5 ? h : h * 1.6);
+      ctx.fillStyle = `rgba(${r},${g},${b},${a.toFixed(2)})`;
       ctx.fillText(h > 0.6 ? "*" : "·", col * cw + cw / 2, row * ch + ch / 2 + 1);
     }
   }
@@ -897,10 +981,12 @@ export class AsciiRenderer {
       bucketCounts[bucket]++;
     }
 
-    // Counting sort cells by bucket.
-    const starts = new Int32Array(bucketCounts.length);
+    // Counting sort cells by bucket. Reuse scratch arrays: this runs every frame.
+    const starts = this.bucketStarts;
+    const cursor = this.bucketCursor;
+    starts.fill(0);
     for (let b = 1; b < bucketCounts.length; b++) starts[b] = starts[b - 1] + bucketCounts[b - 1];
-    const cursor = starts.slice();
+    cursor.set(starts);
     for (let i = 0; i < n; i++) {
       const b = bucketOf[i];
       if (b !== SKIP) bucketOrder[cursor[b]++] = i;

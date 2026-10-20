@@ -13,7 +13,8 @@
  * so stragglers get picked off. Eaten fish come back later as new schools
  * swimming in from the edges, which keeps the population steady.
  */
-import { angleDiff, clamp, current, rand, randInt, TAU } from "./math";
+import { angleDiff, clamp, current, TAU } from "./math";
+import { createRng, type Rng } from "./rng";
 import { pickSpecies, SPECIES } from "./species";
 
 export const SHARK_NODES = 20;
@@ -22,6 +23,16 @@ export type SharkKind = "classic" | "hammerhead" | "zebra" | "tiger" | "greatham
 
 /** Which sharks to put in the water; size is relative to the biggest. */
 export type SharkSpec = { kind: SharkKind; size: number };
+
+export interface WorldOptions {
+  sharks?: SharkSpec[];
+  fishCount?: number;
+  seed?: number;
+  /** Fish population multiplier. */
+  density?: number;
+  /** Shark length multiplier. */
+  sharkScale?: number;
+}
 
 // The landing hero: four of the same shark at different depths.
 const DEFAULT_SHARKS: SharkSpec[] = [
@@ -108,11 +119,49 @@ export class World {
   private lastSpawn = 0;
   private tmp = { x: 0, y: 0 };
 
+  private sharkSpecs: SharkSpec[];
+  private fishCount?: number;
+  private rng: Rng;
+  private density: number;
+  private sharkScale: number;
+
   /** fishCount overrides the area-based population (the sidebar wants a single small school). */
-  constructor(
-    private sharkSpecs: SharkSpec[] = DEFAULT_SHARKS,
-    private fishCount?: number,
-  ) {}
+  constructor(options: WorldOptions = {}) {
+    this.sharkSpecs = options.sharks ?? DEFAULT_SHARKS;
+    this.fishCount = options.fishCount;
+    this.rng = createRng(options.seed);
+    this.density = options.density ?? 1;
+    this.sharkScale = options.sharkScale ?? 1;
+  }
+
+  /**
+   * Change structural options. Fish and sharks are re-seeded so the new
+   * roster/density takes effect immediately.
+   */
+  setOptions(options: WorldOptions) {
+    let reseed = false;
+    if (options.sharks !== undefined) {
+      this.sharkSpecs = options.sharks;
+      reseed = true;
+    }
+    if (options.fishCount !== undefined) {
+      this.fishCount = options.fishCount;
+      reseed = true;
+    }
+    if (options.density !== undefined) {
+      this.density = options.density;
+      reseed = true;
+    }
+    if (options.sharkScale !== undefined) {
+      this.sharkScale = options.sharkScale;
+      reseed = true;
+    }
+    if (options.seed !== undefined) {
+      this.rng = createRng(options.seed);
+      reseed = true;
+    }
+    if (reseed && this.width > 0) this.seed();
+  }
 
   resize(width: number, height: number, cellW: number, cellH: number) {
     const first = this.width === 0;
@@ -137,15 +186,18 @@ export class World {
   seed() {
     const { width: W, height: H } = this;
     const minSide = Math.min(W, H);
-    const baseLength = clamp(minSide * 0.44, 170, 430);
+    const baseLength = Math.max(40, clamp(minSide * 0.44, 170, 430) * this.sharkScale);
     const sharkCount = this.sharkSpecs.length;
 
+    this.time = 0;
+    this.lastSpawn = 0;
+    this.events.length = 0;
     this.sharks = [];
     for (let i = 0; i < sharkCount; i++) {
       const { kind, size } = this.sharkSpecs[i];
       const length = baseLength * size;
-      const orbitRadius = minSide * rand(0.28, 0.4);
-      const a = (i / sharkCount) * TAU + rand(-0.4, 0.4);
+      const orbitRadius = minSide * this.rng.range(0.28, 0.4);
+      const a = (i / sharkCount) * TAU + this.rng.range(-0.4, 0.4);
       const orbitDir: 1 | -1 = i % 2 === 0 ? 1 : -1;
       const x = W / 2 + Math.cos(a) * orbitRadius * (W / minSide) * 0.9;
       const y = H / 2 + Math.sin(a) * orbitRadius;
@@ -163,9 +215,9 @@ export class World {
         nodes,
         heading,
         speed: 30,
-        phase: rand(0, TAU),
+        phase: this.rng.range(0, TAU),
         turn: 0,
-        hunger: rand(0.25, 0.75),
+        hunger: this.rng.range(0.25, 0.75),
         wander: 0,
         orbitDir,
         orbitRadius,
@@ -177,30 +229,31 @@ export class World {
     // Smaller (farther) sharks draw first so the big one swims over them.
     this.sharks.sort((a, b) => a.length - b.length);
 
-    const total = this.fishCount ?? clamp(Math.round((W * H) / 4400), 85, 340);
+    const total =
+      this.fishCount ?? clamp(Math.round(((W * H) / 4400) * this.density), 20, 340);
     this.fish = [];
     while (this.fish.length < total) {
-      const species = pickSpecies();
+      const species = pickSpecies(this.rng.next);
       const sp = SPECIES[species];
-      const size = Math.min(randInt(sp.schoolSize[0], sp.schoolSize[1]), total - this.fish.length);
-      const millDir: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
-      const cx = rand(W * 0.06, W * 0.94);
-      const cy = rand(H * 0.08, H * 0.92);
+      const size = Math.min(this.rng.int(sp.schoolSize[0], sp.schoolSize[1]), total - this.fish.length);
+      const millDir: 1 | -1 = this.rng.next() < 0.5 ? 1 : -1;
+      const cx = this.rng.range(W * 0.06, W * 0.94);
+      const cy = this.rng.range(H * 0.08, H * 0.92);
       // Mostly level headings: fish cruise sideways far more than up or down.
-      const dir = (Math.random() < 0.5 ? 0 : Math.PI) + rand(-0.5, 0.5);
+      const dir = (this.rng.next() < 0.5 ? 0 : Math.PI) + this.rng.range(-0.5, 0.5);
       for (let k = 0; k < size; k++) {
         this.fish.push({
-          x: cx + rand(-1, 1) * this.sepX[species] * Math.sqrt(size),
-          y: cy + rand(-1, 1) * this.sepY[species] * Math.sqrt(size) * 0.6,
+          x: cx + this.rng.range(-1, 1) * this.sepX[species] * Math.sqrt(size),
+          y: cy + this.rng.range(-1, 1) * this.sepY[species] * Math.sqrt(size) * 0.6,
           vx: Math.cos(dir) * sp.cruise,
           vy: Math.sin(dir) * sp.cruise,
           species,
           alarm: 0,
           alive: true,
           respawnAt: 0,
-          phase: rand(0, TAU),
+          phase: this.rng.range(0, TAU),
           turn: 0,
-          depth: rand(0.55, 1),
+          depth: this.rng.range(0.55, 1),
           millDir,
         });
       }
@@ -427,8 +480,8 @@ export class World {
 
       // Ambient current and a little individual restlessness.
       current(f.x, f.y, time, cur);
-      ax += cur.x * 0.5 + (Math.random() - 0.5) * sp.jitter;
-      ay += cur.y * 0.5 + (Math.random() - 0.5) * sp.jitter;
+      ax += cur.x * 0.5 + (this.rng.next() - 0.5) * sp.jitter;
+      ay += cur.y * 0.5 + (this.rng.next() - 0.5) * sp.jitter;
       // Swim level, except when bolting from danger.
       ay -= f.vy * sp.verticalDrag * (1 - 0.7 * f.alarm);
 
@@ -475,7 +528,7 @@ export class World {
       let dy = Math.sin(sh.heading);
 
       // Wander: a slowly drifting offset on a circle ahead of the snout.
-      sh.wander = clamp(sh.wander + (Math.random() - 0.5) * dt * 3.2, -1.1, 1.1);
+      sh.wander = clamp(sh.wander + (this.rng.next() - 0.5) * dt * 3.2, -1.1, 1.1);
       dx += Math.cos(sh.heading + sh.wander) * 0.45;
       dy += Math.sin(sh.heading + sh.wander) * 0.45;
 
@@ -587,7 +640,7 @@ export class World {
           if (!f.alive) continue;
           if ((f.x - mx) ** 2 + (f.y - my) ** 2 < mouthR * mouthR) {
             f.alive = false;
-            f.respawnAt = time + rand(3, 8);
+            f.respawnAt = time + this.rng.range(3, 8);
             sh.hunger = Math.max(0, sh.hunger - 0.16);
             this.events.push({ kind: "eat", x: f.x, y: f.y });
           }
@@ -640,22 +693,22 @@ export class World {
     this.lastSpawn = time;
 
     // A new school swims in from a random edge.
-    const side = randInt(0, 3);
-    const along = rand(0.15, 0.85);
+    const side = this.rng.int(0, 3);
+    const along = this.rng.range(0.15, 0.85);
     const x = side === 0 ? -20 : side === 1 ? W + 20 : along * W;
     const y = side === 2 ? -20 : side === 3 ? H + 20 : along * H;
-    const inward = Math.atan2(H / 2 - y, W / 2 - x) + rand(-0.5, 0.5);
-    const species = pickSpecies();
+    const inward = Math.atan2(H / 2 - y, W / 2 - x) + this.rng.range(-0.5, 0.5);
+    const species = pickSpecies(this.rng.next);
     const sp = SPECIES[species];
-    const millDir: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
+    const millDir: 1 | -1 = this.rng.next() < 0.5 ? 1 : -1;
     for (const f of due.slice(0, sp.schoolSize[1])) {
       f.alive = true;
       f.species = species;
       f.alarm = 0;
       f.turn = 0;
       f.millDir = millDir;
-      f.x = x + rand(-1, 1) * this.perception;
-      f.y = y + rand(-1, 1) * this.perception;
+      f.x = x + this.rng.range(-1, 1) * this.perception;
+      f.y = y + this.rng.range(-1, 1) * this.perception;
       f.vx = Math.cos(inward) * sp.cruise * 1.4;
       f.vy = Math.sin(inward) * sp.cruise * 1.4;
     }

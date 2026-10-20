@@ -1,0 +1,11 @@
+ascii-things
+
+Copyright (c) 2026 ascii-things contributors
+
+This project is derived from ascii-sharks by stackedlol
+(https://github.com/stackedlol/ascii-sharks). The original shark simulation and
+procedural ASCII rendering are by the original author. ascii-things adds the
+library API, packaging, palettes, seeded worlds, accessibility options,
+framework adapters, and the robot scene.
+
+Licensed under the MIT License. See LICENSE.

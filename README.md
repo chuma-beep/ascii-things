@@ -1,4 +1,4 @@
-# ascii sharks
+# ascii-things
 
 ```
                             ;'
@@ -10,7 +10,7 @@ t'                            ''XSSS8SSX%XX8#.    %XSX%
  :;'               ;.''X8%8XX%%S%%S%SStt%tSX8S#X8't%ttt.
   ::%'       ''8XXXSSt%Stttttt%8@%%@%8@8%Sttt%%%%SSSSS%tt.
   'SXXtt%t%%%S%:;StS%ttSS%tSXSt88@@%8%@8%tStS%%X%SS%%S%;;t
- .@##88#@...'@@@@#@8@88X88#XXXSX8SX88SX8%SS%S%%S88St%t%%%.
+ .@##88#@...'@@@@#88X88#XXXSX8SX88SX8%SS%S%%S88St%t%%%.
   %;%t             :.    '.'##@###@X#888XX##8@@@#.X%XS%.
  .%t                            ;%%%#@@##@@@.     SXS%%
  t.                            .%;%%%.            %%XXS
@@ -20,14 +20,392 @@ t'                            ''XSSS8SSX%XX8#.    %XSX%
                             .
 ```
 
-Fish and sharks drawn as ASCII on a canvas. Zero dependencies.
+**Living ASCII scenes.** A shark tank, a robot factory floor, a jellyfish
+bloom, and a robot dog test yard, drawn as glyphs on a canvas. Zero runtime
+dependencies. MIT.
+
+Each scene is a small artificial-life simulation, not a looped animation. Sharks
+hunt fish that spread alarm through the school. Robots patrol, scan, haul cargo,
+and queue for a charging bay. Jellyfish pulse through a current, trailing
+tentacles and leaving rings of light. A robot dog trots, sniffs, sits, chases a
+ball, and docks to recharge. Same seed and size produce the same scene.
+
+The research and extraction plan are in [`RESEARCH.md`](./RESEARCH.md).
+
+**Roadmap:** sharks · moving robots · jellyfish · robot dog (this release) →
+murmuration → koi.
+
+## Install
 
 ```sh
-npm install && npm run dev
+npm install ascii-things
 ```
+
+Or use the custom elements from a CDN:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"></script>
+
+<ascii-sharks palette="abyss" seed="42" style="height: 480px"></ascii-sharks>
+<ascii-robots palette="paper" seed="7" style="height: 420px"></ascii-robots>
+<ascii-jellyfish palette="neon" seed="3" style="height: 460px"></ascii-jellyfish>
+<ascii-dog palette="paper" seed="7" style="height: 420px"></ascii-dog>
+```
+
+## Vanilla
 
 ```ts
-import { OceanEngine } from "./src";
+import { createSharks } from "ascii-things/sharks";
 
-const engine = new OceanEngine(canvas, [{ kind: "hammerhead", size: 1 }]);
+const scene = createSharks(canvas, {
+  sharks: [
+    { kind: "hammerhead", size: 1 },
+    { kind: "mako", size: 0.8 },
+  ],
+  palette: "abyss",
+  seed: 42,
+  density: 0.9,
+  interactive: true,
+});
+
+scene.pause();
+scene.resume();
+scene.setOptions({ palette: "paper", speed: 0.8 });
+console.log(scene.getStats());
+scene.destroy();
 ```
+
+The canvas needs a size from CSS. `createSharks` fills whatever box the canvas
+occupies and watches it with `ResizeObserver`.
+
+## Robots
+
+```ts
+import { createRobots } from "ascii-things/robots";
+
+const floor = createRobots(canvas, {
+  robots: [
+    { kind: "scout", size: 1 },
+    { kind: "hauler", size: 1.15 },
+    { kind: "sentinel", size: 1 },
+  ],
+  palette: "paper",
+  seed: 7,
+  count: 8,
+  interactive: true,
+});
+
+floor.setOptions({ palette: "neon", speed: 1.4 });
+console.log(floor.getStats());
+```
+
+Robots patrol, stop to scan, avoid crates and each other, and return to a
+charging bay when their battery gets low. Click the floor to dispatch the
+nearest idle robot to that spot. `getStats()` returns `robots`, `charging`,
+`docks`, `cells`, and frame timing.
+
+## Jellyfish
+
+```ts
+import { createJellyfish } from "ascii-things/jellyfish";
+
+const bloom = createJellyfish(canvas, {
+  jellies: [
+    { kind: "moon", size: 1.15 },
+    { kind: "lion", size: 0.95 },
+    { kind: "atolla", size: 1.05 },
+  ],
+  palette: "abyss",
+  seed: 3,
+  interactive: true,
+});
+
+bloom.setOptions({ palette: "neon", speed: 0.9 });
+console.log(bloom.getStats());
+```
+
+Jellyfish pulse along their heading, ride a divergence-free current, trail
+tentacles and oral arms, and leave a ring of light on every contraction. Move
+the pointer to nudge the bloom; click to send a shockwave. `getStats()` returns
+`jellies`, `pulsing`, `plankton`, `rings`, `cells`, and frame timing.
+
+## Robot dog
+
+```ts
+import { createDog } from "ascii-things/dog";
+
+const yard = createDog(canvas, {
+  dogs: [{ size: 1 }, { size: 1.15 }],
+  palette: "paper",
+  seed: 7,
+  interactive: true,
+});
+
+yard.setOptions({ palette: "neon", speed: 1.2 });
+console.log(yard.getStats());
+```
+
+The dog trots around a test yard, changes gait, stops to sniff or sit, and
+returns to its dock when the battery gets low. Click anywhere to throw the
+ball; the nearest dog gives chase and nudges it. `getStats()` returns `dogs`,
+`charging`, `state`, `ball`, `cells`, and frame timing.
+
+## React
+
+```tsx
+import { AsciiSharks } from "ascii-things/react";
+
+export function Hero() {
+  return (
+    <div style={{ height: 520 }}>
+      <AsciiSharks
+        sharks={[{ kind: "greathammer", size: 1.1 }]}
+        palette="abyss"
+        seed={42}
+        label="A live ASCII shark tank"
+      />
+    </div>
+  );
+}
+```
+
+```tsx
+import { AsciiRobots } from "ascii-things/react";
+
+export function Factory() {
+  return (
+    <div style={{ height: 420 }}>
+      <AsciiRobots
+        robots={[{ kind: "hauler", size: 1.2 }, { kind: "scout" }]}
+        palette="paper"
+        seed={7}
+        label="A live ASCII robot factory floor"
+      />
+    </div>
+  );
+}
+```
+
+```tsx
+import { AsciiJellyfish } from "ascii-things/react";
+
+export function Bloom() {
+  return (
+    <div style={{ height: 460 }}>
+      <AsciiJellyfish
+        jellies={[{ kind: "atolla", size: 1.05 }, { kind: "moon", size: 1.15 }]}
+        palette="neon"
+        seed={3}
+        label="A live ASCII jellyfish bloom"
+      />
+    </div>
+  );
+}
+```
+
+```tsx
+import { AsciiDog } from "ascii-things/react";
+
+export function Yard() {
+  return (
+    <div style={{ height: 420 }}>
+      <AsciiDog
+        dogs={[{ size: 1 }, { size: 1.15 }]}
+        palette="paper"
+        seed={7}
+        label="A live ASCII robot dog test yard"
+      />
+    </div>
+  );
+}
+```
+
+The wrappers are client components (`"use client"`), fill their parent by
+default, and clean up on unmount. `palette`, `speed`, `columns`, `maxCells`,
+`calm`, and `label` update live. Structural options (`sharks`, `robots`,
+`jellies`, `dogs`, `seed`, `density`, `count`, `sharkScale`, `scale`) remount
+the scene when they change.
+
+## HTML custom element
+
+```html
+<ascii-sharks
+  palette="paper"
+  seed="7"
+  density="0.7"
+  sharks="tiger:1,thresher:0.85"
+  interactive
+  label="A live ASCII shark tank"
+></ascii-sharks>
+```
+
+```html
+<ascii-robots
+  palette="paper"
+  seed="7"
+  count="8"
+  robots="scout:1,hauler:1.2,sentinel:1"
+  interactive
+  label="A live ASCII robot factory floor"
+></ascii-robots>
+```
+
+```html
+<ascii-jellyfish
+  palette="neon"
+  seed="3"
+  jellies="moon:1.15,lion:0.95,atolla:1.05"
+  interactive
+  label="A live ASCII jellyfish bloom"
+></ascii-jellyfish>
+```
+
+```html
+<ascii-dog
+  palette="paper"
+  seed="7"
+  count="2"
+  dogs="1,1.15"
+  interactive
+  label="A live ASCII robot dog test yard"
+></ascii-dog>
+```
+
+Shark attributes: `palette`, `seed`, `density`, `speed`, `columns`, `max-cells`,
+`max-dpr`, `calm`, `interactive`, `sharks`, `shark-scale`, `label`.
+
+Robot attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
+`max-dpr`, `calm`, `interactive`, `robots`, `scale`, `label`.
+
+Jellyfish attributes: `palette`, `seed`, `count`, `speed`, `columns`,
+`max-cells`, `max-dpr`, `calm`, `interactive`, `jellies`, `scale`, `label`.
+
+Dog attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
+`max-dpr`, `calm`, `interactive`, `dogs`, `scale`, `label`.
+
+## Shark options
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `sharks` | `{ kind, size }[]` | four classics | `classic`, `hammerhead`, `zebra`, `tiger`, `greathammer`, `mako`, `thresher`, `nurse` |
+| `palette` | `"abyss" \| "neon" \| "mono" \| "paper" \| Palette` | `"abyss"` | Custom palettes accepted |
+| `seed` | `number` | random | Same seed + size = same scene |
+| `columns` | `number` | `124` | Art-direction target; cells stay 8–13 px |
+| `density` | `number` | `1` | Fish population multiplier |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer flee + click splash |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
+| `calm` | `boolean` | `false` | Disables shimmer and glints |
+| `sharkScale` | `number` | `1` | Shark length multiplier |
+| `label` | `string` | — | Adds `role="img"` + `aria-label` |
+| `onEvent` | `(e) => void` | — | `{ kind: "eat" \| "splash", x, y }` |
+
+## Robot options
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `robots` | `{ kind, size }[]` | mixed fleet | `scout`, `hauler`, `sentinel` |
+| `count` | `number` | scales with area | Fleet size when `robots` is omitted |
+| `palette` | `"abyss" \| "neon" \| "mono" \| "paper" \| Palette` | `"abyss"` | Custom palettes accepted |
+| `seed` | `number` | random | Same seed + size = same floor |
+| `columns` | `number` | `150` | Art-direction target; cells stay 8–13 px |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer avoidance + click to dispatch |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
+| `calm` | `boolean` | `false` | Disables beacons, sparks, and scan shimmer |
+| `scale` | `number` | `1` | Robot size multiplier |
+| `label` | `string` | — | Adds `role="img"` + `aria-label` |
+| `onEvent` | `(e) => void` | — | `{ kind: "dock" \| "undock" \| "job" \| "low", x, y, id }` |
+
+## Jellyfish options
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `jellies` | `{ kind, size }[]` | mixed bloom | `moon`, `lion`, `box`, `atolla`, `crystal` |
+| `count` | `number` | scales with area | Bloom size when `jellies` is omitted |
+| `palette` | `"abyss" \| "neon" \| "mono" \| "paper" \| Palette` | `"abyss"` | Custom palettes accepted |
+| `seed` | `number` | random | Same seed + size = same bloom |
+| `columns` | `number` | `140` | Art-direction target; cells stay 8–13 px |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer current + click shockwave |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
+| `calm` | `boolean` | `false` | Disables shimmer, twinkle, and pulse flicker |
+| `scale` | `number` | `1` | Jellyfish size multiplier |
+| `label` | `string` | — | Adds `role="img"` + `aria-label` |
+| `onEvent` | `(e) => void` | — | `{ kind: "pulse" \| "shock", x, y, id? }` |
+
+## Dog options
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `dogs` | `{ size }[]` | responsive | Sizes are relative |
+| `count` | `number` | scales with width (1–3) | Dog count when `dogs` is omitted |
+| `palette` | `"abyss" \| "neon" \| "mono" \| "paper" \| Palette` | `"abyss"` | Custom palettes accepted |
+| `seed` | `number` | random | Same seed + size = same yard |
+| `columns` | `number` | `150` | Art-direction target; cells stay 8–13 px |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer tracking + click to throw the ball |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
+| `calm` | `boolean` | `false` | Disables sparks, beacons, and tail flicker |
+| `scale` | `number` | `1` | Dog size multiplier |
+| `label` | `string` | — | Adds `role="img"` + `aria-label` |
+| `onEvent` | `(e) => void` | — | `{ kind: "ball" \| "nudge" \| "charge" \| "low" \| "sit", x, y, id }` |
+
+## Lifecycle
+
+`pause()`, `resume()`, `setOptions(partial)`, `resize()`, `getStats()`,
+`destroy()`.
+
+## Accessibility
+
+The canvas is decorative (`aria-hidden="true"`) unless you pass `label`. Under
+`prefers-reduced-motion: reduce`, the scene settles for four seconds and then
+renders a still frame. `calm` disables the 2.4 Hz shimmer. Do not put essential
+content inside the canvas.
+
+## Development
+
+```sh
+npm install
+npm run dev        # open the URL Vite prints (5173 by default)
+npm run typecheck
+npm test
+npm run build      # ESM + d.ts in dist/
+```
+
+The demo reads its options from the query string, so you can test without
+editing code:
+
+```text
+http://localhost:5173/?palette=paper
+http://localhost:5173/?palette=neon&seed=7&density=0.6
+http://localhost:5173/?sharks=thresher,hammerhead,mako,nurse&sharkScale=1.2
+http://localhost:5173/?scene=robots&palette=paper&seed=7&count=8
+http://localhost:5173/?scene=robots&palette=neon&robots=scout:1,hauler:1.2,sentinel:1
+http://localhost:5173/?scene=jellyfish&palette=abyss&seed=3
+http://localhost:5173/?scene=jellyfish&palette=neon&jellies=moon:1.15,atolla:1.05,box:0.9
+http://localhost:5173/?scene=dog&palette=paper&seed=7&count=2
+http://localhost:5173/?scene=dog&palette=neon&dogs=1,1.15&scale=1.1
+http://localhost:5173/?calm=1&interactive=0
+```
+
+The scene is exposed as `window.asciiScene` in the demo:
+
+```js
+asciiScene.getStats();
+asciiScene.setOptions({ palette: "paper", speed: 0.5 });
+asciiScene.pause();
+asciiScene.resume();
+```
+
+## Credits
+
+The shark simulation and rendering were originally extracted from
+[`stackedlol/ascii-sharks`](https://github.com/stackedlol/ascii-sharks); see
+[`NOTICE`](./NOTICE). The library API, packaging, palettes, seeded worlds,
+adapters, the robot scene, the jellyfish scene, and the robot dog are part of
+`ascii-things`. MIT licensed.
