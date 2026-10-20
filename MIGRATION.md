@@ -1,7 +1,7 @@
 # Migrating to ascii-things 1.0
 
-**Status: release candidate.** 1.0.0 has not been published. `0.5.0` is the
-baseline for this guide.
+**Status: release candidate (`1.0.0-rc.0`).** 1.0.0 has not been published.
+`0.5.0` is the baseline for this guide.
 
 1.0 freezes the public API described here. The goal is a boring upgrade: if you
 only use documented exports, moving from `0.5.0` to `1.0.0` should not require

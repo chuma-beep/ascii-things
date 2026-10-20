@@ -1,6 +1,6 @@
 {
   "name": "ascii-things",
-  "version": "0.5.0",
+  "version": "1.0.0-rc.0",
   "description": "Living ASCII scenes for the web: sharks, moving robots, jellyfish, and a robot dog.",
   "license": "MIT",
   "publishConfig": {
