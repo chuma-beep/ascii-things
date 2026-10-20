@@ -112,8 +112,9 @@ function Yard() {
 }
 ```
 
-The `DogEngine` exposes `throwBall(x, y)` for this. The other scenes do not expose scripted
-interaction methods in `0.4.0`; their clicks are purely decorative enhancements.
+The `DogEngine` exposes `throwBall(x, y)` for this. Every scene also exposes
+`trigger(action, x, y)` plus the named `splash()`, `dispatch()`, and `shockwave()` actions.
+Pointer clicks remain optional enhancements.
 
 ## Pause controls
 
@@ -124,14 +125,15 @@ scene.pause();
 scene.resume();
 ```
 
-The React wrappers do not expose a handle in this release. Use the vanilla engine if a pause
-button is a product requirement.
+The React wrappers expose the handle through `onReady`. Call `scene.pause()` or
+`scene.resume()` from a control, or use the vanilla engine if you need to own the canvas.
 
 ## The React DOM contract
 
-The React wrappers accept `className`, `style`, `width`, and `height`. They do not forward
-arbitrary `id`, `aria-*`, or `data-*` attributes in `0.4.0`. If you need those, use the vanilla
-factory with your own canvas, or the custom element and a host wrapper with an accessible name.
+The React wrappers accept `className`, `style`, `width`, `height`, `id`, and `aspectRatio`.
+They do not yet forward arbitrary `aria-*` or `data-*` attributes. If you need those, use the
+vanilla factory with your own canvas, or the custom element and a host wrapper with an
+accessible name.
 
 ```tsx
 <div role="group" aria-labelledby="yard-caption">

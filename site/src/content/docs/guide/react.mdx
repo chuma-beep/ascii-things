@@ -140,9 +140,9 @@ Event kinds:
 
 ## Imperative controls
 
-The React wrappers do not forward a ref or expose an imperative handle in `0.4.0`. For
-`pause()`, `resume()`, `setOptions()`, `getStats()`, or `DogEngine.throwBall()`, use the
-vanilla factory and a canvas ref:
+The React wrappers expose the scene handle through `onReady`. Use it for `pause()`,
+`resume()`, `setOptions()`, `getStats()`, or `trigger()`. A ref is still not forwarded; use
+the vanilla factory if you need to own the canvas element:
 
 ```tsx
 import { useEffect, useRef } from "react";
@@ -235,7 +235,7 @@ See [SSR and hydration](/guide/ssr/) for framework-specific notes.
 | Scene restarts on every render | Roster or seed prop changes identity | Hoist arrays and memoize values |
 | Palette looks wrong | Custom palette object is missing tokens, or `dark` does not match the page | Start from `PALETTES.<name>` and override fields |
 | No animation | Reduced motion is enabled, or the tab is hidden | Expected behavior; use `calm` or check the media query |
-| `pause()` missing on component | Wrappers do not expose a handle | Use the vanilla engine |
+| `pause()` missing on component | Wrappers do not expose a handle | Use `onReady` and call `scene.pause()` |
 
 ## API reference
 

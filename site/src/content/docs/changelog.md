@@ -1,12 +1,36 @@
 ---
 title: Changelog
-description: What shipped in ascii-things 0.4.0 and what is planned next.
+description: Release notes for ascii-things.
 ---
+
+## 0.5.0
+
+The current release. Additive to 0.4.0; no existing option or method changes shape.
+
+**Shared API**
+
+- Shared `SceneOptions`, `SceneStats`, `SceneHandle`, and `SceneAction` types.
+- `paused` and `fontFamily` on every scene.
+- React `id`, `aspectRatio`, and `onReady(scene)`.
+- Custom-element `paused`, `font-family`, `aspect-ratio`, and the bubbling `ascii-ready`
+  event carrying the live handle.
+- `palette="auto"` follows the host colour scheme, resolving to `paper` or `abyss` at
+  creation.
+- Adaptive quality lowers the backing-store scale under sustained slow frames;
+  `adaptiveQuality={false}` opts out.
+- Uniform `trigger(action, x, y)` plus named actions: `splash`, `dispatch`, `shockwave`, and
+  `throwBall`.
+
+**Packaging**
+
+- ESM-only, zero runtime dependencies, React as an optional peer.
+- Explicit subpath exports and type declarations.
+- MIT license, with credit to the original `ascii-sharks` project.
 
 ## 0.4.0
 
-The current release. Four living scenes with one adapter shape, packaged as ESM with
-declarations and subpath exports.
+Four living scenes with one adapter shape, packaged as ESM with declarations and subpath
+exports.
 
 **Scenes**
 
@@ -26,26 +50,6 @@ declarations and subpath exports.
 - ESM-only, zero runtime dependencies, React as an optional peer.
 - Explicit subpath exports and type declarations.
 - MIT license, with credit to the original `ascii-sharks` project.
-
-## 0.5.0 (unreleased)
-
-The next minor release is additive; no existing option or method changes shape.
-
-- Shared `SceneOptions`, `SceneStats`, `SceneHandle`, and `SceneAction` types.
-- `paused` and `fontFamily` on every scene.
-- React `id`, `aspectRatio`, and `onReady(scene)`.
-- Custom-element `paused`, `font-family`, `aspect-ratio`, and the bubbling `ascii-ready`
-  event carrying the live handle.
-- `palette="auto"` follows the host colour scheme, resolving to `paper` or `abyss` at
-  creation.
-- Adaptive quality lowers the backing-store scale under sustained slow frames;
-  `adaptiveQuality={false}` opts out.
-- Uniform `trigger(action, x, y)` plus named actions: `splash`, `dispatch`, `shockwave`, and
-  `throwBall`.
-
-Release publication, provenance, visual regression baselines, and the accessibility matrix
-remain on the `0.5.0` checklist. This docs site is part of the Phase 3 work and documents the
-`main` branch alongside the latest published API.
 
 ## Versioning
 

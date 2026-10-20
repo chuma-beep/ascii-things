@@ -1,10 +1,9 @@
 ---
 title: API reference
-description: Every shared option, scene extra, engine method, event, and statistic in ascii-things 0.4.0.
+description: Every shared option, scene extra, engine method, event, and statistic in ascii-things 0.5.0.
 ---
 
-This reference tracks `main`. The latest published release is **0.4.0**; additions landing in
-**0.5.0** are included here and called out inline.
+This reference tracks `main` and the current **0.5.0** release.
 
 ## Package exports
 
@@ -242,8 +241,8 @@ Each wrapper accepts its scene options plus:
 The canvas also gets `ascii-things` and `ascii-<scene>` classes, `display: block`, and
 `aria-hidden="true"` unless `label` is set.
 
-`aria-*`, `data-*`, and `ref` are not forwarded in `0.4.0`. Use the vanilla engine or
-`AsciiStage` when you need to own the canvas element.
+`id` is forwarded. `aria-*`, `data-*`, and `ref` are not yet forwarded. Use the vanilla
+engine or `AsciiStage` when you need to own the canvas element.
 
 ## Custom elements
 

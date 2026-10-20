@@ -84,10 +84,10 @@ import { PALETTES } from "ascii-things/sharks";
 const mine = { ...PALETTES.abyss, name: "mine", accents: ["#00ffaa"] };
 ```
 
-## `pause()` is not on the React component
+## `pause()` and the React component
 
-The wrappers do not forward a ref or expose an imperative handle in `0.4.0`. Use the vanilla
-factory:
+The wrappers expose the handle through `onReady`, so you can call `pause()` without owning a
+canvas. A ref is still not forwarded; use the vanilla factory if you need the canvas element:
 
 ```ts
 const scene = createDog(canvas, options);

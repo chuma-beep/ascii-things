@@ -7,13 +7,13 @@ description: Install ascii-things, pick the right subpath, and load the optional
 
 - A modern browser with canvas, `ResizeObserver`, and `IntersectionObserver`.
 - **React 18 or newer** only if you use `ascii-things/react` or `ascii-things/ui`.
-- **Node 18 or newer** for building from source. The docs site itself needs Node 22.
+- **Node 22 or newer** for building from source. The docs site uses the same version.
 - No runtime dependencies. React and React DOM are optional peers.
 
 :::caution
-The project is prepared for npm as `ascii-things`, but `0.4.0` has not been published to the
-registry yet. Until the first publish, build the package from this repository, or install it
-from GitHub. The CDN examples below describe the published path.
+The project is prepared for npm as `ascii-things`. Until `0.5.0` is published, build the
+package from this repository or install it from GitHub. The CDN examples below describe the
+published path.
 :::
 
 ## Install from npm
@@ -100,7 +100,7 @@ import "ascii-things/ui.css";
 Once published, the element bundle can be loaded directly:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@0.4.0/dist/element.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@0.5.0/dist/element.js"></script>
 
 <ascii-dog
   palette="abyss"
