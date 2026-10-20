@@ -1,0 +1,74 @@
+---
+title: Playground
+description: Switch scenes, seed the world, and change columns and speed live.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+import Playground from "@components/Playground";
+
+This playground is a single React island. It uses the vanilla engines so the readout can poll
+`getStats()` and the scene can be remounted when the seed or column count changes.
+
+<Playground client:load />
+
+## What the controls do
+
+| Control | Effect |
+| --- | --- |
+| Scene tabs | Swaps the engine and remounts the demo |
+| Palette tabs | Calls `setOptions({ palette })` on the running engine |
+| Seed | Remounts with a new world |
+| Columns | Remounts with a new art-direction target |
+| Speed | Calls `setOptions({ speed })` live; `0` freezes |
+| Pause / Resume | Calls `pause()` / `resume()` |
+| Calm | Calls `setOptions({ calm })`; removes flicker and sparkle |
+
+The palette and calm controls are inside the demo component; seed, columns, and speed are
+owned by the page-level playground.
+
+<Aside type="note" title="Reduced motion">
+When your OS asks for reduced motion, the island detects it on the client, turns calm on, and
+the engine settles to a still frame. The prompt is disabled because pointer actions are also
+disabled.
+</Aside>
+
+## Reproduce a configuration
+
+The demos on this site use fixed seeds so screenshots stay stable. To reproduce one:
+
+```tsx
+<AsciiDog
+  palette="abyss"
+  seed={7}
+  columns={110}
+  label="A live ASCII robot dog test yard"
+/>
+```
+
+The vanilla equivalent:
+
+```ts
+import { createDog } from "ascii-things/dog";
+
+const yard = createDog(canvas, {
+  palette: "abyss",
+  seed: 7,
+  columns: 110,
+});
+
+yard.setOptions({ calm: true, speed: 0.8 });
+```
+
+## Query-string playground
+
+The repository also has a zero-framework playground at `examples/playground/` that reads its
+options from the URL:
+
+```text
+/examples/playground/?scene=dog&palette=paper&seed=7&count=2
+/examples/playground/?scene=jellyfish&palette=neon&jellies=moon:1.15,atolla:1.05
+/examples/playground/?calm=1&interactive=0
+```
+
+It is a Vite page served by the library’s root `npm run dev`, not by this docs site. See
+[Examples](/examples/).

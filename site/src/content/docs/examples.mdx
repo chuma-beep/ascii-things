@@ -1,0 +1,186 @@
+---
+title: Examples
+description: Vite React, Next.js App Router, Astro, plain HTML, and the first-party UI layer.
+---
+
+The repository ships runnable examples. The docs site embeds live demos, but these directories
+show complete host setups.
+
+## Vite + React
+
+```tsx
+import { AsciiSharks } from "ascii-things/react";
+
+export function Hero() {
+  return (
+    <div style={{ height: 520 }}>
+      <AsciiSharks
+        sharks={[{ kind: "greathammer", size: 1.1 }]}
+        palette="abyss"
+        seed={42}
+        label="A live ASCII shark tank"
+      />
+    </div>
+  );
+}
+```
+
+The root library landing page and the UI example run on Vite:
+
+```sh
+git clone https://github.com/chuma-beep/ascii-things.git
+cd ascii-things
+npm install
+npm run dev
+```
+
+- `/` — the landing page with a live dog hero.
+- `/examples/playground/` — query-string playground for all four scenes.
+- `/examples/ui/` — the first-party UI components.
+- `/examples/dog-input/` — a focused dog hero with a real prompt.
+
+## Next.js App Router
+
+`app/yard.tsx`:
+
+```tsx
+"use client";
+
+import { AsciiDog } from "ascii-things/react";
+
+export function Yard() {
+  return (
+    <div style={{ height: 420 }}>
+      <AsciiDog palette="paper" seed={7} label="A live ASCII robot dog test yard" />
+    </div>
+  );
+}
+```
+
+`app/page.tsx`:
+
+```tsx
+import { Yard } from "./yard";
+
+export default function Page() {
+  return (
+    <main>
+      <h1>Test yard</h1>
+      <Yard />
+    </main>
+  );
+}
+```
+
+Import the UI stylesheet in `app/layout.tsx` if you use `ascii-things/ui`:
+
+```tsx
+import "ascii-things/ui.css";
+```
+
+## Astro
+
+```astro
+---
+import { AsciiJellyfish } from "ascii-things/react";
+import "ascii-things/ui.css";
+---
+
+<div style="height: 460px">
+  <AsciiJellyfish
+    client:visible
+    palette="neon"
+    seed={3}
+    label="A live ASCII jellyfish bloom"
+  />
+</div>
+```
+
+Or skip React and use a custom element:
+
+```astro
+<ascii-dog palette="abyss" seed="7" style="display:block;height:420px"></ascii-dog>
+
+<script>
+  import "ascii-things/element";
+</script>
+```
+
+This docs site is an Astro + Starlight project. Its source is in `site/`.
+
+## Plain HTML
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Robot dog</title>
+  </head>
+  <body>
+    <script type="module" src="/node_modules/ascii-things/dist/element.js"></script>
+
+    <ascii-dog
+      palette="abyss"
+      seed="7"
+      count="1"
+      label="A live ASCII robot dog test yard"
+      style="display: block; width: 100%; height: 420px"
+    ></ascii-dog>
+  </body>
+</html>
+```
+
+## First-party UI layer
+
+The UI example composes `AsciiDogHero`, `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, and
+`AsciiSceneTabs`:
+
+```tsx
+import { AsciiDog } from "ascii-things/react";
+import {
+  AsciiPrompt,
+  AsciiReadout,
+  AsciiSceneTabs,
+  AsciiStage,
+} from "ascii-things/ui";
+import "ascii-things/ui.css";
+
+export function Yard() {
+  return (
+    <>
+      <AsciiStage
+        label="ROBOT DOG / TEST YARD"
+        status="LIVE"
+        aspectRatio="4 / 3"
+        footer={
+          <AsciiReadout
+            items={[
+              { label: "SCENE", value: "DOG" },
+              { label: "SEED", value: "07" },
+            ]}
+          />
+        }
+      >
+        <AsciiDog palette="abyss" seed={7} />
+      </AsciiStage>
+
+      <AsciiPrompt
+        label="Tell the dog what to fetch"
+        actionLabel="Throw"
+        onSubmit={(command) => console.log(command)}
+      />
+    </>
+  );
+}
+```
+
+See [UI components](/guide/ui-components/) for the full composition.
+
+## Source links
+
+- [Landing page](https://github.com/chuma-beep/ascii-things/blob/main/index.html)
+- [Playground](https://github.com/chuma-beep/ascii-things/tree/main/examples/playground)
+- [UI example](https://github.com/chuma-beep/ascii-things/tree/main/examples/ui)
+- [Dog + input](https://github.com/chuma-beep/ascii-things/tree/main/examples/dog-input)
+- [Docs site](https://github.com/chuma-beep/ascii-things/tree/main/site)

@@ -1,0 +1,74 @@
+---
+title: Introduction
+description: Install ascii-things, pick a scene, and put a small living ecosystem behind your UI.
+---
+
+import { CardGrid, LinkCard, Aside } from "@astrojs/starlight/components";
+import SceneDemo from "@components/SceneDemo";
+
+**ascii-things** is four small artificial-life simulations drawn as glyphs on a canvas: a
+shark tank, a robot factory floor, a jellyfish bloom, and a robot dog test yard. Each one
+runs on its own rules, respects reduced motion, and ships with no runtime dependencies.
+
+Same seed and size produce the same scene. Different palette changes the ink, not the
+behavior. One canvas is the whole surface.
+
+<SceneDemo client:visible scene="dog" seed={7} columns={110} />
+
+## Start here
+
+<CardGrid>
+  <LinkCard
+    title="Installation"
+    href="/guide/installation/"
+    description="Add the package, choose a subpath, and import the optional UI stylesheet."
+  />
+  <LinkCard
+    title="Quickstart"
+    href="/guide/quickstart/"
+    description="The smallest React, vanilla, and plain HTML examples that actually run."
+  />
+  <LinkCard
+    title="React"
+    href="/guide/react/"
+    description="Live props, remount rules, sizing, and the client-component contract."
+  />
+  <LinkCard
+    title="API reference"
+    href="/api/"
+    description="Every option, default, event, statistic, and engine method in one table."
+  />
+</CardGrid>
+
+## What you get
+
+- **Four scenes, one shape.** `palette`, `seed`, `speed`, `columns`, `maxCells`,
+  `maxDpr`, `calm`, `interactive`, `label`, and `onEvent` behave the same everywhere.
+- **Three adapters.** React components from `ascii-things/react`, vanilla `create*`
+  factories from scene subpaths, and `<ascii-*>` custom elements.
+- **An optional UI layer.** `ascii-things/ui` adds a framed stage, command input, live
+  readout, palette tabs, and a full dog-hero recipe.
+- **Calm defaults.** Decorative canvases are hidden from assistive technology unless you
+  pass `label`. Reduced motion settles the world to a still frame. Off-screen scenes pause.
+
+## Version
+
+<Aside type="note" title="This site documents 0.4.0">
+The current release is `0.4.0`. This first pass describes the shipped API. Roadmap items
+from `PLAN.md` — such as `palette="auto"`, `paused` and `aspectRatio` React props,
+`onReady`, and adaptive frame-time quality — are **not** in this release yet. When they
+land, the docs will change with them.
+</Aside>
+
+## The four scenes
+
+| Scene | What it does | Import |
+| --- | --- | --- |
+| Shark tank | Fish school and flee; sharks hunt, splash, and settle. | `ascii-things/sharks` |
+| Robot floor | Robots patrol, scan, haul, queue for a dock, and recharge. | `ascii-things/robots` |
+| Jellyfish bloom | Jellies pulse on a current, trail tentacles, and ring on contraction. | `ascii-things/jellyfish` |
+| Robot dog | A quadruped trots, sniffs, sits, fetches a ball, and docks. | `ascii-things/dog` |
+
+Read the [scene overview](/scenes/) for the shared model, or jump to
+[sharks](/scenes/sharks/), [robots](/scenes/robots/),
+[jellyfish](/scenes/jellyfish/), and [the dog](/scenes/dog/).

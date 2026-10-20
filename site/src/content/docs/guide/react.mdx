@@ -1,0 +1,230 @@
+---
+title: React usage
+description: Use the React wrappers, understand live versus structural props, and size the canvas correctly.
+---
+
+import SceneDemo from "@components/SceneDemo";
+
+The React entry exports four components with one shape. Each renders a single `<canvas>` and
+starts its engine in an effect after mount.
+
+<SceneDemo client:visible scene="sharks" seed={11} columns={110} />
+
+## Import
+
+```tsx
+import {
+  AsciiDog,
+  AsciiJellyfish,
+  AsciiRobots,
+  AsciiSharks,
+} from "ascii-things/react";
+```
+
+`AsciiOcean` is a back-compat alias for `AsciiSharks`.
+
+The wrappers include the `"use client"` directive, so they work in Next.js App Router client
+components without extra ceremony.
+
+## The sizing contract
+
+The wrappers render a canvas with:
+
+```css
+display: block;
+width: 100%;
+height: 100%;
+```
+
+Give the parent a height. Or pass `width` and `height` explicitly. The canvas has no
+intrinsic aspect ratio in this release.
+
+```tsx
+// Parent owns the box
+<div style={{ height: 420 }}>
+  <AsciiDog palette="abyss" seed={7} />
+</div>
+
+// Canvas owns the box
+<AsciiDog palette="abyss" seed={7} height={420} />
+
+// CSS aspect-ratio box
+<div style={{ aspectRatio: "16 / 9" }}>
+  <AsciiDog palette="abyss" seed={7} />
+</div>
+```
+
+`className`, `style`, `width`, and `height` are passed through. The component also adds
+`ascii-things` and `ascii-<scene>` classes, which you can target from CSS.
+
+```tsx
+<AsciiSharks
+  className="hero-scene"
+  style={{ borderRadius: 4 }}
+  palette="abyss"
+  seed={42}
+/>
+```
+
+:::note
+`aspectRatio` is on the roadmap but is **not** a React prop in `0.4.0`. Use a CSS wrapper
+for now, or `AsciiStage` from `ascii-things/ui`, which accepts `aspectRatio`.
+:::
+
+## Live and structural props
+
+Some options update the running engine. Others rebuild the world.
+
+| Updates live | Remounts the scene |
+| --- | --- |
+| `palette` | `seed` |
+| `speed` | `sharks`, `density`, `sharkScale` |
+| `columns` | `robots`, `count`, `scale` |
+| `maxCells` | `jellies` |
+| `calm` | `dogs`, `spread` |
+| `label` | |
+| `onEvent` | |
+
+`interactive` and `maxDpr` are read when the engine is constructed. Change them by remounting
+the component (for example, with a React `key`), or use the vanilla API if you need to toggle
+them at runtime.
+
+The wrapper computes a structural key from the remounting props. Changing a roster array
+literal on every render will remount the scene every time. Hoist the array or memoize it.
+
+```tsx
+// Stable roster: no remount between renders.
+const SHARKS = [{ kind: "hammerhead", size: 1 }] as const;
+
+<AsciiSharks sharks={SHARKS} seed={42} />;
+```
+
+## Events
+
+Use `onEvent` for scene-specific moments. The callback receives a discriminated union.
+
+```tsx
+import { AsciiDog } from "ascii-things/react";
+
+<AsciiDog
+  palette="paper"
+  seed={7}
+  label="A live ASCII robot dog test yard"
+  onEvent={(event) => {
+    if (event.kind === "nudge") console.log("fetch complete", event.x, event.y);
+    if (event.kind === "low") console.log("low battery", event.id);
+  }}
+/>;
+```
+
+Event kinds:
+
+| Scene | Kinds |
+| --- | --- |
+| Sharks | `eat`, `splash` |
+| Robots | `dock`, `undock`, `job`, `low` |
+| Jellyfish | `pulse`, `shock` |
+| Dog | `ball`, `nudge`, `charge`, `low`, `sit` |
+
+## Imperative controls
+
+The React wrappers do not forward a ref or expose an imperative handle in `0.4.0`. For
+`pause()`, `resume()`, `setOptions()`, `getStats()`, or `DogEngine.throwBall()`, use the
+vanilla factory and a canvas ref:
+
+```tsx
+import { useEffect, useRef } from "react";
+import { createDog } from "ascii-things/dog";
+import type { DogEngine } from "ascii-things/dog";
+
+export function Yard() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const engineRef = useRef<DogEngine | null>(null);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const engine = createDog(canvasRef.current, { palette: "abyss", seed: 7 });
+    engineRef.current = engine;
+
+    const timer = window.setInterval(() => {
+      console.log(engine.getStats());
+    }, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+      engine.destroy();
+      engineRef.current = null;
+    };
+  }, []);
+
+  return (
+    <div style={{ height: 420 }}>
+      <canvas
+        ref={canvasRef}
+        style={{ display: "block", width: "100%", height: "100%" }}
+        aria-hidden="true"
+      />
+      <button type="button" onClick={() => engineRef.current?.pause()}>
+        Pause
+      </button>
+      <button type="button" onClick={() => engineRef.current?.resume()}>
+        Resume
+      </button>
+    </div>
+  );
+}
+```
+
+`AsciiDogHero` is the exception: it owns a dog engine internally because it needs a live
+readout and a command input. See [UI components](/guide/ui-components/).
+
+## Reduced motion
+
+The engine reacts to `prefers-reduced-motion: reduce` on its own: it lets the world settle,
+renders one still frame, and disables pointer actions. You do not need a React hook for the
+scene itself.
+
+If your own controls should react too, read the media query in an effect, never during
+render:
+
+```tsx
+import { useEffect, useState } from "react";
+
+const [reduced, setReduced] = useState(false);
+
+useEffect(() => {
+  const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const update = () => setReduced(query.matches);
+  update();
+  query.addEventListener("change", update);
+  return () => query.removeEventListener("change", update);
+}, []);
+```
+
+The docs demos use exactly this pattern.
+
+## Server rendering
+
+The wrappers are safe to render on the server. They emit canvas markup and create the engine
+in `useEffect`. The canvas is empty until hydration.
+
+- In Next.js App Router, import them from a client component.
+- In Astro, use `client:load`, `client:visible`, or `client:only="react"`.
+- Do not generate a different seed on the server and client if you want hydration parity. A
+  fixed `seed` is simplest. With no seed, the engine chooses a random world on the client only.
+
+See [SSR and hydration](/guide/ssr/) for framework-specific notes.
+
+## Common mistakes
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Blank canvas | Parent has zero height | Set a parent height or pass `height` |
+| Scene restarts on every render | Roster or seed prop changes identity | Hoist arrays and memoize values |
+| Palette looks wrong | Custom palette object is missing tokens, or `dark` does not match the page | Start from `PALETTES.<name>` and override fields |
+| No animation | Reduced motion is enabled, or the tab is hidden | Expected behavior; use `calm` or check the media query |
+| `pause()` missing on component | Wrappers do not expose a handle | Use the vanilla engine |
+
+## API reference
+
+The full shared and per-scene option tables are in the [API reference](/api/).

@@ -1,0 +1,157 @@
+---
+title: Shark tank
+description: Fish schools, shark pursuit, splash, and wake in an ASCII ocean.
+---
+
+import SceneDemo from "@components/SceneDemo";
+
+A shark tank is a small food web: fish school, spread alarm, and flee; sharks pursue, eat,
+and settle. The water carries a subtle current, and every splash disturbs the school.
+
+<SceneDemo client:visible scene="sharks" seed={11} columns={110} />
+
+## Behavior
+
+- **Fish** follow separation, alignment, and cohesion rules, with a fear field around sharks.
+  Alarm spreads through the school rather than teleporting every fish at once.
+- **Sharks** use pursuit and turn-rate limits. They are not omniscient; the school can escape.
+- **Splash** pushes fish outward from the click and adds a short wake.
+- **Wake and glints** are decorative. `calm` removes the high-frequency parts.
+- The scene is deterministic for a given seed and canvas size. Resize changes the world.
+
+## Roster
+
+```ts
+type SharkSpec = {
+  kind:
+    | "classic"
+    | "hammerhead"
+    | "zebra"
+    | "tiger"
+    | "greathammer"
+    | "mako"
+    | "thresher"
+    | "nurse";
+  size: number;
+};
+```
+
+Sizes are relative, not pixels. The default roster uses four classic sharks at different
+sizes. `sharkScale` multiplies every shark.
+
+```tsx
+<AsciiSharks
+  sharks={[
+    { kind: "hammerhead", size: 1 },
+    { kind: "mako", size: 0.8 },
+    { kind: "thresher", size: 0.9 },
+  ]}
+  sharkScale={1.1}
+  seed={42}
+/>
+```
+
+## Options
+
+| Option | Type | Default | |
+| --- | --- | --- | --- |
+| `sharks` | `{ kind, size }[]` | four classics | Roster |
+| `sharkScale` | `number` | `1` | Length multiplier |
+| `density` | `number` | `1` | Fish population multiplier |
+| `seed` | `number` | random | Reproducible world |
+| `palette` | name \| `Palette` | `"abyss"` | Theme |
+| `columns` | `number` | `124` | Art-direction target |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer flee + click splash |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grid cap |
+| `calm` | `boolean` | `false` | Disable shimmer and glints |
+| `label` | `string` | — | Accessible name |
+| `onEvent` | `(event) => void` | — | Eat and splash events |
+
+## Events
+
+```ts
+type WorldEvent =
+  | { kind: "eat"; x: number; y: number }
+  | { kind: "splash"; x: number; y: number };
+```
+
+```tsx
+<AsciiSharks
+  seed={42}
+  onEvent={(event) => {
+    if (event.kind === "eat") {
+      console.log("a fish was eaten at", event.x, event.y);
+    }
+  }}
+/>
+```
+
+## Stats
+
+```ts
+type OceanStats = {
+  fps: number;
+  frameMs: number;
+  cells: number;
+  columns: number;
+  rows: number;
+  fish: number;
+  sharks: number;
+};
+```
+
+## Interaction
+
+Move the pointer across the scene to push the school away. Click to splash. Both are disabled
+under reduced motion because pointer-down actions are ignored.
+
+## Accessibility
+
+The canvas is decorative unless you pass `label`. The scene is ambient; no essential
+information should live in it. `calm` is a good choice behind text.
+
+## Vanilla
+
+```ts
+import { createSharks } from "ascii-things/sharks";
+
+const ocean = createSharks(canvas, {
+  sharks: [
+    { kind: "hammerhead", size: 1 },
+    { kind: "mako", size: 0.8 },
+  ],
+  palette: "abyss",
+  seed: 42,
+  density: 0.9,
+  interactive: true,
+  columns: 124,
+});
+
+ocean.pause();
+ocean.setOptions({ palette: "paper", speed: 0.8, density: 0.7 });
+console.log(ocean.getStats());
+ocean.resume();
+ocean.destroy();
+```
+
+## Plain HTML
+
+```html
+<ascii-sharks
+  palette="paper"
+  seed="7"
+  density="0.7"
+  sharks="tiger:1,thresher:0.85"
+  interactive
+  label="A live ASCII shark tank"
+  style="display: block; width: 100%; height: 420px"
+></ascii-sharks>
+```
+
+## Performance notes
+
+Sharks are the densest scene. For a card, use `columns={72}`, `maxCells={4200}`,
+`interactive={false}`, and `calm`. For a hero, the defaults are a reasonable start. Lower
+`density` before lowering `columns` if you want the sharks to stay legible.

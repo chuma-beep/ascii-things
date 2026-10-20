@@ -33,7 +33,9 @@ and queue for a charging bay. Jellyfish pulse through a current, trailing
 tentacles and leaving rings of light. A robot dog trots, sniffs, sits, chases a
 ball, and docks to recharge. Same seed and size produce the same scene.
 
-The research and extraction plan are in [`RESEARCH.md`](./RESEARCH.md).
+The research and extraction plan are in [`RESEARCH.md`](./RESEARCH.md). The documentation
+site lives in [`site/`](./site/) (Astro + Starlight); it builds to a static site with the
+landing page at `/` and the guides under `/guide/`.
 
 **Roadmap:** sharks · moving robots · jellyfish · robot dog (this release) →
 murmuration → koi.

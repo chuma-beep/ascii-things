@@ -1,0 +1,147 @@
+---
+title: Jellyfish bloom
+description: Pulsing bells, drifting tentacles, plankton, and rings of light on a live current.
+---
+
+import SceneDemo from "@components/SceneDemo";
+
+The jellyfish bloom is the calmest scene: a handful of bells pulse along their heading, ride a
+divergence-free current, trail tentacles and oral arms, and leave a ring of light on every
+contraction.
+
+<SceneDemo client:visible scene="jellyfish" seed={3} columns={110} />
+
+## Behavior
+
+- **Pulse** contracts the bell and adds forward thrust. The ring is a visual echo of the
+  contraction.
+- **Current** is a smoothly varying vector field. Jellies drift with it even when they are not
+  pulsing.
+- **Tentacles and oral arms** trail behind the bell and bend with motion.
+- **Plankton** drifts through the water and twinkles unless `calm` is on.
+- **Shockwave** from a click displaces nearby jellies and plankton and adds a ring.
+
+## Roster
+
+```ts
+type JellyfishSpec = {
+  kind: "moon" | "lion" | "box" | "atolla" | "crystal";
+  size: number;
+};
+```
+
+`count` sets the bloom size when `jellies` is omitted. The default scales with the canvas.
+`scale` multiplies every jelly.
+
+```tsx
+<AsciiJellyfish
+  jellies={[
+    { kind: "moon", size: 1.15 },
+    { kind: "lion", size: 0.95 },
+    { kind: "atolla", size: 1.05 },
+  ]}
+  seed={3}
+/>
+```
+
+## Options
+
+| Option | Type | Default | |
+| --- | --- | --- | --- |
+| `jellies` | `{ kind, size }[]` | mixed bloom | Roster |
+| `count` | `number` | scales with area | Bloom size when `jellies` is omitted |
+| `scale` | `number` | `1` | Jelly size multiplier |
+| `seed` | `number` | random | Reproducible bloom |
+| `palette` | name \| `Palette` | `"abyss"` | Theme |
+| `columns` | `number` | `140` | Art-direction target |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer current + click shockwave |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grid cap |
+| `calm` | `boolean` | `false` | Disable shimmer and twinkle |
+| `label` | `string` | — | Accessible name |
+| `onEvent` | `(event) => void` | — | Pulse and shock events |
+
+## Events
+
+```ts
+type JellyfishWorldEvent =
+  | { kind: "pulse"; x: number; y: number; id: number }
+  | { kind: "shock"; x: number; y: number };
+```
+
+```tsx
+<AsciiJellyfish
+  seed={3}
+  onEvent={(event) => {
+    if (event.kind === "pulse") console.log("pulse", event.id);
+    if (event.kind === "shock") console.log("shockwave at", event.x, event.y);
+  }}
+/>
+```
+
+## Stats
+
+```ts
+type JellyfishStats = {
+  fps: number;
+  frameMs: number;
+  cells: number;
+  columns: number;
+  rows: number;
+  jellies: number;
+  pulsing: number;
+  plankton: number;
+  rings: number;
+};
+```
+
+## Interaction
+
+Move the pointer to nudge the current. Click to send a shockwave. Both are disabled under
+reduced motion.
+
+## Accessibility
+
+This is the quietest scene and the best candidate for a background behind text. Use `label`
+if the scene is meaningful, otherwise leave it decorative. `calm` stops the plankton twinkle
+and pulse flicker without stopping the drift.
+
+## Vanilla
+
+```ts
+import { createJellyfish } from "ascii-things/jellyfish";
+
+const bloom = createJellyfish(canvas, {
+  jellies: [
+    { kind: "moon", size: 1.15 },
+    { kind: "lion", size: 0.95 },
+    { kind: "atolla", size: 1.05 },
+  ],
+  palette: "abyss",
+  seed: 3,
+  interactive: true,
+});
+
+bloom.setOptions({ palette: "neon", speed: 0.9 });
+console.log(bloom.getStats());
+```
+
+## Plain HTML
+
+```html
+<ascii-jellyfish
+  palette="neon"
+  seed="3"
+  jellies="moon:1.15,lion:0.95,atolla:1.05"
+  interactive
+  label="A live ASCII jellyfish bloom"
+  style="display: block; width: 100%; height: 460px"
+></ascii-jellyfish>
+```
+
+## Performance notes
+
+Jellyfish are the cheapest scene per cell. The plankton and rings add some work; `calm`
+removes the flicker but keeps the motion. For a long page, use `columns={100}`,
+`maxCells={8000}`, and `speed={0.8}` to slow the drift without pausing it.

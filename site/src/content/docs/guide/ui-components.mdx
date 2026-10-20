@@ -1,0 +1,296 @@
+---
+title: UI components
+description: The optional React layer for framing scenes, capturing commands, and reading live state.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+import DogHeroIsland from "@components/DogHeroIsland";
+import SceneDemo from "@components/SceneDemo";
+
+The `ascii-things/ui` entry is an optional React layer around the scenes. It is not a design
+system: it is a small set of components for the chrome a scene usually needs — a framed stage,
+a command input, a live readout, and palette tabs.
+
+It has no runtime dependencies of its own. It expects React 18+.
+
+<DogHeroIsland client:visible />
+
+## Install the stylesheet once
+
+```tsx
+import "ascii-things/ui.css";
+```
+
+All five components use the same CSS custom properties. Import the stylesheet from your app
+shell or root layout, not from every component.
+
+## Components
+
+### AsciiStage
+
+A framed scene surface with HUD slots.
+
+```tsx
+import { AsciiDog } from "ascii-things/react";
+import { AsciiStage } from "ascii-things/ui";
+
+<AsciiStage
+  label="ROBOT DOG / TEST YARD"
+  status="LIVE"
+  aspectRatio="4 / 3"
+  footer={<span>footer content</span>}
+  overlay={<span>optional overlay</span>}
+>
+  <AsciiDog palette="abyss" seed={7} />
+</AsciiStage>;
+```
+
+| Prop | Type | Default | |
+| --- | --- | --- | --- |
+| `label` | `ReactNode` | — | Top-left HUD label |
+| `status` | `ReactNode` | — | Top-right HUD status; adds a live dot |
+| `overlay` | `ReactNode` | — | Absolutely positioned center overlay |
+| `footer` | `ReactNode` | — | Caption below the canvas |
+| `aspectRatio` | `string \| number` | `"16 / 10"` | CSS aspect-ratio for the frame |
+| `ariaLabel` | `string` | — | Accessible name for the `<figure>` |
+| `className` | `string` | — | Host class |
+| `style` | `CSSProperties` | — | Host style |
+| `children` | `ReactNode` | — | The scene canvas |
+
+`AsciiStage` gives its frame an aspect ratio, which solves the collapsed-canvas problem for
+many layouts. The canvas inside still fills 100% of the frame.
+
+### AsciiPrompt
+
+An accessible command input with an inline action.
+
+```tsx
+import { AsciiPrompt } from "ascii-things/ui";
+
+<AsciiPrompt
+  label="Tell the dog what to fetch"
+  placeholder="Throw the ball…"
+  actionLabel="Throw"
+  status="Awaiting command"
+  hint="Enter submits · focus stays"
+  onSubmit={(value) => console.log(value)}
+/>;
+```
+
+| Prop | Type | Default | |
+| --- | --- | --- | --- |
+| `label` | `string` | `"Command"` | Screen-reader label |
+| `placeholder` | `string` | `"Type a command…"` | Input placeholder |
+| `actionLabel` | `string` | `"Send"` | Submit button text |
+| `status` | `ReactNode` | — | Rendered in a polite live region |
+| `hint` | `ReactNode` | — | Helper text |
+| `value` | `string` | — | Controlled value |
+| `defaultValue` | `string` | `""` | Initial uncontrolled value |
+| `onValueChange` | `(value) => void` | — | Fires on every edit |
+| `onSubmit` | `(value) => void` | — | Fires with the trimmed value |
+| `maxLength` | `number` | `80` | Input limit |
+| `disabled` | `boolean` | `false` | Disable input and action |
+| `autoFocus` | `boolean` | `false` | Focus the input on mount |
+| `className` | `string` | — | Host class |
+| `style` | `CSSProperties` | — | Host style |
+
+Uncontrolled by default. Enter submits, the input clears, and focus stays in the field.
+Controlled when you pass `value`.
+
+### AsciiReadout
+
+A compact label/value grid for live metrics.
+
+```tsx
+import { AsciiReadout } from "ascii-things/ui";
+
+<AsciiReadout
+  ariaLabel="Live scene statistics"
+  columns={4}
+  items={[
+    { label: "CELLS", value: "8,640" },
+    { label: "UNITS", value: "01" },
+    { label: "STATE", value: "SNIFF" },
+    { label: "FPS", value: "60" },
+  ]}
+/>;
+```
+
+| Prop | Type | Default | |
+| --- | --- | --- | --- |
+| `items` | `{ label, value }[]` | — | Rows; returns `null` when empty |
+| `columns` | `number` | `4` | CSS grid columns |
+| `ariaLabel` | `string` | — | Accessible name for the `<dl>` |
+| `className` | `string` | — | Host class |
+| `style` | `CSSProperties` | — | Host style |
+
+### AsciiSceneTabs
+
+Keyboard-navigable tabs for switching scenes, palettes, or variants.
+
+```tsx
+import { useState } from "react";
+import type { PaletteName } from "ascii-things";
+import { AsciiSceneTabs } from "ascii-things/ui";
+
+const [palette, setPalette] = useState<PaletteName>("abyss");
+
+<AsciiSceneTabs
+  ariaLabel="Palette"
+  value={palette}
+  onChange={(id) => setPalette(id as PaletteName)}
+  scenes={[
+    { id: "abyss", label: "Abyss", meta: "night" },
+    { id: "paper", label: "Paper", meta: "day" },
+    { id: "neon", label: "Neon", meta: "loud" },
+    { id: "mono", label: "Mono", meta: "quiet" },
+  ]}
+/>;
+```
+
+| Prop | Type | Default | |
+| --- | --- | --- | --- |
+| `scenes` | `{ id, label, meta? }[]` | — | Tab definitions |
+| `value` | `string` | — | Selected id |
+| `onChange` | `(id) => void` | — | Selection callback |
+| `ariaLabel` | `string` | `"Scenes"` | Tab list label |
+| `className` | `string` | — | Host class |
+| `style` | `CSSProperties` | — | Host style |
+
+Arrow keys, Home, and End move the selection. Roving `tabIndex` keeps one tab in the tab
+order.
+
+### AsciiDogHero
+
+The copy-paste recipe: dog scene, stage, prompt, live stats, and ball throws.
+
+```tsx
+import { AsciiDogHero } from "ascii-things/ui";
+import "ascii-things/ui.css";
+
+export function Hero() {
+  return <AsciiDogHero palette="abyss" seed={7} />;
+}
+```
+
+`AsciiDogHero` extends every `AsciiDogOptions` prop and adds:
+
+| Prop | Type | Default | |
+| --- | --- | --- | --- |
+| `eyebrow` | `ReactNode` | `"ROBOT DOG / TEST YARD"` | Kicker above the title |
+| `title` | `ReactNode` | "A small scene. / A very good dog." | Headline |
+| `lede` | `ReactNode` | Built-in copy | Paragraph |
+| `promptLabel` | `string` | `"Tell the dog what to fetch"` | Input label |
+| `placeholder` | `string` | `"Tell the dog what to fetch…"` | Input placeholder |
+| `actionLabel` | `string` | `"Throw"` | Submit label |
+| `stageLabel` | `string` | `"ROBOT DOG / TEST YARD"` | Stage HUD label |
+| `onCommand` | `(command) => void` | — | Called after each command |
+| `className` | `string` | — | Host class |
+| `style` | `CSSProperties` | — | Host style |
+
+It sets `label` to `"A live ASCII robot dog test yard"` unless you pass one.
+
+## Compose your own layout
+
+The dog hero is only a recipe. Every piece is exported separately.
+
+```tsx
+import { useState } from "react";
+import { AsciiDog } from "ascii-things/react";
+import {
+  AsciiPrompt,
+  AsciiReadout,
+  AsciiSceneTabs,
+  AsciiStage,
+} from "ascii-things/ui";
+import "ascii-things/ui.css";
+import type { PaletteName } from "ascii-things";
+
+const PALETTES = [
+  { id: "abyss", label: "Abyss", meta: "night" },
+  { id: "paper", label: "Paper", meta: "day" },
+  { id: "neon", label: "Neon", meta: "loud" },
+  { id: "mono", label: "Mono", meta: "quiet" },
+] as const;
+
+export function Yard() {
+  const [palette, setPalette] = useState<PaletteName>("abyss");
+
+  return (
+    <div>
+      <AsciiSceneTabs
+        scenes={PALETTES.map((item) => ({ ...item }))}
+        value={palette}
+        onChange={(id) => setPalette(id as PaletteName)}
+      />
+
+      <AsciiStage
+        label="ROBOT DOG / TEST YARD"
+        status="LIVE"
+        aspectRatio="4 / 3"
+        footer={
+          <AsciiReadout
+            items={[
+              { label: "SCENE", value: "DOG" },
+              { label: "PALETTE", value: palette.toUpperCase() },
+            ]}
+          />
+        }
+      >
+        <AsciiDog palette={palette} seed={7} />
+      </AsciiStage>
+
+      <AsciiPrompt
+        label="Tell the dog what to fetch"
+        placeholder="Throw the ball…"
+        actionLabel="Throw"
+        status="Awaiting command"
+        onSubmit={(command) => console.log(command)}
+      />
+    </div>
+  );
+}
+```
+
+<SceneDemo client:visible scene="dog" seed={7} columns={110} />
+
+## Theme tokens
+
+The UI layer uses CSS variables, not Tailwind. Set them on `:root` or on a wrapper:
+
+```css
+:root {
+  --ascii-accent: #ff7a1a;
+  --ascii-bg: #070809;
+  --ascii-panel: #0b0d0f;
+  --ascii-ink: #ece8df;
+  --ascii-muted: rgba(236, 232, 223, 0.56);
+  --ascii-faint: rgba(236, 232, 223, 0.32);
+  --ascii-line: rgba(236, 232, 223, 0.14);
+  --ascii-line-soft: rgba(236, 232, 223, 0.08);
+  --ascii-accent-soft: rgba(255, 122, 26, 0.14);
+  --ascii-font: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ascii-radius: 2px;
+}
+```
+
+These variables style the frame, prompt, readout, tabs, and hero. They do **not** recolor
+canvas glyphs. Canvas colors come from the scene palette. See [Theming](/guide/theming/).
+
+## Using your own design system
+
+The UI layer is intentionally plain. If you already have a design system:
+
+- Keep `AsciiStage` for the frame and aspect ratio, and pass your own controls through
+  `overlay` or below it.
+- Use your own `Input` and `Button` instead of `AsciiPrompt`.
+- Keep `AsciiReadout` as a small `<dl>` or render stats in your own layout.
+- Use `AsciiDog` directly if you do not need the frame at all.
+
+Because the components are copy-paste friendly React source, they work beside shadcn/ui,
+Radix, or a hand-rolled component set without adapter code.
+
+<Aside type="note" title="CSS support">
+The stylesheet uses `color-mix()` for focus rings and tab accents. It degrades to the fallback
+colors in modern browsers; very old browsers may lose the subtle accent mix.
+</Aside>

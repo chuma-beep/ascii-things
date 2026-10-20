@@ -1,0 +1,171 @@
+---
+title: Robot dog
+description: A quadruped that trots, sniffs, sits, fetches a ball, and docks to recharge.
+---
+
+import SceneDemo from "@components/SceneDemo";
+
+The robot dog is the most legible scene and the best fit for a hero with a command input. A
+unit trots around a test yard, changes gait, stops to sniff or sit, chases a thrown ball, and
+returns to its dock when the battery gets low.
+
+<SceneDemo client:visible scene="dog" seed={7} columns={110} />
+
+## Behavior
+
+- **Walk / trot** move the dog across the yard. Gait changes are stateful, not random noise.
+- **Sniff and sit** are short idle states between patrols.
+- **Alert** reacts to the pointer.
+- **Chase** starts when a ball is thrown. The nearest dog goes after it and nudges it.
+- **Charge** sends a low-battery dog to the dock for a while.
+- The tail and antenna settle when the dog sits. `calm` removes sparks and tail flicker.
+
+The dog is the only scene with an imperative interaction method: `throwBall(x, y)`.
+
+## Roster
+
+```ts
+type DogSpec = {
+  size: number;
+};
+```
+
+`count` is clamped to 1–3 when `dogs` is omitted. `scale` multiplies every dog. `spread` is a
+normalized start band across the width; with one dog, the midpoint is used.
+
+```tsx
+<AsciiDog
+  dogs={[{ size: 1 }, { size: 1.15 }]}
+  count={2}
+  spread={[0.4, 0.7]}
+  seed={7}
+/>
+```
+
+A single dog placed on the right side of a hero:
+
+```tsx
+<AsciiDog count={1} dogs={[{ size: 1.15 }]} spread={[0.68, 0.68]} seed={7} />
+```
+
+## Options
+
+| Option | Type | Default | |
+| --- | --- | --- | --- |
+| `dogs` | `{ size }[]` | responsive | Roster |
+| `count` | `number` | scales with width, 1–3 | Dog count when `dogs` is omitted |
+| `scale` | `number` | `1` | Dog size multiplier |
+| `spread` | `[number, number]` | `[0.28, 0.72]` | Normalized start band; one dog uses the midpoint |
+| `seed` | `number` | random | Reproducible yard |
+| `palette` | name \| `Palette` | `"abyss"` | Theme |
+| `columns` | `number` | `150` | Art-direction target |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer tracking + click throw |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grid cap |
+| `calm` | `boolean` | `false` | Disable sparks, beacons, tail flicker |
+| `label` | `string` | — | Accessible name |
+| `onEvent` | `(event) => void` | — | Ball, nudge, charge, low, sit events |
+
+## Events
+
+```ts
+type DogWorldEvent =
+  | { kind: "ball"; x: number; y: number }
+  | { kind: "nudge"; x: number; y: number; id: number }
+  | { kind: "charge"; x: number; y: number; id: number }
+  | { kind: "low"; x: number; y: number; id: number }
+  | { kind: "sit"; x: number; y: number; id: number };
+```
+
+```tsx
+<AsciiDog
+  seed={7}
+  onEvent={(event) => {
+    if (event.kind === "nudge") console.log("fetch complete", event.id);
+    if (event.kind === "low") console.log("low battery", event.id);
+  }}
+/>
+```
+
+## Stats
+
+```ts
+type DogStats = {
+  fps: number;
+  frameMs: number;
+  cells: number;
+  columns: number;
+  rows: number;
+  dogs: number;
+  charging: number;
+  state: string;
+  ball: boolean;
+};
+```
+
+`state` is the first dog's state: `walk`, `trot`, `sniff`, `sit`, `alert`, `chase`, or
+`charge`.
+
+## Interaction
+
+Move the pointer to make the dog alert and track it. Click anywhere to throw the ball. Under
+reduced motion, pointer actions are disabled.
+
+For a scripted throw from your own UI, use the engine:
+
+```ts
+import { createDog } from "ascii-things/dog";
+
+const yard = createDog(canvas, { seed: 7 });
+yard.throwBall(canvas.clientWidth * 0.62, canvas.clientHeight * 0.7);
+```
+
+`throwBall` ignores the call when reduced motion is active.
+
+## Accessibility
+
+`AsciiDogHero` labels its canvas by default. If you use `AsciiDog` directly, pass `label` when
+the scene is content, or leave it decorative behind a heading that explains the demo.
+
+The dog's command input should be real DOM, not a canvas overlay. `AsciiPrompt` and
+`AsciiDogHero` do this for you.
+
+## Vanilla
+
+```ts
+import { createDog } from "ascii-things/dog";
+
+const yard = createDog(canvas, {
+  dogs: [{ size: 1 }, { size: 1.15 }],
+  palette: "paper",
+  seed: 7,
+  interactive: true,
+  spread: [0.4, 0.7],
+});
+
+yard.setOptions({ palette: "neon", speed: 1.2 });
+yard.throwBall(canvas.clientWidth * 0.6, canvas.clientHeight * 0.7);
+console.log(yard.getStats());
+```
+
+## Plain HTML
+
+```html
+<ascii-dog
+  palette="paper"
+  seed="7"
+  count="2"
+  dogs="1,1.15"
+  spread="0.4,0.7"
+  interactive
+  label="A live ASCII robot dog test yard"
+  style="display: block; width: 100%; height: 420px"
+></ascii-dog>
+```
+
+## Performance notes
+
+One dog is cheap. Two or three add pathing and rendering work but stay well within the default
+cell budget. Use `columns={120}` and `maxCells={10000}` for a hero; use `columns={72}` and
+`maxCells={4200}` for a card.

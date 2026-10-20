@@ -1,0 +1,188 @@
+---
+title: Custom elements
+description: Use ascii-things in plain HTML, Astro, Vue, Svelte, or any page without React.
+---
+
+import CustomElementDemo from "@components/CustomElementDemo.astro";
+
+`ascii-things/element` registers four custom elements. They use shadow DOM, render a canvas,
+and need no framework runtime.
+
+<CustomElementDemo />
+
+## Load the script
+
+From a CDN, once the package is published:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@0.4.0/dist/element.js"></script>
+```
+
+From a local checkout after `npm run build`:
+
+```html
+<script type="module" src="/node_modules/ascii-things/dist/element.js"></script>
+```
+
+In Astro, import the module from a client script:
+
+```astro
+<script>
+  import "ascii-things/element";
+</script>
+
+<ascii-dog palette="abyss" seed="7" style="display: block; height: 420px"></ascii-dog>
+```
+
+The script is idempotent: it only defines a tag if `customElements.get()` is empty.
+
+## The four tags
+
+```html
+<ascii-sharks palette="abyss" seed="42" interactive></ascii-sharks>
+<ascii-robots palette="paper" seed="7" count="8" interactive></ascii-robots>
+<ascii-jellyfish palette="neon" seed="3" interactive></ascii-jellyfish>
+<ascii-dog palette="paper" seed="7" count="1" interactive></ascii-dog>
+```
+
+Each tag renders a shadow root containing a canvas. The host is `display: block`, fills its
+parent, and has `min-height: 240px`. Give the tag an explicit height when the parent does not
+provide one:
+
+```html
+<ascii-jellyfish
+  palette="neon"
+  seed="3"
+  style="display: block; width: 100%; height: 420px"
+  label="A live ASCII jellyfish bloom"
+></ascii-jellyfish>
+```
+
+## Attributes
+
+Numbers are parsed with `Number`. A missing or invalid number falls back to the scene
+default. Boolean attributes are true when present, unless the value is `"false"` or `"0"`.
+
+### Shared attributes
+
+| Attribute | Type | Notes |
+| --- | --- | --- |
+| `palette` | name | `abyss`, `neon`, `mono`, `paper` |
+| `seed` | number | Same seed and size produce the same world |
+| `speed` | number | `0` freezes |
+| `columns` | number | Art-direction target |
+| `max-cells` | number | Quality cap, default `16000` |
+| `max-dpr` | number | Backing-store cap, default `2` |
+| `calm` | boolean | Disables flicker and sparkle |
+| `interactive` | boolean | Pointer input, true by default |
+| `label` | string | Makes the canvas `role="img"` with this name |
+
+### Shark attributes
+
+`sharks`, `density`, `shark-scale` in addition to the shared set.
+
+```html
+<ascii-sharks
+  palette="paper"
+  seed="7"
+  density="0.7"
+  sharks="tiger:1,thresher:0.85"
+  interactive
+></ascii-sharks>
+```
+
+The `sharks` grammar is `kind:size` pairs separated by commas. Kinds: `classic`,
+`hammerhead`, `zebra`, `tiger`, `greathammer`, `mako`, `thresher`, `nurse`. An unknown kind
+falls back to `classic`.
+
+### Robot attributes
+
+`robots`, `count`, `scale` in addition to the shared set.
+
+```html
+<ascii-robots
+  palette="paper"
+  seed="7"
+  count="8"
+  robots="scout:1,hauler:1.2,sentinel:1"
+></ascii-robots>
+```
+
+Kinds: `scout`, `hauler`, `sentinel`. `count` is ignored when `robots` is present.
+
+### Jellyfish attributes
+
+`jellies`, `count`, `scale` in addition to the shared set.
+
+```html
+<ascii-jellyfish
+  palette="neon"
+  seed="3"
+  jellies="moon:1.15,lion:0.95,atolla:1.05"
+></ascii-jellyfish>
+```
+
+Kinds: `moon`, `lion`, `box`, `atolla`, `crystal`.
+
+### Dog attributes
+
+`dogs`, `count`, `scale`, `spread` in addition to the shared set.
+
+```html
+<ascii-dog
+  palette="paper"
+  seed="7"
+  count="2"
+  dogs="1,1.15"
+  spread="0.4,0.7"
+  interactive
+></ascii-dog>
+```
+
+`dogs` is a comma-separated list of sizes. `spread` is two normalized values, `start,end`,
+across the width.
+
+## Attribute changes
+
+The elements observe their attributes. When one changes, they destroy the engine and remount
+it on the next microtask. That means every attribute change is structural: palettes and speed
+are not updated in place from HTML.
+
+If you need live `setOptions()` behavior, use the vanilla or React adapter.
+
+## No events or handles
+
+Custom elements expose markup only. There is no `onEvent`, `getStats()`, or `pause()` surface
+on the element itself. For scripted interaction, use the vanilla factory:
+
+```ts
+import { createDog } from "ascii-things/dog";
+
+const yard = createDog(canvas, { seed: 7 });
+yard.throwBall(canvas.clientWidth * 0.6, canvas.clientHeight * 0.7);
+yard.pause();
+```
+
+## SSR and Astro
+
+The element script is a client module. The tags render as inert markup on the server and
+upgrade once the script runs. That is fine for static pages and Astro.
+
+If you use the script inside an Astro component with a `<style>` block, keep the element tag
+sized from the host page, not from inside the shadow root.
+
+## Styling
+
+Style the host element, not the canvas inside the shadow root:
+
+```css
+ascii-dog {
+  display: block;
+  width: 100%;
+  height: min(60vh, 520px);
+}
+```
+
+Palette colors live in JavaScript, so you cannot recolor the canvas from CSS. The UI layer
+(`ascii-things/ui.css`) uses CSS variables, but those style the frame, prompt, and readout,
+not the glyph pixels.

@@ -1,0 +1,16 @@
+# Wrangler configuration for CLI deployments of the docs site.
+#
+# From this directory:
+#   npm run build
+#   npx wrangler pages deploy dist --project-name ascii-things-docs
+#
+# The Cloudflare Pages dashboard build uses these settings instead:
+#   Root directory: repository root
+#   Build command: npm ci && npm --prefix site ci && npm --prefix site run build
+#   Build output directory: site/dist
+#   NODE_VERSION: 22
+#
+# The site is fully static. No Functions or bindings are required.
+name = "ascii-things-docs"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-10-20"

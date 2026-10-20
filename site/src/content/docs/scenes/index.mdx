@@ -1,0 +1,84 @@
+---
+title: The four scenes
+description: One shared model, four small ecosystems, and the defaults that keep them composable.
+---
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+import SceneDemo from "@components/SceneDemo";
+
+Every scene is a small artificial-life simulation, not a looped animation. The engine owns
+the clock, resize handling, DPR cap, pointer input, off-screen pausing, and reduced-motion
+behavior. The scene owns state, rules, and drawing.
+
+<SceneDemo client:visible scene="jellyfish" seed={3} columns={110} />
+
+## Shared model
+
+| Concept | Behavior |
+| --- | --- |
+| Seed | Same seed and size produce the same world |
+| Palette | Four built-ins or a custom palette object |
+| Columns | Art-direction target; cell size adjusts |
+| Max cells | Caps the grid at 4K and other large surfaces |
+| Speed | Time scale; `0` freezes |
+| Calm | Removes flicker and sparkle |
+| Interactive | Pointer input, on by default |
+| Label | Makes the canvas `role="img"` with a name |
+| Events | `onEvent` receives scene-specific moments |
+
+## The four
+
+<CardGrid>
+  <LinkCard
+    title="Shark tank"
+    href="/scenes/sharks/"
+    description="Schools, pursuit, splash, and wake. Eight shark kinds and five fish species."
+  />
+  <LinkCard
+    title="Robot floor"
+    href="/scenes/robots/"
+    description="Patrols, scans, hauling, charging bays, and a click-to-dispatch floor."
+  />
+  <LinkCard
+    title="Jellyfish bloom"
+    href="/scenes/jellyfish/"
+    description="Pulsing bells, a divergence-free current, tentacles, and rings of light."
+  />
+  <LinkCard
+    title="Robot dog"
+    href="/scenes/dog/"
+    description="A quadruped that trots, sniffs, sits, fetches a ball, and docks to charge."
+  />
+</CardGrid>
+
+## Defaults
+
+| Scene | `columns` | Population default | Interaction |
+| --- | --- | --- | --- |
+| Sharks | `124` | Four classic sharks, density `1` | Pointer flee, click splash |
+| Robots | `150` | Fleet scales with area | Pointer avoidance, click dispatch |
+| Jellyfish | `140` | Bloom scales with area | Pointer current, click shockwave |
+| Dog | `150` | One dog, count scales 1–3 | Pointer tracking, click throw |
+
+All scenes share `maxCells: 16000` and `maxDpr: 2`.
+
+## Choosing a scene
+
+- **Sharks** are the busiest and most narrative. Good for a large hero or a section divider.
+- **Robots** read as work and systems. Good for product, infrastructure, and developer tools.
+- **Jellyfish** are the calmest. Good behind text, in dark sections, and on slow pages.
+- **The dog** is the most legible character. Good for a hero with a command input, a playful
+  empty state, or a landing page.
+
+All four are ambient. None of them should carry essential information. Read
+[Accessibility](/guide/accessibility/) before shipping a scene behind content.
+
+## Per-scene references
+
+Each scene page has a live demo, behavior notes, its options table, events, stats, and
+copy-paste examples:
+
+- [Sharks](/scenes/sharks/)
+- [Robots](/scenes/robots/)
+- [Jellyfish](/scenes/jellyfish/)
+- [Robot dog](/scenes/dog/)

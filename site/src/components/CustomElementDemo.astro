@@ -1,0 +1,47 @@
+---
+// A plain-HTML custom-element demo. No React, no hydration: the element script
+// defines the tags and the host page only supplies markup and a size.
+---
+
+<div class="custom-element-demo">
+  <ascii-dog
+    palette="abyss"
+    seed="7"
+    count="1"
+    dogs="1.15"
+    spread="0.62,0.62"
+    label="A live ASCII robot dog test yard"
+    style="height: 380px"
+  ></ascii-dog>
+  <p>
+    This block is an <code>&lt;ascii-dog&gt;</code> element. Click it to throw the ball. The
+    element uses shadow DOM and needs no framework runtime.
+  </p>
+</div>
+
+<script>
+  import "ascii-things/element";
+</script>
+
+<style>
+  .custom-element-demo {
+    margin: 2rem 0;
+    border: 1px solid var(--sl-color-hairline, rgba(236, 232, 223, 0.14));
+    background: #050607;
+  }
+
+  .custom-element-demo ascii-dog {
+    display: block;
+    width: 100%;
+    height: 380px;
+  }
+
+  .custom-element-demo p {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    border-top: 1px solid var(--sl-color-hairline, rgba(236, 232, 223, 0.14));
+    color: var(--sl-color-gray-3, rgba(236, 232, 223, 0.56));
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+</style>

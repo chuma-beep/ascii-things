@@ -1,0 +1,153 @@
+---
+title: Robot floor
+description: A working factory floor of tracked robots, jobs, docks, and low batteries.
+---
+
+import SceneDemo from "@components/SceneDemo";
+
+The robot floor is a small scheduling simulation. Robots patrol, stop to scan, take jobs,
+haul cargo, avoid crates and each other, and return to a dock when their battery gets low.
+
+<SceneDemo client:visible scene="robots" seed={12} columns={110} />
+
+## Behavior
+
+- **Patrol** robots wander the floor between waypoints.
+- **Scan** pauses a robot and sweeps its sensor.
+- **Job** sends a robot to a crate or work point, then to a destination.
+- **Dock** routes a low-battery robot to an available charging bay.
+- **Charge** holds the robot at the dock until it has enough power.
+- Docks are finite. A queue can form when several robots run low at once.
+
+Click the floor to dispatch the nearest idle robot to that point. This is a real state change,
+not a visual effect.
+
+## Roster
+
+```ts
+type RobotSpec = {
+  kind: "scout" | "hauler" | "sentinel";
+  size: number;
+};
+```
+
+`count` sets the fleet size when `robots` is omitted. The default scales with the canvas area.
+`scale` multiplies every robot.
+
+```tsx
+<AsciiRobots
+  robots={[
+    { kind: "scout", size: 1 },
+    { kind: "hauler", size: 1.15 },
+    { kind: "sentinel", size: 1 },
+  ]}
+  count={8}
+  seed={7}
+/>
+```
+
+`count` is ignored when `robots` is present.
+
+## Options
+
+| Option | Type | Default | |
+| --- | --- | --- | --- |
+| `robots` | `{ kind, size }[]` | mixed fleet | Roster |
+| `count` | `number` | scales with area | Fleet size when `robots` is omitted |
+| `scale` | `number` | `1` | Robot size multiplier |
+| `seed` | `number` | random | Reproducible floor |
+| `palette` | name \| `Palette` | `"abyss"` | Theme |
+| `columns` | `number` | `150` | Art-direction target |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer avoidance + click dispatch |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `maxCells` | `number` | `16000` | Grid cap |
+| `calm` | `boolean` | `false` | Disable beacons, sparks, scan shimmer |
+| `label` | `string` | — | Accessible name |
+| `onEvent` | `(event) => void` | — | Dock, undock, job, low events |
+
+## Events
+
+```ts
+type RobotWorldEvent =
+  | { kind: "dock"; x: number; y: number; id: number }
+  | { kind: "undock"; x: number; y: number; id: number }
+  | { kind: "job"; x: number; y: number; id: number }
+  | { kind: "low"; x: number; y: number; id: number };
+```
+
+```tsx
+<AsciiRobots
+  seed={7}
+  onEvent={(event) => {
+    if (event.kind === "low") console.log("robot low", event.id);
+    if (event.kind === "job") console.log("job assigned", event.id, event.x, event.y);
+  }}
+/>
+```
+
+## Stats
+
+```ts
+type RobotStats = {
+  fps: number;
+  frameMs: number;
+  cells: number;
+  columns: number;
+  rows: number;
+  robots: number;
+  charging: number;
+  docks: number;
+};
+```
+
+## Interaction
+
+Move the pointer to make nearby robots avoid it. Click to dispatch the nearest idle robot to
+that point. Both are disabled under reduced motion.
+
+## Accessibility
+
+The floor is decorative unless labelled. If the simulation state matters, surface it as text
+with the stats above rather than asking users to read the canvas.
+
+## Vanilla
+
+```ts
+import { createRobots } from "ascii-things/robots";
+
+const floor = createRobots(canvas, {
+  robots: [
+    { kind: "scout", size: 1 },
+    { kind: "hauler", size: 1.15 },
+    { kind: "sentinel", size: 1 },
+  ],
+  palette: "paper",
+  seed: 7,
+  count: 8,
+  interactive: true,
+});
+
+floor.setOptions({ palette: "neon", speed: 1.4 });
+console.log(floor.getStats());
+```
+
+## Plain HTML
+
+```html
+<ascii-robots
+  palette="paper"
+  seed="7"
+  count="8"
+  robots="scout:1,hauler:1.2,sentinel:1"
+  interactive
+  label="A live ASCII robot factory floor"
+  style="display: block; width: 100%; height: 420px"
+></ascii-robots>
+```
+
+## Performance notes
+
+Robots are cheaper than sharks at the same grid size, but pathing and docking still scale with
+the fleet. Use `count={5}` and `columns={100}` for a card. Leave `interactive` on for a hero;
+the pointer avoidance is a nice affordance and costs little.

@@ -1,0 +1,16 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Page not found",
+    description: "That page does not exist.",
+    template: "splash",
+  }}
+>
+  <p>
+    That page does not exist. Try the <a href="/guide/">docs home</a> or the
+    <a href="/scenes/">scene overview</a>.
+  </p>
+</StarlightPage>

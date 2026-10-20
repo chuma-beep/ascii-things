@@ -1,0 +1,104 @@
+import { fileURLToPath } from "node:url";
+import starlight from "@astrojs/starlight";
+import react from "@astrojs/react";
+import { defineConfig } from "astro/config";
+
+export default defineConfig({
+  // Cloudflare Pages serves the static build from site/dist.
+  // Swap `site` if the docs move to a custom domain.
+  site: "https://ascii-things.pages.dev",
+  output: "static",
+  vite: {
+    resolve: {
+      alias: {
+        "@components": fileURLToPath(new URL("./src/components", import.meta.url)),
+      },
+    },
+  },
+  integrations: [
+    starlight({
+      title: "ascii-things",
+      disable404Route: true,
+      description:
+        "Living ASCII scenes for the web: sharks, robots, jellyfish, and a robot dog. Zero runtime dependencies, one canvas.",
+      favicon: "/favicon.svg",
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/chuma-beep/ascii-things",
+        },
+      ],
+      editLink: {
+        baseUrl: "https://github.com/chuma-beep/ascii-things/edit/main/site/",
+      },
+      customCss: ["./src/styles/docs.css"],
+      head: [
+        { tag: "meta", attrs: { name: "theme-color", content: "#070809" } },
+        {
+          tag: "link",
+          attrs: { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        },
+        {
+          tag: "link",
+          attrs: {
+            rel: "preconnect",
+            href: "https://fonts.gstatic.com",
+            crossorigin: "anonymous",
+          },
+        },
+        {
+          tag: "link",
+          attrs: {
+            rel: "stylesheet",
+            href: "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap",
+          },
+        },
+      ],
+      sidebar: [
+        {
+          label: "Start here",
+          items: [
+            { label: "Introduction", link: "guide/" },
+            { label: "Installation", link: "guide/installation/" },
+            { label: "Quickstart", link: "guide/quickstart/" },
+            { label: "React", link: "guide/react/" },
+            { label: "Custom elements", link: "guide/custom-elements/" },
+            { label: "UI components", link: "guide/ui-components/" },
+          ],
+        },
+        {
+          label: "Scenes",
+          items: [
+            { label: "All four scenes", link: "scenes/" },
+            { label: "Shark tank", link: "scenes/sharks/" },
+            { label: "Robot floor", link: "scenes/robots/" },
+            { label: "Jellyfish bloom", link: "scenes/jellyfish/" },
+            { label: "Robot dog", link: "scenes/dog/" },
+          ],
+        },
+        {
+          label: "Guides",
+          items: [
+            { label: "Theming and palettes", link: "guide/theming/" },
+            { label: "Performance", link: "guide/performance/" },
+            { label: "Accessibility", link: "guide/accessibility/" },
+            { label: "SSR and hydration", link: "guide/ssr/" },
+            { label: "Troubleshooting", link: "guide/troubleshooting/" },
+            { label: "Deployment", link: "guide/deployment/" },
+          ],
+        },
+        {
+          label: "Reference",
+          items: [
+            { label: "API reference", link: "api/" },
+            { label: "Playground", link: "playground/" },
+            { label: "Examples", link: "examples/" },
+            { label: "Changelog", link: "changelog/" },
+          ],
+        },
+      ],
+    }),
+    react(),
+  ],
+});
