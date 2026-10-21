@@ -20,31 +20,40 @@ t'                            ''XSSS8SSX%XX8#.    %XSX%
                             .
 ```
 
-**Living ASCII scenes.** A shark tank, a robot factory floor, a jellyfish
-bloom, and a robot dog test yard, drawn as glyphs on a canvas. Zero runtime
-dependencies. MIT.
+**Ten living ASCII scenes.** A shark tank, robot factory, jellyfish bloom,
+robot dog, starling murmuration, firefly meadow, ant trail, koi pond, city
+grid, and server room — drawn as glyphs on a canvas. Zero runtime dependencies.
+MIT.
 
 The optional `ascii-things/ui` subpath adds a framed stage, command input, live
-readout, and scene tabs for React hosts.
+readout, scene tabs, panels, toolbars, status readouts, and ready-made scene
+heroes for React hosts.
 
-Each scene is a small artificial-life simulation, not a looped animation. Sharks
-hunt fish that spread alarm through the school. Robots patrol, scan, haul cargo,
-and queue for a charging bay. Jellyfish pulse through a current, trailing
-tentacles and leaving rings of light. A robot dog trots, sniffs, sits, chases a
-ball, and docks to recharge. Same seed and size produce the same scene.
+Each scene is a small artificial-life simulation, not a looped animation.
+Sharks hunt fish that spread alarm through the school. Robots patrol, scan,
+haul cargo, and queue for a charging bay. Jellyfish pulse through a current,
+trailing tentacles and leaving rings of light. A robot dog trots, sniffs, sits,
+chases a ball, and docks to recharge. Starlings murmur around a predator.
+Fireflies drift and blink. Ants forage along pheromone trails. Koi circle a pond
+and rise for crumbs. Traffic crosses a lit city grid. Packets move between
+server racks. Same seed and size produce the same scene.
 
 The research and extraction plan are in [`RESEARCH.md`](./RESEARCH.md). The documentation
 site lives in [`site/`](./site/) (Astro + Starlight); it builds to a static site with the
-landing page at `/` and the guides under `/guide/`.
+landing page at `/`, the guides under `/guide/`, and a page for every scene under
+`/scenes/`.
 
-**Roadmap:** sharks · moving robots · jellyfish · robot dog (this release) →
-murmuration → koi.
+**Release:** `1.0.0-rc.0`. The public runtime, type, and subpath exports are
+frozen for 1.0. See [`MIGRATION.md`](./MIGRATION.md).
 
 ## Install
 
 ```sh
 npm install ascii-things
 ```
+
+`1.0.0-rc.0` is the release candidate and is not on npm yet. Until the 1.0
+publish, build from this repository or install the tarball from `npm pack`.
 
 Or use the custom elements from a CDN:
 
@@ -55,6 +64,12 @@ Or use the custom elements from a CDN:
 <ascii-robots palette="paper" seed="7" style="height: 420px"></ascii-robots>
 <ascii-jellyfish palette="neon" seed="3" style="height: 460px"></ascii-jellyfish>
 <ascii-dog palette="paper" seed="7" style="height: 420px"></ascii-dog>
+<ascii-starlings palette="abyss" seed="11" style="height: 420px"></ascii-starlings>
+<ascii-fireflies palette="abyss" seed="13" style="height: 420px"></ascii-fireflies>
+<ascii-ants palette="abyss" seed="17" style="height: 420px"></ascii-ants>
+<ascii-koi palette="paper" seed="19" style="height: 420px"></ascii-koi>
+<ascii-city palette="neon" seed="23" style="height: 420px"></ascii-city>
+<ascii-servers palette="abyss" seed="29" style="height: 420px"></ascii-servers>
 ```
 
 ## Vanilla
@@ -155,6 +170,44 @@ returns to its dock when the battery gets low. Click anywhere to throw the
 ball; the nearest dog gives chase and nudges it. `getStats()` returns `dogs`,
 `charging`, `state`, `ball`, `cells`, and frame timing.
 
+## Ambient scenes
+
+Six ambient habitats share the same handle, options, and action API:
+
+| Scene | Factory | Action | Default count | Stats extras |
+|---|---|---|---|---|
+| Starlings | `createStarlings` | `scatter(x, y)` | `110` | `birds`, `predators` |
+| Fireflies | `createFireflies` | `flare(x, y)` | `70` | `fireflies`, `lit` |
+| Ants | `createAnts` | `crumb(x, y)` | `44` | `ants`, `food`, `carrying` |
+| Koi | `createKoi` | `feed(x, y)` | `7` | `koi`, `ripples` |
+| City | `createCity` | `rush(x, y)` | `18` | `cars`, `buildings`, `lights` |
+| Servers | `createServers` | `ping(x, y)` | `8` | `servers`, `packets`, `alerts` |
+
+```ts
+import { createStarlings } from "ascii-things/starlings";
+
+const flock = createStarlings(canvas, {
+  count: 110,
+  palette: "abyss",
+  seed: 11,
+  interactive: true,
+});
+
+flock.scatter(canvas.clientWidth * 0.6, canvas.clientHeight * 0.4);
+console.log(flock.getStats()); // birds, predators, cells, fps...
+```
+
+Starlings use boids rules around a moving predator. Fireflies drift across a
+dusk meadow and blink. Ants leave decaying pheromone trails while carrying
+crumbs home. Koi seek food, ripple the surface, and occasionally nibble.
+City traffic wraps a lit grid. Server packets travel between racks and raise
+an alert when a ping completes. Every scene also exposes `trigger(action, x, y)`
+and the common lifecycle methods.
+
+Full scene pages: [starlings](/scenes/starlings/), [fireflies](/scenes/fireflies/),
+[ants](/scenes/ants/), [koi](/scenes/koi/), [city](/scenes/city/), and
+[servers](/scenes/servers/).
+
 ## React
 
 ```tsx
@@ -225,11 +278,30 @@ export function Yard() {
 }
 ```
 
+```tsx
+import { AsciiStarlings } from "ascii-things/react";
+
+export function Murmuration() {
+  return (
+    <div style={{ height: 420 }}>
+      <AsciiStarlings
+        count={110}
+        palette="abyss"
+        seed={11}
+        label="A live ASCII starling murmuration"
+      />
+    </div>
+  );
+}
+```
+
 The wrappers are client components (`"use client"`), fill their parent by
-default, and clean up on unmount. `palette`, `speed`, `columns`, `maxCells`,
-`calm`, `label`, `paused`, and `fontFamily` update live. Structural options
-(`sharks`, `robots`, `jellies`, `dogs`, `seed`, `density`, `count`,
-`sharkScale`, `scale`) remount the scene when they change.
+default, and clean up on unmount. The ambient wrappers are `AsciiStarlings`,
+`AsciiFireflies`, `AsciiAnts`, `AsciiKoi`, `AsciiCity`, and `AsciiServers`.
+`palette`, `speed`, `columns`, `maxCells`, `adaptiveQuality`, `calm`, `label`,
+`paused`, and `fontFamily` update live. Structural options (`sharks`, `robots`,
+`jellies`, `dogs`, `seed`, `density`, `count`, `sharkScale`, `scale`) remount
+the scene when they change.
 
 Each wrapper also accepts `id`, `aspectRatio` (for example `"16 / 9"` or a
 number), and `onReady(scene)`, which fires after the scene engine mounts. Use
@@ -239,8 +311,9 @@ canvas font stack.
 ## UI components
 
 `ascii-things/ui` is an optional, zero-dependency React layer for the interface
-around a scene: a framed stage, command input, live readout, and scene tabs.
-It uses plain CSS variables, not Tailwind. Import the stylesheet once.
+around a scene: framed stages, command inputs, live readouts, scene tabs,
+panels, toolbars, toggles, status readouts, dividers, and ready-made scene
+heroes. It uses plain CSS variables, not Tailwind. Import the stylesheet once.
 
 ```tsx
 import { AsciiDogHero } from "ascii-things/ui";
@@ -309,11 +382,20 @@ export function Yard() {
 }
 ```
 
-Components: `AsciiDogHero`, `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, and
-`AsciiSceneTabs`. Theme them with `--ascii-accent`, `--ascii-bg`, `--ascii-ink`,
-`--ascii-font`, and `--ascii-radius`. The components are framework-light React,
-so they work beside shadcn: keep shadcn `Input`/`Button` for page chrome, or put
-your own controls over `AsciiStage` and use only the scene beneath.
+Components: `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, `AsciiSceneTabs`,
+`AsciiButton`, `AsciiToolbar`, `AsciiToggle`, `AsciiPanel`, `AsciiStatus`,
+`AsciiDivider`, and `AsciiDogHero`. `AsciiSceneHero` is the generic hero for any
+habitat, with `AsciiSharkHero`, `AsciiRobotHero`, `AsciiJellyfishHero`,
+`AsciiStarlingsHero`, `AsciiFirefliesHero`, `AsciiAntsHero`, `AsciiKoiHero`,
+`AsciiCityHero`, and `AsciiServersHero` presets. `useAsciiScene` exposes the
+same engine handle for custom layouts.
+
+Theme them with `--ascii-accent`, `--ascii-bg`, `--ascii-ink`, `--ascii-font`,
+and `--ascii-radius`. Containers are square by default; only true indicators
+(dots, toggle thumb, toggle track) stay round. The components are
+framework-light React, so they work beside shadcn: keep shadcn `Input`/`Button`
+for page chrome, or put your own controls over `AsciiStage` and use only the
+scene beneath.
 
 See the [UI example](examples/ui/) for the full composition.
 
@@ -362,23 +444,39 @@ See the [UI example](examples/ui/) for the full composition.
 ></ascii-dog>
 ```
 
+The ambient elements use the same attribute pattern:
+
+```html
+<ascii-starlings palette="abyss" seed="11" count="110" interactive></ascii-starlings>
+<ascii-fireflies palette="abyss" seed="13" count="70" interactive></ascii-fireflies>
+<ascii-ants palette="abyss" seed="17" count="44" interactive></ascii-ants>
+<ascii-koi palette="paper" seed="19" count="7" interactive></ascii-koi>
+<ascii-city palette="neon" seed="23" count="18" interactive></ascii-city>
+<ascii-servers palette="abyss" seed="29" count="8" interactive></ascii-servers>
+```
+
 Shark attributes: `palette`, `seed`, `density`, `speed`, `columns`, `max-cells`,
-`max-dpr`, `calm`, `interactive`, `sharks`, `shark-scale`, `label`,
-`aspect-ratio`, `paused`, `font-family`.
+`max-dpr`, `adaptive-quality`, `calm`, `interactive`, `sharks`, `shark-scale`,
+`label`, `aspect-ratio`, `paused`, `font-family`.
 
 Robot attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
-`max-dpr`, `calm`, `interactive`, `robots`, `scale`, `label`, `aspect-ratio`,
-`paused`, `font-family`.
+`max-dpr`, `adaptive-quality`, `calm`, `interactive`, `robots`, `scale`,
+`label`, `aspect-ratio`, `paused`, `font-family`.
 
 Jellyfish attributes: `palette`, `seed`, `count`, `speed`, `columns`,
-`max-cells`, `max-dpr`, `calm`, `interactive`, `jellies`, `scale`, `label`,
-`aspect-ratio`, `paused`, `font-family`.
+`max-cells`, `max-dpr`, `adaptive-quality`, `calm`, `interactive`, `jellies`,
+`scale`, `label`, `aspect-ratio`, `paused`, `font-family`.
 
 Dog attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
-`max-dpr`, `calm`, `interactive`, `dogs`, `spread`, `scale`, `label`,
-`aspect-ratio`, `paused`, `font-family`.
+`max-dpr`, `adaptive-quality`, `calm`, `interactive`, `dogs`, `spread`, `scale`,
+`label`, `aspect-ratio`, `paused`, `font-family`.
 
-All four elements dispatch a bubbling, composed `ascii-ready` event after the
+Ambient elements (`ascii-starlings`, `ascii-fireflies`, `ascii-ants`,
+`ascii-koi`, `ascii-city`, `ascii-servers`) share: `palette`, `seed`, `count`,
+`scale`, `speed`, `columns`, `max-cells`, `max-dpr`, `adaptive-quality`,
+`calm`, `interactive`, `label`, `aspect-ratio`, `paused`, `font-family`.
+
+All ten elements dispatch a bubbling, composed `ascii-ready` event after the
 engine mounts. The event detail is `{ scene }`, where `scene` is the engine
 handle.
 
@@ -473,6 +571,29 @@ handle.
 `"auto"` resolves to `paper` under a light host colour scheme and `abyss`
 otherwise, at scene creation.
 
+## Ambient options
+
+All six ambient scenes accept the shared options below. `count` and `scale` are
+scene-specific population and size hints, clamped by each simulation.
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `count` | `number` | per scene | Starlings 110, fireflies 70, ants 44, koi 7, city 18, servers 8 |
+| `scale` | `number` | `1` | Scene-specific size multiplier |
+| `palette` | `PaletteChoice` | `"abyss"` | Name, `"auto"`, or a custom palette |
+| `seed` | `number` | random | Same seed + size = same scene |
+| `columns` | `number` | `124` | Art-direction target; cells stay 8–13 px |
+| `speed` | `number` | `1` | Time scale; `0` freezes |
+| `interactive` | `boolean` | `true` | Pointer interaction + click action |
+| `maxDpr` | `number` | `2` | Backing-store cap |
+| `adaptiveQuality` | `boolean` | `true` | Lowers DPR when frames stay slow |
+| `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
+| `calm` | `boolean` | `false` | Disables shimmer and glow flicker |
+| `paused` | `boolean` | `false` | Start with the clock stopped |
+| `fontFamily` | `string` | host canvas font | Override the glyph font |
+| `label` | `string` | — | Adds `role="img"` + `aria-label` |
+| `onEvent` | `(e) => void` | — | `{ kind, x, y }`; kinds include `scatter`, `flare`, `crumb`, `nibble`, `feed`, `rush`, and `ping` |
+
 ## Lifecycle
 
 `pause()`, `resume()`, `setOptions(partial)`, `resize()`, `getStats()`,
@@ -484,6 +605,12 @@ otherwise, at scene creation.
 | Robots | `dispatch(x, y)` | `"dispatch"` |
 | Jellyfish | `shockwave(x, y)` | `"shockwave"` |
 | Dog | `throwBall(x, y)` | `"throwBall"` |
+| Starlings | `scatter(x, y)` | `"scatter"` |
+| Fireflies | `flare(x, y)` | `"flare"` |
+| Ants | `crumb(x, y)` | `"crumb"` |
+| Koi | `feed(x, y)` | `"feed"` |
+| City | `rush(x, y)` | `"rush"` |
+| Servers | `ping(x, y)` | `"ping"` |
 
 `trigger(action, x, y)` is the uniform handle method exposed through React
 `onReady` and the custom element's `ascii-ready` event. Coordinates are
@@ -505,12 +632,15 @@ content inside the canvas.
 
 ## Development
 
+Node 22 or newer is required.
+
 ```sh
 npm install
 npm run dev        # open the URL Vite prints (5173 by default)
-npm run typecheck
-npm test
-npm run build      # ESM + d.ts in dist/
+npm run check:all  # Biome, types, unit tests, build, package, size gates
+npm run test:e2e   # Playwright browser gates
+npm run build      # ESM + d.ts + ui.css in dist/
+npm --prefix site run build  # static docs site in site/dist
 ```
 
 The root URL is the landing page. The query-string playground lives at
@@ -528,6 +658,12 @@ http://localhost:5173/examples/playground/?scene=jellyfish&palette=abyss&seed=3
 http://localhost:5173/examples/playground/?scene=jellyfish&palette=neon&jellies=moon:1.15,atolla:1.05,box:0.9
 http://localhost:5173/examples/playground/?scene=dog&palette=paper&seed=7&count=2
 http://localhost:5173/examples/playground/?scene=dog&palette=neon&dogs=1,1.15&scale=1.1
+http://localhost:5173/examples/playground/?scene=starlings&palette=abyss&seed=11
+http://localhost:5173/examples/playground/?scene=fireflies&palette=neon&seed=13
+http://localhost:5173/examples/playground/?scene=ants&palette=paper&seed=17
+http://localhost:5173/examples/playground/?scene=koi&palette=paper&seed=19
+http://localhost:5173/examples/playground/?scene=city&palette=neon&seed=23
+http://localhost:5173/examples/playground/?scene=servers&palette=abyss&seed=29
 http://localhost:5173/examples/playground/?calm=1&interactive=0
 ```
 
@@ -536,6 +672,7 @@ The scene is exposed as `window.asciiScene` in the demo:
 ```js
 asciiScene.getStats();
 asciiScene.setOptions({ palette: "paper", speed: 0.5 });
+asciiScene.trigger("scatter", 320, 180);
 asciiScene.pause();
 asciiScene.resume();
 ```
@@ -545,5 +682,5 @@ asciiScene.resume();
 The shark simulation and rendering were originally extracted from
 [`stackedlol/ascii-sharks`](https://github.com/stackedlol/ascii-sharks); see
 [`NOTICE`](./NOTICE). The library API, packaging, palettes, seeded worlds,
-adapters, the robot scene, the jellyfish scene, and the robot dog are part of
-`ascii-things`. MIT licensed.
+adapters, and the robot, jellyfish, dog, starlings, fireflies, ants, koi, city,
+and server scenes are part of `ascii-things`. MIT licensed.
