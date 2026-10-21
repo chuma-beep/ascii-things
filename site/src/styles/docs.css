@@ -347,3 +347,18 @@ h4 {
 .right-sidebar a[aria-current="true"]:focus-visible {
   border-radius: 0;
 }
+
+/* Search is part of the docs chrome, so it uses the same square language. */
+#starlight__search {
+  --pagefind-ui-border-radius: 0;
+  --sl-search-corners: 0;
+}
+
+#starlight__search .pagefind-ui__search-input,
+#starlight__search .pagefind-ui__search-clear,
+site-search button,
+site-search .search-input,
+site-search kbd,
+site-search kbd kbd {
+  border-radius: 0;
+}
