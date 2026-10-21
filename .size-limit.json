@@ -118,5 +118,23 @@
     "path": "dist/dither-element.js",
     "limit": "10 kB",
     "gzip": true
+  },
+  {
+    "name": "webgl",
+    "path": "dist/webgl.js",
+    "limit": "15 kB",
+    "gzip": true
+  },
+  {
+    "name": "webgl-react",
+    "path": "dist/webgl-react.js",
+    "limit": "15 kB",
+    "gzip": true
+  },
+  {
+    "name": "webgl-element",
+    "path": "dist/webgl-element.js",
+    "limit": "15 kB",
+    "gzip": true
   }
 ]

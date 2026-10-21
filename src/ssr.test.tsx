@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { AsciiDog } from "./react";
 import { AsciiPrompt, AsciiReadout, AsciiSceneTabs, AsciiStage } from "./ui";
+import { AsciiSurface } from "./webgl/react";
 
 describe("server rendering", () => {
   it("renders the React scene adapter without a DOM", () => {
@@ -64,8 +65,20 @@ describe("server rendering", () => {
     expect(readout).toContain("ascii-readout");
     expect(readout).toContain("CELLS");
     expect(readout).toContain("1,024");
-    expect(tabs).toContain('role="tablist"');
+    expect(tabs).toContain("ascii-tabs");
     expect(tabs).toContain("Sharks");
     expect(tabs).toContain("Dog");
+  });
+
+  it("renders the WebGL surface adapter without a DOM", () => {
+    const html = renderToStaticMarkup(
+      <AsciiSurface text="ASCII-THINGS" label="A living ASCII field" />,
+    );
+
+    expect(html).toContain("<canvas");
+    expect(html).toContain('class="ascii-things ascii-surface"');
+    expect(html).toContain('role="img"');
+    expect(html).toContain('aria-label="A living ASCII field"');
+    expect(html).toContain("height:320px");
   });
 });

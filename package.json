@@ -22,6 +22,7 @@
     "./dist/element.js",
     "./dist/image-element.js",
     "./dist/dither-element.js",
+    "./dist/webgl-element.js",
     "./dist/ui.css"
   ],
   "main": "./dist/index.js",
@@ -115,6 +116,18 @@
       "types": "./dist/dither-element.d.ts",
       "import": "./dist/dither-element.js"
     },
+    "./webgl": {
+      "types": "./dist/webgl.d.ts",
+      "import": "./dist/webgl.js"
+    },
+    "./webgl/react": {
+      "types": "./dist/webgl-react.d.ts",
+      "import": "./dist/webgl-react.js"
+    },
+    "./webgl/element": {
+      "types": "./dist/webgl-element.d.ts",
+      "import": "./dist/webgl-element.js"
+    },
     "./ui.css": "./dist/ui.css"
   },
   "keywords": [
@@ -129,7 +142,10 @@
     "robot-dog",
     "image-to-ascii",
     "ascii-image",
-    "dithering"
+    "dithering",
+    "webgl",
+    "shader",
+    "ascii-surface"
   ],
   "scripts": {
     "dev": "vite",
