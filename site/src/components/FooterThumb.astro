@@ -1,0 +1,121 @@
+---
+---
+
+<div class="footer-thumb">
+  <canvas data-footer-thumb aria-hidden="true"></canvas>
+  <div class="footer-thumb__content">
+    <div class="footer-thumb__top">
+      <span class="footer-thumb__brand">ascii-things<span>®</span></span>
+      <span class="footer-thumb__note">ascii box footer</span>
+    </div>
+    <div class="footer-thumb__links">
+      <span>npm ↗</span>
+      <span>GitHub ↗</span>
+      <span>MIT</span>
+    </div>
+  </div>
+  <div class="footer-thumb__art" aria-hidden="true">ASCII-THINGS</div>
+</div>
+
+<script>
+  import { createAsciiBoxFooter } from "../../../examples/ascii-box-footer/ascii-box-footer";
+
+  for (const canvas of document.querySelectorAll<HTMLCanvasElement>("[data-footer-thumb]")) {
+    createAsciiBoxFooter(canvas, { size: 7, boxWidth: 6, boxHeight: 3, padding: 10 });
+  }
+</script>
+
+<style>
+  .footer-thumb {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    overflow: hidden;
+    background:
+      radial-gradient(70% 90% at 50% 118%, rgba(255, 122, 26, 0.08), transparent 62%), #050607;
+  }
+
+  .footer-thumb canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .footer-thumb__content {
+    position: relative;
+    z-index: 2;
+    padding: 1rem;
+  }
+
+  .footer-thumb__top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(236, 232, 223, 0.12);
+  }
+
+  .footer-thumb__brand {
+    color: #ece8df;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+  }
+
+  .footer-thumb__brand span {
+    color: #ff7a1a;
+    font-size: 0.4rem;
+    vertical-align: super;
+  }
+
+  .footer-thumb__note {
+    color: rgba(236, 232, 223, 0.38);
+    font-size: 0.48rem;
+    letter-spacing: 0.08em;
+    text-align: right;
+    text-transform: uppercase;
+  }
+
+  .footer-thumb__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 1rem;
+    padding-top: 0.7rem;
+    color: rgba(236, 232, 223, 0.55);
+    font-size: 0.48rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .footer-thumb__art {
+    position: absolute;
+    bottom: 0.35rem;
+    left: 50%;
+    z-index: 1;
+    width: max-content;
+    transform: translateX(-50%);
+    color: transparent;
+    font-family: var(--sl-font-mono);
+    font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.08em;
+    line-height: 0.72;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 122, 26, 0.62) 0%,
+      rgba(255, 122, 26, 0.24) 58%,
+      rgba(255, 122, 26, 0.08) 100%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-stroke: 1px rgba(255, 122, 26, 0.55);
+  }
+</style>

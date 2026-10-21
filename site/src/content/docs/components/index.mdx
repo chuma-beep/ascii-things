@@ -3,6 +3,8 @@ title: Components
 description: Copyable shadcn registry components built around ascii-things scenes and surfaces.
 ---
 
+import ComponentGallery from "@components/ComponentGallery.astro";
+
 These are composed components, not package exports. Each one is a
 [shadcn registry item](https://ui.shadcn.com/docs/registry): install it with the CLI or copy the
 source into your project. The CLI writes the file where shadcn expects it and pulls in the
@@ -24,14 +26,7 @@ that already has `components.json`.
 
 ## Components
 
-| Component | Registry | Source |
-| --- | --- | --- |
-| [ASCII box footer](/components/ascii-box-footer/) | [`ascii-box-footer.json`](/r/ascii-box-footer.json) | `lib/ascii-box-footer.ts` |
-| [Koi card](/components/koi-card/) | [`koi-card.json`](/r/koi-card.json) | `components/koi-card.tsx` |
-| [Dither card](/components/dither-card/) | [`dither-card.json`](/r/dither-card.json) | `components/dither-card.tsx` |
-| [Surface card](/components/surface-card/) | [`surface-card.json`](/r/surface-card.json) | `components/surface-card.tsx` |
-| [Scene console](/components/scene-console/) | [`scene-console.json`](/r/scene-console.json) | `components/scene-console.tsx` |
-| [Scene toolbar](/components/scene-toolbar/) | [`scene-toolbar.json`](/r/scene-toolbar.json) | `components/scene-toolbar.tsx` |
+<ComponentGallery />
 
 The registry index is at
 [`/r/registry.json`](https://ascii-things-docs.pages.dev/r/registry.json).
