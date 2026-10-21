@@ -2,7 +2,7 @@ const WORD = "ASCII-THINGS";
 const FONT_STACK = '"Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace';
 const ORANGE = "rgba(255, 122, 26, 0.9)";
 const IVORY = "rgba(236, 232, 223, 0.7)";
-const FIELD = "rgba(236, 232, 223, 0.2)";
+const FIELD = "rgba(236, 232, 223, 0.15)";
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 
 const canvas = document.querySelector<HTMLCanvasElement>(".footer-canvas");
@@ -35,7 +35,7 @@ if (canvas) {
       offCtx.fillRect(0, 0, width, height);
       offCtx.fillStyle = "#fff";
 
-      let fontSize = height * 0.82;
+      let fontSize = height * 0.62;
       offCtx.font = `700 ${fontSize}px ${FONT_STACK}`;
       const maxWidth = width * 0.84;
 
@@ -46,7 +46,7 @@ if (canvas) {
 
       offCtx.textAlign = "center";
       offCtx.textBaseline = "middle";
-      offCtx.fillText(WORD, width / 2, height / 2);
+      offCtx.fillText(WORD, width / 2, height * 0.66);
       mask = offCtx.getImageData(0, 0, width, height).data;
     };
 
