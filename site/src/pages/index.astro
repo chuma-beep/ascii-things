@@ -36,39 +36,6 @@ const vanillaSnippet = `<span class="tok-key">import</span> { createDog } <span 
 
 scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="tok-num">0.55</span>, canvas.clientHeight * <span class="tok-num">0.5</span>);`;
 
-const footerGlyphs: Record<string, string[]> = {
-  A: [" ### ", "#   #", "#####", "#   #", "#   #"],
-  S: [" ####", "#    ", " ### ", "    #", "#### "],
-  C: [" ####", "#    ", "#    ", "#    ", " ####"],
-  I: ["#####", "  #  ", "  #  ", "  #  ", "#####"],
-  T: ["#####", "  #  ", "  #  ", "  #  ", "  #  "],
-  H: ["#   #", "#   #", "#####", "#   #", "#   #"],
-  N: ["#   #", "##  #", "# # #", "#  ##", "#   #"],
-  G: [" ####", "#    ", "# ###", "#   #", " ####"],
-  "-": ["     ", "     ", " ### ", "     ", "     "],
-};
-
-const footerWord = "ASCII-THINGS";
-const footerRows = Array.from({ length: 5 }, (_, row) =>
-  [...footerWord].map((char) => footerGlyphs[char]?.[row] ?? "     ").join(" "),
-);
-
-let footerCellIndex = 0;
-let footerHasOrigin = false;
-const footerArt = footerRows
-  .map((row) => {
-    const cells = [...row]
-      .map((char) => {
-        if (char !== "#") return " ";
-        const index = footerCellIndex++;
-        const origin = !footerHasOrigin;
-        footerHasOrigin = true;
-        return `<span class="footer-ascii-cell${origin ? " footer-ascii-origin" : ""}" style="--i:${index}">█</span>`;
-      })
-      .join("");
-    return `<span class="footer-ascii-line">${cells}</span>`;
-  })
-  .join("");
 ---
 
 <!doctype html>
@@ -498,7 +465,9 @@ const footerArt = footerRows
     </main>
 
     <footer class="site-footer">
-      <div class="footer-art" aria-hidden="true" set:html={footerArt}></div>
+      <div class="footer-art" aria-hidden="true">
+        <canvas class="footer-canvas"></canvas>
+      </div>
       <div class="footer-content">
         <div class="footer-top">
           <a class="footer-brand" href="#top">ascii-things<span>®</span></a>
@@ -517,6 +486,7 @@ const footerArt = footerRows
     </footer>
 
     <script>
+      import "../scripts/footer-art";
       import "../scripts/landing";
     </script>
   </body>
