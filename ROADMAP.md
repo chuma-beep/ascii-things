@@ -10,6 +10,6 @@ These are intentionally outside the current footer work and outside the 1.0 scop
 
 ## Current focus
 
-- Lock the footer wordmark and footer component treatment.
+- Footer treatment is locked to the dither field (`10`); variants `00–09` stay in `footer-lab` for future components.
 - Add the selectable footer kit and the Apple/Google/Tesla-style brand cards.
 - Keep 1.0 unpublished until explicit approval.

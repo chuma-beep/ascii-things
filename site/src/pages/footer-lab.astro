@@ -1,0 +1,1077 @@
+---
+const variants = [
+  {
+    id: "original",
+    index: "00",
+    title: "Original block wordmark",
+    tone: "exact",
+    desc: "The exact first version: literal █ characters, a 7.5s row-major scan, and one orange origin cell.",
+    original: true,
+  },
+  {
+    id: "scan",
+    index: "01",
+    title: "Horizontal scan",
+    tone: "baseline",
+    desc: "The original row-major pulse. A soft orange band travels across the wordmark and repeats.",
+  },
+  {
+    id: "column",
+    index: "02",
+    title: "Column sweep",
+    tone: "motion",
+    desc: "A vertical band moves left to right. Calmer, more like a scanner passing over the letters.",
+  },
+  {
+    id: "cascade",
+    index: "03",
+    title: "Letter cascade",
+    tone: "motion",
+    desc: "Each letter flashes as a whole, then hands off to the next. Reads as a terminal decoding a word.",
+  },
+  {
+    id: "decode",
+    index: "04",
+    title: "Terminal decode",
+    tone: "motion",
+    desc: "Sparse cells flicker in a deterministic noise pattern. More texture, less predictable.",
+  },
+  {
+    id: "hover",
+    index: "05",
+    title: "Hover field",
+    tone: "interactive",
+    desc: "No idle motion. Moving across the wordmark lights nearby cells and leaves a fading trail.",
+  },
+  {
+    id: "dots",
+    index: "06",
+    title: "Dot matrix",
+    tone: "form",
+    desc: "The same glyphs with smaller square cells and more air. Refined, but still clearly ASCII.",
+    dots: true,
+  },
+  {
+    id: "stack",
+    index: "07",
+    title: "Stacked lockup",
+    tone: "form",
+    desc: "ASCII over THINGS. A row refresh travels through both lines; the mark gets more vertical space.",
+  },
+  {
+    id: "reverse",
+    index: "08",
+    title: "Reverse tone",
+    tone: "color",
+    desc: "Orange blocks with an ivory scan. Stronger brand color, but louder in the footer.",
+  },
+  {
+    id: "dither",
+    index: "09",
+    title: "Ordered dither",
+    tone: "texture",
+    desc: "A 4×4 Bayer field redraws the wordmark as a moving dot grid. Canvas dither, not block cells.",
+  },
+  {
+    id: "field",
+    index: "10",
+    title: "Dither field",
+    tone: "texture",
+    desc: "The whole footer band becomes a 4×4 Bayer field. The wordmark emerges as a denser region while a slow orange scan crosses the surface.",
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Footer wordmark lab — ascii-things</title>
+    <meta name="robots" content="noindex" />
+    <style is:inline>
+      :root {
+        color-scheme: dark;
+        --bg: #070809;
+        --panel: #0b0d0f;
+        --line: #24262a;
+        --ink: #ece8df;
+        --muted: #8d8a82;
+        --dim: rgba(236, 232, 223, 0.2);
+        --orange: #ff7a1a;
+        --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--bg);
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 16% 0%, rgba(255, 122, 26, 0.06), transparent 32rem),
+          var(--bg);
+        color: var(--ink);
+        font-family: var(--mono);
+        min-height: 100vh;
+      }
+
+      .shell {
+        width: min(1180px, calc(100vw - 64px));
+        margin: 0 auto;
+        padding: 48px 0 72px;
+      }
+
+      .lab-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 32px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        margin: 0 0 14px;
+        color: var(--orange);
+        font-size: 9px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 4.5vw, 54px);
+        font-weight: 600;
+        letter-spacing: -0.055em;
+        line-height: 0.95;
+      }
+
+      .intro {
+        max-width: 580px;
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.75;
+      }
+
+      .lab-note {
+        max-width: 240px;
+        margin: 0;
+        padding-left: 18px;
+        border-left: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 9px;
+        line-height: 1.7;
+      }
+
+      .lab-note b {
+        color: var(--ink);
+        font-weight: 500;
+      }
+
+      .grid {
+        display: grid;
+        gap: 0;
+        margin-top: 18px;
+      }
+
+      .card {
+        display: grid;
+        grid-template-columns: 238px minmax(0, 1fr);
+        gap: 34px;
+        align-items: center;
+        padding: 24px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .card:first-child {
+        border-top: 1px solid var(--line);
+      }
+
+      .card--wide {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 28px 0;
+      }
+
+      .card--wide .card-copy {
+        max-width: 640px;
+      }
+
+      .card-copy {
+        min-width: 0;
+      }
+
+      .index {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        color: var(--orange);
+        font-size: 9px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .tone {
+        color: #6d6a63;
+        font-size: 8px;
+        letter-spacing: 0.12em;
+      }
+
+      h2 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+      }
+
+      .desc {
+        margin: 0;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.65;
+      }
+
+      .stage {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        min-height: 104px;
+        overflow: hidden;
+      }
+
+      .stage::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(236, 232, 223, 0.025), transparent);
+        pointer-events: none;
+      }
+
+      .stage--stack {
+        flex-direction: column;
+        gap: 2px;
+        min-height: 154px;
+      }
+
+      .stage--dither {
+        min-height: 104px;
+      }
+
+      .dither-canvas {
+        display: block;
+        width: 100%;
+        height: 104px;
+      }
+
+      .stage--field {
+        min-height: 220px;
+        background: radial-gradient(ellipse at 50% 50%, rgba(255, 122, 26, 0.035), transparent 68%);
+      }
+
+      .field-canvas {
+        height: 220px;
+      }
+
+      .hint {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        color: #65625b;
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        pointer-events: none;
+      }
+
+      .art {
+        display: block;
+        flex: 0 0 auto;
+        width: max-content;
+        max-width: 100%;
+        color: var(--dim);
+        font-family: var(--mono);
+        line-height: 0;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      .v-scan,
+      .v-column,
+      .v-cascade,
+      .v-decode,
+      .v-dots,
+      .v-reverse {
+        font-size: clamp(4.4px, 1.35vw, 22px);
+      }
+
+      .v-stack {
+        font-size: clamp(7px, 2.2vw, 34px);
+      }
+
+      .v-hover {
+        font-size: clamp(4.4px, 1.35vw, 22px);
+      }
+
+      .v-original {
+        color: rgba(236, 232, 223, 0.2);
+        font-size: clamp(5.9px, 1.35vw, 20px);
+        font-weight: 700;
+        line-height: 0.86;
+        filter: drop-shadow(0 0 24px rgba(255, 122, 26, 0.08));
+      }
+
+      .orig-line {
+        display: block;
+        white-space: pre;
+      }
+
+      .orig-cell {
+        color: inherit;
+        animation: origScan 7.5s linear infinite;
+        animation-delay: calc(var(--i) * -0.052s);
+      }
+
+      .orig-cell.orig-origin {
+        color: var(--orange);
+      }
+
+      @keyframes origScan {
+        0%,
+        93%,
+        100% {
+          color: rgba(236, 232, 223, 0.2);
+        }
+        94%,
+        96% {
+          color: var(--orange);
+        }
+      }
+
+      .art-line {
+        display: flex;
+        height: 0.62em;
+      }
+
+      .cell {
+        display: block;
+        flex: 0 0 auto;
+        width: 0.62em;
+        height: 0.62em;
+        color: inherit;
+      }
+
+      .cell i {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: currentColor;
+      }
+
+      .art--dots {
+        --dim: rgba(236, 232, 223, 0.32);
+      }
+
+      .art--dots .cell i {
+        transform: scale(0.62);
+        transform-origin: center;
+      }
+
+      .cell.origin {
+        color: var(--orange);
+      }
+
+      .v-scan .cell.on {
+        animation: scanPulse 7.5s linear infinite;
+        animation-delay: calc(var(--i) * -0.052s);
+      }
+
+      .v-column .cell.on {
+        animation: columnPulse 5s linear infinite;
+        animation-delay: calc(var(--col) * -0.06s);
+      }
+
+      .v-cascade .cell.on {
+        animation: letterPulse 5.2s linear infinite;
+        animation-delay: calc(var(--letter) * -0.36s);
+      }
+
+      .v-decode .cell.on {
+        animation: decodePulse 3.2s steps(1, end) infinite;
+        animation-delay: calc(var(--rand) * -3.2s);
+      }
+
+      .v-dots .cell.on {
+        animation: scanPulse 8.5s linear infinite;
+        animation-delay: calc(var(--i) * -0.06s);
+      }
+
+      .v-stack .cell.on {
+        animation: rowPulse 3.6s linear infinite;
+        animation-delay: calc(var(--row) * -0.55s);
+      }
+
+      .v-reverse .cell.on {
+        color: var(--orange);
+        animation: reversePulse 7.5s linear infinite;
+        animation-delay: calc(var(--i) * -0.052s);
+      }
+
+      .v-hover .cell.on {
+        transition: color 180ms ease, filter 180ms ease;
+      }
+
+      .v-hover .stage {
+        cursor: crosshair;
+      }
+
+      @keyframes scanPulse {
+        0%,
+        93%,
+        100% {
+          color: var(--dim);
+        }
+        94%,
+        96% {
+          color: var(--orange);
+        }
+      }
+
+      @keyframes columnPulse {
+        0%,
+        92%,
+        100% {
+          color: var(--dim);
+        }
+        94%,
+        96% {
+          color: var(--orange);
+        }
+      }
+
+      @keyframes letterPulse {
+        0%,
+        88%,
+        100% {
+          color: var(--dim);
+        }
+        91%,
+        94% {
+          color: var(--orange);
+        }
+      }
+
+      @keyframes decodePulse {
+        0%,
+        86%,
+        100% {
+          color: var(--dim);
+        }
+        88%,
+        91% {
+          color: var(--orange);
+        }
+        94% {
+          color: var(--ink);
+        }
+      }
+
+      @keyframes rowPulse {
+        0%,
+        86%,
+        100% {
+          color: var(--dim);
+        }
+        89%,
+        93% {
+          color: var(--orange);
+        }
+      }
+
+      @keyframes reversePulse {
+        0%,
+        91%,
+        100% {
+          color: var(--orange);
+        }
+        93%,
+        96% {
+          color: var(--ink);
+        }
+      }
+
+      .lab-foot {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 32px;
+        padding-top: 28px;
+        color: var(--muted);
+        font-size: 9px;
+        line-height: 1.7;
+      }
+
+      .lab-foot b {
+        color: var(--ink);
+        font-weight: 500;
+      }
+
+      .back {
+        color: var(--orange);
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .back:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      @media (max-width: 760px) {
+        .shell {
+          width: calc(100vw - 32px);
+          padding: 30px 0 52px;
+        }
+
+        .lab-head {
+          display: block;
+        }
+
+        .lab-note {
+          max-width: none;
+          margin-top: 20px;
+          padding-left: 0;
+          border-left: 0;
+          border-top: 1px solid var(--line);
+          padding-top: 14px;
+        }
+
+        .card {
+          grid-template-columns: 1fr;
+          gap: 16px;
+          padding: 22px 0;
+        }
+
+        .stage {
+          min-height: 84px;
+        }
+
+        .stage--stack {
+          min-height: 130px;
+        }
+
+        .dither-canvas {
+          height: 84px;
+        }
+
+        .stage--field {
+          min-height: 150px;
+        }
+
+        .field-canvas {
+          height: 150px;
+        }
+
+        .lab-foot {
+          display: block;
+        }
+
+        .back {
+          display: inline-block;
+          margin-top: 14px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .cell.on {
+          animation: none !important;
+          color: var(--dim) !important;
+        }
+
+        .v-reverse .cell.on {
+          color: var(--dim) !important;
+        }
+
+        .orig-cell {
+          animation: none !important;
+          color: rgba(236, 232, 223, 0.2) !important;
+        }
+
+        .orig-cell.orig-origin {
+          color: var(--orange) !important;
+        }
+
+        .cell.origin,
+        .v-reverse .cell.origin {
+          color: var(--orange) !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="lab-head">
+        <div>
+          <p class="eyebrow">Throwaway lab / footer treatments</p>
+          <h1>Footer treatments</h1>
+          <p class="intro">
+            The first footer version, back on the bench. <b>00 is the exact original</b>; 01–09 are
+            variations built from it. <b>10 is now live in the production footer</b>; every variant
+            stays here for future components.
+          </p>
+        </div>
+        <p class="lab-note">
+          <b>10 is live.</b> The field treatment is in the real footer. 00–09 stay here as
+          component variants for the project.
+        </p>
+      </header>
+
+      <section class="grid" aria-label="Footer wordmark variations">
+        {
+          variants.map((variant) => (
+            <article class={`card${variant.id === "field" ? " card--wide" : ""}`}>
+              <div class="card-copy">
+                <div class="index">
+                  <span>{variant.index}</span>
+                  <span class="tone">{variant.tone}</span>
+                </div>
+                <h2>{variant.title}</h2>
+                <p class="desc">{variant.desc}</p>
+              </div>
+
+              {variant.original ? (
+                <div class="stage stage--original" aria-hidden="true">
+                  <div class="art v-original" data-word="ASCII-THINGS" data-original="true" />
+                </div>
+              ) : variant.id === "stack" ? (
+                <div class="stage stage--stack" aria-hidden="true">
+                  <div class="art v-stack" data-word="ASCII" />
+                  <div class="art v-stack" data-word="THINGS" data-row-offset="5" />
+                </div>
+              ) : variant.id === "dither" ? (
+                <div class="stage stage--dither" aria-hidden="true">
+                  <canvas class="dither-canvas" data-word="ASCII-THINGS" />
+                  <span class="hint">bayer 4×4 →</span>
+                </div>
+              ) : variant.id === "field" ? (
+                <div class="stage stage--field" aria-hidden="true">
+                  <canvas class="dither-canvas field-canvas" data-word="ASCII-THINGS" data-mode="field" />
+                  <span class="hint">field + wordmark →</span>
+                </div>
+              ) : (
+                <div class="stage" aria-hidden="true">
+                  <div
+                    class={`art v-${variant.id}${variant.dots ? " art--dots" : ""}`}
+                    data-word="ASCII-THINGS"
+                  />
+                  {variant.id === "hover" && <span class="hint">move across →</span>}
+                </div>
+              )}
+            </article>
+          ))
+        }
+      </section>
+
+      <footer class="lab-foot">
+        <span>
+          <b>Production footer is untouched.</b> This page is noindex and will be removed after the
+          choice. Reduced motion keeps one static orange cell per mark.
+        </span>
+        <a class="back" href="/">← back to the site</a>
+      </footer>
+    </main>
+
+    <script is:inline>
+      const GLYPHS = {
+        A: [" ### ", "#   #", "#####", "#   #", "#   #"],
+        S: [" ####", "#    ", " ### ", "    #", "#### "],
+        C: [" ####", "#    ", "#    ", "#    ", " ####"],
+        I: ["#####", "  #  ", "  #  ", "  #  ", "#####"],
+        T: ["#####", "  #  ", "  #  ", "  #  ", "  #  "],
+        H: ["#   #", "#   #", "#####", "#   #", "#   #"],
+        N: ["#   #", "##  #", "# # #", "#  ##", "#   #"],
+        G: [" ####", "#    ", "# ###", "#   #", " ####"],
+        "-": ["     ", "     ", " ### ", "     ", "     "],
+      };
+
+      function hash(value) {
+        const raw = Math.sin(value * 12.9898) * 43758.5453;
+        return raw - Math.floor(raw);
+      }
+
+      function buildRows(word, rowOffset) {
+        const rows = Array.from({ length: 5 }, () => []);
+        let originSet = false;
+
+        for (let row = 0; row < 5; row++) {
+          let col = 0;
+
+          for (let letter = 0; letter < word.length; letter++) {
+            const glyph = GLYPHS[word[letter]] || GLYPHS["-"];
+
+            for (let cell = 0; cell < 5; cell++) {
+              const on = glyph[row][cell] === "#";
+              const origin = on && !originSet;
+              if (origin) originSet = true;
+
+              rows[row].push({
+                on,
+                origin,
+                row: row + rowOffset,
+                col,
+                letter,
+              });
+              col++;
+            }
+
+            if (letter < word.length - 1) {
+              rows[row].push({
+                on: false,
+                origin: false,
+                row: row + rowOffset,
+                col,
+                letter,
+              });
+              col++;
+            }
+          }
+        }
+
+        for (let row = 0; row < rows.length; row++) {
+          for (let col = 0; col < rows[row].length; col++) {
+            const index = row * rows[row].length + col;
+            rows[row][col].index = index;
+            rows[row][col].rand = hash(index + rowOffset * 37 + 1);
+          }
+        }
+
+        return rows;
+      }
+
+      function renderOriginalArt(art) {
+        const word = art.dataset.word || "ASCII-THINGS";
+        const rows = Array.from({ length: 5 }, (_, row) =>
+          [...word].map((char) => (GLYPHS[char] || GLYPHS["-"])[row]).join(" "),
+        );
+        let index = 0;
+        let hasOrigin = false;
+
+        for (const row of rows) {
+          const line = document.createElement("span");
+          line.className = "orig-line";
+
+          for (const char of row) {
+            if (char !== "#") {
+              line.appendChild(document.createTextNode(" "));
+              continue;
+            }
+
+            const cell = document.createElement("span");
+            const origin = !hasOrigin;
+            if (origin) hasOrigin = true;
+
+            cell.className = "orig-cell" + (origin ? " orig-origin" : "");
+            cell.style.setProperty("--i", index++);
+            cell.textContent = "█";
+            line.appendChild(cell);
+          }
+
+          art.appendChild(line);
+        }
+      }
+
+      function renderArt(art) {
+        if (art.dataset.original === "true") {
+          renderOriginalArt(art);
+          return;
+        }
+
+        const word = art.dataset.word || "ASCII-THINGS";
+        const rowOffset = Number(art.dataset.rowOffset || 0);
+        const rows = buildRows(word, rowOffset);
+
+        for (const row of rows) {
+          const line = document.createElement("div");
+          line.className = "art-line";
+
+          for (const cell of row) {
+            const element = document.createElement("span");
+            element.className = "cell" + (cell.on ? " on" : "") + (cell.origin ? " origin" : "");
+
+            if (cell.on) {
+              element.style.setProperty("--i", cell.index);
+              element.style.setProperty("--col", cell.col);
+              element.style.setProperty("--row", cell.row);
+              element.style.setProperty("--letter", cell.letter);
+              element.style.setProperty("--rand", cell.rand.toFixed(4));
+
+              const block = document.createElement("i");
+              element.appendChild(block);
+            }
+
+            line.appendChild(element);
+          }
+
+          art.appendChild(line);
+        }
+      }
+
+      document.querySelectorAll(".art").forEach(renderArt);
+
+      function setupHover(stage) {
+        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+        if (reduced.matches) return;
+
+        const cells = [...stage.querySelectorAll(".cell.on")];
+        let points = [];
+        let frame = 0;
+
+        const measure = () => {
+          points = cells.map((cell) => {
+            const rect = cell.getBoundingClientRect();
+            return { cell, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+          });
+        };
+
+        const paint = (event) => {
+          for (const point of points) {
+            const distance = Math.hypot(event.clientX - point.x, event.clientY - point.y);
+            const strength = Math.max(0, 1 - distance / 125);
+
+            if (strength > 0.58) {
+              point.cell.style.color = "var(--orange)";
+              point.cell.style.filter = "drop-shadow(0 0 7px rgba(255, 122, 26, 0.35))";
+            } else if (strength > 0.16) {
+              point.cell.style.color = "rgba(236, 232, 223, 0.86)";
+              point.cell.style.filter = "none";
+            } else {
+              point.cell.style.color = "";
+              point.cell.style.filter = "";
+            }
+          }
+        };
+
+        stage.addEventListener("pointerenter", measure);
+        stage.addEventListener("pointermove", (event) => {
+          if (event.pointerType === "touch") return;
+          if (!points.length) measure();
+          cancelAnimationFrame(frame);
+          frame = requestAnimationFrame(() => paint(event));
+        });
+
+        stage.addEventListener("pointerleave", () => {
+          cancelAnimationFrame(frame);
+          for (const point of points) {
+            point.cell.style.color = "";
+            point.cell.style.filter = "";
+          }
+        });
+
+        window.addEventListener("resize", measure, { passive: true });
+      }
+
+      document.querySelectorAll(".v-hover").forEach(setupHover);
+
+      function setupDither(canvas) {
+        const stage = canvas.parentElement;
+        const word = canvas.dataset.word || "ASCII-THINGS";
+        const mode = canvas.dataset.mode || "wordmark";
+        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const ctx = canvas.getContext("2d");
+        const mono =
+          getComputedStyle(document.documentElement).getPropertyValue("--mono").trim() ||
+          "ui-monospace, monospace";
+        const bayer = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+        let width = 0;
+        let height = 0;
+        let mask = null;
+        let raf = 0;
+        let running = false;
+        let visible = true;
+        let last = 0;
+
+        function buildMask() {
+          const off = document.createElement("canvas");
+          off.width = width;
+          off.height = height;
+          const offCtx = off.getContext("2d");
+
+          offCtx.fillStyle = "#000";
+          offCtx.fillRect(0, 0, width, height);
+          offCtx.fillStyle = "#fff";
+
+          let size = height * 0.82;
+          offCtx.font = `700 ${size}px ${mono}`;
+          const maxWidth = width * 0.84;
+
+          while (offCtx.measureText(word).width > maxWidth && size > 8) {
+            size *= 0.92;
+            offCtx.font = `700 ${size}px ${mono}`;
+          }
+
+          offCtx.textAlign = "center";
+          offCtx.textBaseline = "middle";
+          offCtx.fillText(word, width / 2, height / 2);
+          mask = offCtx.getImageData(0, 0, width, height).data;
+        }
+
+        function brightness(x, y) {
+          const px = Math.max(0, Math.min(width - 1, Math.floor(x)));
+          const py = Math.max(0, Math.min(height - 1, Math.floor(y)));
+          return mask[(py * width + px) * 4] / 255;
+        }
+
+        function draw(time) {
+          ctx.clearRect(0, 0, width, height);
+
+          if (mode === "field") drawField(time);
+          else drawWordmark(time);
+        }
+
+        function drawWordmark(time) {
+          const step = Math.max(1.7, width / 330);
+          const scanX = time === 0 ? width * 0.18 : ((time * 0.06) % (width + 240)) - 120;
+
+          for (let y = 0; y < height; y += step) {
+            for (let x = 0; x < width; x += step) {
+              const value = brightness(x + step / 2, y + step / 2);
+              if (value < 0.12) continue;
+
+              const bx = Math.floor(x / step) % 4;
+              const by = Math.floor(y / step) % 4;
+              const threshold = 0.42 + 0.08 * Math.sin(time * 0.0012 + x * 0.01);
+              const pattern = bayer[by * 4 + bx] / 16;
+              const dither =
+                value * 1.1 +
+                pattern * 0.38 +
+                0.06 * Math.sin(time * 0.002 + x * 0.06 + y * 0.09);
+
+              if (dither < threshold) continue;
+
+              const nearScan = Math.abs(x + step / 2 - scanX) < 44;
+              const size = step * (nearScan ? 0.95 : 0.72);
+
+              ctx.fillStyle = nearScan ? "#ff7a1a" : "rgba(236, 232, 223, 0.62)";
+              ctx.fillRect(x + (step - size) / 2, y + (step - size) / 2, size, size);
+            }
+          }
+        }
+
+        function drawField(time) {
+          const step = Math.max(2.2, width / 240);
+          const scanX = time === 0 ? width * 0.18 : ((time * 0.055) % (width + 260)) - 130;
+
+          for (let y = 0; y < height; y += step) {
+            for (let x = 0; x < width; x += step) {
+              const bx = Math.floor(x / step) % 4;
+              const by = Math.floor(y / step) % 4;
+              const pattern = bayer[by * 4 + bx] / 16;
+              const value = brightness(x + step / 2, y + step / 2);
+              const isWord = value > 0.42;
+              const wave =
+                0.5 + 0.5 * Math.sin(x * 0.012 + y * 0.009 + time * 0.0007);
+              const fieldDensity = 0.08 + 0.15 * wave;
+              const density = isWord ? 0.78 : fieldDensity;
+
+              if (pattern > density) continue;
+
+              const nearScan = Math.abs(x + step / 2 - scanX) < 58;
+              const dot = step * (isWord ? (nearScan ? 0.92 : 0.62) : nearScan ? 0.58 : 0.34);
+
+              ctx.fillStyle = nearScan
+                ? "rgba(255, 122, 26, 0.9)"
+                : isWord
+                  ? "rgba(236, 232, 223, 0.7)"
+                  : "rgba(236, 232, 223, 0.2)";
+              ctx.fillRect(x + (step - dot) / 2, y + (step - dot) / 2, dot, dot);
+            }
+          }
+        }
+
+        function loop(now) {
+          if (!running) return;
+          if (now - last > 1000 / 30) {
+            draw(now);
+            last = now;
+          }
+          raf = requestAnimationFrame(loop);
+        }
+
+        function start() {
+          if (reduced.matches || running) return;
+          running = true;
+          last = 0;
+          raf = requestAnimationFrame(loop);
+        }
+
+        function stop() {
+          running = false;
+          cancelAnimationFrame(raf);
+          draw(0);
+        }
+
+        function resize() {
+          const rect = stage.getBoundingClientRect();
+          width = Math.max(1, Math.round(rect.width));
+          height = Math.max(1, Math.round(rect.height));
+          const dpr = Math.min(2, window.devicePixelRatio || 1);
+
+          canvas.width = Math.round(width * dpr);
+          canvas.height = Math.round(height * dpr);
+          canvas.style.width = `${width}px`;
+          canvas.style.height = `${height}px`;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+          buildMask();
+          if (!running) draw(0);
+        }
+
+        resize();
+
+        if (reduced.matches) {
+          draw(0);
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            visible = entry?.isIntersecting ?? true;
+            if (visible) start();
+            else stop();
+          },
+          { rootMargin: "180px 0px" },
+        );
+        observer.observe(stage);
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) stop();
+          else if (visible) start();
+        });
+
+        reduced.addEventListener("change", () => {
+          if (reduced.matches) stop();
+          else if (visible) start();
+        });
+
+        if ("ResizeObserver" in window) {
+          new ResizeObserver(resize).observe(stage);
+        } else {
+          window.addEventListener("resize", resize, { passive: true });
+        }
+
+        document.fonts?.ready.then(resize);
+        if (visible) start();
+      }
+
+      document.querySelectorAll(".dither-canvas").forEach(setupDither);
+    </script>
+  </body>
+</html>

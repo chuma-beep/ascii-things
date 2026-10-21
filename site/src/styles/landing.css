@@ -895,18 +895,19 @@ button {
 }
 
 .footer-art {
+  position: relative;
   width: 100%;
   margin: 0 auto clamp(30px, 4.5vw, 54px);
   padding-bottom: clamp(24px, 3.5vw, 42px);
   border-bottom: 1px solid var(--line-soft);
+  background: radial-gradient(ellipse at 50% 50%, rgba(255, 122, 26, 0.035), transparent 68%);
 }
 
 .footer-canvas {
   display: block;
   width: 100%;
-  height: clamp(120px, 16vw, 240px);
-  cursor: crosshair;
-  touch-action: pan-y;
+  height: clamp(150px, 18vw, 260px);
+  pointer-events: none;
   user-select: none;
 }
 
