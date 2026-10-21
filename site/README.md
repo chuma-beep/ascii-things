@@ -107,7 +107,7 @@ site/
     components/           React islands + Astro demos
     scripts/landing.ts    Landing page engine wiring
     styles/               landing.css and docs.css
-  public/                 favicon, _headers
+  public/                 favicon, favicon motion script, _headers
   wrangler.toml           CLI deploy config
 ```
 

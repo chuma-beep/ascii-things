@@ -36,6 +36,10 @@ export default defineConfig({
       head: [
         { tag: "meta", attrs: { name: "theme-color", content: "#070809" } },
         {
+          tag: "script",
+          attrs: { src: "/favicon-motion.js", type: "module" },
+        },
+        {
           tag: "link",
           attrs: { rel: "preconnect", href: "https://fonts.googleapis.com" },
         },
