@@ -329,6 +329,12 @@ h4 {
   border-left: 0;
 }
 
+/* Footer navigation and content link cards use the square docs chrome. */
+.pagination-links a,
+.sl-link-card {
+  border-radius: 0;
+}
+
 /* Selected sidebar items use the same square language as the rest of the UI. */
 .sidebar-content a[aria-current="page"],
 .sidebar-content a[aria-current="page"]:hover,
