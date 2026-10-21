@@ -75,7 +75,7 @@ function App() {
             <>
               The whole scene.
               <br />
-              <em>In four components.</em>
+              <em>In one composition.</em>
             </>
           }
           lede="AsciiDogHero wires a live dog, a command input, a framed stage, and a stats readout. Swap the copy, keep the behavior."

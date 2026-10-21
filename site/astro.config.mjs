@@ -71,7 +71,7 @@ export default defineConfig({
         {
           label: "Scenes",
           items: [
-            { label: "All ten scenes", link: "scenes/" },
+            { label: "All scenes", link: "scenes/" },
             { label: "Shark tank", link: "scenes/sharks/" },
             { label: "Robot floor", link: "scenes/robots/" },
             { label: "Jellyfish bloom", link: "scenes/jellyfish/" },

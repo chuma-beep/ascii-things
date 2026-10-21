@@ -6,9 +6,10 @@ description: Install ascii-things, pick a scene, and put a small living ecosyste
 import { CardGrid, LinkCard, Aside } from "@astrojs/starlight/components";
 import SceneDemo from "@components/SceneDemo";
 
-**ascii-things** is four small artificial-life simulations drawn as glyphs on a canvas: a
-shark tank, a robot factory floor, a jellyfish bloom, and a robot dog test yard. Each one
-runs on its own rules, respects reduced motion, and ships with no runtime dependencies.
+**ascii-things** is a collection of small artificial-life simulations drawn as glyphs on a
+canvas: a shark tank, a robot factory floor, a jellyfish bloom, a robot dog test yard, and
+ambient worlds for starlings, fireflies, ants, koi, city traffic, and servers. Each one runs
+on its own rules, respects reduced motion, and ships with no runtime dependencies.
 
 Same seed and size produce the same scene. Different palette changes the ink, not the
 behavior. One canvas is the whole surface.
@@ -42,10 +43,10 @@ behavior. One canvas is the whole surface.
 
 ## What you get
 
-- **Four scenes, one shape.** `palette`, `seed`, `speed`, `columns`, `maxCells`,
+- **Every scene, one shape.** `palette`, `seed`, `speed`, `columns`, `maxCells`,
   `maxDpr`, `calm`, `interactive`, `label`, and `onEvent` behave the same everywhere.
-- **Three adapters.** React components from `ascii-things/react`, vanilla `create*`
-  factories from scene subpaths, and `<ascii-*>` custom elements.
+- **Framework-ready adapters.** React components from `ascii-things/react`, vanilla
+  `create*` factories from scene subpaths, and `<ascii-*>` custom elements.
 - **An optional UI layer.** `ascii-things/ui` adds a framed stage, command input, live
   readout, palette tabs, and a full dog-hero recipe.
 - **Calm defaults.** Decorative canvases are hidden from assistive technology unless you
@@ -60,7 +61,7 @@ quality, and the uniform `trigger()` action — and adds the migration guide and
 tests. The `0.5.0` feature notes below still apply.
 </Aside>
 
-## The four scenes
+## The scenes
 
 | Scene | What it does | Import |
 | --- | --- | --- |
@@ -68,7 +69,11 @@ tests. The `0.5.0` feature notes below still apply.
 | Robot floor | Robots patrol, scan, haul, queue for a dock, and recharge. | `ascii-things/robots` |
 | Jellyfish bloom | Jellies pulse on a current, trail tentacles, and ring on contraction. | `ascii-things/jellyfish` |
 | Robot dog | A quadruped trots, sniffs, sits, fetches a ball, and docks. | `ascii-things/dog` |
+| Starlings | A murmuration folds around a predator and scatters. | `ascii-things/starlings` |
+| Fireflies | A dusk meadow of fireflies blinks, flares, and settles. | `ascii-things/fireflies` |
+| Ants | A colony forages pheromone trails and carries crumbs home. | `ascii-things/ants` |
+| Koi | A koi pond with lily pads, ripples, and food. | `ascii-things/koi` |
+| City | A night grid of traffic and lit windows. | `ascii-things/city` |
+| Servers | A rack room of blinking LEDs and traveling packets. | `ascii-things/servers` |
 
-Read the [scene overview](/scenes/) for the shared model, or jump to
-[sharks](/scenes/sharks/), [robots](/scenes/robots/),
-[jellyfish](/scenes/jellyfish/), and [the dog](/scenes/dog/).
+Read the [scene overview](/scenes/) for the shared model, or open any scene from there.

@@ -6,9 +6,9 @@ description: Switch scenes, seed the world, and change columns and speed live.
 import { Aside } from "@astrojs/starlight/components";
 import Playground from "@components/Playground";
 
-This playground is a single React island with all ten scenes: the four originals plus
-starlings, fireflies, ants, koi, city, and servers. It uses the vanilla engines so the readout
-can poll `getStats()` and the scene can be remounted when the seed or column count changes.
+This playground is a single React island for every scene. It uses the vanilla engines so the
+readout can poll `getStats()` and the scene can be remounted when the seed or column count
+changes.
 
 <Playground client:load />
 

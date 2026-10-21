@@ -5,8 +5,8 @@ description: Use ascii-things in plain HTML, Astro, Vue, Svelte, or any page wit
 
 import CustomElementDemo from "@components/CustomElementDemo.astro";
 
-`ascii-things/element` registers four custom elements. They use shadow DOM, render a canvas,
-and need no framework runtime.
+`ascii-things/element` registers a custom element for every scene. They use shadow DOM, render
+a canvas, and need no framework runtime.
 
 <CustomElementDemo />
 
@@ -36,13 +36,19 @@ In Astro, import the module from a client script:
 
 The script is idempotent: it only defines a tag if `customElements.get()` is empty.
 
-## The four tags
+## The tags
 
 ```html
 <ascii-sharks palette="abyss" seed="42" interactive></ascii-sharks>
 <ascii-robots palette="paper" seed="7" count="8" interactive></ascii-robots>
 <ascii-jellyfish palette="neon" seed="3" interactive></ascii-jellyfish>
 <ascii-dog palette="paper" seed="7" count="1" interactive></ascii-dog>
+<ascii-starlings palette="abyss" seed="5" interactive></ascii-starlings>
+<ascii-fireflies palette="abyss" seed="9" interactive></ascii-fireflies>
+<ascii-ants palette="paper" seed="4" interactive></ascii-ants>
+<ascii-koi palette="neon" seed="2" interactive></ascii-koi>
+<ascii-city palette="abyss" seed="8" interactive></ascii-city>
+<ascii-servers palette="paper" seed="6" interactive></ascii-servers>
 ```
 
 Each tag renders a shadow root containing a canvas. The host is `display: block`, fills its

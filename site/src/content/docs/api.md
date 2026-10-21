@@ -9,13 +9,13 @@ This reference tracks `main` and the current **1.0.0-rc.0** release.
 
 | Entry | Exports |
 | --- | --- |
-| `ascii-things` | All four scenes (convenience re-exports) |
+| `ascii-things` | All scenes (convenience re-exports) |
 | `ascii-things/sharks` | `createSharks`, `OceanEngine`, shark types, palette helpers |
 | `ascii-things/robots` | `createRobots`, `RobotEngine`, robot types |
 | `ascii-things/jellyfish` | `createJellyfish`, `JellyfishEngine`, jellyfish types |
 | `ascii-things/dog` | `createDog`, `DogEngine`, dog types |
-| `ascii-things/react` | `AsciiSharks`, `AsciiRobots`, `AsciiJellyfish`, `AsciiDog`, `AsciiOcean` |
-| `ascii-things/element` | Registers the four custom elements |
+| `ascii-things/react` | Scene components: `AsciiSharks`, `AsciiRobots`, `AsciiJellyfish`, `AsciiDog`, ambient wrappers, `AsciiOcean` |
+| `ascii-things/element` | Registers the scene custom elements |
 | `ascii-things/ui` | `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, `AsciiSceneTabs`, `AsciiDogHero` |
 | `ascii-things/ui.css` | UI stylesheet |
 

@@ -1,6 +1,6 @@
 ---
 title: Performance
-description: Cell caps, DPR limits, off-screen pausing, and how to keep four canvases calm.
+description: Cell caps, DPR limits, off-screen pausing, and how to keep multiple canvases calm.
 ---
 
 Each scene is a fixed-timestep simulation rendered as glyphs on one canvas. There is no WebGL,
@@ -164,6 +164,6 @@ release.
 
 ## Multiple scenes
 
-Every canvas owns a loop. Four small cards are fine; four full-screen heroes are not. Prefer
-one active scene per viewport. The landing page uses reduced `columns` and `maxCells` for its
-four preview cards, and pauses them when they leave the viewport automatically.
+Every canvas owns a loop. A few small cards are fine; multiple full-screen heroes are not.
+Prefer one active scene per viewport. The landing page uses reduced `columns` and `maxCells`
+for its preview cards, and pauses them when they leave the viewport automatically.

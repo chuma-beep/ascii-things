@@ -4,10 +4,10 @@
 
 *The landing page, live. Type a command and the dog fetches the ball.*
 
-**Ten living ASCII scenes.** A shark tank, robot factory, jellyfish bloom,
+**Living ASCII scenes.** A shark tank, robot factory, jellyfish bloom,
 robot dog, starling murmuration, firefly meadow, ant trail, koi pond, city
-grid, and server room — drawn as glyphs on a canvas. Zero runtime dependencies.
-MIT.
+grid, and server room — drawn as glyphs on a canvas. The collection keeps
+growing. Zero runtime dependencies. MIT.
 
 The optional `ascii-things/ui` subpath adds a framed stage, command input, live
 readout, scene tabs, panels, toolbars, status readouts, and ready-made scene
@@ -539,8 +539,8 @@ Ambient elements (`ascii-starlings`, `ascii-fireflies`, `ascii-ants`,
 `scale`, `speed`, `columns`, `max-cells`, `max-dpr`, `adaptive-quality`,
 `calm`, `interactive`, `label`, `aspect-ratio`, `paused`, `font-family`.
 
-All ten elements dispatch a bubbling, composed `ascii-ready` event after the
-engine mounts. The event detail is `{ scene }`, where `scene` is the engine
+Every custom element dispatches a bubbling, composed `ascii-ready` event after
+the engine mounts. The event detail is `{ scene }`, where `scene` is the engine
 handle.
 
 ## Examples

@@ -1,6 +1,6 @@
 ---
-title: The ten scenes
-description: One shared model, ten small ecosystems, and the defaults that keep them composable.
+title: The scenes
+description: One shared model, a set of small ecosystems, and the defaults that keep them composable.
 ---
 
 import { CardGrid, LinkCard } from "@astrojs/starlight/components";
@@ -26,7 +26,7 @@ behavior. The scene owns state, rules, and drawing.
 | Label | Makes the canvas `role="img"` with a name |
 | Events | `onEvent` receives scene-specific moments |
 
-## The ten
+## The scenes
 
 <CardGrid>
   <LinkCard
@@ -112,7 +112,7 @@ All scenes share `maxCells: 16000` and `maxDpr: 2`.
 - **City and servers** read as infrastructure. Good for developer tools, dashboards, and
   operations pages.
 
-All ten are ambient. None of them should carry essential information. Read
+Every scene is ambient. None of them should carry essential information. Read
 [Accessibility](/guide/accessibility/) before shipping a scene behind content.
 
 ## Per-scene references

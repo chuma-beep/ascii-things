@@ -67,7 +67,7 @@ Import only the scene you need. Every scene has its own subpath, which keeps the
 | `ascii-things/element` | Registers `<ascii-sharks>`, `<ascii-robots>`, `<ascii-jellyfish>`, `<ascii-dog>` |
 | `ascii-things/ui` | `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, `AsciiSceneTabs`, `AsciiDogHero` |
 | `ascii-things/ui.css` | Styles for the optional UI layer |
-| `ascii-things` | Convenience re-exports of all four vanilla scenes |
+| `ascii-things` | Convenience re-exports of the vanilla scenes |
 
 The root `ascii-things` entry re-exports every scene. Prefer subpaths in application code so
 unused scenes stay out of the bundle.
