@@ -970,7 +970,7 @@ const variants = [
         <div class="preview-head">
           <div>
             <p class="eyebrow">Selected footer treatment</p>
-            <h2 id="preview-title">
+            <h2 id="preview-title" aria-live="polite" aria-atomic="true">
               <span data-preview-index>10</span> / <span data-preview-name>Dither field</span>
             </h2>
           </div>
@@ -984,6 +984,7 @@ const variants = [
                   data-index={variant.index}
                   data-name={variant.title}
                   aria-pressed={variant.id === "field"}
+                  tabindex={variant.id === "field" ? "0" : "-1"}
                   title={`${variant.index} / ${variant.title}`}
                 >
                   {variant.index}
@@ -1009,7 +1010,8 @@ const variants = [
           </div>
         </div>
         <p class="preview-note">
-          Click a treatment. Production uses 10 / Dither field; 00–09 stay as component variants.
+          Click a treatment, or use the arrow keys. Production uses 10 / Dither field; 00–09 stay
+          as component variants. Your choice is remembered in this browser.
         </p>
       </section>
 
@@ -1521,6 +1523,19 @@ const variants = [
       const previewSection = document.querySelector("[data-preview]");
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const pickers = [...document.querySelectorAll("[data-select]")];
+      const STORAGE_KEY = "ascii-footer-treatment";
+
+      function readInitialTreatment() {
+        const hash = location.hash.slice(1);
+        if (pickers.some((item) => item.dataset.select === hash)) return hash;
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored && pickers.some((item) => item.dataset.select === stored)) return stored;
+        } catch {
+          // ignore storage errors
+        }
+        return "field";
+      }
 
       function selectTreatment(id, options = {}) {
         const button = pickers.find((item) => item.dataset.select === id) || pickers[0];
@@ -1530,6 +1545,7 @@ const variants = [
           const on = item.dataset.select === nextId;
           item.classList.toggle("is-selected", on);
           item.setAttribute("aria-pressed", String(on));
+          item.tabIndex = on ? 0 : -1;
         });
 
         previewIndex.textContent = button.dataset.index;
@@ -1587,6 +1603,16 @@ const variants = [
           if (nextId === "hover") setupHover(art);
         }
 
+        if (options.persist !== false) {
+          try {
+            localStorage.setItem(STORAGE_KEY, nextId);
+          } catch {
+            // ignore storage errors
+          }
+          if (location.hash !== `#${nextId}`) history.replaceState(null, "", `#${nextId}`);
+        }
+        if (options.focus) button.focus({ preventScroll: true });
+
         if (options.scroll) {
           previewSection.scrollIntoView({
             behavior: reducedMotion.matches ? "auto" : "smooth",
@@ -1595,11 +1621,32 @@ const variants = [
         }
       }
 
-      pickers.forEach((item) =>
-        item.addEventListener("click", () => selectTreatment(item.dataset.select)),
-      );
+      function movePick(event, item) {
+        const index = pickers.indexOf(item);
+        let next = index;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (index + 1) % pickers.length;
+        else if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (index - 1 + pickers.length) % pickers.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = pickers.length - 1;
+        else return;
+        event.preventDefault();
+        const target = pickers[next];
+        selectTreatment(target.dataset.select, { persist: true, focus: true });
+      }
 
-      selectTreatment("field");
+      pickers.forEach((item) => {
+        item.addEventListener("click", () => selectTreatment(item.dataset.select, { persist: true }));
+        item.addEventListener("keydown", (event) => movePick(event, item));
+      });
+
+      window.addEventListener("hashchange", () => {
+        const hash = location.hash.slice(1);
+        if (pickers.some((item) => item.dataset.select === hash)) {
+          selectTreatment(hash, { persist: false });
+        }
+      });
+
+      selectTreatment(readInitialTreatment(), { persist: false });
 
       class LineCard {
         constructor(card, canvas) {
