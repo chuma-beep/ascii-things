@@ -1,0 +1,76 @@
+---
+title: Scene console
+description: A copyable stage, palette tabs, command prompt, and live readout around a robot dog scene.
+---
+
+import CardPreview from "@components/CardPreview.astro";
+import SceneConsolePreview from "@components/SceneConsolePreview";
+
+A complete scene console built from the first-party UI primitives. The tabs switch the palette,
+the stage frames the canvas and the HUD, the readout reports live state, and the prompt is a
+controlled command loop with a polite status line.
+
+<CardPreview title="Scene console" description="ascii-things/ui · robot dog" badge="interactive">
+  <SceneConsolePreview client:visible />
+</CardPreview>
+
+## Installation
+
+```sh
+npx shadcn@latest add https://ascii-things-docs.pages.dev/r/scene-console.json
+```
+
+This adds `components/scene-console.tsx` and installs `ascii-things`.
+
+Import the stylesheet once in your app shell or root layout:
+
+```tsx
+import "ascii-things/ui.css";
+```
+
+## Usage
+
+```tsx
+import { SceneConsole } from "@/components/scene-console";
+
+export function Yard() {
+  return <SceneConsole />;
+}
+```
+
+## Composition
+
+The component is four primitives in a column. Each one is controlled by local state, so you can
+replace any piece without touching the engine:
+
+```tsx
+<AsciiSceneTabs
+  scenes={PALETTES}
+  value={palette}
+  onChange={(id) => setPalette(id as Palette)}
+  ariaLabel="Scene palette"
+/>
+
+<AsciiStage
+  label="ROBOT DOG / TEST YARD"
+  status="LIVE"
+  footer={<AsciiReadout items={readout} />}
+>
+  <AsciiDog palette={palette} seed={7} count={1} />
+</AsciiStage>
+
+<AsciiPrompt
+  label="Command the unit"
+  status={status}
+  onSubmit={handleCommand}
+/>
+```
+
+`AsciiStage` owns the aspect ratio and the HUD. `AsciiReadout` takes a flat `items` array and a
+`columns` count. `AsciiPrompt` is uncontrolled until you pass `value`; Enter submits, clears, and
+returns focus.
+
+## Source
+
+- [scene-console.tsx](https://github.com/chuma-beep/ascii-things/blob/main/registry/scene-console.tsx)
+- [UI components guide](/guide/ui-components/)

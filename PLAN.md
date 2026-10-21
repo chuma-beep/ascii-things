@@ -4,6 +4,21 @@
 
 Baseline: `main` at `272be46`, package `ascii-things@0.4.0`, four scenes (sharks, robots, jellyfish, robot dog), 18 tests passing, MIT, published source on GitHub, not yet on npm.
 
+> **Status update · 21 Oct 2026.** This document is the historical build plan, not the current
+> task list. The package is now `ascii-things@1.0.0-rc.0` on `main`; the public surface is frozen,
+> the docs site and examples are shipped, and the package gates are green. See
+> [ROADMAP.md](ROADMAP.md) and [MIGRATION.md](MIGRATION.md) for the current state. The only open
+> 1.0 gate is explicit approval of the version, changelog, and release notes.
+>
+> Shipped since this plan:
+>
+> - Ten scenes: sharks, robots, jellyfish, robot dog, starlings, fireflies, ants, koi, city, servers.
+> - Optional React UI layer, image-to-ASCII, dither, and WebGL surface entries.
+> - A Starlight docs site with guides, scene pages, a playground, and a Components section.
+> - Copyable shadcn registry items for cards, the ASCII box footer, and scene UI compositions.
+> - Biome, Vitest, Playwright, accessibility, reduced-motion, visual, performance, publint, attw,
+>   and size-limit gates.
+
 ---
 
 ## 1. Goal

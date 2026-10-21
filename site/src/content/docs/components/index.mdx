@@ -9,7 +9,9 @@ source into your project. The CLI writes the file where shadcn expects it and pu
 shadcn primitives the component uses.
 
 The scene wrappers stay ascii-things imports. The surrounding card, badge, and button belong
-to your design system.
+to your design system. The scene console and scene toolbar are different: they copy the
+first-party `ascii-things/ui` composition into your project, so you own the layout while the
+package supplies the primitives and stylesheet.
 
 ## Install one
 
@@ -28,9 +30,19 @@ that already has `components.json`.
 | [Koi card](/components/koi-card/) | [`koi-card.json`](/r/koi-card.json) | `components/koi-card.tsx` |
 | [Dither card](/components/dither-card/) | [`dither-card.json`](/r/dither-card.json) | `components/dither-card.tsx` |
 | [Surface card](/components/surface-card/) | [`surface-card.json`](/r/surface-card.json) | `components/surface-card.tsx` |
+| [Scene console](/components/scene-console/) | [`scene-console.json`](/r/scene-console.json) | `components/scene-console.tsx` |
+| [Scene toolbar](/components/scene-toolbar/) | [`scene-toolbar.json`](/r/scene-toolbar.json) | `components/scene-toolbar.tsx` |
 
 The registry index is at
 [`/r/registry.json`](https://ascii-things-docs.pages.dev/r/registry.json).
+
+## Primitives
+
+The package primitives themselves — `AsciiStage`, `AsciiPrompt`, `AsciiReadout`,
+`AsciiSceneTabs`, `AsciiPanel`, `AsciiToolbar`, `AsciiToggle`, `AsciiButton`,
+`AsciiStatus`, and `AsciiDivider` — are documented in the
+[UI components guide](/guide/ui-components/). The scene console and scene toolbar are the
+copyable compositions built from them.
 
 ## Copy by hand
 

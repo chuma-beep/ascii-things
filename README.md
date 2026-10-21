@@ -381,7 +381,10 @@ framework-light React, so they work beside shadcn: keep shadcn `Input`/`Button`
 for page chrome, or put your own controls over `AsciiStage` and use only the
 scene beneath.
 
-See the [UI example](examples/ui/) for the full composition.
+See the [UI example](examples/ui/) for the full composition. The
+[scene console](https://ascii-things-docs.pages.dev/components/scene-console/) and
+[scene toolbar](https://ascii-things-docs.pages.dev/components/scene-toolbar/)
+registry items show the same primitives as copyable source.
 
 ## Image to ASCII
 
@@ -683,7 +686,8 @@ handle.
 - [Design system recipes](https://ascii-things-docs.pages.dev/guide/design-systems/) —
   shadcn/ui, Material UI, Tailwind, and custom-element integration patterns.
 - [Components](https://ascii-things-docs.pages.dev/components/) — copyable shadcn
-  registry items for an ASCII box footer, koi card, dither card, and surface card.
+  registry items for an ASCII box footer, koi card, dither card, surface card,
+  scene console, and scene toolbar.
 - [Image to ASCII](examples/image/) — drag-and-drop portrait conversion with
   charset, contrast, dithering, colour, copy, and download.
 - [Dither field](examples/dither/) — an ordered-dither wordmark with live matrix,

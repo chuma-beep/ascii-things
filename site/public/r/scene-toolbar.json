@@ -1,0 +1,16 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scene-toolbar",
+  "type": "registry:component",
+  "title": "Scene toolbar",
+  "description": "A panel, toolbar, toggle, buttons, divider, and live status row for scene controls.",
+  "dependencies": ["ascii-things"],
+  "files": [
+    {
+      "path": "registry/scene-toolbar.tsx",
+      "type": "registry:component",
+      "target": "components/scene-toolbar.tsx",
+      "content": "\"use client\";\n\nimport { useState } from \"react\";\nimport {\n  AsciiButton,\n  AsciiDivider,\n  AsciiPanel,\n  AsciiStatus,\n  AsciiToggle,\n  AsciiToolbar,\n} from \"ascii-things/ui\";\n\nexport function SceneToolbar() {\n  const [calm, setCalm] = useState(false);\n  const [lastAction, setLastAction] = useState(\"Ready\");\n\n  const act = (label: string, nextCalm: boolean) => {\n    setCalm(nextCalm);\n    setLastAction(label);\n  };\n\n  return (\n    <AsciiPanel\n      eyebrow=\"Control surface\"\n      heading=\"Calm the yard.\"\n      actions={\n        <AsciiStatus\n          label=\"Mode\"\n          value={calm ? \"CALM\" : \"LIVE\"}\n          tone={calm ? \"neutral\" : \"success\"}\n          pulse={!calm}\n          live\n        />\n      }\n      footer={`Last action · ${lastAction}`}\n    >\n      <AsciiToolbar label=\"Scene controls\">\n        <AsciiToggle\n          checked={calm}\n          onCheckedChange={(checked) => act(checked ? \"Calm mode\" : \"Live mode\", checked)}\n          label=\"Calm mode\"\n          hint=\"Settles the scene\"\n        />\n        <AsciiDivider orientation=\"vertical\" />\n        <AsciiButton variant=\"solid\" onClick={() => act(\"Wake\", false)}>\n          Wake\n        </AsciiButton>\n        <AsciiButton variant=\"ghost\" onClick={() => act(\"Settle\", true)}>\n          Settle\n        </AsciiButton>\n        <AsciiButton variant=\"quiet\" onClick={() => act(\"Reset\", false)}>\n          Reset\n        </AsciiButton>\n      </AsciiToolbar>\n\n      <AsciiDivider label=\"State\" />\n\n      <div className=\"flex flex-wrap gap-3\">\n        <AsciiStatus label=\"Scene\" value=\"Robot dog\" tone=\"accent\" />\n        <AsciiStatus\n          label=\"Motion\"\n          value={calm ? \"Settled\" : \"Running\"}\n          tone={calm ? \"neutral\" : \"success\"}\n          pulse={!calm}\n          live\n        />\n      </div>\n    </AsciiPanel>\n  );\n}\n"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scene-console",
+  "type": "registry:component",
+  "title": "Scene console",
+  "description": "A stage, palette tabs, command prompt, and live readout around a robot dog scene.",
+  "dependencies": ["ascii-things"],
+  "files": [
+    {
+      "path": "registry/scene-console.tsx",
+      "type": "registry:component",
+      "target": "components/scene-console.tsx",
+      "content": "\"use client\";\n\nimport { useState, type CSSProperties } from \"react\";\nimport { AsciiDog } from \"ascii-things/react\";\nimport { AsciiPrompt, AsciiReadout, AsciiSceneTabs, AsciiStage } from \"ascii-things/ui\";\n\ntype Palette = \"abyss\" | \"neon\" | \"mono\" | \"paper\";\n\nconst PALETTES: Array<{ id: Palette; label: string; meta: string }> = [\n  { id: \"abyss\", label: \"Abyss\", meta: \"night\" },\n  { id: \"paper\", label: \"Paper\", meta: \"day\" },\n  { id: \"neon\", label: \"Neon\", meta: \"loud\" },\n  { id: \"mono\", label: \"Mono\", meta: \"quiet\" },\n];\n\nexport function SceneConsole() {\n  const [palette, setPalette] = useState<Palette>(\"abyss\");\n  const [command, setCommand] = useState(\"Awaiting command\");\n  const [status, setStatus] = useState(\"READY\");\n  const stageStyle =\n    palette === \"paper\"\n      ? ({\n          \"--ascii-bg\": \"#ece8df\",\n          \"--ascii-panel\": \"#f6f2ea\",\n          \"--ascii-ink\": \"#101112\",\n          \"--ascii-muted\": \"rgba(16, 17, 18, 0.66)\",\n          \"--ascii-faint\": \"rgba(16, 17, 18, 0.52)\",\n          \"--ascii-line\": \"rgba(16, 17, 18, 0.18)\",\n          \"--ascii-line-soft\": \"rgba(16, 17, 18, 0.1)\",\n          \"--ascii-accent\": \"#c2410c\",\n          \"--ascii-accent-soft\": \"rgba(194, 65, 12, 0.14)\",\n        } as CSSProperties)\n      : undefined;\n\n  return (\n    <div className=\"grid gap-4\">\n      <AsciiSceneTabs\n        scenes={PALETTES}\n        value={palette}\n        onChange={(id) => setPalette(id as Palette)}\n        ariaLabel=\"Scene palette\"\n      />\n\n      <AsciiStage\n        label=\"ROBOT DOG / TEST YARD\"\n        status=\"LIVE\"\n        aspectRatio=\"16 / 10\"\n        style={stageStyle}\n        footer={\n          <AsciiReadout\n            ariaLabel=\"Scene metadata\"\n            items={[\n              { label: \"SCENE\", value: \"DOG\" },\n              { label: \"PALETTE\", value: palette.toUpperCase() },\n              { label: \"SEED\", value: \"07\" },\n              { label: \"COMMAND\", value: command.toUpperCase() },\n            ]}\n          />\n        }\n      >\n        <AsciiDog\n          palette={palette}\n          seed={7}\n          count={1}\n          dogs={[{ size: 1.1 }]}\n          spread={[0.55, 0.55]}\n          columns={120}\n          maxCells={12000}\n          label=\"A live ASCII robot dog in a test yard\"\n        />\n      </AsciiStage>\n\n      <AsciiPrompt\n        label=\"Command the unit\"\n        placeholder=\"Ask the dog to fetch…\"\n        actionLabel=\"Send\"\n        status={status}\n        hint=\"Enter submits · input clears · focus stays\"\n        onSubmit={(value) => {\n          setCommand(value);\n          setStatus(`QUEUED · ${value.toUpperCase()}`);\n        }}\n      />\n    </div>\n  );\n}\n"
+    }
+  ]
+}

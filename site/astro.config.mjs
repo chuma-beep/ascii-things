@@ -82,6 +82,8 @@ export default defineConfig({
             { label: "Koi card", link: "components/koi-card/" },
             { label: "Dither card", link: "components/dither-card/" },
             { label: "Surface card", link: "components/surface-card/" },
+            { label: "Scene console", link: "components/scene-console/" },
+            { label: "Scene toolbar", link: "components/scene-toolbar/" },
           ],
         },
         {

@@ -1,0 +1,78 @@
+---
+title: Scene toolbar
+description: A copyable panel, toolbar, toggle, buttons, divider, and live status row.
+---
+
+import CardPreview from "@components/CardPreview.astro";
+import SceneToolbarPreview from "@components/SceneToolbarPreview";
+
+A control surface assembled from the first-party primitives. The panel supplies the header,
+body, and footer; the toolbar groups the controls; the toggle and buttons share one state; the
+status row reports what changed.
+
+<CardPreview title="Scene toolbar" description="ascii-things/ui · controls" badge="interactive">
+  <SceneToolbarPreview client:visible />
+</CardPreview>
+
+## Installation
+
+```sh
+npx shadcn@latest add https://ascii-things-docs.pages.dev/r/scene-toolbar.json
+```
+
+This adds `components/scene-toolbar.tsx` and installs `ascii-things`.
+
+Import the stylesheet once in your app shell or root layout:
+
+```tsx
+import "ascii-things/ui.css";
+```
+
+## Usage
+
+```tsx
+import { SceneToolbar } from "@/components/scene-toolbar";
+
+export function Controls() {
+  return <SceneToolbar />;
+}
+```
+
+## Composition
+
+The toolbar is an accessible `role="toolbar"` container. The toggle is a `role="switch"` button,
+not a checkbox, so it keeps the same keyboard behavior as the rest of the controls:
+
+```tsx
+<AsciiPanel
+  eyebrow="Control surface"
+  heading="Calm the yard."
+  actions={<AsciiStatus label="Mode" value={calm ? "CALM" : "LIVE"} />}
+>
+  <AsciiToolbar label="Scene controls">
+    <AsciiToggle
+      checked={calm}
+      onCheckedChange={setCalm}
+      label="Calm mode"
+      hint="Settles the scene"
+    />
+    <AsciiDivider orientation="vertical" />
+    <AsciiButton variant="solid" onClick={wake}>
+      Wake
+    </AsciiButton>
+    <AsciiButton variant="ghost" onClick={settle}>
+      Settle
+    </AsciiButton>
+  </AsciiToolbar>
+  <AsciiDivider label="State" />
+  <AsciiStatus label="Motion" value={calm ? "Settled" : "Running"} live />
+</AsciiPanel>
+```
+
+`AsciiButton` has `solid`, `ghost`, and `quiet` variants and `sm` / `md` sizes. `AsciiStatus`
+takes a `tone` (`neutral`, `accent`, `success`, `warning`) and an optional `pulse`.
+
+## Source
+
+- [scene-toolbar.tsx](https://github.com/chuma-beep/ascii-things/blob/main/registry/scene-toolbar.tsx)
+- [UI components guide](/guide/ui-components/)

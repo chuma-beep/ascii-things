@@ -881,7 +881,7 @@ button {
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: clamp(260px, 34vw, 420px);
+  min-height: clamp(300px, 36vw, 460px);
   padding: clamp(26px, 3.6vw, 48px) var(--pad) clamp(30px, 4vw, 56px);
   overflow: hidden;
   border-top: 1px solid var(--line-soft);
@@ -898,7 +898,7 @@ button {
   text-shadow: 0 1px 12px rgba(5, 6, 7, 0.95);
 }
 
-.footer-canvas {
+.footer-box {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -907,6 +907,41 @@ button {
   height: 100%;
   pointer-events: none;
   user-select: none;
+}
+
+.footer-art {
+  position: absolute;
+  bottom: clamp(6px, 1vw, 16px);
+  left: 50%;
+  z-index: 1;
+  width: max-content;
+  transform: translateX(-50%);
+  color: transparent;
+  font-family: var(--mono);
+  font-size: clamp(3.4rem, 11.5vw, 10rem);
+  font-weight: 700;
+  line-height: 0.72;
+  letter-spacing: -0.08em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 122, 26, 0.62) 0%,
+    rgba(255, 122, 26, 0.24) 58%,
+    rgba(255, 122, 26, 0.08) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-stroke: 1px rgba(255, 122, 26, 0.55);
+  filter: drop-shadow(0 0 42px rgba(255, 122, 26, 0.16));
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .footer-art {
+    color: rgba(255, 122, 26, 0.18);
+    -webkit-text-stroke: 0;
+  }
 }
 
 .footer-top {

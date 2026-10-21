@@ -60,6 +60,34 @@
           "target": "components/surface-card.tsx"
         }
       ]
+    },
+    {
+      "name": "scene-console",
+      "type": "registry:component",
+      "title": "Scene console",
+      "description": "A stage, palette tabs, command prompt, and live readout around a robot dog scene.",
+      "dependencies": ["ascii-things"],
+      "files": [
+        {
+          "path": "registry/scene-console.tsx",
+          "type": "registry:component",
+          "target": "components/scene-console.tsx"
+        }
+      ]
+    },
+    {
+      "name": "scene-toolbar",
+      "type": "registry:component",
+      "title": "Scene toolbar",
+      "description": "A panel, toolbar, toggle, buttons, divider, and live status row for scene controls.",
+      "dependencies": ["ascii-things"],
+      "files": [
+        {
+          "path": "registry/scene-toolbar.tsx",
+          "type": "registry:component",
+          "target": "components/scene-toolbar.tsx"
+        }
+      ]
     }
   ]
 }
