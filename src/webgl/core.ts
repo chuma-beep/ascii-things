@@ -11,7 +11,9 @@ export type SurfaceVariant =
   | "voronoi"
   | "plasma"
   | "caustics"
-  | "constellation";
+  | "constellation"
+  | "torus-3d"
+  | "cube-3d";
 
 const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   field: 0,
@@ -27,6 +29,8 @@ const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   plasma: 10,
   caustics: 11,
   constellation: 12,
+  "torus-3d": 13,
+  "cube-3d": 14,
 };
 
 export type AsciiSurfaceOptions = {
@@ -95,6 +99,30 @@ uniform float u_variant;
 
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+
+float sdTorus3(vec3 p, vec2 t) {
+  vec2 q = vec2(length(p.xz) - t.x, p.y);
+  return length(q) - t.y;
+}
+
+float sdRoundBox(vec3 p, vec3 b, float r) {
+  vec3 q = abs(p) - b + r;
+  return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0) - r;
+}
+
+float objectSDF(vec3 p) {
+  float ca = cos(u_time * 0.35);
+  float sa = sin(u_time * 0.35);
+  p.xz = mat2(ca, -sa, sa, ca) * p.xz;
+  float cb = cos(u_time * 0.22);
+  float sb = sin(u_time * 0.22);
+  p.xy = mat2(cb, -sb, sb, cb) * p.xy;
+  if (u_variant > 13.5) {
+    return sdRoundBox(p, vec3(0.52), 0.06);
+  }
+  return sdTorus3(p, vec2(0.62, 0.22));
 }
 
 void main() {
@@ -254,7 +282,7 @@ void main() {
       + sin(p.y * 12.0 + cos(p.x * 6.0 - u_time * 0.5) * 2.0);
     level = smoothstep(0.75, 1.1, v);
     weight = 1.0;
-  } else {
+  } else if (u_variant < 12.5) {
     // Constellation: layered stars and a sparse linked star map.
     vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
     float band = exp(-pow((p.y + p.x * 0.35 - 0.05) * 2.8, 2.0));
@@ -283,6 +311,37 @@ void main() {
       }
     }
     level = max(max(star, dust * 0.55), max(link * 0.55, band * 0.1));
+    weight = 1.0;
+  } else {
+    // Solid 3D object: raymarched torus or cube with real depth.
+    vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
+    vec3 ro = vec3(0.0, 0.0, 2.8);
+    vec3 rd = normalize(vec3(p * 0.9, -2.4));
+    float t = 0.0;
+    float hit = 0.0;
+    vec3 pos = ro;
+    for (int i = 0; i < 64; i++) {
+      pos = ro + rd * t;
+      float d = objectSDF(pos);
+      if (d < 0.002) { hit = 1.0; break; }
+      t += d;
+      if (t > 6.0) break;
+    }
+    float starField = step(0.995, hash(grid)) * (0.3 + 0.5 * sin(u_time * 1.5 + hash(grid) * 6.283));
+    if (hit > 0.5) {
+      float e = 0.008;
+      vec3 n = normalize(vec3(
+        objectSDF(pos + vec3(e, 0.0, 0.0)) - objectSDF(pos - vec3(e, 0.0, 0.0)),
+        objectSDF(pos + vec3(0.0, e, 0.0)) - objectSDF(pos - vec3(0.0, e, 0.0)),
+        objectSDF(pos + vec3(0.0, 0.0, e)) - objectSDF(pos - vec3(0.0, 0.0, e))
+      ));
+      vec3 lightDir = normalize(vec3(-0.45, 0.75, 0.65));
+      float diffuse = max(dot(n, lightDir), 0.0);
+      float rim = pow(1.0 - max(dot(n, normalize(-rd)), 0.0), 2.5);
+      level = 0.18 + 0.72 * diffuse + 0.45 * rim;
+    } else {
+      level = starField;
+    }
     weight = 1.0;
   }
 

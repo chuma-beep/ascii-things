@@ -91,6 +91,7 @@ export default defineConfig({
           items: [
             { label: "WebGL Lab", link: "webgl/" },
             { label: "More WebGL", link: "webgl/more/" },
+            { label: "3D Objects", link: "webgl/3d/" },
           ],
         },
         {
