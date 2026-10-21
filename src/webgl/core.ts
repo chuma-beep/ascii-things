@@ -255,13 +255,34 @@ void main() {
     level = smoothstep(0.75, 1.1, v);
     weight = 1.0;
   } else {
-    // Constellation: a starfield stitched with faint links.
+    // Constellation: layered stars and a sparse linked star map.
     vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
-    float stars = step(0.988, hash(grid));
-    float twinkle = 0.6 + 0.4 * sin(u_time * 2.0 + hash(grid) * 6.283);
-    float lx = 1.0 - smoothstep(0.0, 0.012, abs(fract(p.x * 6.0) - 0.5));
-    float ly = 1.0 - smoothstep(0.0, 0.012, abs(fract(p.y * 6.0) - 0.5));
-    level = max(stars * twinkle, (lx + ly) * 0.06);
+    float band = exp(-pow((p.y + p.x * 0.35 - 0.05) * 2.8, 2.0));
+    vec2 starGrid = floor(frag / (u_cell * 3.0));
+    vec2 starLocal = fract(frag / (u_cell * 3.0)) - 0.5;
+    vec2 starJitter = vec2(hash(starGrid), hash(starGrid + 17.0)) - 0.5;
+    float starDistance = length(starLocal - starJitter * 0.6);
+    float starCore = 1.0 - smoothstep(0.0, 0.38, starDistance);
+    float starBright = step(0.82, hash(starGrid + 5.0));
+    float starTwinkle = 0.55 + 0.45 * sin(u_time * (1.2 + hash(starGrid) * 2.0) + hash(starGrid) * 6.283);
+    float star = starBright * starCore * starTwinkle;
+    float dust = step(0.982, hash(grid)) * (0.4 + 0.6 * sin(u_time * 1.7 + hash(grid) * 6.283));
+    float link = 0.0;
+    for (int y = -1; y <= 1; y++) {
+      for (int x = -1; x <= 1; x++) {
+        vec2 g = starGrid + vec2(float(x), float(y));
+        if (hash(g + 5.0) > 0.82) {
+          vec2 a = (starGrid + 0.5 + (vec2(hash(starGrid), hash(starGrid + 17.0)) - 0.5) * 0.6) * 3.0 * u_cell;
+          vec2 b = (g + 0.5 + (vec2(hash(g), hash(g + 17.0)) - 0.5) * 0.6) * 3.0 * u_cell;
+          vec2 ab = b - a;
+          float len2 = max(dot(ab, ab), 0.001);
+          float h = clamp(dot(frag - a, ab) / len2, 0.0, 1.0);
+          float dist = length(frag - (a + ab * h));
+          link = max(link, (1.0 - smoothstep(0.0, 1.4, dist)) * (1.0 - h) * 0.35);
+        }
+      }
+    }
+    level = max(max(star, dust * 0.55), max(link * 0.55, band * 0.1));
     weight = 1.0;
   }
 
