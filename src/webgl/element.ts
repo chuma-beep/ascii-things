@@ -1,4 +1,4 @@
-import { AsciiSurfaceEngine, type AsciiSurfaceOptions } from "./core";
+import { AsciiSurfaceEngine, type AsciiSurfaceOptions, type SurfaceVariant } from "./core";
 
 const Base =
   typeof HTMLElement !== "undefined" ? HTMLElement : (class {} as unknown as typeof HTMLElement);
@@ -30,6 +30,7 @@ function optionsFrom(element: HTMLElement): AsciiSurfaceOptions {
     background: element.getAttribute("background") ?? undefined,
     fontFamily: element.getAttribute("font-family") ?? undefined,
     maxDpr: numberAttr(element, "max-dpr"),
+    variant: (element.getAttribute("variant") as SurfaceVariant | null) ?? undefined,
   };
 }
 
@@ -52,6 +53,7 @@ export class AsciiSurfaceElement extends Base {
     "background",
     "font-family",
     "max-dpr",
+    "variant",
     "label",
     "paused",
   ];

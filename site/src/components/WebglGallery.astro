@@ -1,0 +1,147 @@
+---
+import { AsciiSurface } from "ascii-things/webgl/react";
+
+const items = [
+  {
+    variant: "globe",
+    title: "Globe",
+    family: "Worlds",
+    description: "A rotating ASCII Earth with latitude, longitude, land and a moving light.",
+    code: '<AsciiSurface variant="globe" />',
+  },
+  {
+    variant: "ripple",
+    title: "Ripple pond",
+    family: "Water",
+    description: "Concentric rings and pointer ripples across a dark pond.",
+    code: '<AsciiSurface variant="ripple" pointer />',
+  },
+  {
+    variant: "flow",
+    title: "Flow field",
+    family: "Fields",
+    description: "Two travelling waves fold into each other and become a field of glyphs.",
+    code: '<AsciiSurface variant="flow" />',
+  },
+  {
+    variant: "tunnel",
+    title: "Tunnel",
+    family: "Space",
+    description: "A ring-and-spoke corridor that keeps collapsing toward the center.",
+    code: '<AsciiSurface variant="tunnel" />',
+  },
+  {
+    variant: "glyph-rain",
+    title: "Glyph rain",
+    family: "Signals",
+    description: "Columns of falling glyphs with independent heads and trails.",
+    code: '<AsciiSurface variant="glyph-rain" />',
+  },
+  {
+    variant: "torus",
+    title: "Torus",
+    family: "Objects",
+    description: "A woven ring that turns through the glyph grid.",
+    code: '<AsciiSurface variant="torus" />',
+  },
+] as const;
+---
+
+<div class="webgl-gallery">
+  {
+    items.map((item) => (
+      <article class="webgl-card">
+        <div class="webgl-card__preview">
+          <AsciiSurface
+            client:load
+            variant={item.variant}
+            text=""
+            density={0.3}
+            pointer={item.variant === "ripple"}
+            label={`${item.title} ASCII WebGL demo`}
+            style={{ height: "220px" }}
+          />
+        </div>
+        <div class="webgl-card__body">
+          <p class="webgl-card__family">{item.family}</p>
+          <h2>{item.title}</h2>
+          <p class="webgl-card__description">{item.description}</p>
+          <code>{item.code}</code>
+        </div>
+      </article>
+    ))
+  }
+</div>
+
+<style>
+  .webgl-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0 2.5rem;
+  }
+
+  .webgl-card {
+    overflow: hidden;
+    border: 1px solid rgba(236, 232, 223, 0.16);
+    background: #0b0d0f;
+  }
+
+  .webgl-card__preview {
+    height: 220px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(236, 232, 223, 0.1);
+    background: #050607;
+  }
+
+  .webgl-card__preview :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 220px !important;
+  }
+
+  .webgl-card__body {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  .webgl-card__family {
+    margin: 0 0 0.35rem;
+    color: #ff7a1a;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .webgl-card h2 {
+    margin: 0;
+    color: #ece8df;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .webgl-card__description {
+    min-height: 3.8em;
+    margin: 0.45rem 0 0.7rem;
+    color: rgba(236, 232, 223, 0.58);
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+
+  .webgl-card code {
+    color: rgba(236, 232, 223, 0.45);
+    font-size: 0.62rem;
+  }
+
+  @media (max-width: 72rem) {
+    .webgl-gallery {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 42rem) {
+    .webgl-gallery {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

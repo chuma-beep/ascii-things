@@ -1,3 +1,22 @@
+export type SurfaceVariant =
+  | "field"
+  | "globe"
+  | "ripple"
+  | "flow"
+  | "tunnel"
+  | "glyph-rain"
+  | "torus";
+
+const VARIANT_INDEX: Record<SurfaceVariant, number> = {
+  field: 0,
+  globe: 1,
+  ripple: 2,
+  flow: 3,
+  tunnel: 4,
+  "glyph-rain": 5,
+  torus: 6,
+};
+
 export type AsciiSurfaceOptions = {
   /** Wordmark or short line that emerges from the glyph field. */
   text?: string;
@@ -19,6 +38,8 @@ export type AsciiSurfaceOptions = {
   fontFamily?: string;
   /** Backing-store pixel ratio cap. */
   maxDpr?: number;
+  /** Visual preset. Defaults to "field". */
+  variant?: SurfaceVariant;
 };
 
 export const SURFACE_DEFAULTS = {
@@ -34,6 +55,7 @@ export const SURFACE_DEFAULTS = {
   background: "transparent",
   fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
   maxDpr: 2,
+  variant: "field",
 } satisfies Required<AsciiSurfaceOptions>;
 
 const VERTEX_SHADER = `attribute vec2 a_position;
@@ -57,6 +79,7 @@ uniform vec2 u_pointer;
 uniform float u_pointerStrength;
 uniform sampler2D u_atlas;
 uniform sampler2D u_mask;
+uniform float u_variant;
 
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -67,31 +90,114 @@ void main() {
   vec2 grid = floor(frag / u_cell);
   vec2 local = fract(frag / u_cell);
   vec2 cellUv = (grid + 0.5) * u_cell / u_resolution;
+  float pointer = (1.0 - smoothstep(0.0, 150.0, distance(frag, u_pointer))) * u_pointerStrength;
 
-  float mask = texture2D(u_mask, cellUv).r;
-  float wave = 0.5 + 0.5 * sin(cellUv.x * 13.0 + cellUv.y * 9.0 + u_time * 0.9);
-  float speck = step(hash(grid), 0.55);
-  float base = u_density * (0.5 + 0.8 * wave) * speck;
-  float pointer = 1.0 - smoothstep(0.0, 150.0, distance(frag, u_pointer));
-  pointer *= u_pointerStrength;
+  float mask = 0.0;
+  float level = 0.0;
+  float weight = 1.0;
 
-  float word = mask * (0.46 + 0.54 * wave);
-  float level = max(word, base);
-  level = min(1.0, level + pointer * 0.2);
+  if (u_variant < 0.5) {
+    // The original wordmark field: a drifting glyph surface with an
+    // emergent text mask and a slow scan band.
+    mask = texture2D(u_mask, cellUv).r;
+    float wave = 0.5 + 0.5 * sin(cellUv.x * 13.0 + cellUv.y * 9.0 + u_time * 0.9);
+    float speck = step(hash(grid), 0.55);
+    float base = u_density * (0.5 + 0.8 * wave) * speck;
+    float word = mask * (0.46 + 0.54 * wave);
+    level = min(1.0, max(word, base) + pointer * 0.2);
+    weight = step(0.08, mask);
+  } else if (u_variant < 1.5) {
+    // Globe: a rotating sphere with latitude/longitude lines, stylised
+    // continents, and a single soft key light.
+    vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
+    float r2 = dot(p, p);
+    if (r2 > 0.86 * 0.86) {
+      float star = step(0.992, hash(grid)) * (0.35 + 0.65 * (0.5 + 0.5 * sin(u_time * 1.5 + hash(grid) * 6.283)));
+      level = star * 0.45;
+    } else {
+      float z = sqrt(max(0.0, 1.0 - r2));
+      vec3 n = normalize(vec3(p.x, p.y, z));
+      float a = u_time * 0.22;
+      float x = n.x * cos(a) - n.z * sin(a);
+      float zz = n.x * sin(a) + n.z * cos(a);
+      float lat = asin(clamp(n.y, -1.0, 1.0));
+      float lon = atan(x, zz);
+      float latLine = 1.0 - smoothstep(0.018, 0.075, abs(fract(lat / 3.14159265 * 8.0) - 0.5));
+      float lonLine = 1.0 - smoothstep(0.018, 0.075, abs(fract(lon / 3.14159265 * 12.0) - 0.5));
+      float land = sin(lon * 2.0 + sin(lat * 3.0) * 1.4) + sin(lat * 4.0 + lon * 1.3) + 0.5 * sin(lon * 5.0 - lat * 2.0);
+      land = smoothstep(0.35, 0.75, land);
+      vec3 lightDir = normalize(vec3(-0.45, 0.65, 0.8));
+      float lit = 0.4 + 0.6 * clamp(dot(n, lightDir), 0.0, 1.0);
+      float lines = max(latLine, lonLine);
+      level = max(lines * 0.55, land * 0.95) * lit;
+      weight = 1.0;
+    }
+  } else if (u_variant < 2.5) {
+    // Ripple pond: a wide concentric wave with a stronger ring where the
+    // pointer disturbed the surface.
+    vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
+    float d = length(p);
+    float ring = 0.5 + 0.5 * sin(d * 18.0 - u_time * 3.0);
+    float ripple = smoothstep(0.72, 0.95, ring) * smoothstep(1.05, 0.2, d);
+    vec2 pp = (u_pointer - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
+    float pd = length(p - pp);
+    float pRing = 0.5 + 0.5 * sin(pd * 20.0 - u_time * 4.0);
+    float pRipple = smoothstep(0.75, 0.95, pRing) * smoothstep(0.65, 0.0, pd) * u_pointerStrength;
+    level = max(ripple * 0.75, pRipple);
+    weight = 1.0;
+  } else if (u_variant < 3.5) {
+    // Flow field: two crossed travelling waves make a soft vector field.
+    vec2 p = frag / u_resolution;
+    float n = sin(p.x * 8.0 + sin(p.y * 6.0 + u_time * 0.7) * 2.0) + sin(p.y * 10.0 + cos(p.x * 7.0 - u_time * 0.5) * 2.0);
+    n = 0.5 + 0.5 * sin(n * 2.0 + u_time);
+    float line = smoothstep(0.72, 0.94, n);
+    level = line * 0.8;
+    weight = 1.0;
+  } else if (u_variant < 4.5) {
+    // Tunnel: concentric rings and spokes rushing toward a vanishing point.
+    vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y);
+    float r = length(p);
+    float a = atan(p.y, p.x);
+    float depth = 0.36 / max(r, 0.001);
+    float rings = 0.5 + 0.5 * sin(depth * 7.0 - u_time * 3.0);
+    float spokes = 0.5 + 0.5 * sin(a * 12.0 + depth * 0.6);
+    float v = max(rings, spokes);
+    level = smoothstep(0.62, 0.94, v) * smoothstep(0.0, 0.22, r) * smoothstep(1.0, 0.15, r);
+    weight = 1.0;
+  } else if (u_variant < 5.5) {
+    // Glyph rain: one falling head per column, with a fading tail.
+    float column = grid.x;
+    float speed = 0.5 + hash(vec2(column, 0.0)) * 1.4;
+    float head = fract(u_time * 0.16 * speed + hash(vec2(column, 1.0)));
+    float rowNorm = 1.0 - grid.y / max(1.0, u_resolution.y / u_cell.y);
+    float trail = smoothstep(0.0, 0.55, head - rowNorm);
+    float flicker = 0.65 + 0.35 * sin(u_time * 4.0 + column);
+    level = trail * flicker;
+    weight = 1.0;
+  } else {
+    // Torus: a ring with a woven surface, drawn as a single flat primitive.
+    vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
+    float r = length(p);
+    float a = atan(p.y, p.x);
+    float ring = 1.0 - smoothstep(0.045, 0.11, abs(r - 0.58));
+    float weave = 0.5 + 0.5 * sin(a * 16.0 + u_time * 1.6 + r * 9.0);
+    level = max(ring * 0.8, weave * 0.35) * (0.6 + 0.4 * sin(u_time * 1.4 + a * 3.0));
+    weight = 1.0;
+  }
+
+  level = max(level, pointer * 0.18);
   if (level < 0.012) discard;
 
-  float index = floor(clamp(level, 0.0, 0.999) * u_glyphCount);
-  index = min(index, u_glyphCount - 1.0);
+  float index = min(floor(clamp(level, 0.0, 0.999) * u_glyphCount), u_glyphCount - 1.0);
   float localX = clamp(local.x, 0.015, 0.985);
   vec2 glyphUv = vec2((index + localX) / u_glyphCount, local.y);
   float glyph = texture2D(u_atlas, glyphUv).a;
   if (glyph < 0.04) discard;
 
   float scan = u_scan * (1.0 - smoothstep(0.0, u_scanRadius, abs(frag.x - u_scanX)));
-  float weight = step(0.08, mask);
-  float alpha = glyph * mix(0.38, 1.0, max(weight, pointer * 0.75));
-  alpha *= mix(u_foreground.a, u_accent.a, max(scan, pointer * 0.55));
-  vec3 color = mix(u_foreground.rgb, u_accent.rgb, max(scan, pointer * 0.55));
+  float accentMix = max(scan, pointer * 0.55);
+  float alpha = glyph * mix(0.38, 1.0, max(weight, pointer * 0.75)) * mix(u_foreground.a, u_accent.a, accentMix);
+  vec3 color = mix(u_foreground.rgb, u_accent.rgb, accentMix);
   gl_FragColor = vec4(color, alpha);
 }`;
 
@@ -367,6 +473,7 @@ export class AsciiSurfaceEngine {
       "u_accent",
       "u_pointer",
       "u_pointerStrength",
+      "u_variant",
       "u_atlas",
       "u_mask",
     ]) {
@@ -607,6 +714,7 @@ export class AsciiSurfaceEngine {
     const gl = this.gl;
     if (!gl || !this.program || !this.atlasTexture || !this.maskTexture) return;
     const { speed, scan, density, foreground, accent, pointer } = this.options;
+    const variantIndex = VARIANT_INDEX[this.options.variant] ?? 0;
     const seconds = (time / 1000) * speed;
     const cellWidth = this.cell.width * this.dpr;
     const cellHeight = this.cell.height * this.dpr;
@@ -644,6 +752,7 @@ export class AsciiSurfaceEngine {
     gl.uniform4f(this.uniforms.u_accent, ar, ag, ab, aa);
     gl.uniform2f(this.uniforms.u_pointer, pointerX, pointerY);
     gl.uniform1f(this.uniforms.u_pointerStrength, pointerOn ? 1 : 0);
+    gl.uniform1f(this.uniforms.u_variant, variantIndex);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.atlasTexture);

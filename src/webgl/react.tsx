@@ -36,6 +36,7 @@ export function AsciiSurface({
   background,
   fontFamily,
   maxDpr,
+  variant,
 }: AsciiSurfaceProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -55,6 +56,7 @@ export function AsciiSurface({
       background,
       fontFamily,
       maxDpr,
+      variant,
     });
     canvas.dataset.renderer = engine.renderer;
     engine.setPaused(paused);
@@ -72,6 +74,7 @@ export function AsciiSurface({
     background,
     fontFamily,
     maxDpr,
+    variant,
     paused,
   ]);
 

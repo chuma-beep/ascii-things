@@ -1,0 +1,37 @@
+---
+title: WebGL Lab
+description: Live ASCII WebGL elements built on ascii-things/webgl.
+---
+
+import WebglGallery from "@components/WebglGallery.astro";
+
+`ascii-things/webgl` is no longer one surface. The same engine now ships a family
+of glyph-rendered scenes: a rotating globe, water rings, a flow field, a tunnel,
+falling code, and a woven torus. Each runs on the GPU, falls back to a 2D glyph
+field, and respects reduced motion and page visibility.
+
+<WebglGallery />
+
+## Use one
+
+Every variant is the same component with a different `variant`:
+
+```tsx
+import { AsciiSurface } from "ascii-things/webgl/react";
+
+export function Globe() {
+  return <AsciiSurface variant="globe" text="" style={{ height: 360 }} />;
+}
+```
+
+The custom element uses the same name as an attribute:
+
+```html
+<ascii-surface variant="ripple" text=""></ascii-surface>
+```
+
+## Next
+
+The first six variants are the start. Terrain, galaxy, voronoi, plasma,
+caustics, and constellation are next, then a searchable WebGL library with
+install commands and reduced-motion stills.
