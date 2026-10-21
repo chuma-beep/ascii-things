@@ -35,6 +35,40 @@ const vanillaSnippet = `<span class="tok-key">import</span> { createDog } <span 
 });
 
 scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="tok-num">0.55</span>, canvas.clientHeight * <span class="tok-num">0.5</span>);`;
+
+const footerGlyphs: Record<string, string[]> = {
+  A: [" ### ", "#   #", "#####", "#   #", "#   #"],
+  S: [" ####", "#    ", " ### ", "    #", "#### "],
+  C: [" ####", "#    ", "#    ", "#    ", " ####"],
+  I: ["#####", "  #  ", "  #  ", "  #  ", "#####"],
+  T: ["#####", "  #  ", "  #  ", "  #  ", "  #  "],
+  H: ["#   #", "#   #", "#####", "#   #", "#   #"],
+  N: ["#   #", "##  #", "# # #", "#  ##", "#   #"],
+  G: [" ####", "#    ", "# ###", "#   #", " ####"],
+  "-": ["     ", "     ", " ### ", "     ", "     "],
+};
+
+const footerWord = "ASCII-THINGS";
+const footerRows = Array.from({ length: 5 }, (_, row) =>
+  [...footerWord].map((char) => footerGlyphs[char]?.[row] ?? "     ").join(" "),
+);
+
+let footerCellIndex = 0;
+let footerHasOrigin = false;
+const footerArt = footerRows
+  .map((row) => {
+    const cells = [...row]
+      .map((char) => {
+        if (char !== "#") return " ";
+        const index = footerCellIndex++;
+        const origin = !footerHasOrigin;
+        footerHasOrigin = true;
+        return `<span class="footer-ascii-cell${origin ? " footer-ascii-origin" : ""}" style="--i:${index}">█</span>`;
+      })
+      .join("");
+    return `<span class="footer-ascii-line">${cells}</span>`;
+  })
+  .join("");
 ---
 
 <!doctype html>
@@ -464,10 +498,13 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
     </main>
 
     <footer class="site-footer">
+      <div class="footer-art" aria-hidden="true" set:html={footerArt}></div>
       <div class="footer-content">
         <div class="footer-top">
           <a class="footer-brand" href="#top">ascii-things<span>®</span></a>
-          <p class="footer-credit">Living ASCII for the web. Built from the original ascii-sharks.</p>
+          <p class="footer-credit">
+            Living ASCII for the web. Built from the original <span class="footer-credit-keep">ascii-sharks.</span>
+          </p>
         </div>
         <div class="footer-links">
           <a href="/guide/">Docs ↗</a>
@@ -477,7 +514,6 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
           <a href="https://github.com/chuma-beep/ascii-things/blob/main/LICENSE">MIT</a>
         </div>
       </div>
-      <div class="footer-art" aria-hidden="true">ASCII-THINGS</div>
     </footer>
 
     <script>

@@ -881,8 +881,7 @@ button {
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: clamp(420px, 42vw, 680px);
-  padding: clamp(34px, 4vw, 56px) var(--pad) clamp(24px, 3vw, 40px);
+  padding: clamp(30px, 4vw, 56px) var(--pad) clamp(24px, 3vw, 40px);
   overflow: hidden;
   border-top: 1px solid var(--line-soft);
   background:
@@ -896,37 +895,61 @@ button {
 }
 
 .footer-art {
-  position: absolute;
-  bottom: clamp(8px, 1.2vw, 22px);
-  left: 50%;
-  z-index: 1;
-  width: max-content;
-  transform: translateX(-50%);
-  color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto clamp(30px, 4.5vw, 54px);
+  padding-bottom: clamp(26px, 3.5vw, 44px);
+  border-bottom: 1px solid var(--line-soft);
+  color: rgba(236, 232, 223, 0.2);
   font-family: var(--mono);
-  font-size: clamp(3.8rem, 13.2vw, 15rem);
+  font-size: clamp(5.9px, 1.8vw, 26px);
   font-weight: 700;
-  line-height: 0.72;
-  letter-spacing: -0.08em;
+  line-height: 0.86;
+  letter-spacing: 0;
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 122, 26, 0.62) 0%,
-    rgba(255, 122, 26, 0.24) 58%,
-    rgba(255, 122, 26, 0.08) 100%
-  );
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-stroke: 1px rgba(255, 122, 26, 0.55);
-  filter: drop-shadow(0 0 42px rgba(255, 122, 26, 0.16));
+  filter: drop-shadow(0 0 24px rgba(255, 122, 26, 0.08));
 }
 
-@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
-  .footer-art {
-    color: rgba(255, 122, 26, 0.18);
-    -webkit-text-stroke: 0;
+.footer-ascii-line {
+  display: block;
+  white-space: pre;
+}
+
+.footer-ascii-cell {
+  color: inherit;
+  animation: footer-cell-scan 7.5s linear infinite;
+  animation-delay: calc(var(--i) * -0.052s);
+}
+
+.footer-ascii-origin {
+  color: var(--orange);
+}
+
+@keyframes footer-cell-scan {
+  0%,
+  93%,
+  100% {
+    color: rgba(236, 232, 223, 0.2);
+  }
+
+  94%,
+  96% {
+    color: var(--orange);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-ascii-cell {
+    animation: none;
+    color: rgba(236, 232, 223, 0.2);
+  }
+
+  .footer-ascii-cell.footer-ascii-origin {
+    color: var(--orange);
   }
 }
 
@@ -955,6 +978,10 @@ button {
   font-size: 8px;
   letter-spacing: 0.08em;
   text-align: right;
+}
+
+.footer-credit-keep {
+  white-space: nowrap;
 }
 
 .footer-links {
