@@ -174,6 +174,201 @@ const variants = [
         font-weight: 500;
       }
 
+      .preview {
+        margin-top: 28px;
+        padding: 20px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+      }
+
+      .preview-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 16px;
+      }
+
+      .preview-head h2 {
+        margin: 4px 0 0;
+        font-size: 18px;
+        letter-spacing: -0.03em;
+      }
+
+      .picker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .pick {
+        appearance: none;
+        min-width: 32px;
+        height: 28px;
+        padding: 0 8px;
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        font-size: 9px;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+      }
+
+      .pick:hover {
+        color: var(--ink);
+        border-color: #4a4a4a;
+      }
+
+      .pick.is-selected {
+        color: var(--orange);
+        border-color: var(--orange);
+        background: rgba(255, 122, 26, 0.08);
+      }
+
+      .pick:focus-visible {
+        outline: 1px solid var(--orange);
+        outline-offset: 2px;
+      }
+
+      .preview-frame {
+        position: relative;
+        border: 1px solid var(--line);
+        background: #050607;
+        overflow: hidden;
+      }
+
+      .preview-media {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 170px;
+        padding: 24px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .preview-media .art {
+        font-size: clamp(6px, 1.5vw, 24px);
+      }
+
+      .preview-media .v-stack {
+        font-size: clamp(9px, 2.2vw, 34px);
+      }
+
+      .preview-media .dither-canvas {
+        height: 150px;
+      }
+
+      .preview-frame.is-field {
+        min-height: 340px;
+      }
+
+      .preview-frame.is-field .preview-media {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        padding: 0;
+        min-height: 0;
+        border: 0;
+      }
+
+      .preview-frame.is-field .preview-media .field-canvas {
+        height: 100%;
+      }
+
+      .preview-frame.is-field .preview-media .stage--field {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+      }
+
+      .preview-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        padding: 20px;
+      }
+
+      .preview-frame.is-field .preview-content {
+        text-shadow: 0 1px 12px rgba(5, 6, 7, 0.95);
+      }
+
+      .preview-top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .preview-brand {
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .preview-brand span {
+        color: var(--orange);
+        font-size: 7px;
+        vertical-align: super;
+      }
+
+      .preview-credit {
+        max-width: 460px;
+        color: var(--muted);
+        font-size: 9px;
+        line-height: 1.6;
+        text-align: right;
+      }
+
+      .preview-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        color: var(--muted);
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .preview-links .preview-live {
+        margin-left: auto;
+        color: var(--orange);
+      }
+
+      .preview-note {
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 9px;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 720px) {
+        .preview-head {
+          display: block;
+        }
+
+        .picker {
+          margin-top: 14px;
+        }
+
+        .preview-top {
+          display: block;
+        }
+
+        .preview-credit {
+          display: block;
+          margin-top: 8px;
+          text-align: left;
+        }
+
+        .preview-frame.is-field {
+          min-height: 300px;
+        }
+      }
+
       .grid {
         display: grid;
         gap: 0;
@@ -634,6 +829,53 @@ const variants = [
         </p>
       </header>
 
+      <section class="preview" data-preview aria-labelledby="preview-title">
+        <div class="preview-head">
+          <div>
+            <p class="eyebrow">Selected footer treatment</p>
+            <h2 id="preview-title">
+              <span data-preview-index>10</span> / <span data-preview-name>Dither field</span>
+            </h2>
+          </div>
+          <div class="picker" role="group" aria-label="Choose footer treatment">
+            {
+              variants.map((variant) => (
+                <button
+                  class="pick"
+                  type="button"
+                  data-select={variant.id}
+                  data-index={variant.index}
+                  data-name={variant.title}
+                  aria-pressed={variant.id === "field"}
+                  title={`${variant.index} / ${variant.title}`}
+                >
+                  {variant.index}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+        <div class="preview-frame">
+          <div class="preview-media" data-preview-media />
+          <div class="preview-content">
+            <div class="preview-top">
+              <span class="preview-brand">ascii-things<span>®</span></span>
+              <span class="preview-credit"
+                >Living ASCII for the web. Built from the original ascii-sharks.</span
+              >
+            </div>
+            <div class="preview-links">
+              <span>Docs ↗</span><span>npm ↗</span><span>GitHub ↗</span><span>Playground ↗</span>
+              <span>MIT</span>
+              <span class="preview-live">10 live</span>
+            </div>
+          </div>
+        </div>
+        <p class="preview-note">
+          Click a treatment. Production uses 10 / Dither field; 00–09 stay as component variants.
+        </p>
+      </section>
+
       <section class="grid" aria-label="Footer wordmark variations">
         {
           variants.map((variant) => (
@@ -1070,6 +1312,93 @@ const variants = [
         document.fonts?.ready.then(resize);
         if (visible) start();
       }
+
+      const previewFrame = document.querySelector(".preview-frame");
+      const previewMedia = document.querySelector("[data-preview-media]");
+      const previewIndex = document.querySelector("[data-preview-index]");
+      const previewName = document.querySelector("[data-preview-name]");
+      const previewSection = document.querySelector("[data-preview]");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const pickers = [...document.querySelectorAll("[data-select]")];
+
+      function selectTreatment(id, options = {}) {
+        const button = pickers.find((item) => item.dataset.select === id) || pickers[0];
+        const nextId = button.dataset.select;
+
+        pickers.forEach((item) => {
+          const on = item.dataset.select === nextId;
+          item.classList.toggle("is-selected", on);
+          item.setAttribute("aria-pressed", String(on));
+        });
+
+        previewIndex.textContent = button.dataset.index;
+        previewName.textContent = button.dataset.name;
+        previewFrame.classList.toggle("is-field", nextId === "field");
+        previewMedia.innerHTML = "";
+
+        if (nextId === "original") {
+          const stage = document.createElement("div");
+          stage.className = "stage stage--original";
+          const art = document.createElement("div");
+          art.className = "art v-original";
+          art.dataset.word = "ASCII-THINGS";
+          art.dataset.original = "true";
+          stage.appendChild(art);
+          previewMedia.appendChild(stage);
+          renderOriginalArt(art);
+        } else if (nextId === "stack") {
+          const stage = document.createElement("div");
+          stage.className = "stage stage--stack";
+          for (const word of ["ASCII", "THINGS"]) {
+            const art = document.createElement("div");
+            art.className = "art v-stack";
+            art.dataset.word = word;
+            if (word === "THINGS") art.dataset.rowOffset = "5";
+            stage.appendChild(art);
+            renderArt(art);
+          }
+          previewMedia.appendChild(stage);
+        } else if (nextId === "dither" || nextId === "field") {
+          const stage = document.createElement("div");
+          stage.className = nextId === "field" ? "stage stage--field" : "stage stage--dither";
+          const canvas = document.createElement("canvas");
+          canvas.className = "dither-canvas" + (nextId === "field" ? " field-canvas" : "");
+          canvas.dataset.word = "ASCII-THINGS";
+          if (nextId === "field") canvas.dataset.mode = "field";
+          stage.appendChild(canvas);
+          if (nextId !== "field") {
+            const hint = document.createElement("span");
+            hint.className = "hint";
+            hint.textContent = "bayer 4×4 →";
+            stage.appendChild(hint);
+          }
+          previewMedia.appendChild(stage);
+          setupDither(canvas);
+        } else {
+          const stage = document.createElement("div");
+          stage.className = "stage";
+          const art = document.createElement("div");
+          art.className = `art v-${nextId}`;
+          art.dataset.word = "ASCII-THINGS";
+          stage.appendChild(art);
+          previewMedia.appendChild(stage);
+          renderArt(art);
+          if (nextId === "hover") setupHover(art);
+        }
+
+        if (options.scroll) {
+          previewSection.scrollIntoView({
+            behavior: reducedMotion.matches ? "auto" : "smooth",
+            block: "start",
+          });
+        }
+      }
+
+      pickers.forEach((item) =>
+        item.addEventListener("click", () => selectTreatment(item.dataset.select)),
+      );
+
+      selectTreatment("field");
 
       document.querySelectorAll(".dither-canvas").forEach(setupDither);
     </script>
