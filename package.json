@@ -150,6 +150,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsup && node scripts/copy-ui-css.mjs",
+    "registry": "node scripts/build-registry.mjs && biome format --write site/public/r",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",

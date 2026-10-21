@@ -1,7 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./style.css";
-import { DitherCard, KoiCard, SurfaceCard } from "./components/cards";
+import { DitherCard } from "./components/dither-card";
+import { KoiCard } from "./components/koi-card";
+import { SurfaceCard } from "./components/surface-card";
 
 function App() {
   return (

@@ -1,0 +1,52 @@
+---
+title: Dither card
+description: A shadcn card with an ordered-dither ASCII wordmark.
+---
+
+import CardPreview from "@components/CardPreview.astro";
+import { AsciiDither } from "ascii-things/dither/react";
+
+A design surface rather than a scene: an ordered-dither wordmark with a live matrix and a
+configurable density. It drops into the same sized-box pattern as the scenes.
+
+<CardPreview title="Dither field" description="ascii-things/dither · bayer8" badge="canvas">
+  <div style="height: 200px">
+    <AsciiDither client:visible text="ASCII-THINGS" matrix="bayer8" density={0.12} />
+  </div>
+</CardPreview>
+
+## Installation
+
+```sh
+npx shadcn@latest add https://ascii-things-docs.pages.dev/r/dither-card.json
+```
+
+This adds `components/dither-card.tsx`, installs `ascii-things`, and pulls the `card` and `badge`
+shadcn primitives.
+
+## Usage
+
+```tsx
+import { DitherCard } from "@/components/dither-card";
+
+export function Banner() {
+  return <DitherCard />;
+}
+```
+
+## Composition
+
+```tsx
+<div className="h-40 w-full bg-black">
+  <AsciiDither text="ASCII-THINGS" matrix="bayer8" density={0.12} />
+</div>
+```
+
+`matrix` accepts `bayer2`, `bayer4`, `bayer8`, and `none`. `density` controls how much of the
+field is inked before the wordmark mask is applied.
+
+## Source
+
+- [dither-card.tsx](https://github.com/chuma-beep/ascii-things/blob/main/registry/dither-card.tsx)
+- [Runnable shadcn example](https://github.com/chuma-beep/ascii-things/tree/main/examples/shadcn)
+  in the repository at `/examples/shadcn/`

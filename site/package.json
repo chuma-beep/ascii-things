@@ -5,9 +5,9 @@
   "type": "module",
   "description": "Documentation and landing site for ascii-things, built with Astro and Starlight.",
   "scripts": {
-    "predev": "npm --prefix .. run build",
+    "predev": "npm --prefix .. run build && npm --prefix .. run registry",
     "dev": "astro dev",
-    "prebuild": "npm --prefix .. run build",
+    "prebuild": "npm --prefix .. run build && npm --prefix .. run registry",
     "build": "astro build",
     "preview": "astro preview"
   },

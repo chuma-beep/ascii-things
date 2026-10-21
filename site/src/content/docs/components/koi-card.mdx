@@ -1,0 +1,57 @@
+---
+title: Koi card
+description: A shadcn card with a live ASCII koi pond and a re-seed control.
+---
+
+import CardPreview from "@components/CardPreview.astro";
+import { AsciiKoi } from "ascii-things/react";
+
+The card owns the chrome, the spacing, and the seed control. The koi wrapper fills a sized box,
+so the surrounding design system never has to know how the scene is rendered.
+
+<CardPreview title="Koi pond" description="ascii-things/react · abyss" badge="live">
+  <div style="height: 280px">
+    <AsciiKoi client:visible palette="abyss" seed={12} label="A live ASCII koi pond" />
+  </div>
+</CardPreview>
+
+## Installation
+
+```sh
+npx shadcn@latest add https://ascii-things-docs.pages.dev/r/koi-card.json
+```
+
+This adds `components/koi-card.tsx`, installs `ascii-things`, and pulls the `card`, `badge`, and
+`button` shadcn primitives.
+
+## Usage
+
+```tsx
+import { KoiCard } from "@/components/koi-card";
+
+export function Pond() {
+  return <KoiCard />;
+}
+```
+
+## Composition
+
+The important part is the sized child. `AsciiKoi` fills its parent; a parent without a height
+gives the canvas nothing to fill.
+
+```tsx
+<CardContent className="p-0">
+  <div className="h-64 w-full bg-black">
+    <AsciiKoi palette="abyss" seed={seed} label="A live ASCII koi pond" />
+  </div>
+</CardContent>
+```
+
+The `Re-seed` button increments local state. A new `seed` is a new world, so the scene remounts
+without any imperative calls.
+
+## Source
+
+- [koi-card.tsx](https://github.com/chuma-beep/ascii-things/blob/main/registry/koi-card.tsx)
+- [Runnable shadcn example](https://github.com/chuma-beep/ascii-things/tree/main/examples/shadcn)
+  in the repository at `/examples/shadcn/`

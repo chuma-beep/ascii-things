@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASCII box footer — ascii-things</title>
+    <meta
+      name="description"
+      content="A copyable ASCII box lattice that sits behind a footer wordmark."
+    />
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #050607;
+        --panel: #0b0d0f;
+        --line: #24262a;
+        --line-soft: rgba(236, 232, 223, 0.12);
+        --ink: #ece8df;
+        --muted: #8d8a82;
+        --faint: #5f5d58;
+        --orange: #ff7a1a;
+        --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--mono);
+      }
+      .page {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: 1fr auto;
+      }
+      .intro {
+        width: min(880px, calc(100vw - 48px));
+        margin: 0 auto;
+        padding: clamp(48px, 9vw, 110px) 0 64px;
+      }
+      .eyebrow {
+        color: var(--orange);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 12px 0 10px;
+        font-size: clamp(30px, 5vw, 56px);
+        letter-spacing: -0.055em;
+        line-height: 0.95;
+      }
+      .lede {
+        max-width: 620px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.75;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px 28px;
+        align-items: end;
+        margin-top: 30px;
+        padding-top: 22px;
+        border-top: 1px solid var(--line);
+      }
+      label {
+        display: grid;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      input[type="range"] {
+        width: 150px;
+        accent-color: var(--orange);
+      }
+      button {
+        min-height: 30px;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--panel);
+        color: var(--ink);
+        font: inherit;
+        font-size: 10px;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+      button:hover {
+        border-color: var(--orange);
+        color: var(--orange);
+      }
+      .demo-footer {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: clamp(420px, 42vw, 680px);
+        padding: clamp(34px, 4vw, 56px) clamp(24px, 4vw, 56px) clamp(24px, 3vw, 40px);
+        overflow: hidden;
+        border-top: 1px solid var(--line-soft);
+        background:
+          radial-gradient(70% 90% at 50% 118%, rgba(255, 122, 26, 0.08), transparent 62%),
+          #050607;
+      }
+      .demo-footer__canvas {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      .demo-footer__content {
+        position: relative;
+        z-index: 2;
+      }
+      .demo-footer__top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 24px;
+        padding-bottom: 28px;
+        border-bottom: 1px solid var(--line-soft);
+      }
+      .demo-footer__brand {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: -0.035em;
+      }
+      .demo-footer__brand sup {
+        color: var(--orange);
+        font-size: 7px;
+      }
+      .demo-footer__top p {
+        margin: 0;
+        color: var(--faint);
+        font-size: 8px;
+        letter-spacing: 0.08em;
+        text-align: right;
+      }
+      .demo-footer__links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 26px;
+        padding-top: 22px;
+        color: var(--muted);
+        font-size: 8px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .demo-footer__links a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .demo-footer__links a:hover {
+        color: var(--orange);
+      }
+      .demo-footer__art {
+        position: absolute;
+        bottom: clamp(8px, 1.2vw, 22px);
+        left: 50%;
+        z-index: 1;
+        width: max-content;
+        transform: translateX(-50%);
+        color: transparent;
+        font-family: var(--mono);
+        font-size: clamp(3.8rem, 13.2vw, 15rem);
+        font-weight: 700;
+        line-height: 0.72;
+        letter-spacing: -0.08em;
+        white-space: nowrap;
+        pointer-events: none;
+        user-select: none;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 122, 26, 0.62) 0%,
+          rgba(255, 122, 26, 0.24) 58%,
+          rgba(255, 122, 26, 0.08) 100%
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-stroke: 1px rgba(255, 122, 26, 0.55);
+        filter: drop-shadow(0 0 42px rgba(255, 122, 26, 0.16));
+      }
+      @media (max-width: 700px) {
+        .demo-footer__top {
+          display: grid;
+        }
+        .demo-footer__top p {
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <main class="intro">
+        <p class="eyebrow">Example component</p>
+        <h1>ASCII box footer</h1>
+        <p class="lede">
+          A continuous lattice of <code>+</code>, <code>-</code>, and <code>|</code> characters,
+          framed as one large ASCII box. It sits behind a footer wordmark and carries a slow
+          orange scan. The component handles resize, device pixel ratio, reduced motion, and
+          pauses off screen.
+        </p>
+        <div class="controls">
+          <label>
+            Character size <span id="size-output">12px</span>
+            <input id="size" type="range" min="8" max="18" step="1" value="12" />
+          </label>
+          <label>
+            Scan
+            <button id="scan" type="button">on</button>
+          </label>
+          <label>
+            Motion
+            <button id="motion" type="button">running</button>
+          </label>
+        </div>
+      </main>
+
+      <footer class="demo-footer">
+        <canvas
+          class="demo-footer__canvas"
+          id="ascii-box"
+          aria-hidden="true"
+          data-ascii-box-footer
+        ></canvas>
+        <div class="demo-footer__content">
+          <div class="demo-footer__top">
+            <a class="demo-footer__brand" href="#top">ascii-things<span>®</span></a>
+            <p>An ASCII box lattice behind a footer wordmark.</p>
+          </div>
+          <div class="demo-footer__links">
+            <a href="https://www.npmjs.com/package/ascii-things">npm ↗</a>
+            <a href="https://github.com/chuma-beep/ascii-things">GitHub ↗</a>
+            <a href="/examples/playground/">Playground ↗</a>
+            <a href="https://github.com/chuma-beep/ascii-things/blob/main/LICENSE">MIT</a>
+          </div>
+        </div>
+        <div class="demo-footer__art" aria-hidden="true">ASCII-THINGS</div>
+      </footer>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

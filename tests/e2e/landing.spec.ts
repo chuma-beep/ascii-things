@@ -8,6 +8,10 @@ test("landing page loads with the expected title and no errors", async ({ page }
   await expect(page).toHaveTitle("ascii-things — living ASCII scenes for the web");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Your interface");
   await expect(page.locator("#hero-canvas")).toBeVisible();
+  await expect(page.locator("[data-ascii-box-footer]")).toHaveAttribute(
+    "data-renderer",
+    "ascii-box",
+  );
 
   await page.getByRole("tab", { name: "HTML" }).click();
   await expect(page.locator("#panel-html")).toBeVisible();

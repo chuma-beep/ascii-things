@@ -6,6 +6,11 @@ const PAGES = [
   { name: "landing", path: "/", ready: null },
   { name: "UI example", path: "/examples/ui/", ready: ".ascii-dog-hero" },
   { name: "dither example", path: "/examples/dither/", ready: "canvas.ascii-dither" },
+  {
+    name: "ASCII box footer example",
+    path: "/examples/ascii-box-footer/",
+    ready: "canvas[data-ascii-box-footer]",
+  },
   { name: "WebGL surface example", path: "/examples/webgl/", ready: "canvas.ascii-surface" },
   { name: "shadcn example", path: "/examples/shadcn/", ready: "canvas.ascii-surface" },
   { name: "Material UI example", path: "/examples/mui/", ready: "canvas.ascii-surface" },

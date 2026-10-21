@@ -682,10 +682,14 @@ handle.
   stage, prompt, readout, and palette tabs.
 - [Design system recipes](https://ascii-things-docs.pages.dev/guide/design-systems/) —
   shadcn/ui, Material UI, Tailwind, and custom-element integration patterns.
+- [Components](https://ascii-things-docs.pages.dev/components/) — copyable shadcn
+  registry items for an ASCII box footer, koi card, dither card, and surface card.
 - [Image to ASCII](examples/image/) — drag-and-drop portrait conversion with
   charset, contrast, dithering, colour, copy, and download.
 - [Dither field](examples/dither/) — an ordered-dither wordmark with live matrix,
   density, scan, and motion controls, plus a custom-element variant.
+- [ASCII box footer](examples/ascii-box-footer/) — a copyable footer background made
+  of an ASCII box lattice, with a live demo and component options.
 - [WebGL surface](examples/webgl/) — a shader-backed ASCII glyph field with live
   text, ramp, density, cell, speed, scan, pointer, and motion controls.
 - [shadcn/ui](examples/shadcn/) — Tailwind with copied shadcn components around a

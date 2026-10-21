@@ -1,0 +1,65 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "ascii-things",
+  "homepage": "https://ascii-things-docs.pages.dev",
+  "items": [
+    {
+      "name": "ascii-box-footer",
+      "type": "registry:lib",
+      "title": "ASCII box footer",
+      "description": "A framework-free canvas background made of a continuous ASCII box lattice with a slow accent scan.",
+      "files": [
+        {
+          "path": "examples/ascii-box-footer/ascii-box-footer.ts",
+          "type": "registry:lib",
+          "target": "lib/ascii-box-footer.ts"
+        }
+      ]
+    },
+    {
+      "name": "koi-card",
+      "type": "registry:component",
+      "title": "Koi card",
+      "description": "A shadcn card with a live ASCII koi pond and a re-seed control.",
+      "dependencies": ["ascii-things"],
+      "registryDependencies": ["card", "badge", "button"],
+      "files": [
+        {
+          "path": "registry/koi-card.tsx",
+          "type": "registry:component",
+          "target": "components/koi-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dither-card",
+      "type": "registry:component",
+      "title": "Dither card",
+      "description": "A shadcn card with an ordered-dither ASCII wordmark.",
+      "dependencies": ["ascii-things"],
+      "registryDependencies": ["card", "badge"],
+      "files": [
+        {
+          "path": "registry/dither-card.tsx",
+          "type": "registry:component",
+          "target": "components/dither-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "surface-card",
+      "type": "registry:component",
+      "title": "Surface card",
+      "description": "A shadcn card with a shader-backed ASCII glyph surface and a density toggle.",
+      "dependencies": ["ascii-things"],
+      "registryDependencies": ["card", "badge", "button"],
+      "files": [
+        {
+          "path": "registry/surface-card.tsx",
+          "type": "registry:component",
+          "target": "components/surface-card.tsx"
+        }
+      ]
+    }
+  ]
+}

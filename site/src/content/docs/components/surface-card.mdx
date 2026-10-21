@@ -1,0 +1,65 @@
+---
+title: Surface card
+description: A shadcn card with a shader-backed ASCII glyph surface and a density toggle.
+---
+
+import CardPreview from "@components/CardPreview.astro";
+import { AsciiSurface } from "ascii-things/webgl/react";
+
+The WebGL surface renders glyphs in a shader and falls back to a 2D glyph field when WebGL is
+unavailable. The card keeps the controls and the frame; the surface fills the sized box.
+
+<CardPreview title="WebGL surface" description="ascii-things/webgl · shader field" badge="webgl">
+  <div style="height: 300px">
+    <AsciiSurface
+      client:visible
+      text="ASCII-THINGS"
+      density={0.16}
+      glyphs=".:-=+*#%@"
+      pointer
+      label="A shader-backed ASCII glyph field"
+    />
+  </div>
+</CardPreview>
+
+## Installation
+
+```sh
+npx shadcn@latest add https://ascii-things-docs.pages.dev/r/surface-card.json
+```
+
+This adds `components/surface-card.tsx`, installs `ascii-things`, and pulls the `card`, `badge`,
+and `button` shadcn primitives.
+
+## Usage
+
+```tsx
+import { SurfaceCard } from "@/components/surface-card";
+
+export function Field() {
+  return <SurfaceCard />;
+}
+```
+
+## Composition
+
+```tsx
+<div className="h-72 w-full bg-[#050607]">
+  <AsciiSurface
+    text="ASCII-THINGS"
+    density={dense ? 0.34 : 0.16}
+    glyphs=".:-=+*#%@"
+    pointer
+    label="A shader-backed ASCII glyph field"
+  />
+</div>
+```
+
+`glyphs` is the density ramp, ordered from lightest to heaviest. `density` moves the cutoff along
+that ramp. `pointer` ties the field to the pointer position.
+
+## Source
+
+- [surface-card.tsx](https://github.com/chuma-beep/ascii-things/blob/main/registry/surface-card.tsx)
+- [Runnable shadcn example](https://github.com/chuma-beep/ascii-things/tree/main/examples/shadcn)
+  in the repository at `/examples/shadcn/`

@@ -1,0 +1,87 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  badge?: string;
+}
+
+const { title, description, badge = "live" } = Astro.props;
+---
+
+<div class="registry-preview">
+  <div class="registry-preview__header">
+    <div class="registry-preview__meta">
+      <span class="registry-preview__title">{title}</span>
+      <span class="registry-preview__description">{description}</span>
+    </div>
+    <span class="registry-preview__badge">{badge}</span>
+  </div>
+  <div class="registry-preview__body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .registry-preview {
+    margin: 1.75rem 0 2.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(236, 232, 223, 0.16);
+    background: #0b0d0f;
+  }
+
+  .registry-preview__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid rgba(236, 232, 223, 0.1);
+    background: #0b0d0f;
+  }
+
+  .registry-preview__meta {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  .registry-preview__title {
+    overflow: hidden;
+    color: #ece8df;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .registry-preview__description {
+    overflow: hidden;
+    color: rgba(236, 232, 223, 0.52);
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .registry-preview__badge {
+    flex: none;
+    border: 1px solid rgba(236, 232, 223, 0.18);
+    color: rgba(236, 232, 223, 0.7);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    padding: 0.32rem 0.45rem;
+    text-transform: uppercase;
+  }
+
+  .registry-preview__body {
+    min-height: 8rem;
+    background: #050607;
+  }
+
+  .registry-preview__body :global(canvas) {
+    display: block;
+  }
+</style>

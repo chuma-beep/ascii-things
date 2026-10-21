@@ -1,0 +1,40 @@
+---
+title: Components
+description: Copyable shadcn registry components built around ascii-things scenes and surfaces.
+---
+
+These are composed components, not package exports. Each one is a
+[shadcn registry item](https://ui.shadcn.com/docs/registry): install it with the CLI or copy the
+source into your project. The CLI writes the file where shadcn expects it and pulls in the
+shadcn primitives the component uses.
+
+The scene wrappers stay ascii-things imports. The surrounding card, badge, and button belong
+to your design system.
+
+## Install one
+
+```sh
+npx shadcn@latest add https://ascii-things-docs.pages.dev/r/koi-card.json
+```
+
+Swap the item name for any of the components below. Run the command from the root of a project
+that already has `components.json`.
+
+## Components
+
+| Component | Registry | Source |
+| --- | --- | --- |
+| [ASCII box footer](/components/ascii-box-footer/) | [`ascii-box-footer.json`](/r/ascii-box-footer.json) | `lib/ascii-box-footer.ts` |
+| [Koi card](/components/koi-card/) | [`koi-card.json`](/r/koi-card.json) | `components/koi-card.tsx` |
+| [Dither card](/components/dither-card/) | [`dither-card.json`](/r/dither-card.json) | `components/dither-card.tsx` |
+| [Surface card](/components/surface-card/) | [`surface-card.json`](/r/surface-card.json) | `components/surface-card.tsx` |
+
+The registry index is at
+[`/r/registry.json`](https://ascii-things-docs.pages.dev/r/registry.json).
+
+## Copy by hand
+
+Every page links to its source file. The registry JSON is generated from the same files, so the
+install path and the copy path cannot drift. Use the CLI when you want the shadcn primitives and
+the `ascii-things` dependency added for you; copy the source when you want to own the file
+without a registry request.

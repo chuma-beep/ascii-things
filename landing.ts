@@ -1,3 +1,4 @@
+import { createAsciiBoxFooter } from "./examples/ascii-box-footer/ascii-box-footer";
 import {
   createAnts,
   createCity,
@@ -294,6 +295,9 @@ installCopy?.addEventListener("click", async () => {
     document.querySelector<HTMLElement>("#install-command")?.textContent ?? "npm i ascii-things";
   if (await copyText(command)) flash(installCopy, "COPIED");
 });
+
+const footerBox = document.querySelector<HTMLCanvasElement>("[data-ascii-box-footer]");
+if (footerBox) createAsciiBoxFooter(footerBox, { size: 12 });
 
 function fnv1a(text: string) {
   let hash = 0x811c9dc5;

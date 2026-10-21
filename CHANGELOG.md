@@ -10,6 +10,7 @@
 - Add the `ascii-things/dither` entry: `DitherField`, `ditherThreshold`, `shouldDither`, `DITHER_MATRICES`, `DITHER_DEFAULTS`, the `AsciiDither` React wrapper, and the `<ascii-dither>` custom element.
 - Add the `ascii-things/webgl` entry: `AsciiSurfaceEngine`, the `AsciiSurface` React wrapper, the `<ascii-surface>` custom element, glyph/colour/cell helpers, and a 2D glyph-field fallback when WebGL is unavailable.
 - Add guides for image-to-ASCII, dither fields, WebGL surfaces, and design-system recipes, plus runnable shadcn/ui and Material UI examples.
+- Add a Components section with copyable shadcn registry items for an ASCII box footer, koi card, dither card, and WebGL surface card, plus a runnable footer example.
 - Extend the frozen subpath surface to cover the new entries, with size budgets and `publint`/`attw` coverage.
 
 ## 1.0.0-rc.0

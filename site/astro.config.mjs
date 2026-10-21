@@ -75,6 +75,16 @@ export default defineConfig({
           ],
         },
         {
+          label: "Components",
+          items: [
+            { label: "All components", link: "components/" },
+            { label: "ASCII box footer", link: "components/ascii-box-footer/" },
+            { label: "Koi card", link: "components/koi-card/" },
+            { label: "Dither card", link: "components/dither-card/" },
+            { label: "Surface card", link: "components/surface-card/" },
+          ],
+        },
+        {
           label: "Scenes",
           items: [
             { label: "All scenes", link: "scenes/" },

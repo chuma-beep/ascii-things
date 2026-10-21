@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dither-card",
+  "type": "registry:component",
+  "title": "Dither card",
+  "description": "A shadcn card with an ordered-dither ASCII wordmark.",
+  "dependencies": ["ascii-things"],
+  "registryDependencies": ["card", "badge"],
+  "files": [
+    {
+      "path": "registry/dither-card.tsx",
+      "type": "registry:component",
+      "target": "components/dither-card.tsx",
+      "content": "\"use client\";\n\nimport { AsciiDither } from \"ascii-things/dither/react\";\nimport { Badge } from \"@/components/ui/badge\";\nimport { Card, CardContent, CardDescription, CardHeader, CardTitle } from \"@/components/ui/card\";\n\nexport function DitherCard() {\n  return (\n    <Card className=\"overflow-hidden border-white/10 bg-card\">\n      <CardHeader className=\"flex-row items-center justify-between\">\n        <div className=\"flex flex-col gap-1\">\n          <CardTitle>Dither field</CardTitle>\n          <CardDescription>ascii-things/dither · bayer8</CardDescription>\n        </div>\n        <Badge>canvas</Badge>\n      </CardHeader>\n      <CardContent className=\"p-0\">\n        <div className=\"h-40 w-full bg-black\">\n          <AsciiDither text=\"ASCII-THINGS\" matrix=\"bayer8\" density={0.12} />\n        </div>\n      </CardContent>\n    </Card>\n  );\n}\n"
+    }
+  ]
+}
