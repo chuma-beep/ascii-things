@@ -688,6 +688,10 @@ handle.
   density, scan, and motion controls, plus a custom-element variant.
 - [WebGL surface](examples/webgl/) — a shader-backed ASCII glyph field with live
   text, ramp, density, cell, speed, scan, pointer, and motion controls.
+- [shadcn/ui](examples/shadcn/) — Tailwind with copied shadcn components around a
+  koi scene, a dither field, and a WebGL surface.
+- [Material UI](examples/mui/) — MUI cards, theme, and controls around a
+  jellyfish scene, a koi scene, and a WebGL surface.
 - [Dog + input](examples/dog-input/) — a focused landing-page hero with the
   robot dog behind a real prompt. Type a command and the dog fetches the ball.
 
