@@ -369,6 +369,143 @@ const variants = [
         }
       }
 
+      .link-lab {
+        margin-top: 46px;
+        padding-top: 30px;
+        border-top: 1px solid var(--line);
+      }
+
+      .link-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 18px;
+      }
+
+      .link-head h2 {
+        margin: 4px 0 0;
+        font-size: 24px;
+        letter-spacing: -0.04em;
+      }
+
+      .link-note {
+        max-width: 340px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.65;
+        text-align: right;
+      }
+
+      .link-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .link-card {
+        position: relative;
+        display: block;
+        min-height: 196px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        background: #050607;
+        color: var(--ink);
+        text-decoration: none;
+      }
+
+      .link-canvas {
+        position: absolute;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .link-shade {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(
+          180deg,
+          rgba(5, 6, 7, 0) 18%,
+          rgba(5, 6, 7, 0.5) 58%,
+          rgba(5, 6, 7, 0.97) 100%
+        );
+      }
+
+      .link-copy {
+        position: absolute;
+        inset: auto 14px 14px;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .link-kicker {
+        color: var(--orange);
+        font-size: 8px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .link-title {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+      }
+
+      .link-desc {
+        color: var(--muted);
+        font-size: 9px;
+        line-height: 1.5;
+      }
+
+      .link-open {
+        margin-top: 6px;
+        color: var(--ink);
+        font-size: 8px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .link-card:hover {
+        border-color: rgba(255, 122, 26, 0.55);
+      }
+
+      .link-card:focus-visible {
+        outline: 1px solid var(--orange);
+        outline-offset: 3px;
+      }
+
+      @media (max-width: 980px) {
+        .link-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 560px) {
+        .link-head {
+          display: block;
+        }
+
+        .link-note {
+          margin-top: 10px;
+          text-align: left;
+        }
+
+        .link-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .link-card {
+          min-height: 170px;
+        }
+      }
+
       .grid {
         display: grid;
         gap: 0;
@@ -922,6 +1059,70 @@ const variants = [
         }
       </section>
 
+      <section class="link-lab" aria-labelledby="link-lab-title">
+        <div class="link-head">
+          <div>
+            <p class="eyebrow">Footer components</p>
+            <h2 id="link-lab-title">Link cards</h2>
+          </div>
+          <p class="link-note">
+            Line-scan treatment with pointer bend and on-hover detection. Four real footer links.
+          </p>
+        </div>
+        <div class="link-grid">
+          <a class="link-card" href="/guide/">
+            <canvas class="link-canvas" data-label="DOCS" />
+            <span class="link-shade" />
+            <span class="link-copy">
+              <span class="link-kicker">01 / read</span>
+              <span class="link-title">Docs</span>
+              <span class="link-desc">Guides, API, examples.</span>
+              <span class="link-open">open docs ↗</span>
+            </span>
+          </a>
+          <a
+            class="link-card"
+            href="https://www.npmjs.com/package/ascii-things"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <canvas class="link-canvas" data-label="NPM" />
+            <span class="link-shade" />
+            <span class="link-copy">
+              <span class="link-kicker">02 / install</span>
+              <span class="link-title">npm</span>
+              <span class="link-desc">Install ascii-things.</span>
+              <span class="link-open">view package ↗</span>
+            </span>
+          </a>
+          <a
+            class="link-card"
+            href="https://github.com/chuma-beep/ascii-things"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <canvas class="link-canvas" data-label="GITHUB" />
+            <span class="link-shade" />
+            <span class="link-copy">
+              <span class="link-kicker">03 / source</span>
+              <span class="link-title">GitHub</span>
+              <span class="link-desc">Source and issues.</span>
+              <span class="link-open">open repo ↗</span>
+            </span>
+          </a>
+          <a class="link-card" href="/playground/">
+            <canvas class="link-canvas" data-label="PLAY" />
+            <span class="link-shade" />
+            <span class="link-copy">
+              <span class="link-kicker">04 / try</span>
+              <span class="link-title">Playground</span>
+              <span class="link-desc">Drive the scenes.</span>
+              <span class="link-open">open playground ↗</span>
+            </span>
+          </a>
+        </div>
+      </section>
+
       <footer class="lab-foot">
         <span>
           <b>Production footer is untouched.</b> This page is noindex and will be removed after the
@@ -1399,6 +1600,231 @@ const variants = [
       );
 
       selectTreatment("field");
+
+      class LineCard {
+        constructor(card, canvas) {
+          this.card = card;
+          this.canvas = canvas;
+          this.ctx = canvas.getContext("2d");
+          this.label = canvas.dataset.label || "";
+          this.mono =
+            getComputedStyle(document.documentElement).getPropertyValue("--mono").trim() ||
+            "ui-monospace, monospace";
+          this.motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+          this.reduced = this.motion.matches;
+          this.width = 1;
+          this.height = 1;
+          this.mask = new Uint8ClampedArray(4);
+          this.points = [];
+          this.pointer = { x: -1e4, y: -1e4 };
+          this.hover = false;
+          this.raf = 0;
+
+          this.resize();
+
+          this.card.addEventListener("pointerenter", () => {
+            if (this.reduced) return;
+            this.hover = true;
+            this.start();
+          });
+
+          this.card.addEventListener("pointermove", (event) => {
+            const rect = this.card.getBoundingClientRect();
+            this.pointer.x = event.clientX - rect.left;
+            this.pointer.y = event.clientY - rect.top;
+            if (!this.reduced && !this.hover) {
+              this.hover = true;
+              this.start();
+            }
+          });
+
+          this.card.addEventListener("pointerleave", () => {
+            this.hover = false;
+            this.stop();
+            this.draw(0, false);
+          });
+
+          this.card.addEventListener("focus", () => {
+            if (this.reduced) return;
+            this.hover = true;
+            this.start();
+          });
+
+          this.card.addEventListener("blur", () => {
+            this.hover = false;
+            this.stop();
+            this.draw(0, false);
+          });
+
+          this.motion.addEventListener("change", () => {
+            this.reduced = this.motion.matches;
+            if (this.reduced) {
+              this.hover = false;
+              this.stop();
+              this.draw(0, false);
+            } else if (this.card.matches(":hover")) {
+              this.hover = true;
+              this.start();
+            }
+          });
+
+          if ("ResizeObserver" in window) {
+            new ResizeObserver(() => this.resize()).observe(this.card);
+          } else {
+            window.addEventListener("resize", () => this.resize(), { passive: true });
+          }
+
+          document.fonts?.ready.then(() => this.resize());
+        }
+
+        resize() {
+          const rect = this.card.getBoundingClientRect();
+          this.width = Math.max(1, Math.round(rect.width));
+          this.height = Math.max(1, Math.round(rect.height));
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+          this.canvas.width = Math.round(this.width * dpr);
+          this.canvas.height = Math.round(this.height * dpr);
+          this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+          this.buildMask();
+          this.points = this.brightPoints();
+          if (!this.hover) this.draw(0, false);
+        }
+
+        buildMask() {
+          const off = document.createElement("canvas");
+          off.width = this.width;
+          off.height = this.height;
+          const c = off.getContext("2d");
+
+          c.fillStyle = "#000";
+          c.fillRect(0, 0, this.width, this.height);
+          c.fillStyle = "#fff";
+
+          let size = this.height * 0.68;
+          c.font = `700 ${size}px ${this.mono}`;
+          while (c.measureText(this.label).width > this.width * 0.8 && size > 7) {
+            size *= 0.92;
+            c.font = `700 ${size}px ${this.mono}`;
+          }
+
+          c.textAlign = "center";
+          c.textBaseline = "middle";
+          c.fillText(this.label, this.width / 2, this.height * 0.42);
+          this.mask = c.getImageData(0, 0, this.width, this.height).data;
+        }
+
+        brightness(x, y) {
+          const xi = Math.max(0, Math.min(this.width - 1, Math.round(x)));
+          const yi = Math.max(0, Math.min(this.height - 1, Math.round(y)));
+          return this.mask[(yi * this.width + xi) * 4] / 255;
+        }
+
+        brightPoints() {
+          const found = [];
+          const step = Math.max(5, Math.round(this.width / 26));
+
+          for (let y = step; y < this.height - step; y += step) {
+            for (let x = step; x < this.width - step; x += step) {
+              const value = this.brightness(x, y);
+              if (value > 0.8) found.push({ x, y, value });
+            }
+          }
+
+          found.sort((a, b) => b.value - a.value);
+          const out = [];
+          for (const point of found) {
+            if (out.every((other) => Math.hypot(other.x - point.x, other.y - point.y) > this.width * 0.28)) {
+              out.push(point);
+            }
+            if (out.length >= 3) break;
+          }
+          return out;
+        }
+
+        draw(time, hover) {
+          const { width: w, height: h, ctx } = this;
+          ctx.clearRect(0, 0, w, h);
+
+          ctx.fillStyle = "rgba(236,232,223,.035)";
+          for (let x = 0; x < w; x += Math.max(6, w / 80)) {
+            ctx.fillRect(x, 0, 0.5, h);
+          }
+
+          const gap = Math.max(3.4, w / 92);
+          const step = Math.max(2.2, h / 58);
+          const scanX = hover ? ((time * 0.045) % (w + 180)) - 90 : -1e4;
+
+          for (let x = 0; x < w; x += gap) {
+            const distance = hover ? Math.abs(x - this.pointer.x) : 1e4;
+            const push =
+              hover && distance < 80
+                ? (1 - distance / 80) * 13 * Math.sin(time * 0.007 + x * 0.02)
+                : 0;
+            const drawX = x + push;
+
+            for (let y = 0; y < h; y += step) {
+              let value = this.brightness(x, y);
+              if (hover) value += Math.sin(time * 0.003 + x * 0.05 + y * 0.08) * 0.08;
+              if (value <= 0.08) continue;
+
+              const lineWidth =
+                value > 0.82 ? 2.4 : value > 0.58 ? 1.7 : value > 0.34 ? 1.1 : 0.65;
+              const nearScan = hover && Math.abs(drawX - scanX) < 30;
+              ctx.fillStyle = nearScan ? "rgba(255,122,26,.92)" : "rgba(236,232,223,.4)";
+              ctx.fillRect(drawX, y, lineWidth, step);
+            }
+          }
+
+          if (hover && this.points.length) {
+            ctx.strokeStyle = "rgba(255,122,26,.85)";
+            ctx.fillStyle = "rgba(255,122,26,.95)";
+            ctx.lineWidth = 1;
+            ctx.font = "8px ui-monospace, monospace";
+            ctx.textBaseline = "alphabetic";
+
+            this.points.forEach((point, index) => {
+              const size = 20;
+              ctx.strokeRect(point.x - size / 2, point.y - size / 2, size, size);
+              ctx.fillText(
+                `${Math.round(point.x)},${Math.round(point.y)}`,
+                point.x - size / 2,
+                point.y - size / 2 - 4,
+              );
+
+              if (index > 0) {
+                const previous = this.points[index - 1];
+                ctx.beginPath();
+                ctx.moveTo(previous.x, previous.y);
+                ctx.lineTo(point.x, point.y);
+                ctx.stroke();
+              }
+            });
+          }
+        }
+
+        start() {
+          if (this.reduced || this.raf) return;
+          const tick = (now) => {
+            this.raf = 0;
+            if (!this.hover) return;
+            this.draw(now, true);
+            this.raf = requestAnimationFrame(tick);
+          };
+          this.raf = requestAnimationFrame(tick);
+        }
+
+        stop() {
+          if (this.raf) cancelAnimationFrame(this.raf);
+          this.raf = 0;
+        }
+      }
+
+      document.querySelectorAll(".link-card").forEach((card) => {
+        const canvas = card.querySelector(".link-canvas");
+        if (canvas) new LineCard(card, canvas);
+      });
 
       document.querySelectorAll(".dither-canvas").forEach(setupDither);
     </script>
