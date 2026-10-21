@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ascii-things — dither field</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #070809;
+        --panel: #0b0d0f;
+        --line: #24262a;
+        --ink: #ece8df;
+        --muted: #8d8a82;
+        --orange: #ff7a1a;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); }
+      main { width: min(980px, calc(100vw - 40px)); margin: 0 auto; padding: 48px 0 64px; }
+      .eyebrow { color: var(--orange); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; }
+      h1 { margin: 10px 0 8px; font-size: clamp(28px, 5vw, 48px); letter-spacing: -.05em; }
+      p { max-width: 620px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+      .field { margin: 28px 0 18px; border: 1px solid var(--line); background: #050607; }
+      .controls { display: grid; grid-template-columns: 1fr 150px 180px auto auto; gap: 12px; align-items: end; }
+      label { display: grid; gap: 6px; color: var(--muted); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+      input, select, button {
+        width: 100%; min-height: 34px; border: 1px solid var(--line); border-radius: 0;
+        background: var(--panel); color: var(--ink); font: inherit; font-size: 11px; padding: 7px 9px;
+      }
+      input[type="range"] { padding: 0; accent-color: var(--orange); }
+      button { cursor: pointer; }
+      button:hover { border-color: var(--orange); color: var(--orange); }
+      @media (max-width: 760px) { .controls { grid-template-columns: 1fr 1fr; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Design component</p>
+      <h1>Dither field</h1>
+      <p>
+        An ordered-dither dot field with a legible wordmark and a moving accent scan.
+        The component owns the canvas lifecycle, resize, reduced motion, and visibility pause.
+      </p>
+      <div id="root"></div>
+    </main>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

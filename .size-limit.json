@@ -100,5 +100,23 @@
     "path": "dist/image-element.js",
     "limit": "10 kB",
     "gzip": true
+  },
+  {
+    "name": "dither",
+    "path": "dist/dither.js",
+    "limit": "10 kB",
+    "gzip": true
+  },
+  {
+    "name": "dither-react",
+    "path": "dist/dither-react.js",
+    "limit": "10 kB",
+    "gzip": true
+  },
+  {
+    "name": "dither-element",
+    "path": "dist/dither-element.js",
+    "limit": "10 kB",
+    "gzip": true
   }
 ]

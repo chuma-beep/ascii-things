@@ -21,6 +21,7 @@
   "sideEffects": [
     "./dist/element.js",
     "./dist/image-element.js",
+    "./dist/dither-element.js",
     "./dist/ui.css"
   ],
   "main": "./dist/index.js",
@@ -101,6 +102,18 @@
     "./image/element": {
       "types": "./dist/image-element.d.ts",
       "import": "./dist/image-element.js"
+    },
+    "./dither": {
+      "types": "./dist/dither.d.ts",
+      "import": "./dist/dither.js"
+    },
+    "./dither/react": {
+      "types": "./dist/dither-react.d.ts",
+      "import": "./dist/dither-react.js"
+    },
+    "./dither/element": {
+      "types": "./dist/dither-element.d.ts",
+      "import": "./dist/dither-element.js"
     },
     "./ui.css": "./dist/ui.css"
   },
