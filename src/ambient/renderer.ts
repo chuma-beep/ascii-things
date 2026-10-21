@@ -2,7 +2,7 @@ import { rgba } from "../core/color";
 import { CellGrid } from "../core/grid";
 import { resolvePalette, type Palette, type PaletteChoice } from "../palette";
 import type { AmbientKind } from "./options";
-import type { AmbientWorld } from "./world";
+import type { AmbientWorld, Koi } from "./world";
 
 export interface AmbientRendererOptions {
   palette?: PaletteChoice;
@@ -11,6 +11,11 @@ export interface AmbientRendererOptions {
   calm?: boolean;
 }
 
+/**
+ * Koi are drawn procedurally: a tapered, slightly curved body rasterised into
+ * character cells, with translucent vector fins and a flowing tail. This keeps
+ * the ASCII grid but drops the rectangular sprite look.
+ */
 export class AmbientRenderer extends CellGrid {
   readonly kind: AmbientKind;
   private palette: Palette;
@@ -261,11 +266,267 @@ export class AmbientRenderer extends CellGrid {
     }
   }
 
+  private koiProfile(u: number) {
+    let profile = Math.sin(Math.PI * (0.04 + u * 0.92)) ** 0.7;
+    if (u < 0.22) profile *= 0.45 + 0.55 * (u / 0.22);
+    if (u > 0.82) {
+      profile *= Math.sqrt(Math.max(0, 1 - ((u - 0.82) / 0.18) ** 2)) * 0.6 + 0.4;
+    }
+    return profile;
+  }
+
+  private koiBodyPath(fish: Koi, cos: number, sin: number, bodyLength: number, halfWidth: number) {
+    const path = new Path2D();
+    const steps = 28;
+    const left: Array<[number, number]> = [];
+    const right: Array<[number, number]> = [];
+    for (let i = 0; i <= steps; i++) {
+      const u = 0.02 + (i / steps) * 0.96;
+      const along = (u - 0.5) * bodyLength;
+      const bend = Math.sin(u * Math.PI * 1.55 + fish.phase) * bodyLength * 0.05;
+      const x = fish.x + cos * along - sin * bend;
+      const y = fish.y + sin * along + cos * bend;
+      const width = this.koiProfile(u) * halfWidth;
+      left.push([x - sin * width, y + cos * width]);
+      right.push([x + sin * width, y - cos * width]);
+    }
+    path.moveTo(left[0][0], left[0][1]);
+    for (let i = 1; i < left.length; i++) path.lineTo(left[i][0], left[i][1]);
+    for (let i = right.length - 1; i >= 0; i--) path.lineTo(right[i][0], right[i][1]);
+    path.closePath();
+    return path;
+  }
+
+  private drawKoiFish(fish: Koi) {
+    const { ctx, cw, ch } = this;
+    const cos = Math.cos(fish.heading);
+    const sin = Math.sin(fish.heading);
+    const perpX = -sin;
+    const perpY = cos;
+    const bodyCells = Math.round(14 + fish.size * 5);
+    const bodyLength = bodyCells * cw;
+    const halfWidth = (1.8 + fish.size * 0.8) * cw;
+    const orange = rgba(this.palette.heatHot, 1);
+    const warm = this.palette.dark ? "rgba(255, 246, 230, 0.95)" : "rgba(38, 42, 50, 0.92)";
+    const rim = this.palette.dark ? "rgba(255, 248, 234, 0.9)" : "rgba(255, 246, 230, 0.8)";
+    const eye = this.palette.dark ? "rgba(8, 12, 14, 0.96)" : "rgba(12, 14, 18, 0.96)";
+    const bodyPath = this.koiBodyPath(fish, cos, sin, bodyLength, halfWidth);
+    const tailBend = Math.sin(0.02 * Math.PI * 1.55 + fish.phase) * bodyLength * 0.05;
+    const tailX = fish.x - cos * bodyLength * 0.5 + perpX * tailBend;
+    const tailY = fish.y - sin * bodyLength * 0.5 + perpY * tailBend;
+
+    // Soft shadow under the fish.
+    ctx.save();
+    ctx.translate(cw * 0.25, ch * 0.3);
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+    ctx.fill(bodyPath);
+    ctx.restore();
+
+    // Tail: two translucent lobes with a warm rim.
+    const tailLen = bodyLength * 0.26;
+    const tailSpread = halfWidth * 1.15;
+    ctx.save();
+    ctx.globalAlpha = 0.22;
+    ctx.fillStyle = warm;
+    ctx.beginPath();
+    ctx.moveTo(tailX, tailY);
+    ctx.quadraticCurveTo(
+      tailX - cos * tailLen * 0.35 + perpX * tailSpread,
+      tailY - sin * tailLen * 0.35 + perpY * tailSpread,
+      tailX - cos * tailLen + perpX * tailSpread * 1.15,
+      tailY - sin * tailLen + perpY * tailSpread * 1.15,
+    );
+    ctx.quadraticCurveTo(
+      tailX - cos * tailLen * 0.62 + perpX * tailSpread * 0.15,
+      tailY - sin * tailLen * 0.62 + perpY * tailSpread * 0.15,
+      tailX - cos * tailLen - perpX * tailSpread * 1.15,
+      tailY - sin * tailLen - perpY * tailSpread * 1.15,
+    );
+    ctx.quadraticCurveTo(
+      tailX - cos * tailLen * 0.35 - perpX * tailSpread,
+      tailY - sin * tailLen * 0.35 - perpY * tailSpread,
+      tailX,
+      tailY,
+    );
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = rgba(this.palette.heatHot, 0.9);
+    ctx.lineWidth = Math.max(1, cw * 0.06);
+    ctx.stroke();
+    ctx.restore();
+
+    // Pectoral fins.
+    const shoulderBend = Math.sin(0.68 * Math.PI * 1.55 + fish.phase) * bodyLength * 0.05;
+    const finX = fish.x + cos * (0.68 - 0.5) * bodyLength + perpX * shoulderBend;
+    const finY = fish.y + sin * (0.68 - 0.5) * bodyLength + perpY * shoulderBend;
+    const finBack = bodyLength * 0.12;
+    const finSpread = halfWidth * 1.2;
+    for (const side of [-1, 1]) {
+      ctx.save();
+      ctx.globalAlpha = 0.16;
+      ctx.fillStyle = warm;
+      ctx.beginPath();
+      ctx.moveTo(finX, finY);
+      ctx.quadraticCurveTo(
+        finX + perpX * finSpread * side - cos * finBack * 0.3,
+        finY + perpY * finSpread * side - sin * finBack * 0.3,
+        finX + perpX * finSpread * side - cos * finBack,
+        finY + perpY * finSpread * side - sin * finBack,
+      );
+      ctx.quadraticCurveTo(
+        finX + perpX * halfWidth * 0.2 - cos * finBack * 0.4,
+        finY + perpY * halfWidth * 0.2 - sin * finBack * 0.4,
+        finX,
+        finY,
+      );
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalAlpha = 0.45;
+      ctx.strokeStyle = rgba(this.palette.heatHot, 0.8);
+      ctx.lineWidth = Math.max(1, cw * 0.05);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Body: a smooth tapered shape. A translucent calico patch layer and a
+    // sparse glyph scale pattern keep it in the same visual family as the
+    // cell-rendered sharks without turning the fish into a block of cells.
+    const bodyGradient = ctx.createLinearGradient(
+      fish.x - cos * bodyLength * 0.5,
+      fish.y - sin * bodyLength * 0.5,
+      fish.x + cos * bodyLength * 0.5,
+      fish.y + sin * bodyLength * 0.5,
+    );
+    bodyGradient.addColorStop(
+      0,
+      this.palette.dark ? "rgba(205, 195, 180, 0.55)" : "rgba(70, 60, 52, 0.5)",
+    );
+    bodyGradient.addColorStop(0.55, warm);
+    bodyGradient.addColorStop(
+      1,
+      this.palette.dark ? "rgba(255, 250, 240, 0.98)" : "rgba(24, 28, 34, 0.96)",
+    );
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = bodyGradient;
+    ctx.fill(bodyPath);
+    ctx.clip(bodyPath);
+
+    ctx.save();
+    ctx.translate(fish.x, fish.y);
+    ctx.rotate(fish.heading);
+    ctx.fillStyle = orange;
+    const patches = [
+      { u: 0.78, across: 0, rx: bodyLength * 0.12, ry: halfWidth * 0.9 },
+      { u: 0.56, across: halfWidth * 0.3, rx: bodyLength * 0.14, ry: halfWidth * 0.65 },
+      { u: 0.3, across: -halfWidth * 0.2, rx: bodyLength * 0.1, ry: halfWidth * 0.55 },
+    ];
+    for (const patch of patches) {
+      ctx.beginPath();
+      ctx.ellipse(
+        (patch.u - 0.5) * bodyLength,
+        patch.across,
+        patch.rx,
+        patch.ry,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Sparse scale marks. The clip keeps them inside the silhouette.
+    const texture = this.palette.dark ? "rgba(68, 48, 38, 0.18)" : "rgba(255, 255, 255, 0.18)";
+    ctx.font = `400 ${Math.round(ch * 0.42)}px ${this.fontFamily}`;
+    const reach = bodyLength * 0.5 + halfWidth * 2;
+    const startX = Math.round((fish.x - reach) / cw) * cw;
+    const startY = Math.round((fish.y - reach) / ch) * ch;
+    for (let gy = startY; gy <= fish.y + reach; gy += ch) {
+      for (let gx = startX; gx <= fish.x + reach; gx += cw) {
+        if ((Math.floor(gx / cw) + Math.floor(gy / ch)) % 3 !== 0) continue;
+        if (!ctx.isPointInPath(bodyPath, gx + cw * 0.5, gy + ch * 0.5)) continue;
+        this.glyph(gx + cw * 0.5, gy + ch * 0.5, "'", texture, 0.6);
+      }
+    }
+    ctx.restore();
+
+    // Rim and a thin spine highlight.
+    ctx.save();
+    ctx.strokeStyle = rim;
+    ctx.lineWidth = Math.max(1, cw * 0.12);
+    ctx.globalAlpha = 0.8;
+    ctx.stroke(bodyPath);
+    ctx.globalAlpha = 0.35;
+    ctx.strokeStyle = rgba(this.palette.heatHot, 0.9);
+    ctx.lineWidth = Math.max(1, cw * 0.05);
+    ctx.stroke(bodyPath);
+    ctx.restore();
+
+    ctx.save();
+    ctx.clip(bodyPath);
+    ctx.strokeStyle = this.palette.dark ? "rgba(255, 255, 255, 0.18)" : "rgba(0, 0, 0, 0.12)";
+    ctx.lineWidth = Math.max(1, cw * 0.08);
+    ctx.beginPath();
+    for (let i = 0; i <= 18; i++) {
+      const u = 0.1 + (i / 18) * 0.8;
+      const along = (u - 0.5) * bodyLength;
+      const bend = Math.sin(u * Math.PI * 1.55 + fish.phase) * bodyLength * 0.05;
+      const x = fish.x + cos * along - sin * (bend - halfWidth * 0.25);
+      const y = fish.y + sin * along + cos * (bend - halfWidth * 0.25);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // Eyes, set wide on the head.
+    const eyeAlong = (0.82 - 0.5) * bodyLength;
+    const eyeAcross = halfWidth * 0.45;
+    for (const side of [-1, 1]) {
+      const ex = fish.x + cos * eyeAlong + perpX * eyeAcross * side;
+      const ey = fish.y + sin * eyeAlong + perpY * eyeAcross * side;
+      ctx.save();
+      ctx.globalAlpha = 0.96;
+      ctx.fillStyle = eye;
+      ctx.beginPath();
+      ctx.arc(ex, ey, Math.max(1.8, cw * 0.28), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 0.7;
+      ctx.strokeStyle = rgba(this.palette.heatHot, 0.9);
+      ctx.lineWidth = Math.max(1, cw * 0.06);
+      ctx.stroke();
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+      ctx.beginPath();
+      ctx.arc(ex - cw * 0.06, ey - ch * 0.06, Math.max(0.7, cw * 0.09), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
   private drawKoi(world: AmbientWorld) {
     this.backdrop((g) => {
-      g.globalAlpha = 0.18;
+      const glow = g.createRadialGradient(
+        this.width * 0.5,
+        this.height * 0.18,
+        0,
+        this.width * 0.5,
+        this.height * 0.18,
+        Math.max(this.width, this.height) * 0.9,
+      );
+      glow.addColorStop(0, rgba(this.palette.heatHot, 0.09));
+      glow.addColorStop(0.55, rgba(this.palette.heatHot, 0.03));
+      glow.addColorStop(1, rgba(this.palette.heatHot, 0));
+      g.fillStyle = glow;
+      g.fillRect(0, 0, this.width, this.height);
+
       g.strokeStyle = this.palette.fish[2];
       g.lineWidth = 1;
+      g.globalAlpha = 0.24;
       for (let y = this.height * 0.22; y < this.height; y += this.ch * 4) {
         g.beginPath();
         g.moveTo(0, y);
@@ -274,36 +535,73 @@ export class AmbientRenderer extends CellGrid {
         }
         g.stroke();
       }
+      g.globalAlpha = 0.1;
+      g.strokeStyle = this.palette.fish[1];
+      for (let y = this.height * 0.34; y < this.height; y += this.ch * 7) {
+        g.beginPath();
+        g.moveTo(0, y);
+        for (let x = 0; x <= this.width; x += this.cw * 3) {
+          g.lineTo(x, y + Math.sin(x * 0.009 + y * 0.6) * this.ch * 1.6);
+        }
+        g.stroke();
+      }
       g.globalAlpha = 1;
     });
 
     for (const pad of world.lilyPads) {
-      for (let i = -1; i <= 1; i++) {
-        this.glyph(pad.x + i * this.cw, pad.y, i === 0 ? "@" : ":", this.palette.fish[1], 0.45);
+      const radius = Math.max(1, Math.round(1.2 + pad.size * 1.6));
+      for (let i = -radius; i <= radius; i++) {
+        const center = i === 0;
+        this.glyph(
+          pad.x + i * this.cw,
+          pad.y,
+          center ? (pad.size > 1.15 ? "*" : "@") : "=",
+          center && pad.size > 1.15 ? rgba(this.palette.heatHot, 0.65) : this.palette.fish[2],
+          center ? 0.5 : 0.3,
+        );
       }
+      this.glyph(pad.x, pad.y - this.ch, "-", this.palette.fish[1], 0.22);
+      this.glyph(pad.x, pad.y + this.ch, "-", this.palette.fish[1], 0.22);
     }
+
     for (const ripple of world.ripples) {
       const r = ripple.radius;
-      for (let i = 0; i < 8; i++) {
-        const a = (i / 8) * Math.PI * 2;
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
         this.glyph(
           ripple.x + Math.cos(a) * r,
           ripple.y + Math.sin(a) * r * 0.52,
-          "o",
+          i % 3 === 0 ? "o" : "·",
           this.palette.fish[3] ?? this.palette.fish[0],
-          0.5,
+          0.55,
         );
       }
     }
     for (const crumb of world.crumbs) {
       this.glyph(crumb.x, crumb.y, "*", rgba(this.palette.heatHot, 0.8), 0.8);
+      this.glyph(crumb.x - this.cw, crumb.y, "·", rgba(this.palette.heatHot, 0.35), 0.6);
     }
+
+    // Wakes go down before any body glyphs so they read as water, not fins.
     for (const fish of world.koi) {
-      const dir = fish.vx >= 0 ? ">" : "<";
-      const color = fish.phase % 2 < 1 ? rgba(this.palette.heatHot, 0.9) : this.palette.fish[0];
-      this.glyph(fish.x, fish.y, dir, color, 0.9);
-      this.glyph(fish.x - Math.sign(fish.vx) * this.cw, fish.y, "~", color, 0.5);
+      const cos = Math.cos(fish.heading);
+      const sin = Math.sin(fish.heading);
+      const half = Math.round(10 + fish.size * 6) / 2;
+      for (let i = 1; i <= 3; i++) {
+        this.glyph(
+          fish.x - cos * (half + 1.4 + i * 0.95) * this.cw,
+          fish.y - sin * (half + 1.4 + i * 0.95) * this.cw,
+          "·",
+          this.palette.fish[2],
+          0.2 / i,
+        );
+      }
     }
+
+    const baseFont = this.ctx.font;
+    this.ctx.font = `700 ${Math.round(this.ch * 0.84)}px ${this.fontFamily}`;
+    for (const fish of world.koi) this.drawKoiFish(fish);
+    this.ctx.font = baseFont;
   }
 
   private drawCity(world: AmbientWorld) {

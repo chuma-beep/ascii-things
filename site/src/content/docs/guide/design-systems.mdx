@@ -51,8 +51,8 @@ export function KoiCard() {
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="h-64 bg-black">
-          <AsciiKoi palette="abyss" seed={12} label="A live ASCII koi pond" />
+        <div className="h-96 bg-black">
+          <AsciiKoi palette="abyss" seed={12} count={5} label="A live ASCII koi pond" />
         </div>
       </CardContent>
     </Card>
@@ -60,7 +60,7 @@ export function KoiCard() {
 }
 ```
 
-The `h-64` on the wrapper is the important part. `AsciiKoi` fills the available
+The `h-96` on the wrapper is the important part. `AsciiKoi` fills the available
 height and width; without a sized parent, the canvas has nothing to fill.
 
 ## Material UI

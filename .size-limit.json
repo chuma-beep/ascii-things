@@ -68,13 +68,13 @@
   {
     "name": "react",
     "path": "dist/react.js",
-    "limit": "35 kB",
+    "limit": "37 kB",
     "gzip": true
   },
   {
     "name": "element",
     "path": "dist/element.js",
-    "limit": "35 kB",
+    "limit": "37 kB",
     "gzip": true
   },
   {

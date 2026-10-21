@@ -17,8 +17,8 @@ export function KoiCard() {
         <Badge>live</Badge>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="h-64 w-full bg-black">
-          <AsciiKoi palette="abyss" seed={seed} label="A live ASCII koi pond" />
+        <div className="h-96 w-full bg-black">
+          <AsciiKoi palette="abyss" seed={seed} count={5} label="A live ASCII koi pond" />
         </div>
       </CardContent>
       <CardFooter>
