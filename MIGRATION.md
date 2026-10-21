@@ -207,6 +207,16 @@ same contract.
 | `ascii-things/robots` | `createRobots`, `RobotEngine`, `RobotWorld`, `RobotRenderer` | `AsciiRobotsOptions`, `RobotStats` |
 | `ascii-things/jellyfish` | `createJellyfish`, `JellyfishEngine`, `JellyfishWorld`, `JellyfishRenderer` | `AsciiJellyfishOptions`, `JellyfishStats` |
 | `ascii-things/dog` | `createDog`, `DogEngine`, `DogWorld`, `DogRenderer` | `AsciiDogOptions`, `DogStats` |
+| `ascii-things/starlings`, `ascii-things/fireflies`, `ascii-things/ants`, `ascii-things/koi`, `ascii-things/city`, `ascii-things/servers` | `createStarlings`, `createFireflies`, `createAnts`, `createKoi`, `createCity`, `createServers` and their engines, worlds, and renderers | ambient option and stats types |
+| `ascii-things/image` | `imageToAscii`, `pixelsToAscii`, `renderAsciiImage`, `ASCII_CHARSETS` | `AsciiImageOptions`, `AsciiImageResult`, `AsciiImageSource`, `AsciiImageCharset` |
+| `ascii-things/image/react` | `AsciiImage` | `AsciiImageProps` |
+| `ascii-things/image/element` | `AsciiImageElement` | custom-element detail types |
+| `ascii-things/dither` | `DitherField`, `ditherThreshold`, `shouldDither`, `DITHER_MATRICES`, `DITHER_DEFAULTS` | `DitherFieldOptions`, `DitherMatrixName` |
+| `ascii-things/dither/react` | `AsciiDither` | `AsciiDitherProps` |
+| `ascii-things/dither/element` | `AsciiDitherElement` | custom-element attributes |
+| `ascii-things/webgl` | `AsciiSurfaceEngine`, `resolveGlyphs`, `glyphIndex`, `parseColor`, `surfaceCell`, `SURFACE_DEFAULTS` | `AsciiSurfaceOptions` |
+| `ascii-things/webgl/react` | `AsciiSurface` | `AsciiSurfaceProps` |
+| `ascii-things/webgl/element` | `AsciiSurfaceElement` | custom-element attributes |
 | `ascii-things/react` | `AsciiSharks`, `AsciiRobots`, `AsciiJellyfish`, `AsciiDog`, `AsciiOcean` | component prop types |
 | `ascii-things/element` | `AsciiSharksElement`, `AsciiRobotsElement`, `AsciiJellyfishElement`, `AsciiDogElement` | custom-element detail types |
 | `ascii-things/ui` | `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, `AsciiSceneTabs`, `AsciiDogHero` | UI prop types |
@@ -229,10 +239,10 @@ same contract.
 - [x] Public runtime export snapshot for every entrypoint.
 - [x] Server-render smoke tests for React and UI components.
 - [x] Shared API, actions, palettes, and composition props documented.
-- [ ] Final accessibility and SSR audit pass.
-- [ ] `npm run check:all` and `npm run test:e2e`.
-- [ ] Docs build and migration guide included in the tarball.
-- [ ] Clean-install smoke test from `npm pack`.
+- [x] Final accessibility and SSR audit pass.
+- [x] `npm run check:all` and `npm run test:e2e`.
+- [x] Docs build and migration guide included in the tarball.
+- [x] Clean-install smoke test from `npm pack`.
 - [ ] Version, changelog, and release notes approved.
 
 Until those gates are complete, treat this document and the package as a

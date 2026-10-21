@@ -1,5 +1,8 @@
 import { AsciiSurfaceEngine, type AsciiSurfaceOptions } from "./core";
 
+const Base =
+  typeof HTMLElement !== "undefined" ? HTMLElement : (class {} as unknown as typeof HTMLElement);
+
 function numberAttr(element: HTMLElement, name: string): number | undefined {
   const raw = element.getAttribute(name);
   if (raw === null || raw.trim() === "") return undefined;
@@ -35,7 +38,7 @@ function optionsFrom(element: HTMLElement): AsciiSurfaceOptions {
  *
  * The host owns the frame height. The canvas fills it.
  */
-export class AsciiSurfaceElement extends HTMLElement {
+export class AsciiSurfaceElement extends Base {
   static observedAttributes = [
     "text",
     "glyphs",

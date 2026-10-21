@@ -1,5 +1,8 @@
 import { DitherField, type DitherFieldOptions, type DitherMatrixName } from "./core";
 
+const Base =
+  typeof HTMLElement !== "undefined" ? HTMLElement : (class {} as unknown as typeof HTMLElement);
+
 const MATRICES: DitherMatrixName[] = ["bayer2", "bayer4", "bayer8", "none"];
 
 function numberAttr(element: HTMLElement, name: string): number | undefined {
@@ -37,7 +40,7 @@ function optionsFrom(element: HTMLElement): DitherFieldOptions {
  *
  * The host owns the frame height. The canvas fills it.
  */
-export class AsciiDitherElement extends HTMLElement {
+export class AsciiDitherElement extends Base {
   static observedAttributes = [
     "text",
     "matrix",

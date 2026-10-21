@@ -1,5 +1,17 @@
 # ascii-things
 
+## Unreleased
+
+### Minor Changes
+
+- Add the `ascii-things/image` entry: `imageToAscii`, `pixelsToAscii`, `renderAsciiImage`, `ASCII_CHARSETS`, the `AsciiImage` React wrapper, and the `<ascii-image>` custom element.
+- Add six ambient scenes — starlings, fireflies, ants, koi, city, and servers — with the shared scene API, React wrappers, and custom elements.
+- Expand the first-party React UI primitives.
+- Add the `ascii-things/dither` entry: `DitherField`, `ditherThreshold`, `shouldDither`, `DITHER_MATRICES`, `DITHER_DEFAULTS`, the `AsciiDither` React wrapper, and the `<ascii-dither>` custom element.
+- Add the `ascii-things/webgl` entry: `AsciiSurfaceEngine`, the `AsciiSurface` React wrapper, the `<ascii-surface>` custom element, glyph/colour/cell helpers, and a 2D glyph-field fallback when WebGL is unavailable.
+- Add guides for image-to-ASCII, dither fields, WebGL surfaces, and design-system recipes, plus runnable shadcn/ui and Material UI examples.
+- Extend the frozen subpath surface to cover the new entries, with size budgets and `publint`/`attw` coverage.
+
 ## 1.0.0-rc.0
 
 ### Major Changes

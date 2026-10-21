@@ -3,9 +3,24 @@ title: Changelog
 description: Release notes for ascii-things.
 ---
 
+## Unreleased
+
+Everything below ships with 1.0.
+
+- `ascii-things/image` converts a local image to ASCII text or a canvas, with the
+  `AsciiImage` React wrapper and an `<ascii-image>` custom element.
+- Six ambient scenes — starlings, fireflies, ants, koi, city, and servers — join the
+  original four with the shared scene API.
+- `ascii-things/dither` renders ordered-dither fields with `DitherField`, `AsciiDither`,
+  and `<ascii-dither>`.
+- `ascii-things/webgl` renders a shader-backed ASCII glyph field with `AsciiSurfaceEngine`,
+  `AsciiSurface`, and `<ascii-surface>`, and falls back to a 2D glyph field without WebGL.
+- New guides for image-to-ASCII, dither fields, WebGL surfaces, and design-system recipes,
+  plus runnable shadcn/ui and Material UI examples.
+
 ## 1.0.0-rc.0
 
-The current release candidate. No runtime behavior changes since 0.5.0.
+The previous release candidate. No runtime behavior changes since 0.5.0.
 
 **API freeze**
 

@@ -1,15 +1,15 @@
 # Roadmap notes
 
-## Queued design components
+## Shipped design components
 
-These are intentionally outside the current footer work and outside the 1.0 scope.
+These are now part of the package and the 1.0 surface.
 
-- **Dither components** — reusable ordered and error-diffusion dither patterns for cards, backgrounds, and scene overlays.
-- **ASCII WebGL components** — shader-backed ASCII, dither, and line-scan surfaces that can sit alongside the canvas scenes and design-system recipes.
-- **Integration** — document both in the design-system recipes and use them in the footer and brand-card component set once the footer direction is locked.
+- **Dither components** — `ascii-things/dither` ships ordered-dither fields through `DitherField`, `AsciiDither`, and `<ascii-dither>`.
+- **ASCII WebGL components** — `ascii-things/webgl` ships the shader-backed `AsciiSurfaceEngine`, `AsciiSurface`, and `<ascii-surface>` with a 2D glyph-field fallback.
+- **Integration** — documented in the design-system recipes and used in the runnable shadcn/ui and Material UI examples.
 
 ## Current focus
 
 - Footer treatment is locked to the dither field (`10`); variants `00–09` stay in `footer-lab` for future components.
-- Add the selectable footer kit and the Apple/Google/Tesla-style brand cards.
+- The selectable footer kit and the Apple/Google/Tesla-style brand cards are complete.
 - Keep 1.0 unpublished until explicit approval.

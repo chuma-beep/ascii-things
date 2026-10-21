@@ -1,17 +1,18 @@
 # Quality gates
 
 The package gate stays fast and dependency-light: `npm run check:all` runs Biome, the
-TypeScript check, the 38 Vitest unit tests, the tsup build, publint, attw, and size-limit.
+TypeScript check, the Vitest unit suite, the tsup build, publint, attw, and size-limit.
 
 `npm run test:e2e` adds browser gates through Playwright. It starts Vite on port 5200
 (reusing an already-running dev server locally) and covers:
 
 - **Landing smoke** — expected title, hero canvas, and no console or page errors.
-- **Accessibility** — axe scans `/` and `/examples/ui/`; `critical` violations fail the
-  gate, while `serious` violations are attached to the HTML report as annotations.
-  Known exceptions: small `color-contrast` failures (8 nodes on `/`, 17 on the UI
-  example) in 8 px muted metadata. These are reported but not gated because fixing them
-  changes the visual design; revisit them with a designer rather than lowering the gate.
+- **Accessibility** — axe scans `/` and `/examples/ui/`, plus the dither, WebGL surface,
+  shadcn/ui, and Material UI example pages; `critical` violations fail the gate, while
+  `serious` violations are attached to the HTML report as annotations. Known exceptions:
+  small `color-contrast` failures (8 nodes on `/`, 17 on the UI example) in 8 px muted
+  metadata. These are reported but not gated because fixing them changes the visual
+  design; revisit them with a designer rather than lowering the gate.
 - **Reduced motion** — with `prefers-reduced-motion: reduce`, two hero-canvas captures
   400 ms apart must be byte-identical, and the 390 px landing page must not overflow.
 - **Performance smoke** — normal motion at 1440×900 and 390×844 must report

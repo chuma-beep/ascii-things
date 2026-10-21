@@ -94,6 +94,7 @@ function KoiCard() {
         </Typography>
         <Slider
           size="small"
+          aria-label="Surface density"
           min={0.05}
           max={0.4}
           step={0.01}

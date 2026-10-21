@@ -1,5 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { AsciiDither } from "./dither/react";
+import { AsciiImage } from "./image/react";
 import { AsciiDog } from "./react";
 import { AsciiPrompt, AsciiReadout, AsciiSceneTabs, AsciiStage } from "./ui";
 import { AsciiSurface } from "./webgl/react";
@@ -80,5 +82,18 @@ describe("server rendering", () => {
     expect(html).toContain('role="img"');
     expect(html).toContain('aria-label="A living ASCII field"');
     expect(html).toContain("height:320px");
+  });
+
+  it("renders the dither and image adapters without a DOM", () => {
+    const dither = renderToStaticMarkup(<AsciiDither text="ASCII-THINGS" label="A dither field" />);
+    const image = renderToStaticMarkup(<AsciiImage src="/portrait.png" alt="Portrait" />);
+
+    expect(dither).toContain("<canvas");
+    expect(dither).toContain("ascii-dither");
+    expect(dither).toContain('aria-label="A dither field"');
+    expect(dither).toContain("height:240px");
+    expect(image).toContain("<canvas");
+    expect(image).toContain("ascii-image");
+    expect(image).toContain('aria-label="Portrait"');
   });
 });

@@ -3,8 +3,12 @@ import type { Page } from "@playwright/test";
 import { expect, test, waitForFonts } from "./fixtures";
 
 const PAGES = [
-  { name: "landing", path: "/" },
-  { name: "UI example", path: "/examples/ui/" },
+  { name: "landing", path: "/", ready: null },
+  { name: "UI example", path: "/examples/ui/", ready: ".ascii-dog-hero" },
+  { name: "dither example", path: "/examples/dither/", ready: "canvas.ascii-dither" },
+  { name: "WebGL surface example", path: "/examples/webgl/", ready: "canvas.ascii-surface" },
+  { name: "shadcn example", path: "/examples/shadcn/", ready: "canvas.ascii-surface" },
+  { name: "Material UI example", path: "/examples/mui/", ready: "canvas.ascii-surface" },
 ];
 
 interface ViolationSummary {
@@ -23,8 +27,8 @@ for (const target of PAGES) {
   test(`${target.name} has no critical axe violations`, async ({ page }, testInfo) => {
     await page.goto(target.path);
     await page.waitForLoadState("networkidle");
-    if (target.path !== "/") {
-      await expect(page.locator(".ascii-dog-hero")).toBeVisible();
+    if (target.ready) {
+      await expect(page.locator(target.ready).first()).toBeVisible();
     }
     await waitForFonts(page);
     // Let React mount and the scene settle before auditing.
