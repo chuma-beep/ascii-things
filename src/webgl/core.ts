@@ -5,7 +5,13 @@ export type SurfaceVariant =
   | "flow"
   | "tunnel"
   | "glyph-rain"
-  | "torus";
+  | "torus"
+  | "terrain"
+  | "galaxy"
+  | "voronoi"
+  | "plasma"
+  | "caustics"
+  | "constellation";
 
 const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   field: 0,
@@ -15,6 +21,12 @@ const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   tunnel: 4,
   "glyph-rain": 5,
   torus: 6,
+  terrain: 7,
+  galaxy: 8,
+  voronoi: 9,
+  plasma: 10,
+  caustics: 11,
+  constellation: 12,
 };
 
 export type AsciiSurfaceOptions = {
@@ -174,7 +186,7 @@ void main() {
     float flicker = 0.65 + 0.35 * sin(u_time * 4.0 + column);
     level = trail * flicker;
     weight = 1.0;
-  } else {
+  } else if (u_variant < 6.5) {
     // Torus: a ring with a woven surface, drawn as a single flat primitive.
     vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
     float r = length(p);
@@ -182,6 +194,74 @@ void main() {
     float ring = 1.0 - smoothstep(0.045, 0.11, abs(r - 0.58));
     float weave = 0.5 + 0.5 * sin(a * 16.0 + u_time * 1.6 + r * 9.0);
     level = max(ring * 0.8, weave * 0.35) * (0.6 + 0.4 * sin(u_time * 1.4 + a * 3.0));
+    weight = 1.0;
+  } else if (u_variant < 7.5) {
+    // Terrain: layered ridges over a dark valley.
+    vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
+    float horizon = -0.15;
+    float ridge =
+      0.08 * sin(p.x * 3.0 + u_time * 0.15) +
+      0.04 * sin(p.x * 7.0 - u_time * 0.25) +
+      0.02 * sin(p.x * 13.0 + u_time * 0.4);
+    float line = 1.0 - smoothstep(0.0, 0.035, abs(p.y - horizon - ridge));
+    float under = step(p.y, horizon + ridge) * (0.16 + 0.1 * sin(p.x * 9.0 + p.y * 18.0 + u_time * 0.7));
+    level = max(line, under);
+    weight = 1.0;
+  } else if (u_variant < 8.5) {
+    // Galaxy: spiral arms around a bright core.
+    vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
+    float r = length(p);
+    float a = atan(p.y, p.x);
+    float arms = 0.5 + 0.5 * sin(a * 3.0 + log(r + 0.08) * 7.0 - u_time * 0.8);
+    float core = 1.0 - smoothstep(0.0, 0.36, r);
+    float stars = step(0.986, hash(grid));
+    level = max(arms * smoothstep(1.0, 0.12, r) * 0.65, core * 0.85) + stars * 0.25;
+    weight = 1.0;
+  } else if (u_variant < 9.5) {
+    // Voronoi: bright edges between jittered cell centres.
+    vec2 p = (frag - 0.5 * u_resolution) / u_cell;
+    vec2 cell = floor(p);
+    vec2 f = fract(p);
+    float d1 = 8.0;
+    float d2 = 8.0;
+    for (int y = -1; y <= 1; y++) {
+      for (int x = -1; x <= 1; x++) {
+        vec2 g = vec2(float(x), float(y));
+        vec2 o = vec2(hash(cell + g), hash(cell + g + 17.0));
+        vec2 r = g + o - f;
+        float d = dot(r, r);
+        if (d < d1) {
+          d2 = d1;
+          d1 = d;
+        } else if (d < d2) {
+          d2 = d;
+        }
+      }
+    }
+    float edge = 1.0 - smoothstep(0.0, 0.08, sqrt(d2) - sqrt(d1));
+    level = edge * 0.85;
+    weight = 1.0;
+  } else if (u_variant < 10.5) {
+    // Plasma: interfering waves in a molten field.
+    vec2 p = frag / u_resolution;
+    float v = sin(p.x * 8.0 + u_time) + sin(p.y * 10.0 - u_time * 0.8) + sin((p.x + p.y) * 12.0 + u_time * 0.6);
+    level = smoothstep(0.15, 0.95, 0.5 + 0.5 * sin(v * 1.8));
+    weight = 1.0;
+  } else if (u_variant < 11.5) {
+    // Caustics: bright ridges crossing like a pool floor.
+    vec2 p = frag / min(u_resolution.x, u_resolution.y);
+    float v = sin(p.x * 10.0 + sin(p.y * 7.0 + u_time * 0.7) * 2.0)
+      + sin(p.y * 12.0 + cos(p.x * 6.0 - u_time * 0.5) * 2.0);
+    level = smoothstep(0.75, 1.1, v);
+    weight = 1.0;
+  } else {
+    // Constellation: a starfield stitched with faint links.
+    vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
+    float stars = step(0.988, hash(grid));
+    float twinkle = 0.6 + 0.4 * sin(u_time * 2.0 + hash(grid) * 6.283);
+    float lx = 1.0 - smoothstep(0.0, 0.012, abs(fract(p.x * 6.0) - 0.5));
+    float ly = 1.0 - smoothstep(0.0, 0.012, abs(fract(p.y * 6.0) - 0.5));
+    level = max(stars * twinkle, (lx + ly) * 0.06);
     weight = 1.0;
   }
 

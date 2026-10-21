@@ -44,12 +44,62 @@ const items = [
     description: "A woven ring that turns through the glyph grid.",
     code: '<AsciiSurface variant="torus" />',
   },
+  {
+    variant: "terrain",
+    title: "Terrain",
+    family: "Worlds",
+    description: "Layered ridges under a moving horizon.",
+    code: '<AsciiSurface variant="terrain" />',
+  },
+  {
+    variant: "galaxy",
+    title: "Galaxy",
+    family: "Particles",
+    description: "Spiral arms around a bright core.",
+    code: '<AsciiSurface variant="galaxy" />',
+  },
+  {
+    variant: "voronoi",
+    title: "Voronoi",
+    family: "Cells",
+    description: "Jittered cells with bright edges.",
+    code: '<AsciiSurface variant="voronoi" />',
+  },
+  {
+    variant: "plasma",
+    title: "Plasma",
+    family: "Fields",
+    description: "Interfering waves in a molten field.",
+    code: '<AsciiSurface variant="plasma" />',
+  },
+  {
+    variant: "caustics",
+    title: "Caustics",
+    family: "Water",
+    description: "Crossing light ridges on a pool floor.",
+    code: '<AsciiSurface variant="caustics" />',
+  },
+  {
+    variant: "constellation",
+    title: "Constellation",
+    family: "Signals",
+    description: "A starfield stitched with faint links.",
+    code: '<AsciiSurface variant="constellation" />',
+  },
 ] as const;
+
+interface Props {
+  from?: number;
+  to?: number;
+}
+
+const { from = 0, to = items.length } = Astro.props;
+const visible = items.slice(from, to);
 ---
 
 <div class="webgl-gallery">
   {
-    items.map((item) => (
+    visible.map((item) => (
       <article class="webgl-card">
         <div class="webgl-card__preview">
           <AsciiSurface
