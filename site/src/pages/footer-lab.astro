@@ -383,7 +383,16 @@ const variants = [
 
       .brand-card {
         min-height: 300px;
-        cursor: default;
+        cursor: pointer;
+      }
+
+      .brand-card.is-selected {
+        border-color: var(--orange);
+        box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.45);
+      }
+
+      .brand-card.is-selected .link-kicker {
+        color: var(--ink);
       }
 
       .brand-card .link-copy {
@@ -392,6 +401,63 @@ const variants = [
 
       .brand-card .link-title {
         font-size: 20px;
+      }
+
+      .brand-head-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+      }
+
+      .brand-picker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .brand-pick {
+        appearance: none;
+        min-width: 32px;
+        height: 28px;
+        padding: 0 8px;
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        font-size: 9px;
+        letter-spacing: 0.08em;
+        cursor: pointer;
+      }
+
+      .brand-pick:hover {
+        color: var(--ink);
+        border-color: #4a4a4a;
+      }
+
+      .brand-pick.is-selected {
+        color: var(--orange);
+        border-color: var(--orange);
+        background: rgba(255, 122, 26, 0.08);
+      }
+
+      .brand-pick:focus-visible {
+        outline: 1px solid var(--orange);
+        outline-offset: 2px;
+      }
+
+      .brand-status {
+        margin: 0;
+        color: var(--muted);
+        font-size: 9px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 720px) {
+        .brand-head-actions {
+          align-items: flex-start;
+        }
       }
 
       @media (max-width: 980px) {
@@ -1172,12 +1238,41 @@ const variants = [
             <p class="eyebrow">Design components</p>
             <h2 id="brand-lab-title">Brand cards</h2>
           </div>
-          <p class="link-note">
-            Line-scan card treatment with pointer bend and on-hover detection. Sample brand content.
-          </p>
+          <div class="brand-head-actions">
+            <p class="link-note">
+              Line-scan card treatment with pointer bend and on-hover detection. Sample brand content.
+            </p>
+            <div class="brand-picker" role="group" aria-label="Choose brand card">
+              <button
+                class="brand-pick is-selected"
+                type="button"
+                data-brand="apple"
+                data-name="Apple"
+                aria-pressed="true"
+                tabindex="0">01</button
+              >
+              <button
+                class="brand-pick"
+                type="button"
+                data-brand="google"
+                data-name="Google"
+                aria-pressed="false"
+                tabindex="-1">02</button
+              >
+              <button
+                class="brand-pick"
+                type="button"
+                data-brand="tesla"
+                data-name="Tesla"
+                aria-pressed="false"
+                tabindex="-1">03</button
+              >
+            </div>
+            <p class="brand-status" data-brand-status aria-live="polite">Selected: Apple</p>
+          </div>
         </div>
         <div class="brand-grid">
-          <article class="link-card brand-card" tabindex="0" aria-label="Apple brand card">
+          <article class="link-card brand-card" data-brand="apple" tabindex="0" aria-label="Apple brand card">
             <canvas class="link-canvas" data-label="Apple" />
             <span class="link-shade" />
             <span class="link-copy">
@@ -1187,7 +1282,7 @@ const variants = [
               <span class="link-open">sample card</span>
             </span>
           </article>
-          <article class="link-card brand-card" tabindex="0" aria-label="Google brand card">
+          <article class="link-card brand-card" data-brand="google" tabindex="0" aria-label="Google brand card">
             <canvas class="link-canvas" data-label="Google" />
             <span class="link-shade" />
             <span class="link-copy">
@@ -1197,7 +1292,7 @@ const variants = [
               <span class="link-open">sample card</span>
             </span>
           </article>
-          <article class="link-card brand-card" tabindex="0" aria-label="Tesla brand card">
+          <article class="link-card brand-card" data-brand="tesla" tabindex="0" aria-label="Tesla brand card">
             <canvas class="link-canvas" data-label="Tesla" />
             <span class="link-shade" />
             <span class="link-copy">
@@ -1732,6 +1827,86 @@ const variants = [
       });
 
       selectTreatment(readInitialTreatment(), { persist: false });
+
+      const BRAND_KEY = "ascii-brand-card";
+      const brandPicks = [...document.querySelectorAll(".brand-pick")];
+      const brandCards = [...document.querySelectorAll(".brand-card")];
+      const brandStatus = document.querySelector("[data-brand-status]");
+
+      function readInitialBrand() {
+        try {
+          const stored = localStorage.getItem(BRAND_KEY);
+          if (stored && brandPicks.some((item) => item.dataset.brand === stored)) return stored;
+        } catch {
+          // ignore storage errors
+        }
+        return "apple";
+      }
+
+      function selectBrand(id, options = {}) {
+        const button = brandPicks.find((item) => item.dataset.brand === id) || brandPicks[0];
+        const nextId = button.dataset.brand;
+
+        brandPicks.forEach((item) => {
+          const on = item.dataset.brand === nextId;
+          item.classList.toggle("is-selected", on);
+          item.setAttribute("aria-pressed", String(on));
+          item.tabIndex = on ? 0 : -1;
+        });
+
+        brandCards.forEach((card) => {
+          const on = card.dataset.brand === nextId;
+          card.classList.toggle("is-selected", on);
+          card.setAttribute("aria-current", String(on));
+        });
+
+        if (brandStatus) brandStatus.textContent = `Selected: ${button.dataset.name}`;
+
+        if (options.persist !== false) {
+          try {
+            localStorage.setItem(BRAND_KEY, nextId);
+          } catch {
+            // ignore storage errors
+          }
+        }
+
+        if (options.focus) button.focus({ preventScroll: true });
+      }
+
+      function moveBrand(event, item) {
+        const index = brandPicks.indexOf(item);
+        let next = index;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          next = (index + 1) % brandPicks.length;
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          next = (index - 1 + brandPicks.length) % brandPicks.length;
+        } else if (event.key === "Home") {
+          next = 0;
+        } else if (event.key === "End") {
+          next = brandPicks.length - 1;
+        } else {
+          return;
+        }
+        event.preventDefault();
+        selectBrand(brandPicks[next].dataset.brand, { focus: true });
+      }
+
+      brandPicks.forEach((item) => {
+        item.addEventListener("click", () => selectBrand(item.dataset.brand));
+        item.addEventListener("keydown", (event) => moveBrand(event, item));
+      });
+
+      brandCards.forEach((card) => {
+        card.addEventListener("click", () => selectBrand(card.dataset.brand));
+        card.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectBrand(card.dataset.brand);
+          }
+        });
+      });
+
+      selectBrand(readInitialBrand(), { persist: false });
 
       class LineCard {
         constructor(card, canvas) {
