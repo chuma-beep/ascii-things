@@ -1,0 +1,118 @@
+---
+title: Dither field
+description: An ordered-dither canvas field with a legible wordmark and an animated accent scan.
+---
+
+`ascii-things/dither` is a separate, tree-shakeable entry for building ordered
+dither fields. A field is a grid of dots ordered by a Bayer matrix; a wordmark or
+short line emerges from the field and an accent scan moves across it.
+
+It has no runtime dependencies and owns its own canvas lifecycle: resize,
+visibility pause, reduced motion, and animation.
+
+## Install
+
+```sh
+npm install ascii-things
+```
+
+```ts
+import { DitherField, ditherThreshold, shouldDither } from "ascii-things/dither";
+```
+
+## Use the renderer
+
+```ts
+import { DitherField } from "ascii-things/dither";
+
+const field = new DitherField(canvas, {
+  text: "ASCII-THINGS",
+  matrix: "bayer4",
+  density: 0.1,
+});
+
+// Later, when the canvas leaves the page:
+field.destroy();
+```
+
+`DitherField` re-reads its size from the canvas box and stops when the canvas is
+off-screen, the tab is hidden, or the visitor prefers reduced motion.
+
+## Ordered dither helpers
+
+The matrix threshold is exposed so you can build your own pass:
+
+```ts
+import { ditherThreshold, shouldDither } from "ascii-things/dither";
+
+const threshold = ditherThreshold("bayer4", x, y); // 0–1
+const dot = shouldDither(0.5, "bayer4", x, y);
+```
+
+## React
+
+```tsx
+import { AsciiDither } from "ascii-things/dither/react";
+
+export function Field() {
+  return <AsciiDither text="ASCII-THINGS" matrix="bayer8" density={0.12} />;
+}
+```
+
+`AsciiDither` renders a canvas with `role="img"`. The host owns the frame: give
+the element or its parent a height. The default is `240px`.
+
+## Custom element
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/dither-element.js"></script>
+
+<ascii-dither
+  text="ASCII-THINGS"
+  matrix="bayer4"
+  density="0.1"
+  label="ASCII-THINGS dither field"
+  style="display: block; height: 240px"
+></ascii-dither>
+```
+
+Attribute names use kebab-case, so `wordDensity` is `word-density` and
+`fontFamily` is `font-family`.
+
+## Options
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `text` | `string` | `"ASCII-THINGS"` | Wordmark or short line inside the field |
+| `matrix` | `"bayer2" \| "bayer4" \| "bayer8" \| "none"` | `"bayer4"` | Ordered dither pattern; `"none"` is a flat threshold |
+| `cell` | `number` | `0` | Dot spacing in CSS pixels; `0` derives it from the width |
+| `density` | `number` | `0.1` | Background dot density, 0–1 |
+| `wordDensity` | `number` | `0.78` | Density inside the text mask, 0–1 |
+| `scan` | `boolean` | `true` | Animated accent band |
+| `speed` | `number` | `1` | Speed multiplier for the wave and scan |
+| `foreground` | `string` | `"rgba(236,232,223,0.7)"` | Dot ink |
+| `accent` | `string` | `"rgba(255,122,26,0.92)"` | Scan colour |
+| `background` | `string` | `"transparent"` | Canvas background |
+| `fontFamily` | `string` | mono stack | Font used for the text mask |
+
+The named matrices are:
+
+```ts
+bayer2; // 2×2
+bayer4; // 4×4
+bayer8; // 8×8
+none; // no pattern, a single 0.5 threshold
+```
+
+## Demo
+
+The repository includes an interactive demo with text, matrix, density, scan,
+and motion controls:
+
+```sh
+npm run dev
+# http://localhost:5173/examples/dither/
+```
+
+Source: [`examples/dither`](https://github.com/chuma-beep/ascii-things/tree/main/examples/dither).
+The custom element has a matching page at `/examples/dither/element.html`.

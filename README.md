@@ -462,6 +462,136 @@ CORS; local files avoid that requirement.
 See the [image demo](examples/image/) for drag-and-drop, URL loading, live
 controls, copy, and download.
 
+## Dither field
+
+`ascii-things/dither` renders an ordered-dither dot field with a legible
+wordmark and a moving accent scan. It is a separate tree-shakeable entry, not a
+scene, and has no runtime dependencies.
+
+```ts
+import { DitherField } from "ascii-things/dither";
+
+const field = new DitherField(canvas, {
+  text: "ASCII-THINGS",
+  matrix: "bayer4",
+  density: 0.1,
+});
+
+// later
+field.destroy();
+```
+
+`DitherField` owns resize, visibility, and reduced-motion handling.
+`ditherThreshold(matrix, x, y)` and `shouldDither(value, matrix, x, y)` expose
+the ordered thresholds for custom passes.
+
+### React
+
+```tsx
+import { AsciiDither } from "ascii-things/dither/react";
+
+export function Card() {
+  return <AsciiDither text="ASCII-THINGS" matrix="bayer4" style={{ height: 240 }} />;
+}
+```
+
+### HTML custom element
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/dither-element.js"></script>
+
+<ascii-dither
+  text="ASCII-THINGS"
+  matrix="bayer4"
+  density="0.1"
+  word-density="0.78"
+></ascii-dither>
+```
+
+Attributes: `text`, `matrix`, `cell`, `density`, `word-density`, `scan`,
+`speed`, `foreground`, `accent`, `background`, `font-family`, `label`, `paused`.
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `text` | `string` | `"ASCII-THINGS"` | Wordmark rendered inside the field |
+| `matrix` | `"bayer2" \| "bayer4" \| "bayer8" \| "none"` | `"bayer4"` | Ordered dither pattern |
+| `cell` | `number` | `0` | Dot spacing in CSS pixels; `0` derives from the width |
+| `density` | `number` | `0.1` | Background dot density, 0–1 |
+| `wordDensity` | `number` | `0.78` | Density inside the wordmark, 0–1 |
+| `scan` | `boolean` | `true` | Animated accent scan band |
+| `speed` | `number` | `1` | Motion multiplier |
+| `foreground` | `string` | `"rgba(236,232,223,0.7)"` | Ink colour |
+| `accent` | `string` | `"rgba(255,122,26,0.92)"` | Scan colour |
+| `background` | `string` | `"transparent"` | Canvas background |
+| `fontFamily` | `string` | Geist Mono stack | Wordmark font |
+
+See the [dither demo](examples/dither/) for live text, matrix, density, scan,
+and motion controls.
+
+## WebGL surface
+
+`ascii-things/webgl` renders a living ASCII glyph field with an optional
+wordmark, an accent scan, and pointer response. It uses a WebGL fragment shader
+with a generated glyph atlas and falls back to a 2D glyph field when WebGL is
+unavailable. It is a separate tree-shakeable entry with no runtime
+dependencies.
+
+```ts
+import { AsciiSurfaceEngine } from "ascii-things/webgl";
+
+const surface = new AsciiSurfaceEngine(canvas, {
+  text: "ASCII-THINGS",
+  glyphs: ".:-=+*#%@",
+  density: 0.16,
+  pointer: true,
+});
+
+surface.renderer; // "webgl" | "2d" | "none"
+
+// later
+surface.destroy();
+```
+
+### React
+
+```tsx
+import { AsciiSurface } from "ascii-things/webgl/react";
+
+export function Hero() {
+  return <AsciiSurface text="ASCII-THINGS" density={0.16} style={{ height: 320 }} />;
+}
+```
+
+### HTML custom element
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/webgl-element.js"></script>
+
+<ascii-surface text="ASCII-THINGS" glyphs=".:-=+*#%@" density="0.16"></ascii-surface>
+```
+
+Attributes: `text`, `glyphs`, `cell`, `density`, `speed`, `scan`, `pointer`,
+`foreground`, `accent`, `background`, `font-family`, `max-dpr`, `label`,
+`paused`. The host carries `data-renderer="webgl" | "2d"`.
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `text` | `string` | `"ASCII-THINGS"` | Wordmark that emerges from the field |
+| `glyphs` | `string` | `".:-=+*#%@"` | Character ramp, low brightness first |
+| `cell` | `number` | `0` | Glyph cell height in CSS pixels; `0` derives from the width |
+| `density` | `number` | `0.16` | Ambient field density, 0–1 |
+| `speed` | `number` | `1` | Wave and scan multiplier |
+| `scan` | `boolean` | `true` | Animated accent scan band |
+| `pointer` | `boolean` | `true` | Brighten glyphs near a fine pointer |
+| `foreground` | `string` | `"#ece8df"` | Ink colour |
+| `accent` | `string` | `"#ff7a1a"` | Scan and pointer colour |
+| `background` | `string` | `"transparent"` | Canvas background |
+| `fontFamily` | `string` | Geist Mono stack | Atlas and mask font |
+| `maxDpr` | `number` | `2` | Backing-store pixel ratio cap |
+
+See the [WebGL demo](examples/webgl/) for live text, ramp, density, cell, speed,
+scan, pointer, and motion controls.
+
 ## HTML custom element
 
 ```html
@@ -554,6 +684,10 @@ handle.
   shadcn/ui, Material UI, Tailwind, and custom-element integration patterns.
 - [Image to ASCII](examples/image/) — drag-and-drop portrait conversion with
   charset, contrast, dithering, colour, copy, and download.
+- [Dither field](examples/dither/) — an ordered-dither wordmark with live matrix,
+  density, scan, and motion controls, plus a custom-element variant.
+- [WebGL surface](examples/webgl/) — a shader-backed ASCII glyph field with live
+  text, ramp, density, cell, speed, scan, pointer, and motion controls.
 - [Dog + input](examples/dog-input/) — a focused landing-page hero with the
   robot dog behind a real prompt. Type a command and the dog fetches the ball.
 

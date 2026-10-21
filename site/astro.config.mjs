@@ -70,6 +70,8 @@ export default defineConfig({
             { label: "Custom elements", link: "guide/custom-elements/" },
             { label: "UI components", link: "guide/ui-components/" },
             { label: "Image to ASCII", link: "guide/image/" },
+            { label: "Dither field", link: "guide/dither/" },
+            { label: "WebGL surface", link: "guide/webgl-surface/" },
           ],
         },
         {

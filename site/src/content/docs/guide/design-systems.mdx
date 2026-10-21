@@ -125,6 +125,53 @@ Install MUI alongside the package:
 npm install ascii-things @mui/material @emotion/react @emotion/styled
 ```
 
+## Dither and WebGL surfaces
+
+The `ascii-things/dither` and `ascii-things/webgl` entries are design surfaces
+rather than scenes. Drop them into the same sized-box pattern.
+
+`components/dither-card.tsx`:
+
+```tsx
+"use client";
+
+import { AsciiDither } from "ascii-things/dither/react";
+import { Card, CardContent } from "@/components/ui/card";
+
+export function DitherCard() {
+  return (
+    <Card className="overflow-hidden border-white/10 bg-zinc-950">
+      <CardContent className="p-0">
+        <div className="h-40">
+          <AsciiDither text="ASCII-THINGS" matrix="bayer8" density={0.12} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+`AsciiDither` defaults to `240px`; the Tailwind `h-40` box overrides it. The
+same pattern in MUI with the WebGL surface:
+
+```tsx
+"use client";
+
+import { AsciiSurface } from "ascii-things/webgl/react";
+import { Box } from "@mui/material";
+
+export function SurfacePanel() {
+  return (
+    <Box sx={{ height: 320, bgcolor: "#050607" }}>
+      <AsciiSurface text="ASCII-THINGS" density={0.16} pointer />
+    </Box>
+  );
+}
+```
+
+Both entries are tree-shakeable, so a scene-only app does not pull them in. See
+[Dither field](/guide/dither/) and [WebGL surface](/guide/webgl-surface/).
+
 ## Tailwind, Chakra, Mantine, and friends
 
 The scene does not care which component library owns the box. Use a fixed

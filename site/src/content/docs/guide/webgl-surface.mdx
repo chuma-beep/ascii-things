@@ -1,0 +1,118 @@
+---
+title: WebGL surface
+description: A living WebGL ASCII glyph field with a wordmark, accent scan, and pointer response.
+---
+
+`ascii-things/webgl` is a separate, tree-shakeable entry for a WebGL ASCII
+surface. A surface is a grid of real glyphs: an ambient field drifts and
+shimmers, a wordmark emerges from the field, and an accent scan sweeps across it.
+
+It has no runtime dependencies. When WebGL is unavailable the surface falls back
+to an animated 2D glyph field, so the canvas is never blank.
+
+## Install
+
+```sh
+npm install ascii-things
+```
+
+```ts
+import { AsciiSurfaceEngine } from "ascii-things/webgl";
+```
+
+## Use the engine
+
+```ts
+import { AsciiSurfaceEngine } from "ascii-things/webgl";
+
+const surface = new AsciiSurfaceEngine(canvas, {
+  text: "ASCII-THINGS",
+  density: 0.16,
+  pointer: true,
+});
+
+// The renderer that was selected at runtime:
+surface.renderer; // "webgl" | "2d" | "none"
+
+// Later, when the canvas leaves the page:
+surface.destroy();
+```
+
+The engine owns its own canvas lifecycle: resize, DPR cap, visibility pause,
+reduced motion, pointer response, and WebGL context loss and restore.
+
+## React
+
+```tsx
+import { AsciiSurface } from "ascii-things/webgl/react";
+
+export function Hero() {
+  return (
+    <AsciiSurface
+      text="ASCII-THINGS"
+      glyphs=".:-=+*#%@"
+      density={0.16}
+      style={{ height: 320 }}
+    />
+  );
+}
+```
+
+`AsciiSurface` renders a canvas with `role="img"`. The host owns the frame: give
+the element or its parent a height. The default is `320px`.
+
+## Custom element
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/webgl-element.js"></script>
+
+<ascii-surface
+  text="ASCII-THINGS"
+  density="0.16"
+  pointer
+  label="ASCII-THINGS surface"
+  style="display: block; height: 320px"
+></ascii-surface>
+```
+
+Attribute names use kebab-case, so `fontFamily` is `font-family` and `maxDpr` is
+`max-dpr`. The host mirrors the selected renderer on `data-renderer`.
+
+## Options
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `text` | `string` | `"ASCII-THINGS"` | Wordmark or short line inside the field |
+| `glyphs` | `string` | `".:-=+*#%@"` | Character ramp, low brightness first; up to 16 glyphs |
+| `cell` | `number` | `0` | Glyph cell height in CSS pixels; `0` derives it from the width |
+| `density` | `number` | `0.16` | Ambient field density, 0–1 |
+| `speed` | `number` | `1` | Speed multiplier for the wave and scan |
+| `scan` | `boolean` | `true` | Animated accent scan band |
+| `pointer` | `boolean` | `true` | Brighten glyphs near a fine pointer |
+| `foreground` | `string` | `"#ece8df"` | Glyph ink |
+| `accent` | `string` | `"#ff7a1a"` | Scan and pointer colour |
+| `background` | `string` | `"transparent"` | Canvas background |
+| `fontFamily` | `string` | mono stack | Font used for the glyph atlas and mask |
+| `maxDpr` | `number` | `2` | Backing-store pixel ratio cap |
+
+## Renderer fallback
+
+The engine probes for WebGL when it is constructed. If a context cannot be
+created, it renders the same field with the 2D canvas API. Read `renderer` (or
+`data-renderer` on `<ascii-surface>`) to see which path ran.
+
+Reduced motion draws a single static frame. Visibility and off-screen pauses
+keep the loop idle when the surface is not in view.
+
+## Demo
+
+The repository includes an interactive demo with text, glyph ramp, density,
+cell, speed, scan, pointer, and motion controls:
+
+```sh
+npm run dev
+# http://localhost:5173/examples/webgl/
+```
+
+Source: [`examples/webgl`](https://github.com/chuma-beep/ascii-things/tree/main/examples/webgl).
+The custom element has a matching page at `/examples/webgl/element.html`.
