@@ -87,6 +87,7 @@ export default defineConfig({
         {
           label: "Guides",
           items: [
+            { label: "Design systems", link: "guide/design-systems/" },
             { label: "Theming and palettes", link: "guide/theming/" },
             { label: "Performance", link: "guide/performance/" },
             { label: "Accessibility", link: "guide/accessibility/" },

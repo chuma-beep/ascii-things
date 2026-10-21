@@ -1,0 +1,187 @@
+---
+title: Design system recipes
+description: Use ascii-things inside shadcn/ui, Material UI, Tailwind, Chakra, Mantine, or any React design system.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The React wrappers are canvases, not a design system. They accept `className`,
+`style`, `width`, `height`, and `aspectRatio`, so the host owns the frame. The
+pattern is the same everywhere: give the scene a sized box, let the canvas fill
+it, and let the surrounding library own color, spacing, and state.
+
+<Aside type="note" title="Client-only by design">
+Scenes start their engines after mount. In Next.js, any component that owns
+interaction state needs `"use client"`. In Astro, render the React wrapper with
+`client:load` or `client:visible`. The wrappers are SSR-safe; the canvas is not
+painted until the client runs.
+</Aside>
+
+## shadcn/ui
+
+shadcn/ui copies components into your project. Import them from
+`@/components/ui/...` as usual, and put the scene inside a sized container. The
+surrounding card can use Tailwind; the canvas does not need it.
+
+`components/koi-card.tsx`:
+
+```tsx
+"use client";
+
+import { AsciiKoi } from "ascii-things/react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+export function KoiCard() {
+  return (
+    <Card className="overflow-hidden border-white/10 bg-zinc-950 text-zinc-50">
+      <CardHeader>
+        <div className="flex items-center justify-between gap-4">
+          <CardTitle className="text-sm font-medium">Koi pond</CardTitle>
+          <Badge variant="secondary">live</Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="h-64 bg-black">
+          <AsciiKoi palette="abyss" seed={12} label="A live ASCII koi pond" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+The `h-64` on the wrapper is the important part. `AsciiKoi` fills the available
+height and width; without a sized parent, the canvas has nothing to fill.
+
+## Material UI
+
+MUI can own the card, typography, and controls. Pass a `seed` from React state
+and the scene remounts with a new world.
+
+`components/jellyfish-card.tsx`:
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { AsciiJellyfish } from "ascii-things/react";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Chip,
+  Stack,
+  Typography,
+} from "@mui/material";
+
+export function JellyfishCard() {
+  const [seed, setSeed] = useState(3);
+
+  return (
+    <Card
+      sx={{
+        bgcolor: "#070809",
+        color: "#ece8df",
+        border: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      <CardHeader
+        title={<Typography variant="subtitle2">Jellyfish bloom</Typography>}
+        action={<Chip label="live" size="small" variant="outlined" />}
+      />
+      <Box sx={{ height: 280 }}>
+        <AsciiJellyfish
+          palette="abyss"
+          seed={seed}
+          label="A live ASCII jellyfish bloom"
+        />
+      </Box>
+      <CardContent>
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Typography variant="caption" color="text.secondary">
+            seeded world / abyss
+          </Typography>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => setSeed((value) => value + 1)}
+          >
+            Re-seed
+          </Button>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+Install MUI alongside the package:
+
+```sh
+npm install ascii-things @mui/material @emotion/react @emotion/styled
+```
+
+## Tailwind, Chakra, Mantine, and friends
+
+The scene does not care which component library owns the box. Use a fixed
+height, an aspect ratio, or the `aspectRatio` prop.
+
+```tsx
+import { AsciiCity } from "ascii-things/react";
+
+export function CityPanel() {
+  return (
+    <div className="h-72 overflow-hidden bg-black">
+      <AsciiCity palette="neon" seed={8} label="A live ASCII city grid" />
+    </div>
+  );
+}
+```
+
+The equivalent in Chakra is a `<Box h="18rem">`; in Mantine, `<Box h={288}>`.
+Any component that renders a block-level wrapper with a height works.
+
+If you use the optional [`ascii-things/ui`](/guide/ui-components/) layer inside a
+design system, import `ascii-things/ui.css` once at the app root, not inside each
+card. Its components use CSS variables and can sit inside a shadcn or MUI frame.
+
+## Plain HTML, Vue, Svelte, and Astro
+
+For non-React hosts, use a custom element instead of a wrapper:
+
+```html
+<script type="module" src="/node_modules/ascii-things/dist/element.js"></script>
+
+<ascii-city
+  palette="neon"
+  seed="8"
+  label="A live ASCII city grid"
+  style="display: block; height: 288px"
+></ascii-city>
+```
+
+The host element owns the height. The canvas fills it and handles pointer input
+inside that box.
+
+## Shared rules
+
+- **Give the canvas a height.** Scenes have no intrinsic aspect ratio. Use a
+  fixed height, `aspectRatio`, or a grid/flex track that resolves to a height.
+- **Use `label` for meaningful art.** Without it, the canvas is hidden from
+  assistive technology. With it, the canvas becomes `role="img"` with that name.
+- **Let the library own the frame.** Use shadcn, MUI, Tailwind, or Chakra for
+  borders, radius, spacing, and controls. The scene should not re-implement them.
+- **Pick a palette explicitly when needed.** `palette="auto"` follows the OS
+  color scheme, not the component library's theme. Pass `"paper"` for light
+  surfaces or `"abyss"`/`"neon"` for dark ones.
+- **Keep controls outside the canvas.** Interactive scenes use pointer input
+  inside their box. Put buttons and sliders in a separate toolbar.
+- **Import UI CSS once.** If you use `ascii-things/ui`, import
+  `ascii-things/ui.css` at the app root.
+
+See [React usage](/guide/react/) for live props and remount rules, and
+[SSR and hydration](/guide/ssr/) for the client-component contract.

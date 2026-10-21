@@ -550,6 +550,8 @@ handle.
 - [Playground](examples/playground/) — the query-string demo for every scene.
 - [UI layer](examples/ui/) — first-party React components composing the dog,
   stage, prompt, readout, and palette tabs.
+- [Design system recipes](https://ascii-things-docs.pages.dev/guide/design-systems/) —
+  shadcn/ui, Material UI, Tailwind, and custom-element integration patterns.
 - [Image to ASCII](examples/image/) — drag-and-drop portrait conversion with
   charset, contrast, dithering, colour, copy, and download.
 - [Dog + input](examples/dog-input/) — a focused landing-page hero with the
