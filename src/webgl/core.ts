@@ -13,7 +13,8 @@ export type SurfaceVariant =
   | "caustics"
   | "constellation"
   | "torus-3d"
-  | "cube-3d";
+  | "cube-3d"
+  | "planet-3d";
 
 const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   field: 0,
@@ -31,6 +32,7 @@ const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   constellation: 12,
   "torus-3d": 13,
   "cube-3d": 14,
+  "planet-3d": 15,
 };
 
 export type AsciiSurfaceOptions = {
@@ -119,6 +121,9 @@ float objectSDF(vec3 p) {
   float cb = cos(u_time * 0.22);
   float sb = sin(u_time * 0.22);
   p.xy = mat2(cb, -sb, sb, cb) * p.xy;
+  if (u_variant > 14.5) {
+    return length(p) - 0.72;
+  }
   if (u_variant > 13.5) {
     return sdRoundBox(p, vec3(0.52), 0.06);
   }
@@ -338,7 +343,21 @@ void main() {
       vec3 lightDir = normalize(vec3(-0.45, 0.75, 0.65));
       float diffuse = max(dot(n, lightDir), 0.0);
       float rim = pow(1.0 - max(dot(n, normalize(-rd)), 0.0), 2.5);
-      level = 0.18 + 0.72 * diffuse + 0.45 * rim;
+      if (u_variant > 14.5) {
+        float lat = asin(clamp(n.y, -1.0, 1.0));
+        float lon = atan(n.z, n.x);
+        float land = sin(lon * 2.0 + sin(lat * 3.0) * 1.5)
+          + sin(lat * 4.0 + lon * 1.3)
+          + 0.5 * sin(lon * 5.0 - lat * 2.0);
+        float mask = smoothstep(0.35, 0.75, land);
+        float grid = max(
+          1.0 - smoothstep(0.02, 0.08, abs(fract(lat * 4.0) - 0.5)),
+          1.0 - smoothstep(0.02, 0.08, abs(fract(lon * 6.0) - 0.5))
+        );
+        level = max(level * (0.68 + 0.32 * mask), grid * (0.25 + 0.25 * diffuse));
+      } else {
+        level = 0.32 + 0.58 * diffuse + 0.38 * rim;
+      }
     } else {
       level = starField;
     }
