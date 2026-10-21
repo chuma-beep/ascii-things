@@ -20,6 +20,18 @@ exports[`public API surface > matches the frozen export names 1`] = `
     "AsciiSharksElement",
     "AsciiStarlingsElement",
   ],
+  "image": [
+    "ASCII_CHARSETS",
+    "imageToAscii",
+    "pixelsToAscii",
+    "renderAsciiImage",
+  ],
+  "imageElement": [
+    "AsciiImageElement",
+  ],
+  "imageReact": [
+    "AsciiImage",
+  ],
   "index": [
     "AntEngine",
     "AntRenderer",

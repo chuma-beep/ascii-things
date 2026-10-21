@@ -1,7 +1,7 @@
 {
   "name": "ascii-things",
   "version": "1.0.0-rc.0",
-  "description": "Living ASCII scenes for the web: sharks, moving robots, jellyfish, and a robot dog.",
+  "description": "Living ASCII scenes and image-to-ASCII art for the web: ten simulations and a zero-dependency renderer.",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -20,6 +20,7 @@
   "type": "module",
   "sideEffects": [
     "./dist/element.js",
+    "./dist/image-element.js",
     "./dist/ui.css"
   ],
   "main": "./dist/index.js",
@@ -89,6 +90,18 @@
       "types": "./dist/ui.d.ts",
       "import": "./dist/ui.js"
     },
+    "./image": {
+      "types": "./dist/image.d.ts",
+      "import": "./dist/image.js"
+    },
+    "./image/react": {
+      "types": "./dist/image-react.d.ts",
+      "import": "./dist/image-react.js"
+    },
+    "./image/element": {
+      "types": "./dist/image-element.d.ts",
+      "import": "./dist/image-element.js"
+    },
     "./ui.css": "./dist/ui.css"
   },
   "keywords": [
@@ -100,7 +113,10 @@
     "sharks",
     "robots",
     "jellyfish",
-    "robot-dog"
+    "robot-dog",
+    "image-to-ascii",
+    "ascii-image",
+    "dithering"
   ],
   "scripts": {
     "dev": "vite",

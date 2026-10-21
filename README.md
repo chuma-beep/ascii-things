@@ -399,6 +399,85 @@ scene beneath.
 
 See the [UI example](examples/ui/) for the full composition.
 
+## Image to ASCII
+
+`ascii-things/image` turns a local image, `Blob`, `ImageBitmap`, or URL into
+monochrome or colour ASCII. It is a separate tree-shakeable entry, not a living
+scene, and has no runtime dependencies.
+
+```ts
+import { imageToAscii, renderAsciiImage } from "ascii-things/image";
+
+const text = await imageToAscii(file, {
+  columns: 80,
+  charset: "classic",
+  dither: "floyd-steinberg",
+});
+
+await renderAsciiImage(canvas, file, {
+  columns: 80,
+  color: true,
+});
+```
+
+### React
+
+```tsx
+import { AsciiImage } from "ascii-things/image/react";
+
+export function Portrait({ file }: { file: File }) {
+  return (
+    <AsciiImage
+      src={file}
+      columns={80}
+      dither="bayer"
+      alt="A portrait rendered in ASCII"
+    />
+  );
+}
+```
+
+`AsciiImage` renders a canvas with `role="img"` and the supplied `alt` text.
+The optional `onRender(result)` and `onError(error)` callbacks expose the plain
+text, dimensions, and per-cell colours.
+
+### HTML custom element
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/image-element.js"></script>
+
+<ascii-image
+  src="/portrait.png"
+  columns="80"
+  charset="classic"
+  label="A portrait rendered in ASCII"
+></ascii-image>
+```
+
+The element dispatches bubbling, composed `ascii-ready` and `ascii-error`
+events. Attributes: `src`, `columns`, `charset`, `invert`, `dither`, `contrast`,
+`color`, `foreground`, `background`, `font-family`, and `label`.
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `columns` | `number` | `80` | Characters across; 8–400 |
+| `charset` | `"classic" \| "blocks" \| "dots" \| string` | `"classic"` | Custom ramps run dark to light |
+| `invert` | `boolean` | `false` | Flip the ramp |
+| `dither` | `"none" \| "floyd-steinberg" \| "bayer"` | `"none"` | Opt-in error diffusion or ordered dithering |
+| `contrast` | `number` | `1` | Multiplier around mid-grey; 0.1–4 |
+| `color` | `boolean` | `false` | Draw from the source pixels |
+| `foreground` | `string` | `"#ece8df"` | Monochrome ink |
+| `background` | `string` | `"#070809"` | Canvas background |
+| `fontFamily` | `string` | Geist Mono stack | Drawing font |
+
+`imageToAscii` returns the plain text. `renderAsciiImage` returns
+`{ text, columns, rows, colors }` and draws to a canvas. Both accept `File`,
+`Blob`, `HTMLImageElement`, `ImageBitmap`, or a URL. Remote URLs must allow
+CORS; local files avoid that requirement.
+
+See the [image demo](examples/image/) for drag-and-drop, URL loading, live
+controls, copy, and download.
+
 ## HTML custom element
 
 ```html
@@ -487,6 +566,8 @@ handle.
 - [Playground](examples/playground/) — the query-string demo for every scene.
 - [UI layer](examples/ui/) — first-party React components composing the dog,
   stage, prompt, readout, and palette tabs.
+- [Image to ASCII](examples/image/) — drag-and-drop portrait conversion with
+  charset, contrast, dithering, colour, copy, and download.
 - [Dog + input](examples/dog-input/) — a focused landing-page hero with the
   robot dog behind a real prompt. Type a command and the dog fetches the ball.
 

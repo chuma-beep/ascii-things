@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import * as dog from "./dog";
 import * as element from "./element";
+import * as image from "./image";
+import * as imageElement from "./image/element";
+import * as imageReact from "./image/react";
 import * as jellyfish from "./jellyfish";
 import * as main from "./index";
 import * as react from "./react";
@@ -24,6 +27,9 @@ describe("public API surface", () => {
       react: Object.keys(react).sort(),
       ui: Object.keys(ui).sort(),
       element: Object.keys(element).sort(),
+      image: Object.keys(image).sort(),
+      imageReact: Object.keys(imageReact).sort(),
+      imageElement: Object.keys(imageElement).sort(),
     }).toMatchSnapshot();
   });
 });

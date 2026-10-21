@@ -82,5 +82,23 @@
     "path": "dist/ui.js",
     "limit": "45 kB",
     "gzip": true
+  },
+  {
+    "name": "image",
+    "path": "dist/image.js",
+    "limit": "10 kB",
+    "gzip": true
+  },
+  {
+    "name": "image-react",
+    "path": "dist/image-react.js",
+    "limit": "10 kB",
+    "gzip": true
+  },
+  {
+    "name": "image-element",
+    "path": "dist/image-element.js",
+    "limit": "10 kB",
+    "gzip": true
   }
 ]

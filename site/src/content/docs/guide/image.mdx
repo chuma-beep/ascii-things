@@ -1,0 +1,134 @@
+---
+title: Image to ASCII
+description: Convert a local image, Blob, ImageBitmap, or URL into ASCII art in the browser.
+---
+
+`ascii-things/image` is a separate, tree-shakeable entry for turning images into
+ASCII. It is not a living scene: there is no loop, no world, and no canvas
+engine. You give it pixels; it gives you text or a drawn canvas.
+
+It has no runtime dependencies and runs entirely in the browser.
+
+## Install
+
+```sh
+npm install ascii-things
+```
+
+```ts
+import { imageToAscii, renderAsciiImage } from "ascii-things/image";
+```
+
+## Convert to text
+
+```ts
+const text = await imageToAscii(file, {
+  columns: 80,
+  charset: "classic",
+  dither: "floyd-steinberg",
+});
+
+console.log(text);
+```
+
+`imageToAscii()` accepts a `File`, `Blob`, `HTMLImageElement`, `ImageBitmap`, or
+a URL string. It resolves with the plain-text art.
+
+## Draw to a canvas
+
+```ts
+await renderAsciiImage(canvas, file, {
+  columns: 80,
+  color: true,
+  background: "#070809",
+});
+```
+
+`renderAsciiImage()` resolves with `{ text, columns, rows, colors }` and paints
+the characters into the supplied canvas. The canvas is sized from its rendered
+width, with the backing store capped at 2× DPR.
+
+## React
+
+```tsx
+import { AsciiImage } from "ascii-things/image/react";
+
+export function Portrait({ file }: { file: File }) {
+  return (
+    <AsciiImage
+      src={file}
+      columns={80}
+      dither="bayer"
+      alt="A portrait rendered in ASCII"
+    />
+  );
+}
+```
+
+`AsciiImage` renders a canvas with `role="img"` and the supplied `alt`. Use
+`onRender(result)` to read the generated text and colours, or `onError(error)`
+to handle a failed load.
+
+## Custom element
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/image-element.js"></script>
+
+<ascii-image
+  src="/portrait.png"
+  columns="80"
+  charset="classic"
+  dither="bayer"
+  label="A portrait rendered in ASCII"
+></ascii-image>
+```
+
+The element dispatches bubbling, composed `ascii-ready` and `ascii-error`
+events. The ready event carries `{ result }`; the error event carries `{ error }`.
+
+## Options
+
+| Option | Type | Default | |
+|---|---|---|---|
+| `columns` | `number` | `80` | Characters across; clamped to 8–400 |
+| `charset` | `"classic" \| "blocks" \| "dots" \| string` | `"classic"` | A named ramp or any dark-to-light string |
+| `invert` | `boolean` | `false` | Flip the luminance ramp |
+| `dither` | `"none" \| "floyd-steinberg" \| "bayer"` | `"none"` | Error diffusion or ordered dithering |
+| `contrast` | `number` | `1` | Multiplier around mid-grey; clamped to 0.1–4 |
+| `color` | `boolean` | `false` | Draw glyphs from the source pixels |
+| `foreground` | `string` | `"#ece8df"` | Monochrome ink |
+| `background` | `string` | `"#070809"` | Canvas background |
+| `fontFamily` | `string` | Geist Mono stack | Font used when drawing |
+
+The named ramps are:
+
+```ts
+classic; // "@%#*+=-:. "
+blocks; // "█▓▒░ "
+dots; // "●◉◎○· "
+```
+
+Custom ramps are read from dark to light. Set `invert` when your ramp runs the
+other way.
+
+## Loading images
+
+Remote URLs are subject to CORS. If the server does not send an
+`Access-Control-Allow-Origin` header, the browser cannot read the pixels.
+Local files selected by the user avoid the restriction.
+
+The custom element and React wrapper do not fetch anything until they are
+mounted in the browser. For server-rendered pages, render the canvas on the
+client.
+
+## Demo
+
+The repository includes a full drag-and-drop demo with URL loading, live
+columns, contrast, charset, dither, invert, colour, copy, and download controls:
+
+```sh
+npm run dev
+# http://localhost:5173/examples/image/
+```
+
+Source: [`examples/image`](https://github.com/chuma-beep/ascii-things/tree/main/examples/image).

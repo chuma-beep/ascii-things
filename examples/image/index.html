@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image to ASCII — ascii-things</title>
+    <meta
+      name="description"
+      content="Turn any image into ASCII art with ascii-things/image. Drop a portrait, adjust the ramp, copy or download the text."
+    />
+    <meta name="theme-color" content="#070809" />
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/examples/image/style.css" />
+    <script type="module" src="/examples/image/main.ts"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">ascii-things<span>®</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="/">Landing</a>
+        <a href="/examples/ui/">UI</a>
+        <a href="https://github.com/chuma-beep/ascii-things">GitHub ↗</a>
+      </nav>
+      <div class="header-end">
+        <span class="version">image / 1.0.0-rc.0</span>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><i></i> IMAGE → ASCII / 01</p>
+          <h1 id="hero-title">Your image.<br /><em>In characters.</em></h1>
+          <p class="lede">
+            Drop a portrait, a logo, or a screenshot. Tune the ramp, contrast, and
+            dithering, then copy the text or download it. The library does the rest.
+          </p>
+
+          <div class="drop" id="drop">
+            <input id="file" type="file" accept="image/*" hidden />
+            <div class="drop-copy">
+              <span class="drop-title">Drop an image here</span>
+              <span class="drop-sub">PNG, JPEG, WebP, GIF · or choose a file</span>
+            </div>
+            <button class="button primary" id="pick" type="button">Choose image</button>
+          </div>
+
+          <form class="url-form" id="url-form">
+            <label class="sr-only" for="url">Image URL</label>
+            <span class="prompt-caret">›</span>
+            <input
+              id="url"
+              type="url"
+              inputmode="url"
+              autocomplete="off"
+              placeholder="https://example.com/portrait.png"
+            />
+            <button type="submit">Load URL</button>
+          </form>
+          <p class="hint">Remote images need CORS headers. Local files always work.</p>
+          <p class="error" id="error" role="alert"></p>
+
+          <div class="controls" aria-label="ASCII options">
+            <label class="control">
+              <span>Columns <output id="columns-value">80</output></span>
+              <input id="columns" type="range" min="32" max="160" step="1" value="80" />
+            </label>
+
+            <label class="control">
+              <span>Contrast <output id="contrast-value">1.00</output></span>
+              <input
+                id="contrast"
+                type="range"
+                min="0.5"
+                max="2"
+                step="0.05"
+                value="1"
+              />
+            </label>
+
+            <label class="control">
+              <span>Character set</span>
+              <select id="charset">
+                <option value="classic">Classic · @%#*+=-:.</option>
+                <option value="blocks">Blocks · █▓▒░</option>
+                <option value="dots">Dots · ●◉◎○·</option>
+              </select>
+            </label>
+
+            <label class="control">
+              <span>Dither</span>
+              <select id="dither">
+                <option value="none">None</option>
+                <option value="floyd-steinberg">Floyd–Steinberg</option>
+                <option value="bayer">Bayer 4×4</option>
+              </select>
+            </label>
+
+            <label class="check">
+              <input id="invert" type="checkbox" />
+              <span>Invert luminance</span>
+            </label>
+
+            <label class="check">
+              <input id="color" type="checkbox" />
+              <span>Colour the glyphs</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="preview">
+          <div class="preview-head">
+            <div class="source">
+              <img id="source-preview" src="/examples/image/avatar.png" alt="Current source" />
+              <span id="source-name">github.com/chuma-beep</span>
+            </div>
+            <span class="stats" id="stats">—</span>
+          </div>
+
+          <div class="canvas-wrap">
+            <canvas id="canvas" role="img" aria-label="ASCII art preview"></canvas>
+          </div>
+
+          <div class="actions">
+            <button class="button primary" id="copy" type="button">Copy text</button>
+            <button class="button ghost" id="download" type="button">Download .txt</button>
+          </div>
+
+          <details class="plain">
+            <summary>Plain text output</summary>
+            <pre id="text"></pre>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>ascii-things / image</span>
+      <span>MIT · built from pixels</span>
+    </footer>
+  </body>
+</html>
