@@ -328,3 +328,16 @@ h4 {
   border-inline-start: 0;
   border-left: 0;
 }
+
+/* Selected sidebar items use the same square language as the rest of the UI. */
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:focus-visible {
+  border-radius: 0;
+}
+
+.right-sidebar a[aria-current="true"],
+.right-sidebar a[aria-current="true"]:hover,
+.right-sidebar a[aria-current="true"]:focus-visible {
+  border-radius: 0;
+}
