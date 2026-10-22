@@ -14,7 +14,8 @@ export type SurfaceVariant =
   | "constellation"
   | "torus-3d"
   | "cube-3d"
-  | "planet-3d";
+  | "planet-3d"
+  | "helix-3d";
 
 const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   field: 0,
@@ -33,6 +34,7 @@ const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   "torus-3d": 13,
   "cube-3d": 14,
   "planet-3d": 15,
+  "helix-3d": 16,
 };
 
 export type AsciiSurfaceOptions = {
@@ -114,6 +116,13 @@ float sdRoundBox(vec3 p, vec3 b, float r) {
   return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0) - r;
 }
 
+float sdHelix(vec3 p) {
+  float y = clamp(p.y, -0.5, 0.5);
+  float t = atan(p.z, p.x) + 6.28318 * (y + 0.5) * 2.0;
+  vec3 c = vec3(0.55 * cos(t), y, 0.55 * sin(t));
+  return length(p - c) - 0.2;
+}
+
 float objectSDF(vec3 p) {
   float ca = cos(u_time * 0.35);
   float sa = sin(u_time * 0.35);
@@ -121,6 +130,9 @@ float objectSDF(vec3 p) {
   float cb = cos(u_time * 0.22);
   float sb = sin(u_time * 0.22);
   p.xy = mat2(cb, -sb, sb, cb) * p.xy;
+  if (u_variant > 15.5) {
+    return sdHelix(p);
+  }
   if (u_variant > 14.5) {
     return length(p) - 0.72;
   }
