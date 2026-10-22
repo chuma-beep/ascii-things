@@ -1155,3 +1155,62 @@ button {
 #install {
   scroll-margin-top: clamp(70px, 9vh, 100px);
 }
+
+/* ----------------------------------------------------------------- library nav */
+
+.nav-library {
+  position: relative;
+}
+
+.nav-library summary {
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+  transition: color 160ms ease;
+}
+
+.nav-library summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-library summary::after {
+  content: "▾";
+  margin-left: 5px;
+  color: var(--faint);
+  font-size: 7px;
+}
+
+.nav-library[open] summary,
+.nav-library summary:hover {
+  color: var(--ink);
+}
+
+.nav-library__panel {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: -10px;
+  z-index: 20;
+  display: grid;
+  min-width: 190px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+.nav-library__panel a {
+  padding: 8px 10px;
+  color: var(--faint);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition:
+    color 140ms ease,
+    background-color 140ms ease;
+}
+
+.nav-library__panel a:hover {
+  color: var(--orange);
+  background: var(--panel);
+}
+
