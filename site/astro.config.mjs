@@ -33,6 +33,10 @@ export default defineConfig({
         baseUrl: "https://github.com/chuma-beep/ascii-things/edit/main/site/",
       },
       customCss: ["./src/styles/docs.css"],
+      components: {
+        Header: "./src/components/DocsHeader.astro",
+        Sidebar: "./src/components/DocsSidebar.astro",
+      },
       head: [
         { tag: "meta", attrs: { name: "theme-color", content: "#070809" } },
         {

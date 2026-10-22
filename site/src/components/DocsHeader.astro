@@ -1,0 +1,61 @@
+---
+import config from "virtual:starlight/user-config";
+
+import LanguageSelect from "virtual:starlight/components/LanguageSelect";
+import Search from "virtual:starlight/components/Search";
+import SiteTitle from "virtual:starlight/components/SiteTitle";
+import SocialIcons from "virtual:starlight/components/SocialIcons";
+import ThemeSelect from "virtual:starlight/components/ThemeSelect";
+
+const shouldRenderSearch =
+  config.pagefind || config.components.Search !== "@astrojs/starlight/components/Search.astro";
+---
+
+<div class="docs-header">
+  <div class="docs-header-top">
+    <div class="title-wrapper sl-flex"><SiteTitle /></div>
+    <div class="sl-flex print:hidden">{shouldRenderSearch && <Search />}</div>
+    <div class="sl-hidden md:sl-flex print:hidden right-group">
+      <div class="sl-flex social-icons"><SocialIcons /></div>
+      <ThemeSelect />
+      <LanguageSelect />
+    </div>
+  </div>
+
+  <nav class="docs-primary-nav" aria-label="Primary">
+    <details class="docs-library">
+      <summary>Library</summary>
+      <div class="docs-library-panel">
+        <a href="/library/">All items</a>
+        <a href="/library/#library-search">Search the library</a>
+        <a href="/#scenes">Scenes</a>
+        <a href="/webgl/">WebGL</a>
+        <a href="/components/">Components</a>
+        <a href="/playground/">Tools</a>
+      </div>
+    </details>
+    <a href="/#scenes">Scenes</a>
+    <a href="/webgl/">WebGL</a>
+    <a href="/components/">Components</a>
+    <a href="/guide/">Docs</a>
+    <a href="/api/">API</a>
+    <a href="/playground/">Playground ↗</a>
+  </nav>
+</div>
+
+<script>
+  const closeLibraryMenu = (event: Event) => {
+    document.querySelectorAll<HTMLDetailsElement>(".docs-library[open]").forEach((details) => {
+      if (event.type === "keydown" && (event as KeyboardEvent).key === "Escape") {
+        details.removeAttribute("open");
+        return;
+      }
+      if (!(event.target instanceof Node) || !details.contains(event.target)) {
+        details.removeAttribute("open");
+      }
+    });
+  };
+
+  document.addEventListener("click", closeLibraryMenu);
+  document.addEventListener("keydown", closeLibraryMenu);
+</script>

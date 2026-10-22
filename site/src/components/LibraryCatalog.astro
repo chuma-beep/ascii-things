@@ -23,6 +23,7 @@ const filters = [
     <label class="library-search">
       <span class="library-sr">Search the library</span>
       <input
+        id="library-search"
         type="search"
         placeholder="Search scenes, WebGL, components, tools…"
         data-library-search
@@ -78,7 +79,7 @@ const filters = [
   const root = document.querySelector(".library-catalog");
 
   if (root) {
-    const search = root.querySelector("[data-library-search]");
+    const search = root.querySelector<HTMLInputElement>("[data-library-search]");
     const buttons = Array.from(root.querySelectorAll("[data-filter]"));
     const cards = Array.from(root.querySelectorAll(".library-card"));
     const count = root.querySelector("[data-library-count]");
@@ -102,6 +103,12 @@ const filters = [
     };
 
     search?.addEventListener("input", apply);
+
+    const focusFromHash = () => {
+      if (window.location.hash === "#library-search") search?.focus();
+    };
+    focusFromHash();
+    window.addEventListener("hashchange", focusFromHash);
 
     buttons.forEach((button) => {
       button.addEventListener("click", () => {
