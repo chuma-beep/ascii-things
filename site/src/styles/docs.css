@@ -522,7 +522,7 @@ site-search kbd kbd {
     left: -0.6rem;
     z-index: 20;
     display: grid;
-    min-width: 12rem;
+    min-width: 17rem;
     padding: 0.35rem;
     border: 1px solid var(--sl-color-gray-5);
     background: var(--sl-color-bg-nav);
