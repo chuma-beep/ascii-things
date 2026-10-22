@@ -61,6 +61,10 @@ export default defineConfig({
       ],
       sidebar: [
         {
+          label: "Explore",
+          items: [{ label: "Library", link: "library/" }],
+        },
+        {
           label: "Start here",
           items: [
             { label: "Introduction", link: "guide/" },
