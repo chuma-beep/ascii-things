@@ -1,36 +1,49 @@
 ---
 const faces = [
-  { name: "front", tone: "dark", glyphs: "永龍風水火土空海月" },
-  { name: "right", tone: "light", glyphs: "花鳥山川光雨雪雲星" },
-  { name: "top", tone: "dark", glyphs: "心夢愛和美真善力魂" },
-  { name: "left", tone: "light", glyphs: "木林森石天地日夜春" },
-  { name: "back", tone: "dark", glyphs: "夏秋冬朝夕東西南北" },
-  { name: "bottom", tone: "light", glyphs: "金銀銅鉄玉珠音色香" },
+  { name: "front", glyphs: "永龍風水火土空海月" },
+  { name: "right", glyphs: "花鳥山川光雨雪雲星" },
+  { name: "top", glyphs: "心夢愛和美真善力魂" },
+  { name: "left", glyphs: "木林森石天地日夜春" },
+  { name: "back", glyphs: "夏秋冬朝夕東西南北" },
+  { name: "bottom", glyphs: "金銀銅鉄玉珠音色香" },
 ];
+
+const asciiGlyphs = ["+", "-", "/", "\\", "|", ".", ":", "*", "="];
 ---
 
 <div class="design-gallery">
   <article class="design-piece" id="rubik">
     <header class="design-piece__head">
-      <p class="design-piece__meta">3D object / CSS / Kanji</p>
+      <p class="design-piece__meta">3D object / CSS / Kanji + ASCII</p>
       <h2>Rubik's cube</h2>
       <p>
-        A black-and-white 3D cube with 54 kanji stickers. It turns continuously in perspective,
-        keeping the faces and glyph grid readable.
+        A black-and-white ASCII field cube. Each face is a 3×3 grid of tiles; every tile holds a
+        kanji at its center, surrounded by a field of ASCII marks. The cube turns continuously in
+        perspective.
       </p>
     </header>
     <div class="design-piece__stage design-piece__stage--cube">
       <div
         class="rubik-scene"
         role="img"
-        aria-label="A rotating black-and-white 3D Rubik's cube covered in kanji"
+        aria-label="A rotating black-and-white ASCII cube with kanji fields"
       >
         <div class="rubik-cube" aria-hidden="true">
           {
             faces.map((face) => (
-              <div class={`rubik-face rubik-face--${face.name} is-${face.tone}`}>
-                {Array.from(face.glyphs).map((glyph) => (
-                  <span>{glyph}</span>
+              <div class={`rubik-face rubik-face--${face.name}`}>
+                {Array.from(face.glyphs).map((kanji, tileIndex) => (
+                  <div class="rubik-tile">
+                    {Array.from({ length: 9 }).map((_, cellIndex) =>
+                      cellIndex === 4 ? (
+                        <span class="rubik-cell rubik-kanji">{kanji}</span>
+                      ) : (
+                        <span class="rubik-cell">
+                          {asciiGlyphs[(tileIndex * 3 + cellIndex) % asciiGlyphs.length]}
+                        </span>
+                      ),
+                    )}
+                  </div>
                 ))}
               </div>
             ))
@@ -39,7 +52,7 @@ const faces = [
       </div>
     </div>
     <footer class="design-piece__foot">
-      <code>CSS 3D · 6 faces · 54 kanji</code>
+      <code>CSS 3D · 54 kanji · 432 ASCII cells</code>
     </footer>
   </article>
 </div>
@@ -99,7 +112,9 @@ const faces = [
     height: 380px;
     padding: 0;
     overflow: hidden;
-    background: #050607;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(245, 241, 232, 0.06), transparent 55%),
+      #050607;
   }
 
   .rubik-scene {
@@ -113,7 +128,7 @@ const faces = [
   }
 
   .rubik-cube {
-    --cube: clamp(160px, 44vw, 205px);
+    --cube: clamp(170px, 46vw, 215px);
     position: relative;
     width: var(--cube);
     height: var(--cube);
@@ -127,35 +142,37 @@ const faces = [
     inset: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    padding: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: #08090b;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid rgba(245, 241, 232, 0.14);
+    background: #0a0b0d;
     backface-visibility: hidden;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.65);
   }
 
-  .rubik-face.is-dark {
-    --sticker: #0a0a0a;
-    --ink: #f5f1e8;
+  .rubik-tile {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #0d0e10;
+    box-shadow: inset 0 0 0 1px rgba(245, 241, 232, 0.06);
   }
 
-  .rubik-face.is-light {
-    --sticker: #f5f1e8;
-    --ink: #0a0a0a;
-  }
-
-  .rubik-face span {
+  .rubik-cell {
     display: grid;
     place-items: center;
-    background: var(--sticker);
-    color: var(--ink);
+    color: rgba(245, 241, 232, 0.4);
+    font-family: var(--sl-font-mono);
+    font-size: clamp(0.42rem, 1vw, 0.58rem);
+    line-height: 1;
+  }
+
+  .rubik-kanji {
+    color: #f5f1e8;
     font-family:
       "Noto Serif CJK JP", "Yu Mincho", "Hiragino Mincho ProN", "Noto Sans CJK JP", serif;
-    font-size: clamp(0.72rem, 1.8vw, 1.05rem);
+    font-size: clamp(0.62rem, 1.5vw, 0.82rem);
     font-weight: 500;
-    line-height: 1;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
   }
 
   .rubik-face--front {
