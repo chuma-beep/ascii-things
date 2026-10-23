@@ -56,6 +56,58 @@ const items = [
     accent: "#7ee787",
     code: '<AsciiSurface variant="helix-3d" glyphs="龍神光" />',
   },
+  {
+    variant: "glyph-rain" as const,
+    title: "Kanji rain",
+    family: "Weather",
+    description: "Columns of rain, wind, water, and sound falling through the dark.",
+    glyphs: "雨風水音",
+    text: "",
+    density: 0.38,
+    cell: 12,
+    foreground: "#b8d8ff",
+    accent: "#7fbcff",
+    code: '<AsciiSurface variant="glyph-rain" glyphs="雨風水音" />',
+  },
+  {
+    variant: "ripple" as const,
+    title: "Kanji pond",
+    family: "Water",
+    description: "Concentric rings of water, wave, moon, and shadow characters.",
+    glyphs: "水波月影",
+    text: "",
+    density: 0.3,
+    cell: 12,
+    foreground: "#b8d8ff",
+    accent: "#7fbcff",
+    code: '<AsciiSurface variant="ripple" glyphs="水波月影" />',
+  },
+  {
+    variant: "tunnel" as const,
+    title: "Kanji gate",
+    family: "Architecture",
+    description: "A corridor of gates and lantern light made from 門, 光, and 道.",
+    glyphs: "門光道",
+    text: "",
+    density: 0.3,
+    cell: 12,
+    foreground: "#ffd7a8",
+    accent: "#ff7a1a",
+    code: '<AsciiSurface variant="tunnel" glyphs="門光道" />',
+  },
+  {
+    variant: "galaxy" as const,
+    title: "Kanji galaxy",
+    family: "Sky",
+    description: "A spiral of star, moon, night, and light characters.",
+    glyphs: "星月夜光",
+    text: "",
+    density: 0.3,
+    cell: 11,
+    foreground: "#d8d0ff",
+    accent: "#a78bfa",
+    code: '<AsciiSurface variant="galaxy" glyphs="星月夜光" />',
+  },
 ];
 ---
 
@@ -98,6 +150,7 @@ const items = [
   }
 
   .kanji-card {
+    scroll-margin-top: calc(var(--sl-nav-height, 4rem) + 1rem);
     overflow: hidden;
     border: 1px solid rgba(236, 232, 223, 0.16);
     background: #0b0d0f;

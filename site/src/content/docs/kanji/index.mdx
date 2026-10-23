@@ -1,15 +1,23 @@
 ---
 title: Kanji Lab
-description: ASCII surfaces and 3D models rendered with kanji glyphs.
+description: ASCII fields, scenes, and 3D models rendered with kanji glyphs.
 ---
 
 import KanjiGallery from "@components/KanjiGallery.astro";
+import KanjiMarks from "@components/KanjiMarks.astro";
 
 Kanji are already glyphs. The same `AsciiSurface` engine can use them as its
 character ramp, turning a field into a type study and turning the true 3D
-objects into kanji-built models.
+objects into kanji-built models. The lab now collects eight studies: a
+wordmark field, a torus, a cube, a helix, rain, a pond, a gate, and a galaxy.
 
 <KanjiGallery />
+
+## Marks
+
+Two print studies use kanji at full size: a carved seal and a vertical scroll.
+
+<KanjiMarks />
 
 ## Use one
 
@@ -46,6 +54,10 @@ The custom element takes the same values as attributes:
 - `永遠風水火` — the torus
 - `空海山月` — the cube
 - `龍神光` — the helix
+- `雨風水音` — the rain
+- `水波月影` — the pond
+- `門光道` — the gate
+- `星月夜光` — the galaxy
 
 Keep sets short. Sixteen glyphs is the engine limit, and fewer glyphs read
 better at small cell sizes.

@@ -1,0 +1,211 @@
+---
+const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', serif";
+---
+
+<div class="kanji-marks" style={`--kanji-font: ${kanjiFont}`}>
+  <article class="kanji-mark" id="seal">
+    <div class="kanji-mark__stage">
+      <div class="hanko" role="img" aria-label="Hanko seal with the characters 永, 龍, 風, and 水">
+        <span>永</span>
+        <span>龍</span>
+        <span>風</span>
+        <span>水</span>
+      </div>
+    </div>
+    <div class="kanji-mark__body">
+      <p class="kanji-mark__family">Mark</p>
+      <h2>Hanko seal</h2>
+      <p class="kanji-mark__description">
+        A carved vermilion seal with four characters in a square block.
+      </p>
+      <code>CSS · 永龍風水</code>
+    </div>
+  </article>
+
+  <article class="kanji-mark" id="scroll">
+    <div class="kanji-mark__stage">
+      <div class="scroll" role="img" aria-label="Vertical scroll with 春夏秋冬 and a 寿 seal">
+        <p class="scroll__text">春夏秋冬</p>
+        <span class="scroll__seal">寿</span>
+      </div>
+    </div>
+    <div class="kanji-mark__body">
+      <p class="kanji-mark__family">Paper</p>
+      <h2>Kanji scroll</h2>
+      <p class="kanji-mark__description">
+        A vertical seasonal scroll with a small red seal.
+      </p>
+      <code>CSS · 春夏秋冬</code>
+    </div>
+  </article>
+</div>
+
+<style>
+  .kanji-marks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0 2.5rem;
+  }
+
+  .kanji-mark {
+    scroll-margin-top: calc(var(--sl-nav-height, 4rem) + 1rem);
+    overflow: hidden;
+    border: 1px solid rgba(236, 232, 223, 0.16);
+    background: #0b0d0f;
+  }
+
+  .kanji-mark__stage {
+    display: grid;
+    place-items: center;
+    height: 280px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(236, 232, 223, 0.1);
+    background:
+      radial-gradient(circle at 50% 42%, rgba(255, 122, 26, 0.08), transparent 58%),
+      #050607;
+  }
+
+  .kanji-mark__body {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  .kanji-mark__family {
+    margin: 0 0 0.35rem;
+    color: #ff7a1a;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .kanji-mark h2 {
+    margin: 0;
+    color: #ece8df;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .kanji-mark__description {
+    min-height: 3.8em;
+    margin: 0.45rem 0 0.7rem;
+    color: rgba(236, 232, 223, 0.58);
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+
+  .kanji-mark code {
+    color: rgba(236, 232, 223, 0.45);
+    font-size: 0.62rem;
+  }
+
+  .hanko {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    place-items: center;
+    width: clamp(150px, 32vw, 190px);
+    aspect-ratio: 1;
+    padding: 0.7rem;
+    border: 2px solid #f4ead6;
+    background: #a8342b;
+    color: #f7efe2;
+    font-family: var(--kanji-font);
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    line-height: 1;
+    box-shadow:
+      inset 0 0 0 4px rgba(0, 0, 0, 0.16),
+      0 18px 40px rgba(0, 0, 0, 0.38);
+    transform: rotate(-3deg);
+    transition: transform 220ms ease;
+    animation: hanko-press 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .hanko span {
+    display: block;
+  }
+
+  .hanko:hover {
+    transform: rotate(-1deg) scale(1.02);
+  }
+
+  .scroll {
+    position: relative;
+    width: clamp(110px, 24vw, 150px);
+    height: clamp(190px, 40vw, 250px);
+    padding: 1rem 0.9rem;
+    border: 1px solid #d9cdb9;
+    background: linear-gradient(90deg, #efe3cc, #f8f0df 38%, #efe3cc);
+    color: #1b1a17;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    transform: rotate(2deg);
+    transition: transform 220ms ease;
+    animation: scroll-rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .scroll:hover {
+    transform: rotate(0deg);
+  }
+
+  .scroll__text {
+    margin: 0;
+    font-family: var(--kanji-font);
+    font-size: clamp(1.7rem, 5vw, 2.6rem);
+    line-height: 1.1;
+    letter-spacing: 0.14em;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+  }
+
+  .scroll__seal {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.85rem;
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    background: #a8342b;
+    color: #f7efe2;
+    font-family: var(--kanji-font);
+    font-size: 0.9rem;
+  }
+
+  @keyframes hanko-press {
+    0% {
+      opacity: 0;
+      transform: scale(1.12) rotate(-6deg);
+    }
+    65% {
+      opacity: 1;
+      transform: scale(0.97) rotate(-2deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(-3deg);
+    }
+  }
+
+  @keyframes scroll-rise {
+    0% {
+      opacity: 0;
+      transform: translateY(10px) rotate(3deg);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) rotate(2deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hanko,
+    .scroll {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 72rem) {
+    .kanji-marks {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
