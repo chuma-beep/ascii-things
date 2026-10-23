@@ -10,6 +10,11 @@ const filters = [
     count: LIBRARY.filter((item) => item.kind === "webgl").length,
   },
   {
+    id: "kanji",
+    label: "Kanji",
+    count: LIBRARY.filter((item) => item.tags.includes("kanji")).length,
+  },
+  {
     id: "component",
     label: "Components",
     count: LIBRARY.filter((item) => item.kind === "component").length,
@@ -25,7 +30,7 @@ const filters = [
       <input
         id="library-search"
         type="search"
-        placeholder="Search scenes, WebGL, components, tools…"
+        placeholder="Search scenes, WebGL, kanji, components, tools…"
         data-library-search
       />
     </label>
@@ -54,6 +59,7 @@ const filters = [
           class="library-card"
           href={item.href}
           data-kind={item.kind}
+          data-kanji={item.tags.includes("kanji") ? "true" : "false"}
           data-search={`${item.title} ${item.description} ${item.tags.join(" ")}`.toLowerCase()}
         >
           <span class="library-card__kind">{item.kind}</span>
@@ -94,7 +100,9 @@ const filters = [
       let shown = 0;
 
       cards.forEach((card) => {
-        const matchesKind = active === "all" || card.dataset.kind === active;
+        const matchesKind =
+          active === "all" ||
+          (active === "kanji" ? card.dataset.kanji === "true" : card.dataset.kind === active);
         const matchesQuery = !query || (card.dataset.search || "").includes(query);
         const visible = matchesKind && matchesQuery;
         card.hidden = !visible;

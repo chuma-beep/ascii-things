@@ -1,5 +1,6 @@
 ---
 import "../styles/landing.css";
+import KanjiMarks from "../components/KanjiMarks.astro";
 
 const reactSnippet = `<span class="tok-key">import</span> { AsciiDog } <span class="tok-key">from</span> <span class="tok-str">"ascii-things/react"</span>;
 
@@ -84,6 +85,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <a href="/library/#library-search">Search the library</a>
             <a href="/library/?type=scene">Scenes</a>
             <a href="/library/?type=webgl">WebGL</a>
+            <a href="/library/?type=kanji">Kanji</a>
             <a href="/library/?type=component">Components</a>
             <a href="/library/?type=tool">Tools</a>
           </div>
@@ -349,10 +351,28 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         </div>
       </section>
 
+      <section id="kanji" class="section kanji-feature" aria-labelledby="kanji-title">
+        <div class="wrap">
+          <div class="section-head">
+            <p class="eyebrow">02 / KANJI</p>
+            <h2 id="kanji-title">The alphabet<br />is the artwork.</h2>
+            <p class="section-lede">
+              Eight animated studies and two print marks. The same engine, switched to kanji:
+              fields, water, gates, stars, a carved seal, and a paper scroll.
+            </p>
+          </div>
+          <KanjiMarks />
+          <div class="kanji-feature__actions">
+            <a class="button primary" href="/kanji/">Open the Kanji Lab</a>
+            <a class="button ghost" href="/library/?type=kanji">Browse all 10</a>
+          </div>
+        </div>
+      </section>
+
       <section id="install" class="section install" aria-labelledby="install-title">
         <div class="wrap install-grid">
           <div class="install-copy">
-            <p class="eyebrow">02 / INTEGRATE</p>
+            <p class="eyebrow">03 / INTEGRATE</p>
             <h2 id="install-title">One install.<br />Anywhere you render.</h2>
             <p class="section-lede">
               React, plain HTML, Astro, Vue, Svelte, or a static page. Canvas in, life out.
@@ -428,7 +448,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
       <section class="section features" aria-labelledby="features-title">
         <div class="wrap">
           <div class="section-head">
-            <p class="eyebrow">03 / WHY IT FEELS ALIVE</p>
+            <p class="eyebrow">04 / WHY IT FEELS ALIVE</p>
             <h2 id="features-title">Small simulations.<br />Serious defaults.</h2>
           </div>
           <div class="feature-grid">

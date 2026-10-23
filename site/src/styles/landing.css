@@ -639,6 +639,25 @@ button {
   content: "· ";
 }
 
+/* ------------------------------------------------------------------ kanji */
+
+.kanji-feature {
+  background:
+    radial-gradient(58% 62% at 74% 18%, rgba(168, 52, 43, 0.1), transparent 64%),
+    var(--bg);
+}
+
+.kanji-feature .kanji-marks {
+  margin-top: 0;
+}
+
+.kanji-feature__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
 /* ---------------------------------------------------------------- install */
 
 .install-grid {
@@ -1152,6 +1171,7 @@ button {
 }
 
 #scenes,
+#kanji,
 #install {
   scroll-margin-top: clamp(70px, 9vh, 100px);
 }

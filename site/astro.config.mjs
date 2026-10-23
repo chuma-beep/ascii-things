@@ -70,6 +70,7 @@ export default defineConfig({
             { label: "All items", link: "library/" },
             { label: "Scenes", link: "library/?type=scene" },
             { label: "WebGL", link: "library/?type=webgl" },
+            { label: "Kanji", link: "library/?type=kanji" },
             { label: "Components", link: "library/?type=component" },
             { label: "Tools", link: "library/?type=tool" },
           ],
