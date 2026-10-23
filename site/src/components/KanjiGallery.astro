@@ -1,0 +1,157 @@
+---
+import { AsciiSurface } from "ascii-things/webgl/react";
+
+const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', serif";
+
+const items = [
+  {
+    variant: "field" as const,
+    title: "Kanji field",
+    family: "Type",
+    description: "A drifting glyph field with a 漢字 wordmark and an orange scan band.",
+    glyphs: "永龍風水火土空海月花鳥",
+    text: "漢字",
+    density: 0.24,
+    cell: 10,
+    foreground: "#f4ead6",
+    accent: "#ff7a1a",
+    code: '<AsciiSurface text="漢字" glyphs="永龍風水火土空海月花鳥" />',
+  },
+  {
+    variant: "torus-3d" as const,
+    title: "Kanji torus",
+    family: "3D",
+    description: "A raymarched torus wrapped in a slow orbit of kanji.",
+    glyphs: "永遠風水火",
+    text: "",
+    density: 0.3,
+    cell: 9,
+    foreground: "#e8d5a8",
+    accent: "#ffb347",
+    code: '<AsciiSurface variant="torus-3d" glyphs="永遠風水火" />',
+  },
+  {
+    variant: "cube-3d" as const,
+    title: "Kanji cube",
+    family: "3D",
+    description: "A rounded cube with a cool palette and a few quiet characters.",
+    glyphs: "空海山月",
+    text: "",
+    density: 0.3,
+    cell: 9,
+    foreground: "#a9d6ff",
+    accent: "#7fbcff",
+    code: '<AsciiSurface variant="cube-3d" glyphs="空海山月" />',
+  },
+  {
+    variant: "helix-3d" as const,
+    title: "Kanji helix",
+    family: "3D",
+    description: "A double helix turning through a field of bright characters.",
+    glyphs: "龍神光",
+    text: "",
+    density: 0.32,
+    cell: 9,
+    foreground: "#c7e8a4",
+    accent: "#7ee787",
+    code: '<AsciiSurface variant="helix-3d" glyphs="龍神光" />',
+  },
+];
+---
+
+<div class="kanji-gallery">
+  {
+    items.map((item) => (
+      <article class="kanji-card" id={item.variant}>
+        <div class="kanji-card__preview">
+          <AsciiSurface
+            client:load
+            variant={item.variant}
+            text={item.text}
+            glyphs={item.glyphs}
+            density={item.density}
+            cell={item.cell}
+            foreground={item.foreground}
+            accent={item.accent}
+            fontFamily={kanjiFont}
+            label={`${item.title} ASCII kanji demo`}
+            style={{ height: "280px" }}
+          />
+        </div>
+        <div class="kanji-card__body">
+          <p class="kanji-card__family">{item.family}</p>
+          <h2>{item.title}</h2>
+          <p class="kanji-card__description">{item.description}</p>
+          <code>{item.code}</code>
+        </div>
+      </article>
+    ))
+  }
+</div>
+
+<style>
+  .kanji-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0 2.5rem;
+  }
+
+  .kanji-card {
+    overflow: hidden;
+    border: 1px solid rgba(236, 232, 223, 0.16);
+    background: #0b0d0f;
+  }
+
+  .kanji-card__preview {
+    height: 280px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(236, 232, 223, 0.1);
+    background: #050607;
+  }
+
+  .kanji-card__preview :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 280px !important;
+  }
+
+  .kanji-card__body {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  .kanji-card__family {
+    margin: 0 0 0.35rem;
+    color: #ff7a1a;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .kanji-card h2 {
+    margin: 0;
+    color: #ece8df;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .kanji-card__description {
+    min-height: 3.8em;
+    margin: 0.45rem 0 0.7rem;
+    color: rgba(236, 232, 223, 0.58);
+    font-size: 0.72rem;
+    line-height: 1.6;
+  }
+
+  .kanji-card code {
+    color: rgba(236, 232, 223, 0.45);
+    font-size: 0.62rem;
+  }
+
+  @media (max-width: 72rem) {
+    .kanji-gallery {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

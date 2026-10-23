@@ -1,0 +1,51 @@
+---
+title: Kanji Lab
+description: ASCII surfaces and 3D models rendered with kanji glyphs.
+---
+
+import KanjiGallery from "@components/KanjiGallery.astro";
+
+Kanji are already glyphs. The same `AsciiSurface` engine can use them as its
+character ramp, turning a field into a type study and turning the true 3D
+objects into kanji-built models.
+
+<KanjiGallery />
+
+## Use one
+
+Pass a short kanji set as `glyphs` and a serif CJK family as `fontFamily`:
+
+```tsx
+import { AsciiSurface } from "ascii-things/webgl/react";
+
+export function KanjiTorus() {
+  return (
+    <AsciiSurface
+      variant="torus-3d"
+      glyphs="永遠風水火"
+      fontFamily="'Noto Serif CJK JP', 'Yu Mincho', serif"
+      style={{ height: 320 }}
+    />
+  );
+}
+```
+
+The custom element takes the same values as attributes:
+
+```html
+<ascii-surface
+  variant="torus-3d"
+  glyphs="永遠風水火"
+  font-family="'Noto Serif CJK JP', 'Yu Mincho', serif"
+></ascii-surface>
+```
+
+## Glyph sets
+
+- `永龍風水火土空海月花鳥` — the kanji field
+- `永遠風水火` — the torus
+- `空海山月` — the cube
+- `龍神光` — the helix
+
+Keep sets short. Sixteen glyphs is the engine limit, and fewer glyphs read
+better at small cell sizes.
