@@ -1,32 +1,41 @@
 ---
-import { AsciiSurface } from "ascii-things/webgl/react";
+const faces = [
+  { name: "front", color: "#ff7a1a", glyph: "#" },
+  { name: "right", color: "#e8d5a8", glyph: "%" },
+  { name: "top", color: "#7ee787", glyph: "+" },
+  { name: "left", color: "#7fbcff", glyph: "=" },
+  { name: "back", color: "#ffb347", glyph: ":" },
+  { name: "bottom", color: "#c7e8a4", glyph: "·" },
+];
 ---
 
 <div class="design-gallery">
   <article class="design-piece" id="rubik">
     <header class="design-piece__head">
-      <p class="design-piece__meta">WebGL / 3D object</p>
+      <p class="design-piece__meta">3D object / CSS</p>
       <h2>Rubik's cube</h2>
       <p>
-        A raymarched 3×3×3 puzzle. The cube turns slowly in perspective while its top layer
-        completes a quarter turn, pauses, and resets into the same solved grid.
+        A 3D cube built from six 3×3 sticker faces. It rocks between two three-quarter views,
+        keeping the top, front, and side visible while the glyph grid stays readable.
       </p>
     </header>
-    <div class="design-piece__stage design-piece__stage--webgl">
-      <AsciiSurface
-        client:visible
-        variant="rubik-3d"
-        text=""
-        density={0.3}
-        cell={7}
-        foreground="#e8d5a8"
-        accent="#ff7a1a"
-        label="A moving ASCII Rubik's cube"
-        style={{ height: "380px" }}
-      />
+    <div class="design-piece__stage design-piece__stage--cube">
+      <div class="rubik-scene" role="img" aria-label="A rotating 3D ASCII Rubik's cube">
+        <div class="rubik-cube" aria-hidden="true">
+          {
+            faces.map((face) => (
+              <div class={`rubik-face rubik-face--${face.name}`}>
+                {Array.from({ length: 9 }).map(() => (
+                  <span style={`--sticker:${face.color}`}>{face.glyph}</span>
+                ))}
+              </div>
+            ))
+          }
+        </div>
+      </div>
     </div>
     <footer class="design-piece__foot">
-      <code>{'<AsciiSurface variant="rubik-3d" />'}</code>
+      <code>CSS 3D · 6 faces · 54 stickers</code>
     </footer>
   </article>
 </div>
@@ -82,16 +91,79 @@ import { AsciiSurface } from "ascii-things/webgl/react";
     padding: 1rem;
   }
 
-  .design-piece__stage--webgl {
+  .design-piece__stage--cube {
     height: 380px;
     padding: 0;
+    overflow: hidden;
     background: #050607;
   }
 
-  .design-piece__stage--webgl :global(canvas) {
-    display: block;
+  .rubik-scene {
+    display: grid;
+    place-items: center;
+    height: 100%;
     width: 100%;
-    height: 100% !important;
+    overflow: hidden;
+    perspective: 1000px;
+    perspective-origin: 50% 42%;
+  }
+
+  .rubik-cube {
+    --cube: clamp(150px, 42vw, 190px);
+    position: relative;
+    width: var(--cube);
+    height: var(--cube);
+    transform-style: preserve-3d;
+    transform: rotateX(-24deg) rotateY(-32deg);
+    animation: rubik-rock 10s ease-in-out infinite alternate;
+  }
+
+  .rubik-face {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: #08090b;
+    backface-visibility: hidden;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+  }
+
+  .rubik-face span {
+    display: grid;
+    place-items: center;
+    background: var(--sticker);
+    color: rgba(7, 8, 9, 0.68);
+    font-family: var(--sl-font-mono);
+    font-size: clamp(0.55rem, 1.4vw, 0.8rem);
+    line-height: 1;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+  }
+
+  .rubik-face--front {
+    transform: translateZ(calc(var(--cube) / 2));
+  }
+
+  .rubik-face--back {
+    transform: rotateY(180deg) translateZ(calc(var(--cube) / 2));
+  }
+
+  .rubik-face--right {
+    transform: rotateY(90deg) translateZ(calc(var(--cube) / 2));
+  }
+
+  .rubik-face--left {
+    transform: rotateY(-90deg) translateZ(calc(var(--cube) / 2));
+  }
+
+  .rubik-face--top {
+    transform: rotateX(90deg) translateZ(calc(var(--cube) / 2));
+  }
+
+  .rubik-face--bottom {
+    transform: rotateX(-90deg) translateZ(calc(var(--cube) / 2));
   }
 
   .design-piece__foot {
@@ -103,13 +175,31 @@ import { AsciiSurface } from "ascii-things/webgl/react";
     font-size: 0.62rem;
   }
 
+  @keyframes rubik-rock {
+    from {
+      transform: rotateX(-24deg) rotateY(-34deg);
+    }
+
+    to {
+      transform: rotateX(-24deg) rotateY(34deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rubik-cube {
+      animation: none;
+      transform: rotateX(-24deg) rotateY(-32deg);
+    }
+  }
+
   @media (max-width: 42rem) {
     .design-piece__stage {
       padding: 0.65rem;
     }
 
-    .design-piece__stage--webgl {
+    .design-piece__stage--cube {
       height: 300px;
+      padding: 0;
     }
   }
 </style>

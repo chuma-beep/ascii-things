@@ -1,36 +1,23 @@
 ---
 title: Designs
-description: A turning ASCII Rubik's cube built from the same monospace grid.
+description: A 3D ASCII Rubik's cube built from six 3×3 sticker faces.
 ---
 
 import DesignGallery from "../../../components/DesignGallery.astro";
 
-One glyph study built from the same monospace cell: a raymarched object that turns in
-perspective without leaving the character grid.
+One glyph study built from the same monospace cell: a 3D cube with 54 sticker cells that rocks
+between two three-quarter views without leaving the character grid.
 
 <DesignGallery />
 
 ## Motion
 
-The Rubik's cube is a `rubik-3d` WebGL variant. Its top layer completes a slow quarter turn,
-pauses, and resets into the solved grid. It respects `prefers-reduced-motion` and settles to a
-still frame.
+The cube is a CSS 3D composition. It rocks slowly between two fixed angles, keeping the top,
+front, and side faces visible. `prefers-reduced-motion: reduce` holds it at the first
+three-quarter view.
 
-## Use the cube
+## Build
 
-```tsx
-import { AsciiSurface } from "ascii-things/webgl/react";
-
-<AsciiSurface
-  variant="rubik-3d"
-  text=""
-  density={0.3}
-  cell={7}
-  foreground="#e8d5a8"
-  accent="#ff7a1a"
-  style={{ height: 380 }}
-/>;
-```
-
-The cube is a local composition rather than an exported runtime component. It is a reference for
-what the grid can hold: a solid object, a moving layer, and a readable silhouette.
+The cube is a local composition: six faces, nine sticker cells each, using CSS 3D transforms and
+the same monospace cell. It is not an exported runtime component. It is a reference for what the
+grid can hold: a solid object, a visible top face, and a readable silhouette.

@@ -114,13 +114,6 @@ const items = [
     description: "A raymarched spring turning through space.",
     code: '<AsciiSurface variant="helix-3d" />',
   },
-  {
-    variant: "rubik-3d",
-    title: "Rubik's cube",
-    family: "3D Objects",
-    description: "A raymarched 3×3×3 puzzle with a turning top layer.",
-    code: '<AsciiSurface variant="rubik-3d" />',
-  },
 ] as const;
 
 interface Props {
@@ -142,7 +135,7 @@ const visible = items.slice(from, to);
             variant={item.variant}
             text=""
             density={0.3}
-            cell={item.variant === "globe" || item.variant === "rubik-3d" ? 5 : 0}
+            cell={item.variant === "globe" ? 5 : 0}
             foreground={item.variant === "globe" ? "#7fbcff" : undefined}
             accent={item.variant === "globe" ? "#c7e8a4" : undefined}
             pointer={item.variant === "ripple"}
