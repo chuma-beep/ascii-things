@@ -110,13 +110,6 @@ export default defineConfig({
           ],
         },
         {
-          label: "Designs",
-          items: [
-            { label: "All designs", link: "designs/" },
-            { label: "Rubik's cube", link: "designs/#rubik" },
-          ],
-        },
-        {
           label: "Scenes",
           items: [
             { label: "All scenes", link: "scenes/" },

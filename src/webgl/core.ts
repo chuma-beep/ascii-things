@@ -15,8 +15,7 @@ export type SurfaceVariant =
   | "torus-3d"
   | "cube-3d"
   | "planet-3d"
-  | "helix-3d"
-  | "rubik-3d";
+  | "helix-3d";
 
 const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   field: 0,
@@ -36,7 +35,6 @@ const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   "cube-3d": 14,
   "planet-3d": 15,
   "helix-3d": 16,
-  "rubik-3d": 17,
 };
 
 // 64×32 equirectangular land mask, four pixels per hex digit, MSB first.
@@ -183,44 +181,7 @@ float sdHelix(vec3 p) {
   return length(p - c) - 0.2;
 }
 
-float sdRubik(vec3 p) {
-  float cell = 0.46;
-  vec3 q = p / cell;
-  float phase = fract(u_time * 0.18);
-  float turn = smoothstep(0.05, 0.6, phase) * 1.5708;
-  float ct = cos(turn);
-  float st = sin(turn);
-  vec3 qr = q;
-  qr.xz = mat2(ct, -st, st, ct) * q.xz;
-
-  vec3 c1 = floor(q + 0.5);
-  vec3 l1 = q - c1;
-  float in1 = step(-1.5, c1.x) * step(c1.x, 1.5)
-    * step(-1.5, c1.y) * step(c1.y, 1.5)
-    * step(-1.5, c1.z) * step(c1.z, 1.5);
-  float d1 = mix(1.0, sdRoundBox(l1, vec3(0.37), 0.03) * cell, in1);
-
-  vec3 c2 = floor(qr + 0.5);
-  vec3 l2 = qr - c2;
-  float in2 = step(-1.5, c2.x) * step(c2.x, 1.5)
-    * step(0.5, c2.y) * step(c2.y, 1.5)
-    * step(-1.5, c2.z) * step(c2.z, 1.5);
-  float d2 = mix(1.0, sdRoundBox(l2, vec3(0.37), 0.03) * cell, in2);
-
-  float lower = step(q.y, 0.5);
-  return min(mix(1.0, d1, lower), mix(1.0, d2, step(0.5, q.y)));
-}
-
 float objectSDF(vec3 p) {
-  if (u_variant > 16.5) {
-    float ca = cos(u_time * 0.25 - 0.6);
-    float sa = sin(u_time * 0.25 - 0.6);
-    p.xz = mat2(ca, -sa, sa, ca) * p.xz;
-    float cb = cos(0.42);
-    float sb = sin(0.42);
-    p.yz = mat2(cb, -sb, sb, cb) * p.yz;
-    return sdRubik(p * 0.7);
-  }
   float ca = cos(u_time * 0.35);
   float sa = sin(u_time * 0.35);
   p.xz = mat2(ca, -sa, sa, ca) * p.xz;
@@ -488,16 +449,7 @@ void main() {
       vec3 lightDir = normalize(vec3(-0.45, 0.75, 0.65));
       float diffuse = max(dot(n, lightDir), 0.0);
       float rim = pow(1.0 - max(dot(n, normalize(-rd)), 0.0), 2.5);
-      if (u_variant > 16.5) {
-        vec3 sn = n;
-        vec3 an = abs(sn);
-        if (an.x >= an.y && an.x >= an.z) sn = vec3(sign(sn.x), 0.0, 0.0);
-        else if (an.y >= an.z) sn = vec3(0.0, sign(sn.y), 0.0);
-        else sn = vec3(0.0, 0.0, sign(sn.z));
-        float flatDiffuse = max(dot(sn, lightDir), 0.0);
-        level = 0.14 + 0.76 * flatDiffuse + 0.1 * step(0.5, sn.y);
-        tint = step(0.5, sn.y) * 0.85;
-      } else if (u_variant > 14.5) {
+      if (u_variant > 14.5) {
         float lat = asin(clamp(n.y, -1.0, 1.0));
         float lon = atan(n.z, n.x);
         float land = sin(lon * 2.0 + sin(lat * 3.0) * 1.5)

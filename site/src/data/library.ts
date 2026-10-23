@@ -220,14 +220,6 @@ export const LIBRARY: LibraryItem[] = [
     tags: ["webgl", "3d", "object"],
   },
   {
-    id: "rubik-3d",
-    title: "Rubik's cube",
-    description: "A 3D ASCII cube with six preformatted kanji fields and a slow rock.",
-    kind: "scene",
-    href: "/designs/#rubik",
-    tags: ["3d", "puzzle", "rubik", "kanji", "ascii", "design"],
-  },
-  {
     id: "ascii-box-footer",
     title: "ASCII box footer",
     description: "A canvas footer made of a continuous box lattice.",
