@@ -6,6 +6,7 @@ const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', ser
 const items = [
   {
     variant: "field" as const,
+    id: "field",
     title: "Kanji field",
     family: "Type",
     description: "A drifting glyph field with a 漢字 wordmark and an orange scan band.",
@@ -19,6 +20,7 @@ const items = [
   },
   {
     variant: "torus-3d" as const,
+    id: "torus-3d",
     title: "Kanji torus",
     family: "3D",
     description: "A raymarched torus wrapped in a slow orbit of kanji.",
@@ -32,6 +34,7 @@ const items = [
   },
   {
     variant: "cube-3d" as const,
+    id: "cube-3d",
     title: "Kanji cube",
     family: "3D",
     description: "A rounded cube with a cool palette and a few quiet characters.",
@@ -45,6 +48,7 @@ const items = [
   },
   {
     variant: "helix-3d" as const,
+    id: "helix-3d",
     title: "Kanji helix",
     family: "3D",
     description: "A double helix turning through a field of bright characters.",
@@ -58,6 +62,7 @@ const items = [
   },
   {
     variant: "glyph-rain" as const,
+    id: "glyph-rain",
     title: "Kanji rain",
     family: "Weather",
     description: "Columns of rain, wind, water, and sound falling through the dark.",
@@ -71,6 +76,7 @@ const items = [
   },
   {
     variant: "ripple" as const,
+    id: "ripple",
     title: "Kanji pond",
     family: "Water",
     description: "Concentric rings of water, wave, moon, and shadow characters.",
@@ -84,6 +90,7 @@ const items = [
   },
   {
     variant: "tunnel" as const,
+    id: "tunnel",
     title: "Kanji gate",
     family: "Architecture",
     description: "A corridor of gates and lantern light made from 門, 光, and 道.",
@@ -97,6 +104,7 @@ const items = [
   },
   {
     variant: "galaxy" as const,
+    id: "galaxy",
     title: "Kanji galaxy",
     family: "Sky",
     description: "A spiral of star, moon, night, and light characters.",
@@ -108,16 +116,73 @@ const items = [
     accent: "#a78bfa",
     code: '<AsciiSurface variant="galaxy" glyphs="星月夜光" />',
   },
+  {
+    variant: "flow" as const,
+    id: "koi",
+    title: "Kanji koi",
+    family: "Water",
+    description: "A flowing current of koi, water, wave, and swim characters.",
+    glyphs: "鯉水波泳",
+    text: "",
+    density: 0.34,
+    cell: 12,
+    foreground: "#bff0e0",
+    accent: "#34d399",
+    code: '<AsciiSurface variant="flow" glyphs="鯉水波泳" />',
+  },
+  {
+    variant: "constellation" as const,
+    id: "moon",
+    title: "Kanji moon",
+    family: "Sky",
+    description: "A night sky of moon, night, light, and star characters.",
+    glyphs: "月夜光星",
+    text: "",
+    density: 0.28,
+    cell: 11,
+    foreground: "#e8e4ff",
+    accent: "#b8c7ff",
+    code: '<AsciiSurface variant="constellation" glyphs="月夜光星" />',
+  },
+  {
+    variant: "terrain" as const,
+    id: "mountain",
+    title: "Kanji mountain",
+    family: "Land",
+    description: "A green terrain of mountain, wind, rock, and cloud characters.",
+    glyphs: "山風岩雲",
+    text: "",
+    density: 0.3,
+    cell: 11,
+    foreground: "#d8e8d0",
+    accent: "#86efac",
+    code: '<AsciiSurface variant="terrain" glyphs="山風岩雲" />',
+  },
+  {
+    variant: "caustics" as const,
+    id: "wave",
+    title: "Kanji wave",
+    family: "Sea",
+    description: "Caustic water lines made from wave, billow, sea, and open-water characters.",
+    glyphs: "波濤海沖",
+    text: "",
+    density: 0.32,
+    cell: 12,
+    foreground: "#c7e8ff",
+    accent: "#7fbcff",
+    code: '<AsciiSurface variant="caustics" glyphs="波濤海沖" />',
+  },
 ];
 ---
+
 
 <div class="kanji-gallery">
   {
     items.map((item) => (
-      <article class="kanji-card" id={item.variant}>
+      <article class="kanji-card" id={item.id}>
         <div class="kanji-card__preview">
           <AsciiSurface
-            client:load
+            client:visible
             variant={item.variant}
             text={item.text}
             glyphs={item.glyphs}
