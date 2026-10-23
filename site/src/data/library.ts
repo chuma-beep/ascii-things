@@ -398,7 +398,7 @@ export const LIBRARY: LibraryItem[] = [
   {
     id: "kanji-koi",
     title: "Kanji koi",
-    description: "A flowing current of koi, water, wave, and swim characters.",
+    description: "A koi silhouette with a forked tail and fins, drawn in water characters.",
     kind: "webgl",
     href: "/kanji/#koi",
     tags: ["webgl", "kanji", "water", "koi"],
@@ -406,7 +406,7 @@ export const LIBRARY: LibraryItem[] = [
   {
     id: "kanji-moon",
     title: "Kanji moon",
-    description: "A night sky of moon, night, light, and star characters.",
+    description: "A full moon with dark craters, drawn in moon and night characters.",
     kind: "webgl",
     href: "/kanji/#moon",
     tags: ["webgl", "kanji", "sky", "moon"],

@@ -15,7 +15,9 @@ export type SurfaceVariant =
   | "torus-3d"
   | "cube-3d"
   | "planet-3d"
-  | "helix-3d";
+  | "helix-3d"
+  | "moon"
+  | "koi";
 
 const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   field: 0,
@@ -35,6 +37,8 @@ const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   "cube-3d": 14,
   "planet-3d": 15,
   "helix-3d": 16,
+  moon: 17,
+  koi: 18,
 };
 
 // 64×32 equirectangular land mask, four pixels per hex digit, MSB first.
@@ -163,6 +167,27 @@ float fbm3(vec3 p) {
   return value;
 }
 
+vec2 rot2(vec2 p, float a) {
+  float c = cos(a);
+  float s = sin(a);
+  return vec2(c * p.x - s * p.y, s * p.x + c * p.y);
+}
+
+float ellipseMask(vec2 p, vec2 center, vec2 radius, float angle) {
+  vec2 q = rot2(p - center, -angle) / radius;
+  return 1.0 - smoothstep(0.9, 1.06, length(q));
+}
+
+float triangleMask(vec2 p, vec2 a, vec2 b, vec2 c) {
+  vec2 ab = b - a;
+  vec2 bc = c - b;
+  vec2 ca = a - c;
+  float s1 = ab.x * (p.y - a.y) - ab.y * (p.x - a.x);
+  float s2 = bc.x * (p.y - b.y) - bc.y * (p.x - b.x);
+  float s3 = ca.x * (p.y - c.y) - ca.y * (p.x - c.x);
+  bool inside = (s1 >= 0.0 && s2 >= 0.0 && s3 >= 0.0) || (s1 <= 0.0 && s2 <= 0.0 && s3 <= 0.0);
+  return inside ? 1.0 : 0.0;
+}
 
 float sdTorus3(vec3 p, vec2 t) {
   vec2 q = vec2(length(p.xz) - t.x, p.y);
@@ -422,6 +447,58 @@ void main() {
       }
     }
     level = max(max(star, dust * 0.55), max(link * 0.55, band * 0.1));
+    weight = 1.0;
+  } else if (u_variant > 16.5 && u_variant < 17.5) {
+    // Moon: a solid lunar disc with slow craters and a few stars.
+    vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
+    float r = length(p);
+    float disc = 1.0 - smoothstep(0.54, 0.565, r);
+    vec2 cp = rot2(p, u_time * 0.025);
+    float craters = ellipseMask(cp, vec2(-0.17, 0.14), vec2(0.11, 0.08), 0.5);
+    craters = max(craters, ellipseMask(cp, vec2(0.16, -0.06), vec2(0.085, 0.12), -0.4));
+    craters = max(craters, ellipseMask(cp, vec2(0.03, 0.25), vec2(0.055, 0.045), 0.9));
+    craters = max(craters, ellipseMask(cp, vec2(-0.20, -0.22), vec2(0.055, 0.04), 0.2));
+    craters = max(craters, ellipseMask(cp, vec2(0.27, 0.16), vec2(0.04, 0.05), 0.0));
+    float body = disc * (1.0 - craters);
+    float rim = smoothstep(0.48, 0.53, r) * disc * (1.0 - smoothstep(0.53, 0.56, r));
+    float halo = smoothstep(0.56, 0.59, r) * (1.0 - smoothstep(0.59, 0.66, r));
+    float stars = step(0.988, hash(grid)) * (0.25 + 0.2 * sin(u_time * 1.7 + hash(grid) * 6.283)) * (1.0 - disc);
+    float surface = 0.82 + 0.16 * noise3(vec3(cp * 4.0, u_time * 0.02));
+    level = max(max(body * surface, rim * 0.34), max(halo * 0.16, stars * 0.5));
+    tint = body * 0.4;
+    weight = 1.0;
+  } else if (u_variant > 17.5 && u_variant < 18.5) {
+    // Koi: a swimming body, two tail lobes, fins, and an eye.
+    vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
+    float swim = u_time * 0.32;
+    vec2 center = vec2(0.12 * sin(swim), 0.04 * sin(swim * 0.7));
+    float angle = 0.10 * sin(swim * 0.9);
+    vec2 q = rot2(p - center, -angle);
+
+    float body = ellipseMask(q, vec2(0.02, 0.0), vec2(0.50, 0.25), 0.0);
+    float sway = 0.08 * sin(u_time * 2.1);
+    float tailTop = triangleMask(q, vec2(-0.46, 0.10), vec2(-0.94, 0.30 + sway), vec2(-0.72, 0.0));
+    float tailBottom = triangleMask(q, vec2(-0.46, -0.10), vec2(-0.94, -0.30 + sway), vec2(-0.72, 0.0));
+    float dorsal = triangleMask(q, vec2(0.10, 0.22), vec2(-0.08, 0.36), vec2(-0.28, 0.20));
+    float pectoral = triangleMask(q, vec2(0.18, -0.20), vec2(0.02, -0.34), vec2(-0.18, -0.18));
+    float eye = ellipseMask(q, vec2(0.34, 0.06), vec2(0.09, 0.09), 0.0);
+    float mouth = ellipseMask(q, vec2(0.48, 0.0), vec2(0.04, 0.03), 0.0);
+    float gill = ellipseMask(q, vec2(0.18, 0.0), vec2(0.025, 0.16), 0.0);
+    float holes = 1.0 - max(max(eye, mouth * 0.8), gill * 0.8);
+    float bodyMask = body * holes;
+    float tailMask = max(tailTop, tailBottom) * holes;
+    float finMask = max(dorsal, pectoral) * holes;
+    float barbels = max(
+      triangleMask(q, vec2(0.50, 0.02), vec2(0.64, 0.10), vec2(0.58, 0.01)),
+      triangleMask(q, vec2(0.50, -0.02), vec2(0.64, -0.10), vec2(0.58, -0.01))
+    );
+
+    float patch = max(
+      ellipseMask(q, vec2(0.12, 0.02), vec2(0.14, 0.10), 0.2),
+      ellipseMask(q, vec2(-0.18, -0.04), vec2(0.12, 0.09), -0.3)
+    );
+    level = max(max(bodyMask * (0.88 + 0.10 * patch), tailMask * 0.62), max(finMask * 0.50, barbels * 0.40));
+    tint = max(bodyMask, tailMask) * (0.25 + 0.55 * patch);
     weight = 1.0;
   } else {
     // Solid 3D object: raymarched torus or cube with real depth.
