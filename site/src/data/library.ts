@@ -222,7 +222,7 @@ export const LIBRARY: LibraryItem[] = [
   {
     id: "rubik-3d",
     title: "Rubik's cube",
-    description: "A monochrome ASCII field cube with 54 kanji and a continuous turn.",
+    description: "A 3D ASCII cube with six preformatted kanji fields and a slow rock.",
     kind: "scene",
     href: "/designs/#rubik",
     tags: ["3d", "puzzle", "rubik", "kanji", "ascii", "design"],

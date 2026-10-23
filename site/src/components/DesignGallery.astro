@@ -1,49 +1,58 @@
 ---
 const faces = [
-  { name: "front", glyphs: "永龍風水火土空海月" },
-  { name: "right", glyphs: "花鳥山川光雨雪雲星" },
-  { name: "top", glyphs: "心夢愛和美真善力魂" },
-  { name: "left", glyphs: "木林森石天地日夜春" },
-  { name: "back", glyphs: "夏秋冬朝夕東西南北" },
-  { name: "bottom", glyphs: "金銀銅鉄玉珠音色香" },
+  {
+    name: "front",
+    theme: "dark",
+    kanji: ["永", "龍", "風", "水", "火", "土", "空", "海", "月"],
+  },
+  {
+    name: "right",
+    theme: "light",
+    kanji: ["山", "川", "光", "雨", "雪", "星", "心", "夢", "愛"],
+  },
+  {
+    name: "top",
+    theme: "light",
+    kanji: ["日", "天", "地", "春", "夏", "秋", "冬", "花", "鳥"],
+  },
+  {
+    name: "left",
+    theme: "dark",
+    kanji: ["石", "木", "林", "森", "玉", "音", "色", "香", "力"],
+  },
+  {
+    name: "back",
+    theme: "light",
+    kanji: ["金", "銀", "銅", "鉄", "朝", "夕", "東", "西", "南"],
+  },
+  {
+    name: "bottom",
+    theme: "dark",
+    kanji: ["北", "魂", "真", "善", "和", "美", "心", "夢", "愛"],
+  },
 ];
 
-const asciiGlyphs = ["+", "-", "/", "\\", "|", ".", ":", "*", "="];
+const field = (kanji: string) => `·${kanji}·\n${kanji}${kanji}${kanji}\n·${kanji}·`;
 ---
 
 <div class="design-gallery">
   <article class="design-piece" id="rubik">
     <header class="design-piece__head">
-      <p class="design-piece__meta">3D object / CSS / Kanji + ASCII</p>
+      <p class="design-piece__meta">3D object / ASCII</p>
       <h2>Rubik's cube</h2>
       <p>
-        A black-and-white ASCII field cube. Each face is a 3×3 grid of tiles; every tile holds a
-        kanji at its center, surrounded by a field of ASCII marks. The cube turns continuously in
-        perspective.
+        A 3D cube built from six 3×3 sticker faces. Every sticker is a preformatted ASCII field
+        with a kanji at its center, alternating black and white across the six faces.
       </p>
     </header>
     <div class="design-piece__stage design-piece__stage--cube">
-      <div
-        class="rubik-scene"
-        role="img"
-        aria-label="A rotating black-and-white ASCII cube with kanji fields"
-      >
+      <div class="rubik-scene" role="img" aria-label="A rotating 3D ASCII Rubik's cube with kanji">
         <div class="rubik-cube" aria-hidden="true">
           {
             faces.map((face) => (
-              <div class={`rubik-face rubik-face--${face.name}`}>
-                {Array.from(face.glyphs).map((kanji, tileIndex) => (
-                  <div class="rubik-tile">
-                    {Array.from({ length: 9 }).map((_, cellIndex) =>
-                      cellIndex === 4 ? (
-                        <span class="rubik-cell rubik-kanji">{kanji}</span>
-                      ) : (
-                        <span class="rubik-cell">
-                          {asciiGlyphs[(tileIndex * 3 + cellIndex) % asciiGlyphs.length]}
-                        </span>
-                      ),
-                    )}
-                  </div>
+              <div class={`rubik-face rubik-face--${face.name} rubik-face--${face.theme}`}>
+                {face.kanji.map((kanji) => (
+                  <pre>{field(kanji)}</pre>
                 ))}
               </div>
             ))
@@ -52,7 +61,7 @@ const asciiGlyphs = ["+", "-", "/", "\\", "|", ".", ":", "*", "="];
       </div>
     </div>
     <footer class="design-piece__foot">
-      <code>CSS 3D · 54 kanji · 432 ASCII cells</code>
+      <code>ASCII 3D · 6 faces · 54 stickers · 270 kanji</code>
     </footer>
   </article>
 </div>
@@ -102,9 +111,7 @@ const asciiGlyphs = ["+", "-", "/", "\\", "|", ".", ":", "*", "="];
     overflow-x: auto;
     border-top: 1px solid rgba(236, 232, 223, 0.1);
     border-bottom: 1px solid rgba(236, 232, 223, 0.1);
-    background:
-      radial-gradient(circle at 50% 40%, rgba(255, 122, 26, 0.05), transparent 55%),
-      #050607;
+    background: #050607;
     padding: 1rem;
   }
 
@@ -113,7 +120,7 @@ const asciiGlyphs = ["+", "-", "/", "\\", "|", ".", ":", "*", "="];
     padding: 0;
     overflow: hidden;
     background:
-      radial-gradient(circle at 50% 45%, rgba(245, 241, 232, 0.06), transparent 55%),
+      radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.04), transparent 55%),
       #050607;
   }
 
@@ -123,18 +130,18 @@ const asciiGlyphs = ["+", "-", "/", "\\", "|", ".", ":", "*", "="];
     height: 100%;
     width: 100%;
     overflow: hidden;
-    perspective: 1000px;
-    perspective-origin: 50% 42%;
+    perspective: 1100px;
+    perspective-origin: 50% 44%;
   }
 
   .rubik-cube {
-    --cube: clamp(170px, 46vw, 215px);
+    --cube: clamp(200px, 46vw, 240px);
     position: relative;
     width: var(--cube);
     height: var(--cube);
     transform-style: preserve-3d;
-    transform: rotateX(-22deg) rotateY(-30deg);
-    animation: rubik-spin 18s linear infinite;
+    transform: rotateX(-24deg) rotateY(-32deg);
+    animation: rubik-rock 10s ease-in-out infinite alternate;
   }
 
   .rubik-face {
@@ -142,37 +149,34 @@ const asciiGlyphs = ["+", "-", "/", "\\", "|", ".", ":", "*", "="];
     inset: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 3px;
-    padding: 3px;
-    border: 1px solid rgba(245, 241, 232, 0.14);
-    background: #0a0b0d;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     backface-visibility: hidden;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.65);
   }
 
-  .rubik-tile {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: #0d0e10;
-    box-shadow: inset 0 0 0 1px rgba(245, 241, 232, 0.06);
+  .rubik-face--dark {
+    background: #08090b;
+    color: #f5f1e8;
   }
 
-  .rubik-cell {
+  .rubik-face--light {
+    background: #f5f1e8;
+    color: #08090b;
+  }
+
+  .rubik-face pre {
     display: grid;
     place-items: center;
-    color: rgba(245, 241, 232, 0.4);
+    margin: 0;
+    padding: 0;
+    border: 1px solid currentColor;
     font-family: var(--sl-font-mono);
-    font-size: clamp(0.42rem, 1vw, 0.58rem);
-    line-height: 1;
-  }
-
-  .rubik-kanji {
-    color: #f5f1e8;
-    font-family:
-      "Noto Serif CJK JP", "Yu Mincho", "Hiragino Mincho ProN", "Noto Sans CJK JP", serif;
-    font-size: clamp(0.62rem, 1.5vw, 0.82rem);
-    font-weight: 500;
+    font-size: clamp(0.55rem, 1.2vw, 0.82rem);
+    line-height: 1.08;
+    white-space: pre;
+    opacity: 0.9;
   }
 
   .rubik-face--front {
@@ -208,20 +212,20 @@ const asciiGlyphs = ["+", "-", "/", "\\", "|", ".", ":", "*", "="];
     font-size: 0.62rem;
   }
 
-  @keyframes rubik-spin {
+  @keyframes rubik-rock {
     from {
-      transform: rotateX(-22deg) rotateY(-30deg);
+      transform: rotateX(-24deg) rotateY(-34deg);
     }
 
     to {
-      transform: rotateX(-22deg) rotateY(330deg);
+      transform: rotateX(-24deg) rotateY(34deg);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .rubik-cube {
       animation: none;
-      transform: rotateX(-22deg) rotateY(-30deg);
+      transform: rotateX(-24deg) rotateY(-32deg);
     }
   }
 
@@ -231,8 +235,12 @@ const asciiGlyphs = ["+", "-", "/", "\\", "|", ".", ":", "*", "="];
     }
 
     .design-piece__stage--cube {
-      height: 300px;
+      height: 320px;
       padding: 0;
+    }
+
+    .rubik-cube {
+      --cube: clamp(170px, 52vw, 210px);
     }
   }
 </style>

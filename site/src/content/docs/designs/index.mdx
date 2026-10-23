@@ -1,25 +1,30 @@
 ---
 title: Designs
-description: A black-and-white ASCII field cube with 54 kanji and a continuous turn.
+description: A 3D ASCII Rubik's cube built from six preformatted kanji fields.
 ---
 
 import DesignGallery from "../../../components/DesignGallery.astro";
 
-One glyph study built from the same monospace cell: a 3D cube covered in ASCII fields, with a
-kanji at the center of every 3×3 tile. It turns continuously without leaving the character grid.
+A 3D cube built from six faces, each a 3×3 sticker grid. Every sticker is a preformatted ASCII
+field with a kanji at its center, and the six faces alternate between black and white.
 
 <DesignGallery />
 
 ## Motion
 
-The cube is a CSS 3D composition. It makes a slow, continuous turn through all six faces, keeping
-the kanji and the surrounding ASCII field readable as it moves. `prefers-reduced-motion: reduce`
-holds it at a three-quarter view.
+The cube rocks between two three-quarter views, keeping the top, front, and side visible. It
+respects `prefers-reduced-motion` and settles to a still three-quarter view.
 
 ## Build
 
-The cube is a local composition: six faces, nine 3×3 tiles each, and a kanji at the center of every
-tile. The remaining cells are ASCII marks. That makes 54 kanji and 432 ASCII cells across the cube.
-It uses CSS 3D transforms and the same monospace cell. It is not an exported runtime component. It
-is a reference for what the grid can hold: a solid object, a visible top face, and a readable
-silhouette.
+Each face is a CSS 3D plane. The sticker fields are real `<pre>` text, not generated glyph
+textures, so the cube is made from the same monospace grid as the rest of the library:
+
+```text
+·永·
+永永永
+·永·
+```
+
+The full cube uses 54 of these fields: nine per face, with a different kanji at each center.
+The palette is strictly black and white.
