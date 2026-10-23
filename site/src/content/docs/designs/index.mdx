@@ -1,23 +1,24 @@
 ---
 title: Designs
-description: A 3D ASCII Rubik's cube built from six 3×3 sticker faces.
+description: A black-and-white 3D Rubik's cube built from 54 kanji stickers.
 ---
 
 import DesignGallery from "../../../components/DesignGallery.astro";
 
-One glyph study built from the same monospace cell: a 3D cube with 54 sticker cells that rocks
-between two three-quarter views without leaving the character grid.
+One glyph study built from the same monospace cell: a 3D cube with 54 kanji stickers that turns
+continuously without leaving the character grid.
 
 <DesignGallery />
 
 ## Motion
 
-The cube is a CSS 3D composition. It rocks slowly between two fixed angles, keeping the top,
-front, and side faces visible. `prefers-reduced-motion: reduce` holds it at the first
+The cube is a CSS 3D composition. It makes a slow, continuous turn through all six faces, keeping
+the top, front, and side readable as it moves. `prefers-reduced-motion: reduce` holds it at a
 three-quarter view.
 
 ## Build
 
-The cube is a local composition: six faces, nine sticker cells each, using CSS 3D transforms and
-the same monospace cell. It is not an exported runtime component. It is a reference for what the
-grid can hold: a solid object, a visible top face, and a readable silhouette.
+The cube is a local composition: six faces, nine kanji cells each, alternating black and white
+sticker sets. It uses CSS 3D transforms and the same monospace cell. It is not an exported runtime
+component. It is a reference for what the grid can hold: a solid object, a visible top face, and a
+readable silhouette.

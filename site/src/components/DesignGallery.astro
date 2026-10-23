@@ -1,32 +1,36 @@
 ---
 const faces = [
-  { name: "front", color: "#ff7a1a", glyph: "#" },
-  { name: "right", color: "#e8d5a8", glyph: "%" },
-  { name: "top", color: "#7ee787", glyph: "+" },
-  { name: "left", color: "#7fbcff", glyph: "=" },
-  { name: "back", color: "#ffb347", glyph: ":" },
-  { name: "bottom", color: "#c7e8a4", glyph: "·" },
+  { name: "front", tone: "dark", glyphs: "永龍風水火土空海月" },
+  { name: "right", tone: "light", glyphs: "花鳥山川光雨雪雲星" },
+  { name: "top", tone: "dark", glyphs: "心夢愛和美真善力魂" },
+  { name: "left", tone: "light", glyphs: "木林森石天地日夜春" },
+  { name: "back", tone: "dark", glyphs: "夏秋冬朝夕東西南北" },
+  { name: "bottom", tone: "light", glyphs: "金銀銅鉄玉珠音色香" },
 ];
 ---
 
 <div class="design-gallery">
   <article class="design-piece" id="rubik">
     <header class="design-piece__head">
-      <p class="design-piece__meta">3D object / CSS</p>
+      <p class="design-piece__meta">3D object / CSS / Kanji</p>
       <h2>Rubik's cube</h2>
       <p>
-        A 3D cube built from six 3×3 sticker faces. It rocks between two three-quarter views,
-        keeping the top, front, and side visible while the glyph grid stays readable.
+        A black-and-white 3D cube with 54 kanji stickers. It turns continuously in perspective,
+        keeping the faces and glyph grid readable.
       </p>
     </header>
     <div class="design-piece__stage design-piece__stage--cube">
-      <div class="rubik-scene" role="img" aria-label="A rotating 3D ASCII Rubik's cube">
+      <div
+        class="rubik-scene"
+        role="img"
+        aria-label="A rotating black-and-white 3D Rubik's cube covered in kanji"
+      >
         <div class="rubik-cube" aria-hidden="true">
           {
             faces.map((face) => (
-              <div class={`rubik-face rubik-face--${face.name}`}>
-                {Array.from({ length: 9 }).map(() => (
-                  <span style={`--sticker:${face.color}`}>{face.glyph}</span>
+              <div class={`rubik-face rubik-face--${face.name} is-${face.tone}`}>
+                {Array.from(face.glyphs).map((glyph) => (
+                  <span>{glyph}</span>
                 ))}
               </div>
             ))
@@ -35,7 +39,7 @@ const faces = [
       </div>
     </div>
     <footer class="design-piece__foot">
-      <code>CSS 3D · 6 faces · 54 stickers</code>
+      <code>CSS 3D · 6 faces · 54 kanji</code>
     </footer>
   </article>
 </div>
@@ -109,13 +113,13 @@ const faces = [
   }
 
   .rubik-cube {
-    --cube: clamp(150px, 42vw, 190px);
+    --cube: clamp(160px, 44vw, 205px);
     position: relative;
     width: var(--cube);
     height: var(--cube);
     transform-style: preserve-3d;
-    transform: rotateX(-24deg) rotateY(-32deg);
-    animation: rubik-rock 10s ease-in-out infinite alternate;
+    transform: rotateX(-22deg) rotateY(-30deg);
+    animation: rubik-spin 18s linear infinite;
   }
 
   .rubik-face {
@@ -131,13 +135,25 @@ const faces = [
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
   }
 
+  .rubik-face.is-dark {
+    --sticker: #0a0a0a;
+    --ink: #f5f1e8;
+  }
+
+  .rubik-face.is-light {
+    --sticker: #f5f1e8;
+    --ink: #0a0a0a;
+  }
+
   .rubik-face span {
     display: grid;
     place-items: center;
     background: var(--sticker);
-    color: rgba(7, 8, 9, 0.68);
-    font-family: var(--sl-font-mono);
-    font-size: clamp(0.55rem, 1.4vw, 0.8rem);
+    color: var(--ink);
+    font-family:
+      "Noto Serif CJK JP", "Yu Mincho", "Hiragino Mincho ProN", "Noto Sans CJK JP", serif;
+    font-size: clamp(0.72rem, 1.8vw, 1.05rem);
+    font-weight: 500;
     line-height: 1;
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
   }
@@ -175,20 +191,20 @@ const faces = [
     font-size: 0.62rem;
   }
 
-  @keyframes rubik-rock {
+  @keyframes rubik-spin {
     from {
-      transform: rotateX(-24deg) rotateY(-34deg);
+      transform: rotateX(-22deg) rotateY(-30deg);
     }
 
     to {
-      transform: rotateX(-24deg) rotateY(34deg);
+      transform: rotateX(-22deg) rotateY(330deg);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .rubik-cube {
       animation: none;
-      transform: rotateX(-24deg) rotateY(-32deg);
+      transform: rotateX(-22deg) rotateY(-30deg);
     }
   }
 
