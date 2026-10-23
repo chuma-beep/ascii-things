@@ -404,6 +404,17 @@ site-search kbd kbd {
   display: none;
 }
 
+.sidebar-pane,
+.sidebar-content {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar-pane::-webkit-scrollbar,
+.sidebar-content::-webkit-scrollbar {
+  display: none;
+}
+
 .sidebar-library {
   display: flex;
   align-items: center;
