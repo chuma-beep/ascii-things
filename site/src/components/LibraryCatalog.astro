@@ -84,6 +84,9 @@ const filters = [
     const cards = Array.from(root.querySelectorAll(".library-card"));
     const count = root.querySelector("[data-library-count]");
     const empty = root.querySelector("[data-library-empty]");
+    const filterIds = new Set(
+      buttons.map((button) => button.dataset.filter).filter((id): id is string => Boolean(id)),
+    );
     let active = "all";
 
     const apply = () => {
@@ -102,6 +105,27 @@ const filters = [
       if (empty) empty.hidden = shown !== 0;
     };
 
+    const readFilter = () => {
+      const type = new URLSearchParams(window.location.search).get("type");
+      return type && filterIds.has(type) ? type : "all";
+    };
+
+    const setActive = (next: string, push = false) => {
+      active = filterIds.has(next) ? next : "all";
+      buttons.forEach((button) => {
+        const on = button.dataset.filter === active;
+        button.classList.toggle("is-active", on);
+        button.setAttribute("aria-pressed", String(on));
+      });
+      apply();
+
+      if (!push) return;
+      const url = new URL(window.location.href);
+      if (active === "all") url.searchParams.delete("type");
+      else url.searchParams.set("type", active);
+      window.history.pushState({}, "", url);
+    };
+
     search?.addEventListener("input", apply);
 
     const focusFromHash = () => {
@@ -112,17 +136,13 @@ const filters = [
 
     buttons.forEach((button) => {
       button.addEventListener("click", () => {
-        active = button.dataset.filter || "all";
-        buttons.forEach((candidate) => {
-          const on = candidate === button;
-          candidate.classList.toggle("is-active", on);
-          candidate.setAttribute("aria-pressed", String(on));
-        });
-        apply();
+        setActive(button.dataset.filter || "all", true);
       });
     });
 
-    apply();
+    window.addEventListener("popstate", () => setActive(readFilter(), false));
+
+    setActive(readFilter(), false);
   }
 </script>
 
