@@ -91,6 +91,22 @@ export const LIBRARY: LibraryItem[] = [
     tags: ["infra", "network", "monitoring"],
   },
   {
+    id: "rhino-forest",
+    title: "Rhino in a forest",
+    description: "A still rhino in a dark clearing, ringed by fireflies.",
+    kind: "scene",
+    href: "/designs/#rhino",
+    tags: ["ascii", "forest", "rhino", "design"],
+  },
+  {
+    id: "dragon-flight",
+    title: "Dragon",
+    description: "A three-frame dragon beating its wings over a ridge.",
+    kind: "scene",
+    href: "/designs/#dragon",
+    tags: ["ascii", "dragon", "flight", "design"],
+  },
+  {
     id: "globe",
     title: "Globe",
     description:
@@ -218,6 +234,14 @@ export const LIBRARY: LibraryItem[] = [
     kind: "webgl",
     href: "/webgl/3d/",
     tags: ["webgl", "3d", "object"],
+  },
+  {
+    id: "rubik-3d",
+    title: "Rubik's cube",
+    description: "A raymarched 3×3×3 puzzle with a turning top layer.",
+    kind: "webgl",
+    href: "/designs/#rubik",
+    tags: ["webgl", "3d", "puzzle", "rubik"],
   },
   {
     id: "ascii-box-footer",
