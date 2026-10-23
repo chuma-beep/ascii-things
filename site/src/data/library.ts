@@ -93,7 +93,8 @@ export const LIBRARY: LibraryItem[] = [
   {
     id: "globe",
     title: "Globe",
-    description: "A rotating ASCII Earth with latitude, longitude, and land.",
+    description:
+      "A rotating ASCII Earth with drifting continents, cloud bands, and a moving terminator.",
     kind: "webgl",
     href: "/webgl/",
     tags: ["webgl", "world", "rotation"],

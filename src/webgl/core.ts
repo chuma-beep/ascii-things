@@ -37,6 +37,27 @@ const VARIANT_INDEX: Record<SurfaceVariant, number> = {
   "helix-3d": 16,
 };
 
+// 64×32 equirectangular land mask, four pixels per hex digit, MSB first.
+// Derived from Natural Earth 110m land (public domain).
+const LAND_MASK = [
+  "0000000000000000000000000000000000000000000000000000000000000000000000001f80ff00000000000000000000000003feffff8003c0000060000000",
+  "0000060070ffff80040000000c00000000000000c00fff8000000801fe00000000001beefc0fff00000030fffffc380007fffc93a703fe0003f802dffffffff7",
+  "f7ffffff83c7e0600ff5ffffffffffff13ffffff038380001effffffffffffff07effffc0e0080003cfffffffffffe3800c0fffe07c000020c7fffffffffc0c0",
+  "00003fffefe0000711ffffffffff01c000001fffeff00003ffffffffffffe00000001fffff180001ffffffffffffe00000000fffffe00001fffb9fffffffa000",
+  "00000ffffe000005ebc3bfffffff300000000ffffc00000705ffdffffffc000000000ffff800000708ff9fffffcc4000000007fff8000003f007ffffffc5c000",
+  "000003ffe0000007f90fffffffe20000000000fd2000000fffffbfffffe00000000000781800001ffff7dfffffe00000000000380000003ffffbf0ffffc00000",
+  "000000188800003ffffbf87e7c0000000000001d8a80003ffffdf03c3c00000000000001c000003ffffdc0301e000000000000004000003fffff00101e000000",
+  "0000000025c0001fffffc01004000000000000000fe0000fffffc00810080000000000000ffc00001fff800028400000000000000ffc00001fff000011cc0000",
+  "000000001fff00001ffe000009b10000000000001fffe0000ffc00000c10f000000000000ffff00007fc000003007000000000000fffe00007fc000000200800",
+  "0000000007ffc00007fc40000003a0000000000007ffc0000ffc4000000f30000000000001ffc0000ff8c000001ff0000000000001ff800007f08000007ff800",
+  "0000000001ff000007f8800000fffc000000000001fe000007f0000000fffc000000000001fc000003e00000007ffe000000000001f8000003c000000078fc00",
+  "0000000003f000000000000000007c000000000003f0000000000000000028020000000003c00000000000000000100200000000038000000000000000000008",
+  "00000000070000000000000000000000000000000700000000000080000000000000000007200000000000000000000000000000018000000000000000000000",
+  "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000100008800000",
+  "00000000008000000009ff8ffffffe000000000007c0000fffffff7ffffffff80001ff8fffc0003fffffffffffffffe000fffffff80007ffffffffffffffffc0",
+  "000ffffff82703ffffffffffffffff80003fffffffefffffffffffffffffffe0ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+].join("");
+
 export type AsciiSurfaceOptions = {
   /** Wordmark or short line that emerges from the glyph field. */
   text?: string;
@@ -99,10 +120,47 @@ uniform vec2 u_pointer;
 uniform float u_pointerStrength;
 uniform sampler2D u_atlas;
 uniform sampler2D u_mask;
+uniform sampler2D u_land;
 uniform float u_variant;
 
 float hash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float hash3(vec3 p) {
+  return fract(sin(dot(p, vec3(127.1, 311.7, 74.7))) * 43758.5453);
+}
+
+float noise3(vec3 p) {
+  vec3 i = floor(p);
+  vec3 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float n000 = hash3(i + vec3(0.0, 0.0, 0.0));
+  float n100 = hash3(i + vec3(1.0, 0.0, 0.0));
+  float n010 = hash3(i + vec3(0.0, 1.0, 0.0));
+  float n110 = hash3(i + vec3(1.0, 1.0, 0.0));
+  float n001 = hash3(i + vec3(0.0, 0.0, 1.0));
+  float n101 = hash3(i + vec3(1.0, 0.0, 1.0));
+  float n011 = hash3(i + vec3(0.0, 1.0, 1.0));
+  float n111 = hash3(i + vec3(1.0, 1.0, 1.0));
+  float nx00 = mix(n000, n100, f.x);
+  float nx10 = mix(n010, n110, f.x);
+  float nx01 = mix(n001, n101, f.x);
+  float nx11 = mix(n011, n111, f.x);
+  float nxy0 = mix(nx00, nx10, f.y);
+  float nxy1 = mix(nx01, nx11, f.y);
+  return mix(nxy0, nxy1, f.z);
+}
+
+float fbm3(vec3 p) {
+  float value = 0.0;
+  float amplitude = 0.5;
+  for (int i = 0; i < 3; i++) {
+    value += amplitude * noise3(p);
+    p = p * 2.03 + vec3(1.7, 9.2, 3.1);
+    amplitude *= 0.5;
+  }
+  return value;
 }
 
 
@@ -152,6 +210,7 @@ void main() {
   float mask = 0.0;
   float level = 0.0;
   float weight = 1.0;
+  float tint = 0.0;
 
   if (u_variant < 0.5) {
     // The original wordmark field: a drifting glyph surface with an
@@ -164,29 +223,64 @@ void main() {
     level = min(1.0, max(word, base) + pointer * 0.2);
     weight = step(0.08, mask);
   } else if (u_variant < 1.5) {
-    // Globe: a rotating sphere with latitude/longitude lines, stylised
-    // continents, and a single soft key light.
+    // Globe: a turned and tilted sphere with procedural continents,
+    // oceans, a cloud deck, a fixed sun, and a thin atmosphere.
     vec2 p = (frag - 0.5 * u_resolution) / min(u_resolution.x, u_resolution.y) * 2.0;
     float r2 = dot(p, p);
+    float radius = sqrt(r2);
     if (r2 > 0.86 * 0.86) {
       float star = step(0.992, hash(grid)) * (0.35 + 0.65 * (0.5 + 0.5 * sin(u_time * 1.5 + hash(grid) * 6.283)));
-      level = star * 0.45;
+      float halo = smoothstep(0.86, 0.9, radius) * (1.0 - smoothstep(0.9, 1.02, radius));
+      level = max(star * 0.45, halo * 0.24);
+      weight = 1.0;
     } else {
       float z = sqrt(max(0.0, 1.0 - r2));
       vec3 n = normalize(vec3(p.x, p.y, z));
-      float a = u_time * 0.22;
-      float x = n.x * cos(a) - n.z * sin(a);
-      float zz = n.x * sin(a) + n.z * cos(a);
-      float lat = asin(clamp(n.y, -1.0, 1.0));
-      float lon = atan(x, zz);
-      float latLine = 1.0 - smoothstep(0.018, 0.075, abs(fract(lat / 3.14159265 * 8.0) - 0.5));
-      float lonLine = 1.0 - smoothstep(0.018, 0.075, abs(fract(lon / 3.14159265 * 12.0) - 0.5));
-      float land = sin(lon * 2.0 + sin(lat * 3.0) * 1.4) + sin(lat * 4.0 + lon * 1.3) + 0.5 * sin(lon * 5.0 - lat * 2.0);
-      land = smoothstep(0.35, 0.75, land);
-      vec3 lightDir = normalize(vec3(-0.45, 0.65, 0.8));
-      float lit = 0.4 + 0.6 * clamp(dot(n, lightDir), 0.0, 1.0);
-      float lines = max(latLine, lonLine);
-      level = max(lines * 0.55, land * 0.95) * lit;
+
+      float spin = u_time * 0.12 - 1.5708;
+      vec3 s = vec3(n.x * cos(spin) - n.z * sin(spin), n.y, n.x * sin(spin) + n.z * cos(spin));
+      float tilt = 0.0;
+      s = vec3(s.x, s.y * cos(tilt) - s.z * sin(tilt), s.y * sin(tilt) + s.z * cos(tilt));
+      float lat = asin(clamp(s.y, -1.0, 1.0));
+
+      vec2 landUv = vec2(
+        atan(s.z, s.x) / 6.28318 + 0.5,
+        0.5 + asin(clamp(s.y, -1.0, 1.0)) / 3.14159
+      );
+      float earth = texture2D(u_land, landUv).r;
+      float detail = noise3(s * 18.0 + vec3(9.1, 2.4, 0.3));
+      float land = smoothstep(0.3, 0.7, earth);
+      float ice = smoothstep(0.9, 0.97, abs(s.y));
+      land = max(land, ice);
+      tint = land;
+
+      float cloud = fbm3(s * 3.4 + vec3(u_time * 0.02, 0.0, 0.0));
+      cloud = smoothstep(0.72, 0.84, cloud) * (0.72 + 0.28 * sin(lat * 6.0));
+
+      vec3 lightDir = normalize(vec3(-0.3, 0.45, 0.86));
+      float ndl = dot(n, lightDir);
+      float day = smoothstep(-0.1, 0.24, ndl);
+      float diffuse = max(ndl, 0.0);
+      float ocean = 1.0 - land;
+      float oceanLevel = 0.015 + 0.02 * diffuse;
+      float landLevel = 0.5 + 0.4 * diffuse + 0.16 * detail;
+      level = mix(oceanLevel, landLevel, land);
+      level *= mix(0.12, 1.0, day);
+      float spec = pow(max(dot(n, normalize(lightDir + vec3(0.0, 0.0, 1.0))), 0.0), 28.0);
+      level += spec * ocean * day * 0.42;
+      level = mix(level, 0.55 + 0.2 * diffuse, cloud * 0.08 * day);
+      float edgeA = texture2D(u_land, landUv + vec2(0.008, 0.0)).r;
+      float edgeB = texture2D(u_land, landUv + vec2(0.0, 0.016)).r;
+      float edge = abs(earth - edgeA) + abs(earth - edgeB);
+      float coast = smoothstep(0.05, 0.6, edge);
+      level += coast * 0.3 * day;
+
+      float cityField = smoothstep(0.48, 0.72, noise3(s * 11.0 + vec3(4.0, 7.0, 1.0)));
+      float city = step(0.996, hash(grid)) * land * cityField * (1.0 - day);
+      level = max(level, city * 0.55);
+
+      float rim = smoothstep(0.7, 0.86, radius);
+      level = max(level, rim * day * 0.28);
       weight = 1.0;
     }
   } else if (u_variant < 2.5) {
@@ -387,6 +481,7 @@ void main() {
 
   float scan = u_scan * (1.0 - smoothstep(0.0, u_scanRadius, abs(frag.x - u_scanX)));
   float accentMix = max(scan, pointer * 0.55);
+  accentMix = max(accentMix, tint * 0.72);
   float alpha = glyph * mix(0.38, 1.0, max(weight, pointer * 0.75)) * mix(u_foreground.a, u_accent.a, accentMix);
   vec3 color = mix(u_foreground.rgb, u_accent.rgb, accentMix);
   gl_FragColor = vec4(color, alpha);
@@ -564,9 +659,11 @@ export class AsciiSurfaceEngine {
   private buffer: WebGLBuffer | null = null;
   private atlasTexture: WebGLTexture | null = null;
   private maskTexture: WebGLTexture | null = null;
+  private landTexture: WebGLTexture | null = null;
   private uniforms: Record<string, WebGLUniformLocation | null> = {};
   private atlas: HTMLCanvasElement | null = null;
   private maskCanvas: HTMLCanvasElement | null = null;
+  private landCanvas: HTMLCanvasElement | null = null;
   private maskData: Uint8ClampedArray | null = null;
   private glyphCount = 1;
   private width = 1;
@@ -667,6 +764,7 @@ export class AsciiSurfaceEngine {
       "u_variant",
       "u_atlas",
       "u_mask",
+      "u_land",
     ]) {
       this.uniforms[name] = gl.getUniformLocation(this.program, name);
     }
@@ -681,6 +779,7 @@ export class AsciiSurfaceEngine {
 
     this.uploadAtlas();
     this.uploadMask();
+    this.uploadLand();
     this.ready = true;
   }
 
@@ -694,6 +793,16 @@ export class AsciiSurfaceEngine {
     const gl = this.gl;
     if (!gl || !this.maskCanvas) return;
     this.maskTexture = this.uploadTexture(this.maskTexture, this.maskCanvas);
+  }
+
+  private uploadLand(): void {
+    const gl = this.gl;
+    if (!gl || !this.landCanvas) return;
+    this.landTexture = this.uploadTexture(this.landTexture, this.landCanvas);
+    if (this.landTexture) {
+      gl.bindTexture(gl.TEXTURE_2D, this.landTexture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    }
   }
 
   private uploadTexture(
@@ -772,6 +881,7 @@ export class AsciiSurfaceEngine {
     this.buffer = null;
     this.atlasTexture = null;
     this.maskTexture = null;
+    this.landTexture = null;
     this.mode = "none";
   };
 
@@ -822,9 +932,11 @@ export class AsciiSurfaceEngine {
 
     this.buildAtlas();
     this.buildMask();
+    if (!this.landCanvas) this.buildLand();
     if (this.gl) {
       this.uploadAtlas();
       this.uploadMask();
+      this.uploadLand();
     }
     if (this.ready && !this.running) this.draw(0);
   };
@@ -886,6 +998,32 @@ export class AsciiSurfaceEngine {
       this.maskData = null;
       this.maskCanvas = null;
     }
+  }
+
+  private buildLand(): void {
+    const width = 128;
+    const height = 64;
+    const offscreen = document.createElement("canvas");
+    offscreen.width = width;
+    offscreen.height = height;
+    const ctx = offscreen.getContext("2d");
+    if (!ctx) {
+      this.landCanvas = null;
+      return;
+    }
+    const image = ctx.createImageData(width, height);
+    for (let index = 0; index < width * height; index++) {
+      const nibble = Number.parseInt(LAND_MASK[Math.floor(index / 4)] ?? "0", 16);
+      const on = (nibble >> (3 - (index % 4))) & 1;
+      const value = on ? 255 : 0;
+      const offset = index * 4;
+      image.data[offset] = value;
+      image.data[offset + 1] = value;
+      image.data[offset + 2] = value;
+      image.data[offset + 3] = 255;
+    }
+    ctx.putImageData(image, 0, 0);
+    this.landCanvas = offscreen;
   }
 
   private brightness(x: number, y: number): number {
@@ -951,6 +1089,9 @@ export class AsciiSurfaceEngine {
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.maskTexture);
     gl.uniform1i(this.uniforms.u_mask, 1);
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, this.landTexture);
+    gl.uniform1i(this.uniforms.u_land, 2);
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
@@ -1073,6 +1214,7 @@ export class AsciiSurfaceEngine {
     if (gl) {
       if (this.atlasTexture) gl.deleteTexture(this.atlasTexture);
       if (this.maskTexture) gl.deleteTexture(this.maskTexture);
+      if (this.landTexture) gl.deleteTexture(this.landTexture);
       if (this.buffer) gl.deleteBuffer(this.buffer);
       if (this.program) gl.deleteProgram(this.program);
     }
@@ -1082,5 +1224,6 @@ export class AsciiSurfaceEngine {
     this.buffer = null;
     this.atlasTexture = null;
     this.maskTexture = null;
+    this.landTexture = null;
   }
 }

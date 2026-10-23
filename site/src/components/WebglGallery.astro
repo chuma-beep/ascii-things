@@ -6,7 +6,7 @@ const items = [
     variant: "globe",
     title: "Globe",
     family: "Worlds",
-    description: "A rotating ASCII Earth with latitude, longitude, land and a moving light.",
+    description: "A rotating ASCII Earth with drifting continents, cloud bands, and a moving terminator.",
     code: '<AsciiSurface variant="globe" />',
   },
   {
@@ -135,6 +135,9 @@ const visible = items.slice(from, to);
             variant={item.variant}
             text=""
             density={0.3}
+            cell={item.variant === "globe" ? 5 : 0}
+            foreground={item.variant === "globe" ? "#7fbcff" : undefined}
+            accent={item.variant === "globe" ? "#c7e8a4" : undefined}
             pointer={item.variant === "ripple"}
             label={`${item.title} ASCII WebGL demo`}
             style={{ height: "220px" }}
