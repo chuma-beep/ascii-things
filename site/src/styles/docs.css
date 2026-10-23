@@ -428,12 +428,14 @@ site-search kbd kbd {
   color: var(--sl-color-accent);
 }
 
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li:first-child,
 .sidebar-content > ul.top-level > li:first-child {
   padding: 0.35rem 0.3rem 0.45rem;
   border: 1px solid var(--sl-color-hairline);
   background: color-mix(in srgb, var(--sl-color-accent) 6%, transparent);
 }
 
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li:first-child > details > summary .large,
 .sidebar-content > ul.top-level > li:first-child > details > summary .large {
   color: var(--sl-color-accent-high);
   font-size: 0.68rem;

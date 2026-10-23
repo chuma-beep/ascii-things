@@ -65,8 +65,14 @@ export default defineConfig({
       ],
       sidebar: [
         {
-          label: "Explore",
-          items: [{ label: "Library", link: "library/" }],
+          label: "Library",
+          items: [
+            { label: "All items", link: "library/" },
+            { label: "Scenes", link: "library/?type=scene" },
+            { label: "WebGL", link: "library/?type=webgl" },
+            { label: "Components", link: "library/?type=component" },
+            { label: "Tools", link: "library/?type=tool" },
+          ],
         },
         {
           label: "Start here",
