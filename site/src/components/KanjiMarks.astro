@@ -24,6 +24,7 @@ const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', ser
             glyphs="龍神光"
             density={0.5}
             cell={12}
+            pointer={false}
             foreground="#c7e8a4"
             accent="#7ee787"
             fontFamily={kanjiFont}
@@ -169,16 +170,11 @@ const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', ser
       inset 0 0 0 4px rgba(0, 0, 0, 0.16),
       0 18px 40px rgba(0, 0, 0, 0.38);
     transform: rotate(-3deg);
-    transition: transform 220ms ease;
     animation: hanko-press 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
 
   .hanko span {
     display: block;
-  }
-
-  .hanko:hover {
-    transform: rotate(-1deg) scale(1.02);
   }
 
   .scroll {
@@ -191,12 +187,7 @@ const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', ser
     color: #1b1a17;
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
     transform: rotate(2deg);
-    transition: transform 220ms ease;
     animation: scroll-rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-  }
-
-  .scroll:hover {
-    transform: rotate(0deg);
   }
 
   .scroll__text {
