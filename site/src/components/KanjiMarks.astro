@@ -1,8 +1,47 @@
 ---
+import { AsciiSurface } from "ascii-things/webgl/react";
+
+interface Props {
+  showHelix?: boolean;
+}
+
+const { showHelix = false } = Astro.props;
 const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', serif";
 ---
 
-<div class="kanji-marks" style={`--kanji-font: ${kanjiFont}`}>
+<div
+  class:list={["kanji-marks", { "kanji-marks--three": showHelix }]}
+  style={`--kanji-font: ${kanjiFont}`}
+>
+  {
+    showHelix && (
+      <article class="kanji-mark" id="helix">
+        <div class="kanji-mark__stage kanji-mark__stage--webgl">
+          <AsciiSurface
+            client:visible
+            variant="helix-3d"
+            text=""
+            glyphs="龍神光"
+            density={0.5}
+            cell={12}
+            foreground="#c7e8a4"
+            accent="#7ee787"
+            fontFamily={kanjiFont}
+            label="Kanji helix ASCII demo"
+            style={{ height: "280px" }}
+          />
+        </div>
+        <div class="kanji-mark__body">
+          <p class="kanji-mark__family">Live 3D</p>
+          <h2>Kanji helix</h2>
+          <p class="kanji-mark__description">
+            A double helix turning through a field of bright characters.
+          </p>
+          <code>WEBGL · 龍神光</code>
+        </div>
+      </article>
+    )
+  }
   <article class="kanji-mark" id="seal">
     <div class="kanji-mark__stage">
       <div class="hanko" role="img" aria-label="Hanko seal with the characters 永, 龍, 風, and 水">
@@ -48,6 +87,10 @@ const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', ser
     margin: 1.5rem 0 2.5rem;
   }
 
+  .kanji-marks--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .kanji-mark {
     scroll-margin-top: calc(var(--sl-nav-height, 4rem) + 1rem);
     overflow: hidden;
@@ -64,6 +107,16 @@ const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', ser
     background:
       radial-gradient(circle at 50% 42%, rgba(255, 122, 26, 0.08), transparent 58%),
       #050607;
+  }
+
+  .kanji-mark__stage--webgl {
+    background: #050607;
+  }
+
+  .kanji-mark__stage--webgl :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 280px !important;
   }
 
   .kanji-mark__body {
