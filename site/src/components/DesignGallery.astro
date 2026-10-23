@@ -1,7 +1,5 @@
 ---
 import { AsciiSurface } from "ascii-things/webgl/react";
-import AnimatedAscii from "./AnimatedAscii";
-import { DRAGON_FRAMES, RHINO_FRAMES } from "../data/designs";
 ---
 
 <div class="design-gallery">
@@ -29,53 +27,6 @@ import { DRAGON_FRAMES, RHINO_FRAMES } from "../data/designs";
     </div>
     <footer class="design-piece__foot">
       <code>{'<AsciiSurface variant="rubik-3d" />'}</code>
-    </footer>
-  </article>
-
-  <article class="design-piece" id="rhino">
-    <header class="design-piece__head">
-      <p class="design-piece__meta">ASCII art / forest</p>
-      <h2>Rhino in a forest</h2>
-      <p>
-        A rhino stands in a clearing between dark conifers. The tail and ear move in two
-        alternating frames; fireflies mark the edge of the treeline.
-      </p>
-    </header>
-    <div class="design-piece__stage">
-      <AnimatedAscii
-        client:visible
-        frames={RHINO_FRAMES}
-        interval={1700}
-        label="ASCII art of a rhino standing in a forest"
-        className="design-art"
-      />
-    </div>
-    <footer class="design-piece__foot">
-      <code>120 × 42 glyphs · 2 frames</code>
-    </footer>
-  </article>
-
-  <article class="design-piece" id="dragon">
-    <header class="design-piece__head">
-      <p class="design-piece__meta">ASCII art / flight</p>
-      <h2>Dragon</h2>
-      <p>
-        A dragon crosses a mountain ridge with its wings beating through three frames. The
-        silhouette, horns, tail spade, and moon stay fixed while the wing changes shape.
-      </p>
-    </header>
-    <div class="design-piece__stage">
-      <AnimatedAscii
-        client:visible
-        frames={DRAGON_FRAMES}
-        interval={700}
-        start={1}
-        label="ASCII art of a dragon flying over mountains"
-        className="design-art"
-      />
-    </div>
-    <footer class="design-piece__foot">
-      <code>120 × 42 glyphs · 3 frames</code>
     </footer>
   </article>
 </div>
@@ -143,19 +94,6 @@ import { DRAGON_FRAMES, RHINO_FRAMES } from "../data/designs";
     height: 100% !important;
   }
 
-  .design-art {
-    width: max-content;
-    margin: 0 auto;
-    color: #e8e0cd;
-    font-family: var(--sl-font-mono);
-    font-size: clamp(4.5px, 1.1vw, 8.5px);
-    line-height: 1;
-    letter-spacing: 0;
-    text-align: left;
-    text-shadow: 0 0 10px rgba(255, 122, 26, 0.08);
-    white-space: pre;
-  }
-
   .design-piece__foot {
     padding: 0.7rem 1.3rem;
   }
@@ -172,10 +110,6 @@ import { DRAGON_FRAMES, RHINO_FRAMES } from "../data/designs";
 
     .design-piece__stage--webgl {
       height: 300px;
-    }
-
-    .design-art {
-      font-size: clamp(3.2px, 0.8vw, 4.8px);
     }
   }
 </style>

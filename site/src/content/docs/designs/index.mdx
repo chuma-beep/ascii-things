@@ -1,24 +1,20 @@
 ---
 title: Designs
-description: Animated ASCII studies — a turning Rubik's cube, a rhino in a forest, and a dragon in flight.
+description: A turning ASCII Rubik's cube built from the same monospace grid.
 ---
 
 import DesignGallery from "../../../components/DesignGallery.astro";
 
-Three glyph studies that push the same character grid in different directions: one raymarched
-object, one quiet forest scene, and one animated silhouette. Each piece is built from the same
-monospace cell, but only the Rubik's cube uses the WebGL surface.
+One glyph study built from the same monospace cell: a raymarched object that turns in
+perspective without leaving the character grid.
 
 <DesignGallery />
 
 ## Motion
 
 The Rubik's cube is a `rubik-3d` WebGL variant. Its top layer completes a slow quarter turn,
-pauses, and resets into the solved grid. The rhino and dragon are preformatted ASCII art; their
-frames alternate with the same cell dimensions so the composition does not shift.
-
-All three respect `prefers-reduced-motion`: the cube settles to a still frame, and the ASCII art
-stays on its opening frame.
+pauses, and resets into the solved grid. It respects `prefers-reduced-motion` and settles to a
+still frame.
 
 ## Use the cube
 
@@ -36,5 +32,5 @@ import { AsciiSurface } from "ascii-things/webgl/react";
 />;
 ```
 
-The ASCII studies are local compositions rather than exported runtime components. They are a
-reference for what the grid can hold: silhouettes, landscape layers, and frame-by-frame motion.
+The cube is a local composition rather than an exported runtime component. It is a reference for
+what the grid can hold: a solid object, a moving layer, and a readable silhouette.

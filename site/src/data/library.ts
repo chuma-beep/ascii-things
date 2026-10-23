@@ -91,22 +91,6 @@ export const LIBRARY: LibraryItem[] = [
     tags: ["infra", "network", "monitoring"],
   },
   {
-    id: "rhino-forest",
-    title: "Rhino in a forest",
-    description: "A still rhino in a dark clearing, ringed by fireflies.",
-    kind: "scene",
-    href: "/designs/#rhino",
-    tags: ["ascii", "forest", "rhino", "design"],
-  },
-  {
-    id: "dragon-flight",
-    title: "Dragon",
-    description: "A three-frame dragon beating its wings over a ridge.",
-    kind: "scene",
-    href: "/designs/#dragon",
-    tags: ["ascii", "dragon", "flight", "design"],
-  },
-  {
     id: "globe",
     title: "Globe",
     description:

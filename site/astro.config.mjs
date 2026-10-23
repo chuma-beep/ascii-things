@@ -114,8 +114,6 @@ export default defineConfig({
           items: [
             { label: "All designs", link: "designs/" },
             { label: "Rubik's cube", link: "designs/#rubik" },
-            { label: "Rhino in a forest", link: "designs/#rhino" },
-            { label: "Dragon", link: "designs/#dragon" },
           ],
         },
         {
