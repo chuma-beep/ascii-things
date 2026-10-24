@@ -373,6 +373,10 @@ site-search kbd kbd {
   height: 100%;
 }
 
+.docs-header .mobile-nav {
+  display: none;
+}
+
 .docs-header-top {
   display: flex;
   align-items: center;
@@ -484,7 +488,7 @@ site-search kbd kbd {
   }
 }
 
-@media (min-width: 72rem) {
+@media (min-width: 50rem) {
   :root {
     --sl-nav-height: 7rem;
   }
@@ -493,6 +497,7 @@ site-search kbd kbd {
     display: flex;
     align-items: center;
     gap: clamp(0.85rem, 1.8vw, 1.55rem);
+    height: 1.5rem;
     font-size: 0.62rem;
     letter-spacing: 0.16em;
     line-height: 1;
@@ -500,7 +505,11 @@ site-search kbd kbd {
   }
 
   .docs-primary-nav > a,
-  .docs-primary-nav summary {
+  .docs-primary-nav summary,
+  .docs-primary-nav .docs-library {
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
     color: var(--sl-color-gray-3);
     cursor: pointer;
     list-style: none;
@@ -556,6 +565,31 @@ site-search kbd kbd {
   .docs-library-panel a:focus-visible {
     color: var(--sl-color-accent-high);
     background: var(--sl-color-bg-accent);
+  }
+}
+
+@media (max-width: 49.999rem) {
+  .docs-header .mobile-nav {
+    display: block;
+  }
+
+  .docs-header .mobile-nav .mobile-nav__toggle {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  /* Starlight's trigger is replaced by the custom drawer. Show it only as
+     the close toggle while the mobile docs contents are open. */
+  .sl-menu-button {
+    display: none !important;
+  }
+
+  html.starlight-sidebar-open:not(.mobile-nav-open) .sl-menu-button {
+    display: flex !important;
+  }
+
+  html.starlight-sidebar-open .docs-header .mobile-nav__toggle {
+    display: none;
   }
 }
 

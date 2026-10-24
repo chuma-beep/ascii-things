@@ -1,6 +1,7 @@
 ---
 import "../styles/landing.css";
 import KanjiMarks from "../components/KanjiMarks.astro";
+import MobileNav from "../components/MobileNav.astro";
 
 const reactSnippet = `<span class="tok-key">import</span> { AsciiDog } <span class="tok-key">from</span> <span class="tok-str">"ascii-things/react"</span>;
 
@@ -102,6 +103,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         <span class="version">v1.0.0-rc.0</span>
         <a class="github" href="https://github.com/chuma-beep/ascii-things">GitHub ↗</a>
       </div>
+      <MobileNav />
     </header>
 
     <main id="top">

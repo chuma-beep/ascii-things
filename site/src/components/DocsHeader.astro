@@ -6,6 +6,7 @@ import Search from "virtual:starlight/components/Search";
 import SiteTitle from "virtual:starlight/components/SiteTitle";
 import SocialIcons from "virtual:starlight/components/SocialIcons";
 import ThemeSelect from "virtual:starlight/components/ThemeSelect";
+import MobileNav from "./MobileNav.astro";
 
 const shouldRenderSearch =
   config.pagefind || config.components.Search !== "@astrojs/starlight/components/Search.astro";
@@ -20,6 +21,7 @@ const shouldRenderSearch =
       <ThemeSelect />
       <LanguageSelect />
     </div>
+    <MobileNav showDocsMenu />
   </div>
 
   <nav class="docs-primary-nav" aria-label="Primary">

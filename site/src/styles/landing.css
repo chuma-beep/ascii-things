@@ -94,9 +94,13 @@ button {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  height: 1.25rem;
   font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.035em;
+  line-height: 1;
   white-space: nowrap;
 }
 
@@ -112,9 +116,29 @@ button {
   display: flex;
   align-items: center;
   gap: clamp(14px, 2.4vw, 30px);
+  height: 1.25rem;
   font-size: 9px;
   letter-spacing: 0.17em;
+  line-height: 1;
   text-transform: uppercase;
+}
+
+.site-nav > *,
+.header-end > * {
+  display: inline-flex;
+  align-items: center;
+  height: 1.25rem;
+}
+
+.site-nav a,
+.site-nav summary {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+}
+
+.site-header .mobile-nav {
+  display: none;
 }
 
 .site-nav a {
@@ -995,9 +1019,14 @@ button {
 }
 
 @media (max-width: 900px) {
-  .site-nav a[href="#install"],
-  .header-end .version {
+  .site-nav,
+  .header-end {
     display: none;
+  }
+
+  .site-header .mobile-nav {
+    display: block;
+    margin-left: auto;
   }
 
   .hero {
