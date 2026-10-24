@@ -206,13 +206,31 @@ const seasons = [
   }
 
   .season {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
+    display: grid;
+    grid-template-rows: 3.4rem 1fr 3.4rem;
+    justify-items: center;
     padding: 0.7rem 0.2rem;
     border-top: 2px solid var(--tone);
     border-right: 1px solid rgba(236, 232, 223, 0.1);
+  }
+
+  .season__label {
+    grid-row: 1;
+    align-self: start;
+  }
+
+  .season__kanji {
+    grid-row: 2;
+    align-self: center;
+  }
+
+  .season__words {
+    grid-row: 3;
+    align-self: end;
+  }
+
+  .seasons > .season {
+    margin: 0;
   }
 
   .season:last-child {
