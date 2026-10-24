@@ -1,0 +1,220 @@
+---
+import { LIBRARY } from "../../data/library";
+import "../../styles/showcase.css";
+
+type ShowcaseCategory = "scene" | "webgl" | "kanji" | "component";
+
+const CATEGORY_ORDER: ShowcaseCategory[] = ["scene", "webgl", "kanji", "component"];
+const CATEGORY_LABEL: Record<ShowcaseCategory, string> = {
+  scene: "Scene",
+  webgl: "WebGL",
+  kanji: "Kanji",
+  component: "Component",
+};
+
+const pieces = LIBRARY.filter((item) => item.kind !== "tool").map((item) => ({
+  ...item,
+  category: (item.tags.includes("kanji") ? "kanji" : item.kind) as ShowcaseCategory,
+}));
+
+const buckets: Record<ShowcaseCategory, typeof pieces> = {
+  scene: [],
+  webgl: [],
+  kanji: [],
+  component: [],
+};
+
+for (const piece of pieces) {
+  buckets[piece.category].push(piece);
+}
+
+const longestBucket = Math.max(...CATEGORY_ORDER.map((key) => buckets[key].length));
+const ordered = [];
+
+for (let index = 0; index < longestBucket; index += 1) {
+  for (const key of CATEGORY_ORDER) {
+    const piece = buckets[key][index];
+    if (piece) ordered.push(piece);
+  }
+}
+
+const counts = Object.fromEntries(
+  CATEGORY_ORDER.map((key) => [key, buckets[key].length]),
+) as Record<ShowcaseCategory, number>;
+
+const filters = [
+  { id: "all" as const, label: "All", count: pieces.length },
+  ...CATEGORY_ORDER.map((key) => ({
+    id: key,
+    label: CATEGORY_LABEL[key],
+    count: counts[key],
+  })),
+];
+
+const title = "Showcase — ascii-things";
+const description = "The visual archive of every scene, WebGL surface, kanji study, and component.";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#070809" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="showcase-header">
+      <a class="showcase-brand" href="/">
+        ascii-things <span>/ showcase</span>
+      </a>
+      <nav class="showcase-nav" aria-label="Showcase">
+        <a href="/library/">Library</a>
+        <a href="/kanji/">Kanji</a>
+        <a href="/guide/">Docs</a>
+      </nav>
+    </header>
+
+    <main class="showcase-main" data-showcase>
+      <section class="showcase-hero" aria-labelledby="showcase-title">
+        <p class="showcase-eyebrow">Visual archive / {pieces.length} pieces</p>
+        <h1 id="showcase-title">All the <em>work.</em></h1>
+        <p class="showcase-lede">
+          Every scene, WebGL surface, kanji study, and component. No docs, no install commands.
+        </p>
+      </section>
+
+      <div class="showcase-toolbar">
+        <div class="showcase-filters" role="group" aria-label="Filter showcase">
+          {
+            filters.map((filter) => (
+              <button
+                class:list={["showcase-filter", filter.id === "all" && "is-active"]}
+                type="button"
+                data-showcase-filter={filter.id}
+                aria-pressed={filter.id === "all" ? "true" : "false"}
+              >
+                {filter.label}
+                <span>{filter.count}</span>
+              </button>
+            ))
+          }
+        </div>
+        <p class="showcase-count" data-showcase-count aria-live="polite">
+          {pieces.length} pieces
+        </p>
+      </div>
+
+      <div class="showcase-grid">
+        {
+          ordered.map((item) => (
+            <a
+              class="showcase-card"
+              href={item.href}
+              data-showcase-card
+              data-category={item.category}
+            >
+              <figure>
+                <img
+                  src={`/showcase/${item.id}.jpg`}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>
+                  <span>{CATEGORY_LABEL[item.category]}</span>
+                  <strong>{item.title}</strong>
+                </figcaption>
+              </figure>
+            </a>
+          ))
+        }
+      </div>
+
+      <p class="showcase-empty" data-showcase-empty hidden>Nothing in this category.</p>
+    </main>
+
+    <footer class="showcase-footer">
+      <span>ascii-things / visual archive</span>
+      <span>
+        <a href="/library/">Browse the library ↗</a>
+      </span>
+    </footer>
+
+    <script>
+      const root = document.querySelector<HTMLElement>("[data-showcase]");
+
+      if (root) {
+        const cards = Array.from(root.querySelectorAll<HTMLElement>("[data-showcase-card]"));
+        const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-showcase-filter]"));
+        const count = root.querySelector<HTMLElement>("[data-showcase-count]");
+        const empty = root.querySelector<HTMLElement>("[data-showcase-empty]");
+        const valid = new Set(buttons.map((button) => button.dataset.showcaseFilter));
+
+        const readFilter = () => {
+          const value = new URLSearchParams(window.location.search).get("type");
+          return value && valid.has(value) ? value : "all";
+        };
+
+        const apply = (filter: string) => {
+          let visible = 0;
+
+          for (const card of cards) {
+            const matches = filter === "all" || card.dataset.category === filter;
+            card.hidden = !matches;
+            if (matches) visible += 1;
+          }
+
+          for (const button of buttons) {
+            const active = button.dataset.showcaseFilter === filter;
+            button.classList.toggle("is-active", active);
+            button.setAttribute("aria-pressed", active ? "true" : "false");
+          }
+
+          if (count) {
+            count.textContent = `${visible} ${visible === 1 ? "piece" : "pieces"}`;
+          }
+
+          if (empty) {
+            empty.hidden = visible > 0;
+          }
+        };
+
+        const setFilter = (filter: string, push: boolean) => {
+          apply(filter);
+
+          if (push) {
+            const url = new URL(window.location.href);
+            if (filter === "all") {
+              url.searchParams.delete("type");
+            } else {
+              url.searchParams.set("type", filter);
+            }
+            window.history.pushState({}, "", url);
+          }
+        };
+
+        for (const button of buttons) {
+          button.addEventListener("click", () => {
+            setFilter(button.dataset.showcaseFilter || "all", true);
+          });
+        }
+
+        window.addEventListener("popstate", () => apply(readFilter()));
+        apply(readFilter());
+      }
+    </script>
+  </body>
+</html>

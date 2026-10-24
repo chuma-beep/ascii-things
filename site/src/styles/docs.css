@@ -577,3 +577,222 @@ site-search kbd kbd {
 .sl-markdown-content .kanji-mark__stage > * {
   margin-top: 0 !important;
 }
+
+/* ------------------------------------------------------------------ sidebar index rail */
+
+.sidebar-index {
+  display: grid;
+  gap: 0.55rem;
+  padding-bottom: 0.9rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.sidebar-index__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  color: var(--sl-color-gray-3);
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.sidebar-index__count {
+  color: var(--sl-color-accent);
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.sidebar-index__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 0.62rem;
+  overflow: hidden;
+}
+
+.sidebar-index__bars i {
+  display: block;
+  width: 2px;
+  height: 46%;
+  background: var(--sl-color-gray-4);
+}
+
+.sidebar-index__bars i:nth-child(3n) {
+  height: 58%;
+}
+
+.sidebar-index__bars i:nth-child(4n) {
+  height: 82%;
+}
+
+.sidebar-index__bars i:nth-child(5n) {
+  height: 32%;
+}
+
+.sidebar-library__prompt {
+  color: var(--sl-color-accent);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.sidebar-library__label {
+  flex: 1;
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level,
+.sidebar-content > ul.top-level {
+  position: relative;
+  padding-inline-start: 1rem;
+  counter-reset: sidebar-group;
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level::before,
+.sidebar-content > ul.top-level::before {
+  position: absolute;
+  inset-block: 0;
+  left: 0.2rem;
+  width: 1px;
+  background: var(--sl-color-hairline);
+  content: "";
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li,
+.sidebar-content > ul.top-level > li {
+  position: relative;
+  counter-increment: sidebar-group;
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li::before,
+.sidebar-content > ul.top-level > li::before {
+  position: absolute;
+  top: 1rem;
+  left: -0.8rem;
+  width: 5px;
+  height: 5px;
+  border: 1px solid var(--sl-color-gray-4);
+  background: var(--sl-color-bg-sidebar);
+  content: "";
+  transform: rotate(45deg);
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li:has(> details[open])::before,
+.sidebar-content > ul.top-level > li:has(> details[open])::before {
+  border-color: var(--sl-color-accent);
+  background: var(--sl-color-accent);
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li > details > summary,
+.sidebar-content > ul.top-level > li > details > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.5rem;
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li > details > summary .group-label,
+.sidebar-content > ul.top-level > li > details > summary .group-label {
+  flex: 1;
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li > details > summary .large,
+.sidebar-content > ul.top-level > li > details > summary .large {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  text-transform: uppercase;
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li > details > summary .large::before,
+.sidebar-content > ul.top-level > li > details > summary .large::before {
+  color: var(--sl-color-accent);
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  content: counter(sidebar-group, decimal-leading-zero);
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li > details > summary .caret,
+.sidebar-content > ul.top-level > li > details > summary .caret {
+  display: none;
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li > details > summary::after,
+.sidebar-content > ul.top-level > li > details > summary::after {
+  margin-left: 0.35rem;
+  color: var(--sl-color-gray-3);
+  font-size: 0.8rem;
+  line-height: 1;
+  content: "+";
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li > details[open] > summary::after,
+.sidebar-content > ul.top-level > li > details[open] > summary::after {
+  color: var(--sl-color-accent);
+  content: "−";
+}
+
+.sidebar-content ul.top-level > li > details > ul > li > a > span::before {
+  margin-right: 0.4rem;
+  color: var(--sl-color-gray-4);
+  content: "·";
+}
+
+.sidebar-content ul.top-level > li > details > ul > li > a[aria-current="page"] {
+  border-left: 2px solid var(--sl-color-accent);
+  background: color-mix(in srgb, var(--sl-color-accent) 8%, transparent);
+  padding-inline-start: 0.45rem;
+}
+
+.sidebar-content ul.top-level > li > details > ul > li > a[aria-current="page"] > span::before {
+  color: var(--sl-color-accent);
+  content: ">";
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li:first-child > details > ul,
+.sidebar-content > ul.top-level > li:first-child > details > ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  padding-top: 0.35rem;
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li:first-child > details > ul > li > a,
+.sidebar-content > ul.top-level > li:first-child > details > ul > li > a {
+  border: 1px solid var(--sl-color-hairline);
+  padding: 0.42rem 0.45rem;
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li:first-child > details > ul > li:first-child,
+.sidebar-content > ul.top-level > li:first-child > details > ul > li:first-child {
+  grid-column: 1 / -1;
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li:first-child > details > ul > li:first-child > a,
+.sidebar-content > ul.top-level > li:first-child > details > ul > li:first-child > a {
+  display: block;
+  width: 100%;
+}
+
+.sidebar-content > sl-sidebar-state-persist > ul.top-level > li:first-child > details > ul > li > a > span::before,
+.sidebar-content > ul.top-level > li:first-child > details > ul > li > a > span::before {
+  content: none;
+}
+
+@media (max-width: 49.999rem) {
+  .sidebar-index {
+    padding-bottom: 0.65rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .sidebar-index__bars {
+    height: 0.45rem;
+  }
+}

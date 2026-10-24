@@ -4,13 +4,27 @@ import SidebarPersister from "@astrojs/starlight/components/SidebarPersister.ast
 import SidebarSublist from "@astrojs/starlight/components/SidebarSublist.astro";
 
 const { sidebar } = Astro.locals.starlightRoute;
+const sectionCount = String(sidebar.length).padStart(2, "0");
 ---
 
 <SidebarPersister>
+  <div class="sidebar-index" aria-hidden="true">
+    <div class="sidebar-index__head">
+      <span>Index</span>
+      <span class="sidebar-index__count">{sectionCount}</span>
+    </div>
+    <div class="sidebar-index__bars">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+  </div>
+
   <a class="sidebar-library" href="/library/#library-search">
-    <span>Search the library</span>
+    <span class="sidebar-library__prompt" aria-hidden="true">$</span>
+    <span class="sidebar-library__label">Search the library</span>
     <span aria-hidden="true">↗</span>
   </a>
+
   <SidebarSublist sublist={sidebar} />
 </SidebarPersister>
 
