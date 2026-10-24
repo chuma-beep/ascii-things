@@ -15,7 +15,28 @@ const shouldRenderSearch =
 <div class="docs-header">
   <div class="docs-header-top">
     <div class="title-wrapper sl-flex"><SiteTitle /></div>
-    <div class="sl-flex print:hidden">{shouldRenderSearch && <Search />}</div>
+    <nav class="docs-primary-nav" aria-label="Primary">
+      <details class="docs-library">
+        <summary>Library</summary>
+        <div class="docs-library-panel">
+          <a href="/library/">All items</a>
+          <a href="/showcase/">Showcase</a>
+          <a href="/library/#library-search">Search the library</a>
+          <a href="/library/?type=scene">Scenes</a>
+          <a href="/library/?type=webgl">WebGL</a>
+          <a href="/library/?type=kanji">Kanji</a>
+          <a href="/library/?type=component">Components</a>
+          <a href="/library/?type=tool">Tools</a>
+        </div>
+      </details>
+      <a href="/#scenes">Scenes</a>
+      <a href="/webgl/">WebGL</a>
+      <a href="/components/">Components</a>
+      <a href="/guide/">Docs</a>
+      <a href="/api/">API</a>
+      <a href="/playground/">Playground ↗</a>
+    </nav>
+    <div class="docs-search sl-flex print:hidden">{shouldRenderSearch && <Search />}</div>
     <div class="sl-hidden md:sl-flex print:hidden right-group">
       <div class="sl-flex social-icons"><SocialIcons /></div>
       <ThemeSelect />
@@ -24,27 +45,6 @@ const shouldRenderSearch =
     <MobileNav showDocsMenu />
   </div>
 
-  <nav class="docs-primary-nav" aria-label="Primary">
-    <details class="docs-library">
-      <summary>Library</summary>
-      <div class="docs-library-panel">
-        <a href="/library/">All items</a>
-        <a href="/showcase/">Showcase</a>
-        <a href="/library/#library-search">Search the library</a>
-        <a href="/library/?type=scene">Scenes</a>
-        <a href="/library/?type=webgl">WebGL</a>
-        <a href="/library/?type=kanji">Kanji</a>
-        <a href="/library/?type=component">Components</a>
-        <a href="/library/?type=tool">Tools</a>
-      </div>
-    </details>
-    <a href="/#scenes">Scenes</a>
-    <a href="/webgl/">WebGL</a>
-    <a href="/components/">Components</a>
-    <a href="/guide/">Docs</a>
-    <a href="/api/">API</a>
-    <a href="/playground/">Playground ↗</a>
-  </nav>
 </div>
 
 <script>
