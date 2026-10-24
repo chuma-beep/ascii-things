@@ -1,0 +1,244 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { AsciiSurface } from "ascii-things/webgl/react";
+import CopyCode from "@components/CopyCode.astro";
+import KanjiMarkArt from "@components/KanjiMarkArt.astro";
+import KanjiStatic from "@components/KanjiStatic.astro";
+import { ALL_KANJI, type KanjiItem } from "../../data/kanji";
+
+export function getStaticPaths() {
+  return ALL_KANJI.map((item) => ({
+    params: { slug: item.slug },
+    props: { item },
+  }));
+}
+
+interface Props {
+  item: KanjiItem;
+}
+
+const { item } = Astro.props;
+const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', serif";
+const index = ALL_KANJI.findIndex((entry) => entry.slug === item.slug);
+const previous = ALL_KANJI[(index - 1 + ALL_KANJI.length) % ALL_KANJI.length];
+const next = ALL_KANJI[(index + 1) % ALL_KANJI.length];
+---
+
+<StarlightPage
+  frontmatter={{
+    title: item.title,
+    description: item.description,
+  }}
+>
+  <div class="kanji-detail">
+    <p class="kanji-detail__eyebrow">{item.family}</p>
+    <p class="kanji-detail__lede">{item.description}</p>
+
+    <div
+      class:list={[
+        "kanji-detail__stage",
+        { "kanji-detail__stage--mark": item.kind === "mark" },
+      ]}
+    >
+      {
+        item.kind === "webgl" && (
+          <AsciiSurface
+            client:load
+            variant={item.variant}
+            text={item.text}
+            glyphs={item.glyphs}
+            density={item.density}
+            cell={item.cell}
+            pointer={false}
+            foreground={item.foreground}
+            accent={item.accent}
+            fontFamily={kanjiFont}
+            label={`${item.title} ASCII kanji demo`}
+            style={{ height: "480px" }}
+          />
+        )
+      }
+      {item.kind === "static" && <KanjiStatic art={item.art} />}
+      {item.kind === "mark" && <KanjiMarkArt mark={item.id} />}
+    </div>
+
+    <dl class="kanji-detail__meta">
+      <div>
+        <dt>Family</dt>
+        <dd>{item.family}</dd>
+      </div>
+      <div>
+        <dt>Glyphs</dt>
+        <dd>{item.glyphs}</dd>
+      </div>
+      <div>
+        <dt>Type</dt>
+        <dd>{item.kind === "webgl" ? "WebGL" : item.kind === "static" ? "CSS / type" : "Print"}</dd>
+      </div>
+    </dl>
+
+    <h2>Use it</h2>
+    <p>
+      {
+        item.kind === "webgl"
+          ? "This snippet renders the study with the package’s React surface."
+          : "This study is a site composition. Copy its glyph set and rebuild the layout with your own type and color."
+      }
+    </p>
+    <div class="kanji-detail__code">
+      <CopyCode value={item.copy ?? item.code} display={item.code} label={item.title} />
+    </div>
+
+    <p class="kanji-detail__back"><a href="/kanji/">← Back to Kanji Lab</a></p>
+
+    <nav class="kanji-detail__pager" aria-label="Kanji studies">
+      <a href={`/kanji/${previous.slug}/`} rel="prev">← {previous.title}</a>
+      <a href={`/kanji/${next.slug}/`} rel="next">{next.title} →</a>
+    </nav>
+  </div>
+</StarlightPage>
+
+<style>
+  .kanji-detail {
+    margin: 0 0 3rem;
+  }
+
+  .kanji-detail__eyebrow {
+    margin: 0 0 0.45rem;
+    color: #ff7a1a;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .kanji-detail__lede {
+    max-width: 42rem;
+    margin: 0;
+    color: var(--sl-color-gray-3);
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+
+  .kanji-detail__stage {
+    height: 480px;
+    margin: 1.2rem 0 1.4rem;
+    overflow: hidden;
+    border: 1px solid rgba(236, 232, 223, 0.16);
+    background: #050607;
+  }
+
+  .kanji-detail__stage :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 480px !important;
+  }
+
+  .kanji-detail__stage :global(.kanji-static) {
+    height: 480px;
+  }
+
+  .kanji-detail__stage :global(.torii) {
+    width: min(360px, 84%);
+  }
+
+  .kanji-detail__stage :global(.seasons) {
+    width: min(440px, 100%);
+    height: 300px;
+  }
+
+  .kanji-detail__stage :global(.fan) {
+    width: min(300px, 72%);
+  }
+
+  .kanji-detail__stage--mark {
+    height: 380px;
+  }
+
+  .kanji-detail__meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin: 0 0 2rem;
+    border: 1px solid rgba(236, 232, 223, 0.12);
+    background: rgba(236, 232, 223, 0.12);
+  }
+
+  .kanji-detail__meta > div {
+    padding: 0.75rem 0.8rem;
+    background: #0b0d0f;
+  }
+
+  .kanji-detail__meta dt {
+    margin: 0 0 0.25rem;
+    color: rgba(236, 232, 223, 0.42);
+    font-size: 0.52rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .kanji-detail__meta dd {
+    margin: 0;
+    color: #ece8df;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .kanji-detail__code {
+    margin: 0.9rem 0 1.6rem;
+    padding: 0.7rem;
+    border: 1px solid rgba(236, 232, 223, 0.12);
+    background: #0b0d0f;
+  }
+
+  .kanji-detail__back {
+    margin: 0 0 1.6rem;
+    font-size: 0.72rem;
+  }
+
+  .kanji-detail__back a {
+    color: var(--sl-color-gray-3);
+    text-decoration: none;
+  }
+
+  .kanji-detail__back a:hover {
+    color: var(--sl-color-accent);
+  }
+
+  .kanji-detail__pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(236, 232, 223, 0.12);
+    font-size: 0.72rem;
+  }
+
+  .kanji-detail__pager a {
+    color: var(--sl-color-gray-3);
+    text-decoration: none;
+  }
+
+  .kanji-detail__pager a:hover {
+    color: var(--sl-color-accent);
+  }
+
+  @media (max-width: 42rem) {
+    .kanji-detail__stage,
+    .kanji-detail__stage :global(canvas) {
+      height: 340px !important;
+    }
+
+    .kanji-detail__stage :global(.kanji-static) {
+      height: 340px;
+    }
+
+    .kanji-detail__stage--mark {
+      height: 320px;
+    }
+
+    .kanji-detail__meta {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

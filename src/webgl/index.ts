@@ -6,4 +6,4 @@ export {
   resolveGlyphs,
   surfaceCell,
 } from "./core";
-export type { AsciiSurfaceOptions } from "./core";
+export type { AsciiSurfaceOptions, SurfaceVariant } from "./core";

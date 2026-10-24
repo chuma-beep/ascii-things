@@ -1,0 +1,323 @@
+---
+import type { KanjiArt } from "../data/kanji";
+
+interface Props {
+  art: KanjiArt;
+}
+
+const { art } = Astro.props;
+const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', serif";
+const lintel = Array.from({ length: 7 }, () => "一");
+const seasons = [
+  { kanji: "春", label: "Spring", words: "花 風 光", tone: "#86efac" },
+  { kanji: "夏", label: "Summer", words: "海 光 蝉", tone: "#ffb347" },
+  { kanji: "秋", label: "Autumn", words: "紅 月 風", tone: "#ff7a1a" },
+  { kanji: "冬", label: "Winter", words: "雪 月 静", tone: "#b8d8ff" },
+];
+---
+
+<div
+  class:list={["kanji-static", `kanji-static--${art}`]}
+  style={`--kanji-font: ${kanjiFont}`}
+  role="img"
+  aria-label={
+    art === "torii"
+      ? "Torii gate built from kanji"
+      : art === "seasons"
+        ? "Four seasonal kanji panels for spring, summer, autumn, and winter"
+        : "Round summer fan with wind, flower, and moon characters"
+  }
+>
+  {
+    art === "torii" && (
+      <div class="torii">
+        <div class="torii__lintel" aria-hidden="true">
+          {lintel.map((glyph) => (
+            <span>{glyph}</span>
+          ))}
+        </div>
+        <div class="torii__plaque">鳥居</div>
+        <div class="torii__beam" aria-hidden="true">
+          <span>門</span>
+          <span>光</span>
+          <span>道</span>
+        </div>
+        <div class="torii__posts">
+          <span class="torii__post">朱</span>
+          <span class="torii__post">道</span>
+        </div>
+        <div class="torii__base" aria-hidden="true" />
+      </div>
+    )
+  }
+
+  {
+    art === "seasons" && (
+      <div class="seasons">
+        {seasons.map((season) => (
+          <div class="season" style={`--tone: ${season.tone}`}>
+            <span class="season__label">{season.label}</span>
+            <span class="season__kanji">{season.kanji}</span>
+            <span class="season__words">{season.words}</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    art === "fan" && (
+      <div class="fan">
+        <div class="uchiwa">
+          <span class="uchiwa__main">扇</span>
+          <span class="uchiwa__small uchiwa__small--wind">風</span>
+          <span class="uchiwa__small uchiwa__small--flower">花</span>
+          <span class="uchiwa__seal">涼</span>
+        </div>
+        <span class="uchiwa__handle" aria-hidden="true" />
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .kanji-static {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    padding: 1.25rem;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 44%, rgba(255, 122, 26, 0.1), transparent 58%),
+      #050607;
+    font-family: var(--kanji-font);
+  }
+
+  .kanji-static--seasons {
+    background:
+      radial-gradient(circle at 50% 50%, rgba(184, 216, 255, 0.06), transparent 64%),
+      #050607;
+  }
+
+  .kanji-static--fan {
+    background:
+      radial-gradient(circle at 50% 40%, rgba(255, 240, 210, 0.1), transparent 56%),
+      #050607;
+  }
+
+  /* ---------------------------------------------------------------- torii */
+
+  .torii {
+    position: relative;
+    width: min(270px, 84%);
+    aspect-ratio: 1.3;
+  }
+
+  .torii__lintel {
+    position: absolute;
+    top: 2%;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 12%;
+    border-radius: 55% 55% 0 0 / 80% 80% 0 0;
+    background: linear-gradient(180deg, #d4543f, #8f2a22);
+    color: rgba(255, 240, 220, 0.5);
+    font-size: 0.45rem;
+  }
+
+  .torii__plaque {
+    position: absolute;
+    top: 16%;
+    left: 50%;
+    z-index: 2;
+    padding: 0.12rem 0.42rem;
+    border: 1px solid #d4543f;
+    background: #0b0d0f;
+    color: #f4ead6;
+    font-size: 1.05rem;
+    letter-spacing: 0.12em;
+    line-height: 1.1;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  .torii__beam {
+    position: absolute;
+    top: 42%;
+    left: 7%;
+    right: 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 6%;
+    background: linear-gradient(180deg, #d4543f, #a8342b);
+    color: rgba(255, 240, 220, 0.62);
+    font-size: 0.5rem;
+    letter-spacing: 0.16em;
+  }
+
+  .torii__posts {
+    position: absolute;
+    top: 46%;
+    bottom: 0;
+    left: 17%;
+    right: 17%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .torii__post {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 15%;
+    height: 100%;
+    padding-top: 7%;
+    background: linear-gradient(90deg, #7e241e, #c04435 42%, #8f2a22);
+    color: rgba(255, 240, 220, 0.86);
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+
+  .torii__base {
+    position: absolute;
+    right: 9%;
+    bottom: 0;
+    left: 9%;
+    height: 4%;
+    background: #1a1c1f;
+  }
+
+  /* -------------------------------------------------------------- seasons */
+
+  .seasons {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: min(340px, 100%);
+    height: 232px;
+    overflow: hidden;
+    border: 1px solid rgba(236, 232, 223, 0.16);
+    background: #0b0d0f;
+  }
+
+  .season {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 0.2rem;
+    border-top: 2px solid var(--tone);
+    border-right: 1px solid rgba(236, 232, 223, 0.1);
+  }
+
+  .season:last-child {
+    border-right: 0;
+  }
+
+  .season__label,
+  .season__words {
+    color: rgba(236, 232, 223, 0.48);
+    font-size: 0.48rem;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+  }
+
+  .season__kanji {
+    color: var(--tone);
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+  }
+
+  .season__words {
+    color: var(--tone);
+    opacity: 0.72;
+  }
+
+  /* ------------------------------------------------------------------ fan */
+
+  .fan {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(230px, 70%);
+    aspect-ratio: 0.96;
+  }
+
+  .uchiwa {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 1;
+    padding: 17%;
+    border: 1px solid #d9cdb9;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 38%, #fff8e9, #eadcc4 72%);
+    box-shadow:
+      inset 0 0 0 5px rgba(168, 52, 43, 0.08),
+      0 18px 40px rgba(0, 0, 0, 0.38);
+    color: #1b1a17;
+    transform: rotate(-5deg);
+  }
+
+  .uchiwa__main {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    line-height: 1;
+  }
+
+  .uchiwa__small {
+    color: #a8342b;
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+
+  .uchiwa__small--wind {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .uchiwa__small--flower {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .uchiwa__seal {
+    position: absolute;
+    right: 19%;
+    bottom: 19%;
+    display: grid;
+    place-items: center;
+    width: 1.45rem;
+    height: 1.45rem;
+    background: #a8342b;
+    color: #f7efe2;
+    font-size: 0.66rem;
+    line-height: 1;
+  }
+
+  .uchiwa__handle {
+    position: absolute;
+    z-index: 0;
+    bottom: 3%;
+    left: 50%;
+    width: 10px;
+    height: 24%;
+    background: linear-gradient(90deg, #2a1d17, #5a3a2a);
+    border-radius: 0 0 5px 5px;
+    transform: translateX(-50%);
+  }
+</style>

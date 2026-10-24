@@ -1,0 +1,103 @@
+---
+interface Props {
+  value: string;
+  display?: string;
+  label?: string;
+}
+
+const { value, display = value, label = "code" } = Astro.props;
+---
+
+<div class="copy-code">
+  <code title={value}>{display}</code>
+  <button
+    class="copy-code__button"
+    type="button"
+    data-copy-code={value}
+    aria-label={`Copy ${label}`}
+  >
+    Copy
+  </button>
+</div>
+
+<script>
+  const copyText = async (value: string) => {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return;
+    }
+
+    const field = document.createElement("textarea");
+    field.value = value;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.append(field);
+    field.select();
+    document.execCommand("copy");
+    field.remove();
+  };
+
+  document.querySelectorAll<HTMLButtonElement>("[data-copy-code]").forEach((button) => {
+    if (button.dataset.copyBound === "true") return;
+    button.dataset.copyBound = "true";
+
+    button.addEventListener("click", async () => {
+      const value = button.dataset.copyCode;
+      if (!value) return;
+
+      const original = button.textContent;
+      try {
+        await copyText(value);
+        button.textContent = "Copied";
+      } catch {
+        button.textContent = "Copy failed";
+      }
+
+      window.setTimeout(() => {
+        button.textContent = original;
+      }, 1600);
+    });
+  });
+</script>
+
+<style>
+  .copy-code {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .copy-code code {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    color: rgba(236, 232, 223, 0.45);
+    font-size: 0.62rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .copy-code__button {
+    flex: none;
+    padding: 0.28rem 0.48rem;
+    border: 1px solid rgba(236, 232, 223, 0.18);
+    background: transparent;
+    color: rgba(236, 232, 223, 0.62);
+    font: inherit;
+    font-size: 0.52rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition:
+      color 140ms ease,
+      border-color 140ms ease;
+  }
+
+  .copy-code__button:hover,
+  .copy-code__button:focus-visible {
+    border-color: rgba(255, 122, 26, 0.6);
+    color: #ff7a1a;
+  }
+</style>

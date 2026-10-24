@@ -320,7 +320,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji field",
     description: "A drifting field of kanji with a 漢字 wordmark and an orange scan band.",
     kind: "webgl",
-    href: "/kanji/#field",
+    href: "/kanji/field/",
     tags: ["webgl", "kanji", "type", "field"],
   },
   {
@@ -328,7 +328,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji torus",
     description: "A raymarched torus wrapped in a slow orbit of kanji.",
     kind: "webgl",
-    href: "/kanji/#torus-3d",
+    href: "/kanji/torus-3d/",
     tags: ["webgl", "kanji", "3d", "torus"],
   },
   {
@@ -336,7 +336,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji cube",
     description: "A rounded cube with a cool palette and a few quiet characters.",
     kind: "webgl",
-    href: "/kanji/#cube-3d",
+    href: "/kanji/cube-3d/",
     tags: ["webgl", "kanji", "3d", "cube"],
   },
   {
@@ -344,7 +344,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji helix",
     description: "A double helix turning through a field of bright kanji.",
     kind: "webgl",
-    href: "/kanji/#helix-3d",
+    href: "/kanji/helix-3d/",
     tags: ["webgl", "kanji", "3d", "helix"],
   },
   {
@@ -352,7 +352,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji rain",
     description: "Columns of rain, wind, water, and sound falling through the dark.",
     kind: "webgl",
-    href: "/kanji/#glyph-rain",
+    href: "/kanji/glyph-rain/",
     tags: ["webgl", "kanji", "rain", "field"],
   },
   {
@@ -360,7 +360,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji pond",
     description: "Concentric rings of water, wave, moon, and shadow characters.",
     kind: "webgl",
-    href: "/kanji/#ripple",
+    href: "/kanji/ripple/",
     tags: ["webgl", "kanji", "water", "pond"],
   },
   {
@@ -368,7 +368,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji gate",
     description: "A corridor of gates and lantern light made from 門, 光, and 道.",
     kind: "webgl",
-    href: "/kanji/#tunnel",
+    href: "/kanji/tunnel/",
     tags: ["webgl", "kanji", "gate", "architecture"],
   },
   {
@@ -376,7 +376,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji galaxy",
     description: "A spiral of star, moon, night, and light characters.",
     kind: "webgl",
-    href: "/kanji/#galaxy",
+    href: "/kanji/galaxy/",
     tags: ["webgl", "kanji", "stars", "galaxy"],
   },
   {
@@ -384,7 +384,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Hanko seal",
     description: "A carved vermilion seal with four characters in a square block.",
     kind: "scene",
-    href: "/kanji/#seal",
+    href: "/kanji/seal/",
     tags: ["kanji", "seal", "print", "css"],
   },
   {
@@ -392,7 +392,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji scroll",
     description: "A vertical seasonal scroll with a small red seal.",
     kind: "scene",
-    href: "/kanji/#scroll",
+    href: "/kanji/scroll/",
     tags: ["kanji", "scroll", "paper", "css"],
   },
   {
@@ -400,7 +400,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji koi",
     description: "A koi silhouette with a forked tail and fins, drawn in water characters.",
     kind: "webgl",
-    href: "/kanji/#koi",
+    href: "/kanji/koi/",
     tags: ["webgl", "kanji", "water", "koi"],
   },
   {
@@ -408,7 +408,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji moon",
     description: "A full moon with dark craters, drawn in moon and night characters.",
     kind: "webgl",
-    href: "/kanji/#moon",
+    href: "/kanji/moon/",
     tags: ["webgl", "kanji", "sky", "moon"],
   },
   {
@@ -416,7 +416,7 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji mountain",
     description: "A green terrain of mountain, wind, rock, and cloud characters.",
     kind: "webgl",
-    href: "/kanji/#mountain",
+    href: "/kanji/mountain/",
     tags: ["webgl", "kanji", "land", "mountain"],
   },
   {
@@ -424,7 +424,31 @@ export const LIBRARY: LibraryItem[] = [
     title: "Kanji wave",
     description: "Caustic water lines made from wave, billow, sea, and open-water characters.",
     kind: "webgl",
-    href: "/kanji/#wave",
+    href: "/kanji/wave/",
     tags: ["webgl", "kanji", "sea", "wave"],
+  },
+  {
+    id: "kanji-torii",
+    title: "Kanji torii",
+    description: "A vermilion gate built from gate, light, and path characters.",
+    kind: "scene",
+    href: "/kanji/torii/",
+    tags: ["kanji", "torii", "gate", "architecture", "css"],
+  },
+  {
+    id: "kanji-seasons",
+    title: "Kanji seasons",
+    description: "Spring, summer, autumn, and winter in a four-panel glyph study.",
+    kind: "scene",
+    href: "/kanji/seasons/",
+    tags: ["kanji", "seasons", "type", "css"],
+  },
+  {
+    id: "kanji-fan",
+    title: "Kanji fan",
+    description: "A round summer fan with wind, flower, and moon characters.",
+    kind: "scene",
+    href: "/kanji/fan/",
+    tags: ["kanji", "fan", "object", "css"],
   },
 ];
