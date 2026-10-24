@@ -558,3 +558,22 @@ site-search kbd kbd {
     background: var(--sl-color-bg-accent);
   }
 }
+
+/* Starlight's prose flow spacing leaks into nested card internals. Keep the
+   kanji showcase cards on one consistent grid rhythm. */
+.sl-markdown-content .kanji-gallery > .kanji-card,
+.sl-markdown-content .kanji-marks > .kanji-mark {
+  margin-top: 0 !important;
+}
+
+.sl-markdown-content .kanji-card__body,
+.sl-markdown-content .kanji-card__actions,
+.sl-markdown-content .kanji-mark__body,
+.sl-markdown-content .kanji-mark__actions {
+  margin-top: 0 !important;
+}
+
+.sl-markdown-content .kanji-card__preview canvas,
+.sl-markdown-content .kanji-mark__stage > * {
+  margin-top: 0 !important;
+}
