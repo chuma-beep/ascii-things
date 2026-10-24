@@ -12,6 +12,13 @@ const CATEGORY_LABEL: Record<ShowcaseCategory, string> = {
   component: "Component",
 };
 
+const IMAGE_SIZE: Record<ShowcaseCategory, [number, number]> = {
+  scene: [718, 405],
+  webgl: [480, 462],
+  kanji: [480, 386],
+  component: [480, 386],
+};
+
 const pieces = LIBRARY.filter((item) => item.kind !== "tool").map((item) => ({
   ...item,
   category: (item.tags.includes("kanji") ? "kanji" : item.kind) as ShowcaseCategory,
@@ -29,13 +36,19 @@ for (const piece of pieces) {
 }
 
 const longestBucket = Math.max(...CATEGORY_ORDER.map((key) => buckets[key].length));
-const ordered = [];
+const ordered: (typeof pieces)[number][] = [];
 
 for (let index = 0; index < longestBucket; index += 1) {
   for (const key of CATEGORY_ORDER) {
     const piece = buckets[key][index];
     if (piece) ordered.push(piece);
   }
+}
+
+const featuredIndex = ordered.findIndex((item) => item.id === "dog");
+if (featuredIndex > 0) {
+  const [featured] = ordered.splice(featuredIndex, 1);
+  ordered.unshift(featured);
 }
 
 const counts = Object.fromEntries(
@@ -127,12 +140,21 @@ const description = "The visual archive of every scene, WebGL surface, kanji stu
               data-category={item.category}
             >
               <figure>
-                <img
-                  src={`/showcase/${item.id}.jpg`}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                />
+                <picture>
+                  <source
+                    media="(prefers-reduced-motion: reduce)"
+                    srcset={`/showcase/${item.id}.jpg`}
+                    type="image/jpeg"
+                  />
+                  <img
+                    src={`/showcase/${item.id}.webp`}
+                    width={IMAGE_SIZE[item.category][0]}
+                    height={IMAGE_SIZE[item.category][1]}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </picture>
                 <figcaption>
                   <span>{CATEGORY_LABEL[item.category]}</span>
                   <strong>{item.title}</strong>
