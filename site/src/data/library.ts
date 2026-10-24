@@ -308,6 +308,15 @@ export const LIBRARY: LibraryItem[] = [
     tags: ["tools", "ui", "reference"],
   },
   {
+    id: "ascii-symbols",
+    title: "ASCII symbols",
+    description:
+      "A copyable library of ASCII and Unicode glyphs, borders, arrows, and density ramps.",
+    kind: "tool",
+    href: "/symbols/",
+    tags: ["tools", "reference", "ascii", "symbols"],
+  },
+  {
     id: "api",
     title: "API reference",
     description: "Every exported entry, option, and type.",

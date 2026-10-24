@@ -1,0 +1,539 @@
+---
+import { SYMBOLS, SYMBOL_GROUPS, SYMBOL_RAMPS } from "../data/symbols";
+
+const counts = Object.fromEntries(
+  SYMBOL_GROUPS.map((group) => [
+    group.id,
+    SYMBOLS.filter((symbol) => symbol.group === group.id).length,
+  ]),
+) as Record<string, number>;
+
+const filters = [
+  { id: "all", label: "All", count: SYMBOLS.length },
+  ...SYMBOL_GROUPS.map((group) => ({
+    id: group.id,
+    label: group.label,
+    count: counts[group.id],
+  })),
+];
+---
+
+<section class="symbol-browser" data-symbol-browser>
+  <div class="symbol-ramps" aria-labelledby="symbol-ramps-title">
+    <div class="symbol-heading">
+      <p class="symbol-eyebrow">Density presets</p>
+      <h2 id="symbol-ramps-title">Ramps</h2>
+      <p>Copy a ready-made glyph ramp, from a ten-step classic to a seventy-step fine field.</p>
+    </div>
+    <div class="symbol-ramp-grid">
+      {
+        SYMBOL_RAMPS.map((ramp) => (
+          <article class="symbol-ramp">
+            <div class="symbol-ramp__head">
+              <span>{ramp.name}</span>
+              <span>{ramp.note}</span>
+            </div>
+            <pre>{ramp.value}</pre>
+            <button
+              class="symbol-copy"
+              type="button"
+              data-copy-ramp
+              data-ramp-value={ramp.value}
+              aria-label={`Copy the ${ramp.name} ramp`}
+            >
+              Copy ramp
+            </button>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="symbol-toolbar">
+    <label class="symbol-search">
+      <span class="symbol-sr">Search symbols</span>
+      <input
+        id="symbol-search"
+        type="search"
+        placeholder="Search names, glyphs, or code points…"
+        autocomplete="off"
+        data-symbol-search
+      />
+    </label>
+    <div class="symbol-filters" role="group" aria-label="Filter symbols">
+      {
+        filters.map((filter, index) => (
+          <button
+            type="button"
+            data-symbol-filter={filter.id}
+            class={index === 0 ? "is-active" : undefined}
+            aria-pressed={index === 0 ? "true" : "false"}
+          >
+            {filter.label}
+            <span>{filter.count}</span>
+          </button>
+        ))
+      }
+    </div>
+    <p class="symbol-count" data-symbol-count aria-live="polite">
+      {SYMBOLS.length} symbols
+    </p>
+  </div>
+
+  <p class="symbol-status" data-symbol-status aria-live="polite"></p>
+
+  <div class="symbol-grid">
+    {
+      SYMBOLS.map((symbol) => (
+        <button
+          class="symbol-card"
+          type="button"
+          data-symbol-card
+          data-group={symbol.group}
+          data-symbol={symbol.char}
+          data-search={`${symbol.char} ${symbol.name} ${symbol.code} ${symbol.group}`.toLowerCase()}
+          aria-label={`Copy ${symbol.name}`}
+        >
+          <span class="symbol-card__glyph" aria-hidden="true">
+            {symbol.display}
+          </span>
+          <span class="symbol-card__name">{symbol.name}</span>
+          <code class="symbol-card__code">{symbol.code}</code>
+        </button>
+      ))
+    }
+  </div>
+
+  <p class="symbol-empty" data-symbol-empty hidden>No symbols match that search.</p>
+</section>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-symbol-browser]");
+
+  if (root) {
+    const search = root.querySelector<HTMLInputElement>("[data-symbol-search]");
+    const filterButtons = Array.from(
+      root.querySelectorAll<HTMLButtonElement>("[data-symbol-filter]"),
+    );
+    const cards = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-symbol-card]"));
+    const count = root.querySelector<HTMLElement>("[data-symbol-count]");
+    const empty = root.querySelector<HTMLElement>("[data-symbol-empty]");
+    const status = root.querySelector<HTMLElement>("[data-symbol-status]");
+    const groupIds = new Set(
+      filterButtons
+        .map((button) => button.dataset.symbolFilter)
+        .filter((id): id is string => Boolean(id)),
+    );
+    let active = "all";
+    let statusTimer = 0;
+
+    const announce = (message: string) => {
+      if (!status) return;
+      status.textContent = message;
+      window.clearTimeout(statusTimer);
+      statusTimer = window.setTimeout(() => {
+        if (status) status.textContent = "";
+      }, 2200);
+    };
+
+    const writeClipboard = async (text: string) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.append(area);
+        area.select();
+        const copied = document.execCommand("copy");
+        area.remove();
+        return copied;
+      }
+    };
+
+    const copyText = async (text: string, label: string) => {
+      const copied = await writeClipboard(text);
+      announce(copied ? `Copied ${label}` : "Copy failed");
+    };
+
+    const apply = () => {
+      const query = (search?.value || "").trim().toLowerCase();
+      let shown = 0;
+
+      for (const card of cards) {
+        const matchesGroup =
+          active === "all" || card.dataset.group === active;
+        const matchesQuery =
+          !query || (card.dataset.search || "").includes(query);
+        const visible = matchesGroup && matchesQuery;
+        card.hidden = !visible;
+        if (visible) shown += 1;
+      }
+
+      if (count) {
+        count.textContent = `${shown} ${shown === 1 ? "symbol" : "symbols"}`;
+      }
+      if (empty) empty.hidden = shown !== 0;
+    };
+
+    const setActive = (next: string, push: boolean) => {
+      active = groupIds.has(next) ? next : "all";
+      for (const button of filterButtons) {
+        const isActive = button.dataset.symbolFilter === active;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      }
+      apply();
+
+      if (push) {
+        const url = new URL(window.location.href);
+        if (active === "all") url.searchParams.delete("group");
+        else url.searchParams.set("group", active);
+        window.history.pushState({}, "", url);
+      }
+    };
+
+    const readGroup = () => {
+      const group = new URLSearchParams(window.location.search).get("group");
+      return group && groupIds.has(group) ? group : "all";
+    };
+
+    for (const button of filterButtons) {
+      button.addEventListener("click", () => {
+        setActive(button.dataset.symbolFilter || "all", true);
+      });
+    }
+
+    search?.addEventListener("input", apply);
+
+    for (const card of cards) {
+      card.addEventListener("click", () => {
+        const char = card.dataset.symbol;
+        if (char === undefined) return;
+        copyText(char, `“${char}”`);
+        card.classList.add("is-copied");
+        window.setTimeout(() => card.classList.remove("is-copied"), 1200);
+      });
+    }
+
+    for (const button of root.querySelectorAll<HTMLButtonElement>("[data-copy-ramp]")) {
+      button.addEventListener("click", () => {
+        const value = button.dataset.rampValue;
+        const label =
+          button.getAttribute("aria-label")?.replace(/^Copy (the )?/i, "") || "ramp";
+        if (value !== undefined) copyText(value, label);
+      });
+    }
+
+    window.addEventListener("popstate", () => setActive(readGroup(), false));
+    setActive(readGroup(), false);
+  }
+</script>
+
+<style>
+  .symbol-browser {
+    display: grid;
+    gap: 2.2rem;
+    margin: 1.5rem 0 3rem;
+  }
+
+  .symbol-heading {
+    display: grid;
+    gap: 0.35rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .symbol-eyebrow {
+    margin: 0;
+    color: var(--sl-color-accent);
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .symbol-heading h2 {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+
+  .symbol-heading p:last-child {
+    margin: 0;
+    color: var(--sl-color-gray-3);
+    font-size: 0.72rem;
+    line-height: 1.55;
+  }
+
+  .symbol-ramp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .symbol-ramp {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    min-width: 0;
+    padding: 0.85rem;
+    border: 1px solid var(--sl-color-hairline);
+    background: var(--sl-color-bg-nav);
+  }
+
+  .symbol-ramp__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    color: var(--sl-color-text);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .symbol-ramp__head span:last-child {
+    color: var(--sl-color-gray-3);
+    font-size: 0.55rem;
+    letter-spacing: 0.06em;
+  }
+
+  .symbol-ramp pre {
+    margin: 0;
+    overflow-wrap: anywhere;
+    color: var(--sl-color-text);
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+  }
+
+  .symbol-copy {
+    align-self: flex-start;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--sl-color-hairline);
+    background: transparent;
+    color: var(--sl-color-gray-3);
+    font: inherit;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .symbol-copy:hover,
+  .symbol-copy:focus-visible {
+    border-color: var(--sl-color-accent);
+    color: var(--sl-color-accent);
+    outline: none;
+  }
+
+  .symbol-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: start;
+    padding: 0.85rem;
+    border: 1px solid var(--sl-color-hairline);
+    background: var(--sl-color-bg-nav);
+  }
+
+  .symbol-search {
+    display: block;
+    min-width: 0;
+  }
+
+  .symbol-search input {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--sl-color-hairline);
+    background: var(--sl-color-bg);
+    color: var(--sl-color-text);
+    font: inherit;
+    font-size: 0.72rem;
+    outline: none;
+  }
+
+  .symbol-search input:focus {
+    border-color: var(--sl-color-accent);
+  }
+
+  .symbol-search input::placeholder {
+    color: var(--sl-color-gray-3);
+  }
+
+  .symbol-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    grid-column: 1 / -1;
+  }
+
+  .symbol-filters button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2rem;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--sl-color-hairline);
+    background: transparent;
+    color: var(--sl-color-gray-3);
+    font: inherit;
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .symbol-filters button span {
+    color: var(--sl-color-gray-3);
+    font-size: 0.5rem;
+  }
+
+  .symbol-filters button:hover,
+  .symbol-filters button:focus-visible,
+  .symbol-filters button.is-active {
+    border-color: var(--sl-color-accent);
+    color: var(--sl-color-accent);
+    outline: none;
+  }
+
+  .symbol-filters button.is-active span {
+    color: var(--sl-color-accent);
+  }
+
+  .symbol-count {
+    margin: 0;
+    color: var(--sl-color-gray-3);
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .symbol-status {
+    min-height: 1rem;
+    margin: -1.3rem 0 0;
+    color: var(--sl-color-accent);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .symbol-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(7.2rem, 1fr));
+    gap: 0.4rem;
+  }
+
+  .symbol-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-width: 0;
+    min-height: 6rem;
+    padding: 0.6rem;
+    border: 1px solid var(--sl-color-hairline);
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-text);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .symbol-card:hover,
+  .symbol-card:focus-visible,
+  .symbol-card.is-copied {
+    border-color: var(--sl-color-accent);
+    outline: none;
+  }
+
+  .symbol-card.is-copied .symbol-card__code {
+    color: var(--sl-color-accent);
+  }
+
+  .symbol-card[hidden] {
+    display: none;
+  }
+
+  .symbol-card__glyph {
+    color: var(--sl-color-text);
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 1.7rem;
+    line-height: 1;
+  }
+
+  .symbol-card__name {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--sl-color-gray-3);
+    font-size: 0.55rem;
+    line-height: 1.35;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .symbol-card__code {
+    color: var(--sl-color-gray-3);
+    font-family: "Geist Mono", ui-monospace, monospace;
+    font-size: 0.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  .symbol-empty {
+    margin: 0;
+    padding: 1rem;
+    border: 1px dashed var(--sl-color-hairline);
+    color: var(--sl-color-gray-3);
+    font-size: 0.7rem;
+  }
+
+  .symbol-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  :global(.sl-markdown-content .symbol-browser p),
+  :global(.sl-markdown-content .symbol-browser h2),
+  :global(.sl-markdown-content .symbol-browser pre) {
+    margin: 0;
+  }
+
+  :global(.sl-markdown-content .symbol-ramp),
+  :global(.sl-markdown-content .symbol-card),
+  :global(.sl-markdown-content .symbol-toolbar) {
+    margin-top: 0 !important;
+  }
+
+  @media (max-width: 50rem) {
+    .symbol-toolbar {
+      grid-template-columns: 1fr;
+    }
+
+    .symbol-count {
+      grid-row: 3;
+    }
+
+    .symbol-grid {
+      grid-template-columns: repeat(auto-fill, minmax(6.2rem, 1fr));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .symbol-card {
+      transition: none;
+    }
+  }
+</style>

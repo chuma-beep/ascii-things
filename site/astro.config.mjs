@@ -143,6 +143,7 @@ export default defineConfig({
           label: "Reference",
           items: [
             { label: "API reference", link: "api/" },
+            { label: "ASCII symbols", link: "symbols/" },
             { label: "Playground", link: "playground/" },
             { label: "Examples", link: "examples/" },
             { label: "Changelog", link: "changelog/" },

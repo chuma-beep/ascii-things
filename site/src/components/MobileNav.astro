@@ -8,13 +8,14 @@ const browse = [
   { num: "03", label: "Scenes", href: "/scenes/" },
   { num: "04", label: "WebGL", href: "/webgl/" },
   { num: "05", label: "Components", href: "/components/" },
-  { num: "06", label: "Kanji Lab", href: "/kanji/" },
+  { num: "06", label: "Symbols", href: "/symbols/" },
+  { num: "07", label: "Kanji Lab", href: "/kanji/" },
 ];
 
 const docs = [
-  { num: "07", label: "Guide", href: "/guide/" },
-  { num: "08", label: "API", href: "/api/" },
-  { num: "09", label: "Playground", href: "/playground/" },
+  { num: "08", label: "Guide", href: "/guide/" },
+  { num: "09", label: "API", href: "/api/" },
+  { num: "10", label: "Playground", href: "/playground/" },
 ];
 
 const isActive = (href: string) =>
@@ -54,7 +55,7 @@ const isActive = (href: string) =>
     hidden
   >
     <div class="mobile-nav__top">
-      <span class="mobile-nav__eyebrow">Index / 09</span>
+      <span class="mobile-nav__eyebrow">Index / {String(browse.length + docs.length).padStart(2, "0")}</span>
       <button
         class="mobile-nav__close"
         type="button"
