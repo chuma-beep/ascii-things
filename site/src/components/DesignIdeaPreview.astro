@@ -1,5 +1,6 @@
 ---
 import DesignIdeaImage from "./DesignIdeaImage.astro";
+import DesignIdeaLiveScene from "./DesignIdeaLiveScene.astro";
 
 interface Props {
   id: string;
@@ -13,7 +14,12 @@ const loading = featured ? "eager" : "lazy";
 {
   id === "command-deck" && (
     <div class="di-preview di-preview--command" aria-hidden="true">
-      <DesignIdeaImage name="dog" loading={loading} class="di-preview__bg" />
+      <DesignIdeaLiveScene
+        tag="ascii-dog"
+        image="dog"
+        loading={loading}
+        attributes='palette="abyss" seed="7" count="1" dogs="1.35" spread="0.72,0.72" columns="110" max-cells="14000" max-dpr="2" calm interactive="false"'
+      />
       <div class="di-meta di-command__top">
         <span>YARD 04 / UNIT 01</span>
         <span>LIVE CANVAS</span>
@@ -46,7 +52,12 @@ const loading = featured ? "eager" : "lazy";
 {
   id === "signal-room" && (
     <div class="di-preview di-preview--signal" aria-hidden="true">
-      <DesignIdeaImage name="servers" loading={loading} class="di-preview__bg" />
+      <DesignIdeaLiveScene
+        tag="ascii-servers"
+        image="servers"
+        loading={loading}
+        attributes='palette="abyss" seed="12" count="8" columns="110" max-cells="14000" max-dpr="2" calm interactive="false"'
+      />
       <div class="di-meta di-signal__top">
         <span>OPS / SECTOR 04</span>
         <span class="di-live">● LIVE</span>
@@ -86,7 +97,12 @@ const loading = featured ? "eager" : "lazy";
 {
   id === "quiet-pond" && (
     <div class="di-preview di-preview--quiet" aria-hidden="true">
-      <DesignIdeaImage name="koi" loading={loading} class="di-preview__bg" />
+      <DesignIdeaLiveScene
+        tag="ascii-koi"
+        image="koi"
+        loading={loading}
+        attributes='palette="abyss" seed="4" count="4" columns="110" max-cells="14000" max-dpr="2" calm interactive="false"'
+      />
       <article class="di-quiet__card">
         <p class="di-kicker">ISSUE 03 / WATER</p>
         <h3>
@@ -109,7 +125,12 @@ const loading = featured ? "eager" : "lazy";
 {
   id === "night-commute" && (
     <div class="di-preview di-preview--night" aria-hidden="true">
-      <DesignIdeaImage name="city" loading={loading} class="di-preview__bg" />
+      <DesignIdeaLiveScene
+        tag="ascii-city"
+        image="city"
+        loading={loading}
+        attributes='palette="abyss" seed="9" count="42" columns="110" max-cells="14000" max-dpr="2" calm interactive="false"'
+      />
       <div class="di-night__copy">
         <p class="di-kicker">ROUTE 04 / AFTER HOURS</p>
         <h3>
@@ -169,7 +190,12 @@ const loading = featured ? "eager" : "lazy";
 {
   id === "launch-sequence" && (
     <div class="di-preview di-preview--launch" aria-hidden="true">
-      <DesignIdeaImage name="starlings" loading={loading} class="di-preview__bg" />
+      <DesignIdeaLiveScene
+        tag="ascii-starlings"
+        image="starlings"
+        loading={loading}
+        attributes='palette="abyss" seed="5" count="220" columns="110" max-cells="14000" max-dpr="2" calm interactive="false"'
+      />
       <div class="di-launch__center">
         <p class="di-kicker">MURMURATION / LOADING</p>
         <h3>

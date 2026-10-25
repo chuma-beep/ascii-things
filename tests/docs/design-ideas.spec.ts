@@ -65,6 +65,28 @@ test("copies the featured starter code and agent prompt", async ({ page, context
   expect(errors).toEqual([]);
 });
 
+test("featured preview mounts a crisp live scene", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await openIdeas(page);
+
+  const scene = page.locator(".di-featured [data-design-scene]");
+  await expect(scene).toHaveAttribute("data-live", "true", { timeout: 5_000 });
+
+  const metrics = await scene.evaluate((element) => {
+    const dog = element.querySelector("ascii-dog");
+    const canvas = dog?.shadowRoot?.querySelector("canvas");
+    return {
+      tag: dog?.tagName.toLowerCase(),
+      backingWidth: canvas?.width ?? 0,
+      clientWidth: canvas?.clientWidth ?? 0,
+    };
+  });
+
+  expect(metrics.tag).toBe("ascii-dog");
+  expect(metrics.backingWidth).toBeGreaterThanOrEqual(metrics.clientWidth);
+  expect(errors).toEqual([]);
+});
+
 test("glyph specimen uses the live kanji field", async ({ page, context }) => {
   await openIdeas(page);
   const specimen = page.locator("#specimen-sheet");

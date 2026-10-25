@@ -1,0 +1,18 @@
+---
+import DesignIdeaImage from "./DesignIdeaImage.astro";
+
+interface Props {
+  tag: string;
+  image: string;
+  attributes: string;
+  loading?: "eager" | "lazy";
+}
+
+const { tag, image, attributes, loading = "lazy" } = Astro.props;
+const markup = `<${tag} ${attributes} aria-hidden="true"></${tag}>`;
+---
+
+<div class="di-preview__live" data-design-scene>
+  <DesignIdeaImage name={image} loading={loading} class="di-preview__fallback" />
+  <template set:html={markup}></template>
+</div>

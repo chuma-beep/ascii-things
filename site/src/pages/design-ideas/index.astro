@@ -265,6 +265,57 @@ const sceneCount = new Set(
           }, 1900);
         });
       });
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      let sceneLoader: Promise<unknown> | undefined;
+      const loadScenes = () => (sceneLoader ??= import("ascii-things/element"));
+
+      const mountScene = async (host: HTMLElement) => {
+        if (host.dataset.mounted === "true") return;
+        host.dataset.mounted = "true";
+
+        try {
+          await loadScenes();
+        } catch {
+          return;
+        }
+
+        const template = host.querySelector("template");
+        const scene = template?.content.firstElementChild?.cloneNode(true);
+        if (!(scene instanceof HTMLElement)) return;
+
+        if (reducedMotion.matches) {
+          scene.setAttribute("paused", "");
+          scene.setAttribute("calm", "");
+        }
+
+        scene.addEventListener(
+          "ascii-ready",
+          () => {
+            host.dataset.live = "true";
+          },
+          { once: true },
+        );
+        host.append(scene);
+      };
+
+      const sceneHosts = [...document.querySelectorAll<HTMLElement>("[data-design-scene]")];
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (!entry.isIntersecting) continue;
+              observer.unobserve(entry.target);
+              void mountScene(entry.target as HTMLElement);
+            }
+          },
+          { rootMargin: "400px 0px" },
+        );
+
+        sceneHosts.forEach((host) => observer.observe(host));
+      } else {
+        sceneHosts.forEach((host) => void mountScene(host));
+      }
     </script>
   </body>
 </html>
