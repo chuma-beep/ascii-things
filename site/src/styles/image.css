@@ -158,7 +158,9 @@ main:has(.image-studio) > .content-panel:first-of-type {
 
 .studio-workbench {
   display: grid;
-  grid-template-areas: "side stage";
+  grid-template-areas:
+    "source stage"
+    "controls controls";
   grid-template-columns: minmax(17rem, 21.5rem) minmax(0, 1fr);
   gap: 1px;
   margin-top: 1px;
@@ -167,12 +169,11 @@ main:has(.image-studio) > .content-panel:first-of-type {
 }
 
 .studio-side {
-  grid-area: side;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-  background: var(--studio-line);
+  display: contents;
+}
+
+.studio-source {
+  grid-area: source;
 }
 
 .studio-panel {
@@ -544,7 +545,18 @@ main:has(.image-studio) > .content-panel:first-of-type {
 /* --------------------------------------------------------------- controls */
 
 .studio-controls {
-  overflow: auto;
+  grid-area: controls;
+  margin: 0;
+  overflow: visible;
+}
+
+.studio-field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
+  gap: 1px;
+  margin: 0 calc(-1 * clamp(0.85rem, 1.4vw, 1.1rem));
+  border-top: 1px solid var(--studio-line);
+  background: var(--studio-line);
 }
 
 .studio-fieldset {
@@ -553,6 +565,17 @@ main:has(.image-studio) > .content-panel:first-of-type {
   padding: 0.75rem 0;
   border: 0;
   border-top: 1px solid var(--studio-line-soft);
+}
+
+.studio-field-grid .studio-fieldset {
+  padding: 0.85rem clamp(0.85rem, 1.4vw, 1.1rem);
+  border-top: 0;
+  background: var(--studio-panel);
+}
+
+/* Keep the final colour field from leaving an empty third column. */
+.studio-field-grid > .studio-fieldset:nth-child(5) {
+  grid-column: span 2;
 }
 
 .studio-fieldset legend {
@@ -711,13 +734,13 @@ main:has(.image-studio) > .content-panel:first-of-type {
 
 .studio-stage {
   grid-area: stage;
-  align-self: start;
-  position: sticky;
-  top: 4.9rem;
+  align-self: stretch;
+  position: static;
   display: flex;
   flex-direction: column;
   min-height: 30rem;
-  padding: clamp(0.9rem, 1.8vw, 1.4rem);
+  margin: 0;
+  padding: clamp(0.85rem, 1.4vw, 1.1rem);
 }
 
 .studio-stage-head {
@@ -768,6 +791,10 @@ main:has(.image-studio) > .content-panel:first-of-type {
   max-height: 70vh;
   overflow: auto;
   border: 1px solid var(--studio-line);
+  background: var(--studio-screen);
+}
+
+.studio-preview.is-transparent {
   background:
     linear-gradient(45deg, rgba(236, 232, 223, 0.045) 25%, transparent 25%),
     linear-gradient(-45deg, rgba(236, 232, 223, 0.045) 25%, transparent 25%),
@@ -1046,6 +1073,10 @@ main:has(.image-studio) > .content-panel:first-of-type {
     grid-area: controls;
   }
 
+  .studio-field-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .studio-intro {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -1085,6 +1116,14 @@ main:has(.image-studio) > .content-panel:first-of-type {
 
   .studio-tabs {
     align-self: flex-start;
+  }
+
+  .studio-field-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .studio-field-grid > .studio-fieldset:nth-child(5) {
+    grid-column: auto;
   }
 
   .studio-actions {

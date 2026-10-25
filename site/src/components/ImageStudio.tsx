@@ -905,190 +905,192 @@ export default function ImageStudio() {
 
           <section className="studio-panel studio-controls" aria-labelledby="studio-controls-title">
             <div className="studio-panel-head">
-              <span className="studio-eyebrow">02 / Controls</span>
+              <span className="studio-eyebrow">03 / Controls</span>
               <span className="studio-tag">LIVE</span>
             </div>
             <h2 id="studio-controls-title" className="studio-panel-title">
               Tune the field
             </h2>
 
-            <fieldset className="studio-fieldset">
-              <legend>Resolution</legend>
-              <RangeField
-                id="studio-columns"
-                label="Columns"
-                value={options.columns}
-                min={24}
-                max={280}
-                step={1}
-                display={`${options.columns}`}
-                onChange={(value) => updateOption({ columns: value })}
-              />
-              <div className="studio-preset-row">
-                {[48, 80, 96, 140, 200].map((columns) => (
-                  <button
-                    key={columns}
-                    type="button"
-                    className="studio-chip"
-                    aria-pressed={options.columns === columns}
-                    onClick={() => updateOption({ columns })}
-                  >
-                    {columns}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
-
-            <fieldset className="studio-fieldset">
-              <legend>Glyphs</legend>
-              <label className="studio-select" htmlFor="studio-ramp">
-                <span>Character ramp</span>
-                <select
-                  id="studio-ramp"
-                  value={selectRamp}
-                  onChange={(event) => onRampSelect(event.target.value)}
-                >
-                  {RAMPS.map((ramp) => (
-                    <option key={ramp.name} value={ramp.name}>
-                      {ramp.name} — {ramp.note}
-                    </option>
-                  ))}
-                  <option value="custom">Custom…</option>
-                </select>
-              </label>
-              {selectRamp === "custom" ? (
-                <label className="studio-text-field" htmlFor="studio-custom-ramp">
-                  <span>Custom ramp · light → dense</span>
-                  <input
-                    id="studio-custom-ramp"
-                    type="text"
-                    value={customRamp}
-                    onChange={(event) => {
-                      setCustomRamp(event.target.value);
-                      updateOption({ ramp: event.target.value });
-                    }}
-                    spellCheck={false}
-                  />
-                </label>
-              ) : null}
-              <label className="studio-select" htmlFor="studio-dither">
-                <span>Dither</span>
-                <select
-                  id="studio-dither"
-                  value={options.dither}
-                  onChange={(event) =>
-                    updateOption({ dither: event.target.value as StudioOptions["dither"] })
-                  }
-                >
-                  <option value="none">None</option>
-                  <option value="floyd-steinberg">Floyd–Steinberg</option>
-                  <option value="bayer">Bayer 4×4</option>
-                </select>
-              </label>
-            </fieldset>
-
-            <fieldset className="studio-fieldset">
-              <legend>Tone</legend>
-              <RangeField
-                id="studio-contrast"
-                label="Contrast"
-                value={options.contrast}
-                min={0.2}
-                max={3}
-                step={0.05}
-                display={options.contrast.toFixed(2)}
-                onChange={(value) => updateOption({ contrast: value })}
-              />
-              <RangeField
-                id="studio-brightness"
-                label="Brightness"
-                value={options.brightness}
-                min={-0.5}
-                max={0.5}
-                step={0.01}
-                display={options.brightness.toFixed(2)}
-                onChange={(value) => updateOption({ brightness: value })}
-              />
-              <RangeField
-                id="studio-gamma"
-                label="Gamma"
-                value={options.gamma}
-                min={0.4}
-                max={2.5}
-                step={0.05}
-                display={options.gamma.toFixed(2)}
-                onChange={(value) => updateOption({ gamma: value })}
-              />
-              <CheckField
-                label="Invert ramp"
-                checked={options.invert}
-                onChange={(checked) => updateOption({ invert: checked })}
-              />
-            </fieldset>
-
-            <fieldset className="studio-fieldset">
-              <legend>Edge field</legend>
-              <CheckField
-                label="Sobel edges"
-                checked={options.edge}
-                onChange={(checked) =>
-                  updateOption({ edge: checked, color: checked ? false : options.color })
-                }
-                hint="Outputs monochrome contours."
-              />
-              {options.edge ? (
+            <div className="studio-field-grid">
+              <fieldset className="studio-fieldset">
+                <legend>Resolution</legend>
                 <RangeField
-                  id="studio-edge-strength"
-                  label="Edge strength"
-                  value={options.edgeStrength}
-                  min={0.5}
-                  max={4}
-                  step={0.1}
-                  display={options.edgeStrength.toFixed(1)}
-                  onChange={(value) => updateOption({ edgeStrength: value })}
+                  id="studio-columns"
+                  label="Columns"
+                  value={options.columns}
+                  min={24}
+                  max={280}
+                  step={1}
+                  display={`${options.columns}`}
+                  onChange={(value) => updateOption({ columns: value })}
                 />
-              ) : null}
-            </fieldset>
+                <div className="studio-preset-row">
+                  {[48, 80, 96, 140, 200].map((columns) => (
+                    <button
+                      key={columns}
+                      type="button"
+                      className="studio-chip"
+                      aria-pressed={options.columns === columns}
+                      onClick={() => updateOption({ columns })}
+                    >
+                      {columns}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
 
-            <fieldset className="studio-fieldset">
-              <legend>Colour</legend>
-              <CheckField
-                label="Source colour"
-                checked={options.color && !options.edge}
-                disabled={options.edge}
-                onChange={(checked) => updateOption({ color: checked })}
-                hint={
-                  options.edge
-                    ? "Disabled while edges are active."
-                    : "Colour each glyph from the source."
-                }
-              />
-              <div className="studio-colour-row">
-                <label className="studio-colour">
-                  <span>Ink</span>
-                  <input
-                    type="color"
-                    value={options.foreground}
-                    onChange={(event) => updateOption({ foreground: event.target.value })}
-                  />
+              <fieldset className="studio-fieldset">
+                <legend>Glyphs</legend>
+                <label className="studio-select" htmlFor="studio-ramp">
+                  <span>Character ramp</span>
+                  <select
+                    id="studio-ramp"
+                    value={selectRamp}
+                    onChange={(event) => onRampSelect(event.target.value)}
+                  >
+                    {RAMPS.map((ramp) => (
+                      <option key={ramp.name} value={ramp.name}>
+                        {ramp.name} — {ramp.note}
+                      </option>
+                    ))}
+                    <option value="custom">Custom…</option>
+                  </select>
                 </label>
-                <label className="studio-colour">
-                  <span>Paper</span>
-                  <input
-                    type="color"
-                    value={options.background}
-                    disabled={options.transparent}
-                    onChange={(event) => updateOption({ background: event.target.value })}
-                  />
+                {selectRamp === "custom" ? (
+                  <label className="studio-text-field" htmlFor="studio-custom-ramp">
+                    <span>Custom ramp · light → dense</span>
+                    <input
+                      id="studio-custom-ramp"
+                      type="text"
+                      value={customRamp}
+                      onChange={(event) => {
+                        setCustomRamp(event.target.value);
+                        updateOption({ ramp: event.target.value });
+                      }}
+                      spellCheck={false}
+                    />
+                  </label>
+                ) : null}
+                <label className="studio-select" htmlFor="studio-dither">
+                  <span>Dither</span>
+                  <select
+                    id="studio-dither"
+                    value={options.dither}
+                    onChange={(event) =>
+                      updateOption({ dither: event.target.value as StudioOptions["dither"] })
+                    }
+                  >
+                    <option value="none">None</option>
+                    <option value="floyd-steinberg">Floyd–Steinberg</option>
+                    <option value="bayer">Bayer 4×4</option>
+                  </select>
                 </label>
-              </div>
-              <CheckField
-                label="Transparent background"
-                checked={options.transparent}
-                onChange={(checked) => updateOption({ transparent: checked })}
-                hint="PNG and SVG exports keep the alpha channel."
-              />
-            </fieldset>
+              </fieldset>
+
+              <fieldset className="studio-fieldset">
+                <legend>Tone</legend>
+                <RangeField
+                  id="studio-contrast"
+                  label="Contrast"
+                  value={options.contrast}
+                  min={0.2}
+                  max={3}
+                  step={0.05}
+                  display={options.contrast.toFixed(2)}
+                  onChange={(value) => updateOption({ contrast: value })}
+                />
+                <RangeField
+                  id="studio-brightness"
+                  label="Brightness"
+                  value={options.brightness}
+                  min={-0.5}
+                  max={0.5}
+                  step={0.01}
+                  display={options.brightness.toFixed(2)}
+                  onChange={(value) => updateOption({ brightness: value })}
+                />
+                <RangeField
+                  id="studio-gamma"
+                  label="Gamma"
+                  value={options.gamma}
+                  min={0.4}
+                  max={2.5}
+                  step={0.05}
+                  display={options.gamma.toFixed(2)}
+                  onChange={(value) => updateOption({ gamma: value })}
+                />
+                <CheckField
+                  label="Invert ramp"
+                  checked={options.invert}
+                  onChange={(checked) => updateOption({ invert: checked })}
+                />
+              </fieldset>
+
+              <fieldset className="studio-fieldset">
+                <legend>Edge field</legend>
+                <CheckField
+                  label="Sobel edges"
+                  checked={options.edge}
+                  onChange={(checked) =>
+                    updateOption({ edge: checked, color: checked ? false : options.color })
+                  }
+                  hint="Outputs monochrome contours."
+                />
+                {options.edge ? (
+                  <RangeField
+                    id="studio-edge-strength"
+                    label="Edge strength"
+                    value={options.edgeStrength}
+                    min={0.5}
+                    max={4}
+                    step={0.1}
+                    display={options.edgeStrength.toFixed(1)}
+                    onChange={(value) => updateOption({ edgeStrength: value })}
+                  />
+                ) : null}
+              </fieldset>
+
+              <fieldset className="studio-fieldset">
+                <legend>Colour</legend>
+                <CheckField
+                  label="Source colour"
+                  checked={options.color && !options.edge}
+                  disabled={options.edge}
+                  onChange={(checked) => updateOption({ color: checked })}
+                  hint={
+                    options.edge
+                      ? "Disabled while edges are active."
+                      : "Colour each glyph from the source."
+                  }
+                />
+                <div className="studio-colour-row">
+                  <label className="studio-colour">
+                    <span>Ink</span>
+                    <input
+                      type="color"
+                      value={options.foreground}
+                      onChange={(event) => updateOption({ foreground: event.target.value })}
+                    />
+                  </label>
+                  <label className="studio-colour">
+                    <span>Paper</span>
+                    <input
+                      type="color"
+                      value={options.background}
+                      disabled={options.transparent}
+                      onChange={(event) => updateOption({ background: event.target.value })}
+                    />
+                  </label>
+                </div>
+                <CheckField
+                  label="Transparent background"
+                  checked={options.transparent}
+                  onChange={(checked) => updateOption({ transparent: checked })}
+                  hint="PNG and SVG exports keep the alpha channel."
+                />
+              </fieldset>
+            </div>
 
             <button
               type="button"
@@ -1103,7 +1105,7 @@ export default function ImageStudio() {
         <section className="studio-panel studio-stage" aria-labelledby="studio-preview-title">
           <div className="studio-stage-head">
             <div>
-              <span className="studio-eyebrow">03 / Output</span>
+              <span className="studio-eyebrow">02 / Output</span>
               <h2 id="studio-preview-title" className="studio-panel-title">
                 ASCII field
               </h2>
@@ -1130,7 +1132,10 @@ export default function ImageStudio() {
 
           {activeSource ? (
             <>
-              <div className="studio-preview" ref={previewWrapRef}>
+              <div
+                className={`studio-preview${options.transparent ? " is-transparent" : ""}`}
+                ref={previewWrapRef}
+              >
                 <canvas
                   ref={previewCanvasRef}
                   className="studio-canvas"
