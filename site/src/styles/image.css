@@ -757,11 +757,13 @@ main:has(.image-studio) > .content-panel:first-of-type {
 
 .studio-tabs {
   display: inline-flex;
+  margin-top: 0;
   border: 1px solid var(--studio-line);
 }
 
 .studio-tabs button {
   min-height: 32px;
+  margin: 0;
   padding: 0 0.7rem;
   border: 0;
   border-right: 1px solid var(--studio-line);
@@ -787,6 +789,7 @@ main:has(.image-studio) > .content-panel:first-of-type {
   align-items: center;
   justify-content: center;
   flex: 1 1 auto;
+  margin-top: 0;
   min-height: 18rem;
   max-height: 70vh;
   overflow: auto;

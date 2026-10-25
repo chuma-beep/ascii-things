@@ -724,7 +724,7 @@ export default function ImageStudio() {
   };
 
   return (
-    <div className="image-studio" aria-busy={busy !== null || exporting !== null}>
+    <div className="image-studio not-content" aria-busy={busy !== null || exporting !== null}>
       <header className="studio-intro">
         <div>
           <p className="studio-kicker">ASCII-THINGS / IMAGE LAB</p>
