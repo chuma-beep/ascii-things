@@ -65,6 +65,31 @@ test("copies the featured starter code and agent prompt", async ({ page, context
   expect(errors).toEqual([]);
 });
 
+test("glyph specimen uses the live kanji field", async ({ page, context }) => {
+  await openIdeas(page);
+  const specimen = page.locator("#specimen-sheet");
+
+  await expect(specimen).toContainText("Glyph specimen");
+  await expect(specimen).toContainText("永龍風水火");
+
+  const source = await specimen
+    .locator(".di-specimen__art img")
+    .evaluate((image) => (image as HTMLImageElement).currentSrc);
+  expect(source).toContain("kanji-field.webp");
+
+  await context.grantPermissions(["clipboard-read", "clipboard-write"], {
+    origin: "http://127.0.0.1:4322",
+  });
+  await specimen.getByRole("button", { name: "Copy code" }).click();
+  await expect(page.locator("[data-copy-status]")).toContainText(
+    "Glyph specimen starter code copied.",
+  );
+  const code = await page.evaluate(() => navigator.clipboard.readText());
+  expect(code).toContain("ascii-things/dist/webgl-element.js");
+  expect(code).toContain('variant="field"');
+  expect(code).toContain("漢字");
+});
+
 test("mobile keeps every recipe readable without horizontal overflow", async ({
   page,
 }, testInfo) => {

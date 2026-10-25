@@ -239,58 +239,71 @@ Use abyss, cream, and one orange. Add a reduced-motion fallback, hide the inset 
   {
     id: "specimen-sheet",
     number: "05",
-    title: "Specimen sheet",
+    title: "Glyph specimen",
     category: "Editorial",
     description:
-      "Treat a scene like a field specimen: cream paper, clipped labels, a dark viewing window, and one very good dog.",
+      "Treat a live kanji field like a field specimen: cream paper, clipped labels, a dark viewing window, and fifteen drifting studies.",
     ingredients: [
-      { name: "Robot dog", href: "/scenes/dog/" },
+      { name: "Kanji field", href: "/kanji/field/" },
       { name: "Kanji marks", href: "/kanji/" },
       { name: "ASCII symbols", href: "/symbols/" },
     ],
     note: "This is the most useful pattern for an about page, changelog, or case study: the scene becomes evidence.",
-    code: `<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"></script>
-<section class="specimen">
-  <div class="specimen__sheet">
-    <div class="specimen__art">
-      <ascii-dog palette="abyss" seed="7" count="1" spread="0.55,0.55"></ascii-dog>
+    code: `<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/webgl-element.js"></script>
+<section class="glyph-specimen">
+  <div class="glyph-specimen__sheet">
+    <div class="glyph-specimen__art">
+      <ascii-surface
+        variant="field"
+        text="漢字"
+        glyphs="永龍風水火土空海月花鳥"
+        density="0.24"
+        cell="10"
+        background="#050607"
+        foreground="#f4ead6"
+        accent="#ff7a1a"
+        font-family="'Noto Serif CJK JP', 'Yu Mincho', serif"
+        label="A drifting field of kanji glyphs">
+      </ascii-surface>
     </div>
-    <div class="specimen__notes">
+    <div class="glyph-specimen__notes">
       <p>FIELD NOTE / 05</p>
-      <h1>Canis<br><em>roboticus.</em></h1>
+      <h1>Glyph<br><em>specimen.</em></h1>
       <dl>
-        <div><dt>HABITAT</dt><dd>Test yard</dd></div>
-        <div><dt>BEHAVIOR</dt><dd>Trot, sniff, fetch</dd></div>
-        <div><dt>STATUS</dt><dd>Good boy</dd></div>
+        <div><dt>FAMILY</dt><dd>Type field</dd></div>
+        <div><dt>GLYPHS</dt><dd>永龍風水火</dd></div>
+        <div><dt>STATUS</dt><dd>Drifting</dd></div>
       </dl>
-      <span class="specimen__stamp">漢</span>
+      <span class="glyph-specimen__stamp">漢</span>
     </div>
   </div>
 </section>
 <style>
-  .specimen { display: grid; place-items: center; min-height: 100svh; padding: clamp(18px, 4vw, 56px); background: #e8dfd0; color: #181512; font-family: ui-monospace, monospace; }
-  .specimen__sheet { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(220px, .8fr); width: min(1080px, 100%); border: 1px solid #181512; background: #f3eee4; box-shadow: 10px 10px 0 rgba(24,21,18,.14); }
-  .specimen__art { position: relative; min-height: 420px; margin: clamp(14px, 2vw, 24px); border: 1px solid #181512; background: #070809; }
-  .specimen__art ascii-dog { position: absolute; inset: 0; }
-  .specimen__notes { display: flex; flex-direction: column; padding: clamp(18px, 3vw, 32px); border-left: 1px solid rgba(24,21,18,.2); }
-  .specimen__notes > p { margin: 0 0 auto; color: #b84a12; font-size: 9px; letter-spacing: .16em; }
-  .specimen h1 { margin: 24px 0; font-size: clamp(2rem, 4vw, 4rem); font-weight: 500; letter-spacing: -.08em; line-height: .84; }
-  .specimen h1 em { color: #b84a12; font-style: normal; }
-  .specimen dl { display: grid; gap: 8px; margin: 0; }
-  .specimen dl div { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid rgba(24,21,18,.18); padding-top: 7px; }
-  .specimen dt, .specimen dd { margin: 0; font-size: 8px; letter-spacing: .1em; }
-  .specimen dt { color: #7a7063; }
-  .specimen dd { text-align: right; }
-  .specimen__stamp { align-self: flex-end; display: grid; place-items: center; width: 44px; height: 44px; margin-top: 28px; border: 1px solid #b84a12; color: #b84a12; font-size: 24px; }
-  @media (max-width: 700px) { .specimen__sheet { grid-template-columns: 1fr; } .specimen__notes { border-top: 1px solid rgba(24,21,18,.2); border-left: 0; } .specimen__art { min-height: 260px; } }
+  .glyph-specimen { display: grid; place-items: center; min-height: 100svh; padding: clamp(18px, 4vw, 56px); background: #e8dfd0; color: #181512; font-family: ui-monospace, monospace; }
+  .glyph-specimen__sheet { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(220px, .8fr); width: min(1080px, 100%); border: 1px solid #181512; background: #f3eee4; box-shadow: 10px 10px 0 rgba(24,21,18,.14); }
+  .glyph-specimen__art { position: relative; min-height: 420px; margin: clamp(14px, 2vw, 24px); border: 1px solid #181512; background: #050607; }
+  .glyph-specimen__art ascii-surface { position: absolute; inset: 0; display: block; }
+  .glyph-specimen__notes { display: flex; flex-direction: column; padding: clamp(18px, 3vw, 32px); border-left: 1px solid rgba(24,21,18,.2); }
+  .glyph-specimen__notes > p { margin: 0 0 auto; color: #b84a12; font-size: 9px; letter-spacing: .16em; }
+  .glyph-specimen h1 { margin: 24px 0; font-size: clamp(2rem, 4vw, 4rem); font-weight: 500; letter-spacing: -.08em; line-height: .84; }
+  .glyph-specimen h1 em { color: #b84a12; font-style: normal; }
+  .glyph-specimen dl { display: grid; gap: 8px; margin: 0; }
+  .glyph-specimen dl div { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid rgba(24,21,18,.18); padding-top: 7px; }
+  .glyph-specimen dt, .glyph-specimen dd { margin: 0; font-size: 8px; letter-spacing: .1em; }
+  .glyph-specimen dt { color: #7a7063; }
+  .glyph-specimen dd { text-align: right; }
+  .glyph-specimen__stamp { align-self: flex-end; display: grid; place-items: center; width: 44px; height: 44px; margin-top: 28px; border: 1px solid #b84a12; color: #b84a12; font-size: 24px; }
+  @media (max-width: 700px) { .glyph-specimen__sheet { grid-template-columns: 1fr; } .glyph-specimen__notes { border-top: 1px solid rgba(24,21,18,.2); border-left: 0; } .glyph-specimen__art { min-height: 260px; } }
 </style>`,
     prompt: `Using ascii-things, build a cream specimen-sheet section for an about page or case study.
 
-The composition is a paper sheet centered on a deeper cream grid. Inside the sheet, use a two-column layout: a dark framed viewing window on the left containing the live robot dog scene, and a notes column on the right. The notes include a small "FIELD NOTE / 05" label, the headline "Canis roboticus.", a three-row definition list (HABITAT, BEHAVIOR, STATUS), and a small orange kanji stamp (漢).
+The composition is a paper sheet centered on a deeper cream grid. Inside the sheet, use a two-column layout: a dark framed viewing window on the left containing a live Kanji field, and a notes column on the right. The notes include a small "FIELD NOTE / 05" label, the headline "Glyph specimen.", a three-row definition list (FAMILY, GLYPHS, STATUS), and a small orange kanji stamp (漢).
+
+Use the ascii-surface webgl element with variant "field", text "漢字", and the glyph set 永龍風水火土空海月花鳥. Set a serif CJK font, a paper-adjacent foreground, and one orange accent. Do not use a static stamp as the main artwork — the field must drift.
 
 Use paper #f3eee4, deep cream #e8dfd0, ink #181512, and burnt orange #b84a12. Use hairline rules, monospace type, and a hard offset shadow. The scene should feel like evidence, not decoration.
 
-Stack the art above the notes at 700px. Keep the dog aria-labelled and respect prefers-reduced-motion. Return a single React component plus CSS.`,
+Stack the art above the notes at 700px. Keep the surface aria-labelled and respect prefers-reduced-motion. Return a single React component plus CSS.`,
   },
   {
     id: "launch-sequence",
