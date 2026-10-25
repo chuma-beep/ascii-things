@@ -90,6 +90,32 @@ test("glyph specimen uses the live kanji field", async ({ page, context }) => {
   expect(code).toContain("漢字");
 });
 
+test("recipe previews open their full-page demos", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await openIdeas(page);
+
+  const previews = page.locator(".di-featured__preview, .di-card__preview");
+  await expect(previews).toHaveCount(6);
+  expect(
+    await previews.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href"))),
+  ).toEqual([
+    "/design-ideas/command-deck/",
+    "/design-ideas/signal-room/",
+    "/design-ideas/quiet-pond/",
+    "/design-ideas/night-commute/",
+    "/design-ideas/specimen-sheet/",
+    "/design-ideas/launch-sequence/",
+  ]);
+  await expect(page.locator(".di-open-link")).toHaveCount(6);
+
+  await page.locator("#specimen-sheet .di-card__preview").click();
+  await expect(page).toHaveURL(/\/design-ideas\/specimen-sheet\/$/);
+  await expect(page.locator(".glyph-specimen")).toBeVisible();
+  await expect(page.locator("ascii-surface")).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+  expect(errors).toEqual([]);
+});
+
 test("mobile keeps every recipe readable without horizontal overflow", async ({
   page,
 }, testInfo) => {

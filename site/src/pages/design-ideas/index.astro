@@ -92,10 +92,14 @@ const sceneCount = new Set(
       </section>
 
       <section class="di-featured" id={featured.id} aria-labelledby={`${featured.id}-title`}>
-        <div class="di-featured__preview">
+        <a
+          class="di-featured__preview"
+          href={`/design-ideas/${featured.id}/`}
+          aria-label={`Open ${featured.title} as a full page`}
+        >
           <DesignIdeaPreview id={featured.id} featured />
           <span class="di-featured__stamp">01 / FEATURED</span>
-        </div>
+        </a>
         <div class="di-featured__body">
           <div class="di-meta">
             <span>{featured.number} / {featured.category}</span>
@@ -128,6 +132,9 @@ const sceneCount = new Set(
             >
               Copy prompt
             </button>
+            <a class="di-open-link" href={`/design-ideas/${featured.id}/`}>
+              View full page <span aria-hidden="true">↗</span>
+            </a>
           </div>
         </div>
       </section>
@@ -136,9 +143,13 @@ const sceneCount = new Set(
         {
           rest.map((idea) => (
             <article class="di-card" id={idea.id}>
-              <div class="di-card__preview">
+              <a
+                class="di-card__preview"
+                href={`/design-ideas/${idea.id}/`}
+                aria-label={`Open ${idea.title} as a full page`}
+              >
                 <DesignIdeaPreview id={idea.id} />
-              </div>
+              </a>
               <div class="di-card__body">
                 <div class="di-meta">
                   <span>{idea.number} / {idea.category}</span>
@@ -171,6 +182,9 @@ const sceneCount = new Set(
                   >
                     Copy prompt
                   </button>
+                  <a class="di-open-link" href={`/design-ideas/${idea.id}/`}>
+                    View full page <span aria-hidden="true">↗</span>
+                  </a>
                 </div>
               </div>
             </article>

@@ -1,0 +1,275 @@
+---
+import type { DesignIdea } from "../../data/design-ideas";
+import { DESIGN_IDEAS } from "../../data/design-ideas";
+
+export function getStaticPaths() {
+  return DESIGN_IDEAS.map((idea) => ({
+    params: { id: idea.id },
+    props: { idea },
+  }));
+}
+
+interface Props {
+  idea: DesignIdea;
+}
+
+const { idea } = Astro.props;
+const paper = idea.id === "specimen-sheet";
+const title = `${idea.title} — design ideas — ascii-things`;
+const description = `${idea.description} A full-page ascii-things design idea with copyable starter code.`;
+const demoCode = idea.code.replace(
+  /<script type="module" src="https:\/\/cdn\.jsdelivr\.net\/npm\/ascii-things\/dist\/[^"]+"><\/script>\s*/g,
+  "",
+);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content={paper ? "#e8dfd0" : "#070809"} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta
+      property="og:url"
+      content={`https://ascii-things-docs.pages.dev/design-ideas/${idea.id}/`}
+    />
+    <meta property="og:site_name" content="ascii-things" />
+    <meta name="twitter:card" content="summary" />
+    <link
+      rel="canonical"
+      href={`https://ascii-things-docs.pages.dev/design-ideas/${idea.id}/`}
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style is:global>
+      :root {
+        --demo-bar-h: 46px;
+        --demo-bg: #070809;
+        --demo-ink: #ece8df;
+        --demo-line: rgba(236, 232, 223, 0.16);
+        --demo-orange: #ff7a1a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--demo-bg);
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        overflow-x: hidden;
+        background: var(--demo-bg);
+        color: var(--demo-ink);
+        font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+
+      body.demo-paper {
+        --demo-bg: #e8dfd0;
+        --demo-ink: #181512;
+        --demo-line: rgba(24, 21, 18, 0.2);
+        --demo-orange: #b84a12;
+      }
+
+      .demo-bar {
+        position: relative;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-height: var(--demo-bar-h);
+        padding: 0 16px;
+        border-bottom: 1px solid var(--demo-line);
+        background: color-mix(in srgb, var(--demo-bg) 92%, transparent);
+        color: var(--demo-ink);
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        line-height: 1;
+        text-transform: uppercase;
+        backdrop-filter: blur(12px);
+      }
+
+      .demo-bar a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .demo-bar a:hover {
+        color: var(--demo-orange);
+      }
+
+      .demo-bar__back {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        flex: none;
+      }
+
+      .demo-bar__title {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        color: var(--demo-ink);
+        opacity: 0.55;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .demo-bar__actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: none;
+      }
+
+      .demo-bar__actions a,
+      .demo-bar__actions button {
+        padding: 7px 9px;
+        border: 1px solid var(--demo-line);
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        font-size: 8px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .demo-bar__actions a:hover,
+      .demo-bar__actions button:hover {
+        border-color: var(--demo-orange);
+        color: var(--demo-orange);
+      }
+
+      .demo-bar__actions button[data-copied="true"] {
+        border-color: var(--demo-orange);
+        background: var(--demo-orange);
+        color: var(--demo-bg);
+      }
+
+      .demo-main > section {
+        min-height: calc(100svh - var(--demo-bar-h)) !important;
+      }
+
+      .demo-status {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        z-index: 60;
+        margin: 0;
+        padding: 7px 9px;
+        border: 1px solid var(--demo-line);
+        background: var(--demo-bg);
+        color: var(--demo-ink);
+        font-size: 8px;
+        letter-spacing: 0.1em;
+        opacity: 0;
+        pointer-events: none;
+        text-transform: uppercase;
+        transform: translateY(4px);
+        transition:
+          opacity 160ms ease,
+          transform 160ms ease;
+      }
+
+      .demo-status[data-visible="true"] {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 640px) {
+        .demo-bar__title {
+          display: none;
+        }
+
+        .demo-bar__actions a {
+          display: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .demo-status {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body class:list={["demo-page", paper && "demo-paper"]}>
+    <nav class="demo-bar" aria-label="Demo controls">
+      <a class="demo-bar__back" href="/design-ideas/">← All ideas</a>
+      <span class="demo-bar__title">{idea.number} / {idea.title}</span>
+      <div class="demo-bar__actions">
+        <a href={`/design-ideas/#${idea.id}`}>Recipe</a>
+        <button
+          type="button"
+          data-demo-copy={idea.code}
+          data-demo-label={`${idea.title} starter code`}
+        >
+          Copy code
+        </button>
+      </div>
+    </nav>
+
+    <main class="demo-main">
+      <Fragment set:html={demoCode} />
+    </main>
+
+    <p class="demo-status" data-demo-status role="status" aria-live="polite"></p>
+
+    <script>
+      import "ascii-things/element";
+      import "ascii-things/webgl/element";
+    </script>
+
+    <script>
+      const status = document.querySelector<HTMLElement>("[data-demo-status]");
+
+      const fallbackCopy = (text: string) => {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.append(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+      };
+
+      document.querySelectorAll<HTMLButtonElement>("[data-demo-copy]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const text = button.dataset.demoCopy;
+          if (!text) return;
+
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            fallbackCopy(text);
+          }
+
+          const original = button.textContent ?? "Copy code";
+          button.textContent = "Copied";
+          button.dataset.copied = "true";
+          if (status) {
+            status.textContent = `${button.dataset.demoLabel ?? "Code"} copied.`;
+            status.dataset.visible = "true";
+          }
+
+          window.setTimeout(() => {
+            button.textContent = original;
+            delete button.dataset.copied;
+            if (status) status.dataset.visible = "false";
+          }, 1900);
+        });
+      });
+    </script>
+  </body>
+</html>
