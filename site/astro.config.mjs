@@ -143,6 +143,7 @@ export default defineConfig({
           label: "Reference",
           items: [
             { label: "API reference", link: "api/" },
+            { label: "Image studio", link: "image/" },
             { label: "ASCII symbols", link: "symbols/" },
             { label: "Playground", link: "playground/" },
             { label: "Examples", link: "examples/" },

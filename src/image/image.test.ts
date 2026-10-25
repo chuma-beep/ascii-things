@@ -77,6 +77,30 @@ describe("pixelsToAscii", () => {
     expect(pixelsToAscii(data, 2, 2, options)).toEqual(pixelsToAscii(data, 2, 2, options));
   });
 
+  it("lifts blacks with brightness", () => {
+    const black = pixels([[0, 0, 0]]);
+    const base = pixelsToAscii(black, 1, 1, { charset: "@%#*+=-:. " }).text;
+    const lifted = pixelsToAscii(black, 1, 1, {
+      charset: "@%#*+=-:. ",
+      brightness: 0.5,
+    }).text;
+
+    expect(base).toBe("@");
+    expect(lifted).not.toBe(base);
+  });
+
+  it("darkens midtones with lower gamma", () => {
+    const mid = pixels([[128, 128, 128]]);
+    const base = pixelsToAscii(mid, 1, 1, { charset: "@%#*+=-:. " }).text;
+    const darker = pixelsToAscii(mid, 1, 1, {
+      charset: "@%#*+=-:. ",
+      gamma: 0.5,
+    }).text;
+
+    expect(base).toBe("=");
+    expect(darker).not.toBe(base);
+  });
+
   it("rejects empty dimensions", () => {
     expect(() => pixelsToAscii(new Uint8ClampedArray(), 0, 1)).toThrow();
   });

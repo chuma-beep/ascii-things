@@ -2,7 +2,7 @@ export type AsciiImageCharset = "classic" | "blocks" | "dots" | string;
 
 export type AsciiImageDither = "none" | "floyd-steinberg" | "bayer";
 
-export type AsciiImageSource = string | Blob | HTMLImageElement | ImageBitmap;
+export type AsciiImageSource = string | Blob | HTMLImageElement | ImageBitmap | HTMLCanvasElement;
 
 export interface AsciiImageOptions {
   /** Character count across the output. Default 80. */
@@ -15,6 +15,10 @@ export interface AsciiImageOptions {
   dither?: AsciiImageDither;
   /** Contrast multiplier around mid-grey. Default 1. */
   contrast?: number;
+  /** Luminance offset, from -1 to 1. Default 0. */
+  brightness?: number;
+  /** Gamma correction. Values above 1 lift the midtones. Default 1. */
+  gamma?: number;
   /** Colour the drawn canvas from the source pixels. */
   color?: boolean;
   /** Monochrome ink. Default #ece8df. */
@@ -72,6 +76,8 @@ function resolveOptions(options: AsciiImageOptions = {}) {
     invert: options.invert ?? false,
     dither: options.dither ?? "none",
     contrast: clamp(options.contrast ?? 1, 0.1, 4),
+    brightness: clamp(options.brightness ?? 0, -1, 1),
+    gamma: clamp(options.gamma ?? 1, 0.2, 4),
     color: options.color ?? false,
     foreground: options.foreground ?? "#ece8df",
     background: options.background ?? "#070809",
@@ -83,12 +89,20 @@ function luminance(r: number, g: number, b: number) {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-function grayscale(data: Uint8ClampedArray, width: number, height: number, contrast: number) {
+function grayscale(
+  data: Uint8ClampedArray,
+  width: number,
+  height: number,
+  contrast: number,
+  brightness: number,
+  gamma: number,
+) {
   const values = new Float32Array(width * height);
   for (let i = 0; i < values.length; i++) {
     const offset = i * 4;
     const raw = luminance(data[offset], data[offset + 1], data[offset + 2]);
-    values[i] = clamp((raw / 255 - 0.5) * contrast + 0.5, 0, 1) * 255;
+    const adjusted = clamp((raw / 255 - 0.5) * contrast + 0.5 + brightness, 0, 1);
+    values[i] = Math.pow(adjusted, 1 / gamma) * 255;
   }
   return values;
 }
@@ -134,7 +148,14 @@ export function pixelsToAscii(
 ): AsciiImageResult {
   if (width <= 0 || height <= 0) throw new Error("Image dimensions must be positive.");
   const resolved = resolveOptions(options);
-  const values = grayscale(data, width, height, resolved.contrast);
+  const values = grayscale(
+    data,
+    width,
+    height,
+    resolved.contrast,
+    resolved.brightness,
+    resolved.gamma,
+  );
   dither(values, width, height, resolved.dither);
 
   const ramp = resolved.charset;
@@ -196,6 +217,11 @@ async function toDrawable(source: AsciiImageSource): Promise<CanvasImageSource> 
 
   if (typeof ImageBitmap !== "undefined" && source instanceof ImageBitmap) return source;
 
+  if (typeof HTMLCanvasElement !== "undefined" && source instanceof HTMLCanvasElement) {
+    if (source.width === 0 || source.height === 0) throw new Error("The canvas has no pixels.");
+    return source;
+  }
+
   if (typeof HTMLImageElement !== "undefined" && source instanceof HTMLImageElement) {
     if (!source.complete) {
       await new Promise<void>((resolve, reject) => {
@@ -217,6 +243,9 @@ function dimensions(source: CanvasImageSource) {
     return { width: source.naturalWidth, height: source.naturalHeight };
   }
   if (typeof ImageBitmap !== "undefined" && source instanceof ImageBitmap) {
+    return { width: source.width, height: source.height };
+  }
+  if (typeof HTMLCanvasElement !== "undefined" && source instanceof HTMLCanvasElement) {
     return { width: source.width, height: source.height };
   }
   return { width: 0, height: 0 };

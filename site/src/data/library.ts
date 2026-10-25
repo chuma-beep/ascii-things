@@ -278,10 +278,10 @@ export const LIBRARY: LibraryItem[] = [
   {
     id: "image-to-ascii",
     title: "Image to ASCII",
-    description: "Convert local images into ASCII fields.",
+    description: "Crop, tone, dither, and export images as ASCII text, PNG, SVG, or batch ZIP.",
     kind: "tool",
-    href: "/guide/image/",
-    tags: ["tools", "image", "convert"],
+    href: "/image/",
+    tags: ["tools", "image", "convert", "batch", "crop"],
   },
   {
     id: "dither",

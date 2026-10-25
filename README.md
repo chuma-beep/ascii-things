@@ -388,9 +388,12 @@ registry items show the same primitives as copyable source.
 
 ## Image to ASCII
 
-`ascii-things/image` turns a local image, `Blob`, `ImageBitmap`, or URL into
-monochrome or colour ASCII. It is a separate tree-shakeable entry, not a living
-scene, and has no runtime dependencies.
+`ascii-things/image` turns a local image, `Blob`, `ImageBitmap`, canvas, or URL
+into monochrome or colour ASCII. It is a separate tree-shakeable entry, not a
+living scene, and has no runtime dependencies.
+
+The docs site includes a full [image-to-ASCII studio](https://ascii-things-docs.pages.dev/image/)
+with crop, edge detection, batch conversion, and TXT, PNG, SVG, and ZIP export.
 
 ```ts
 import { imageToAscii, renderAsciiImage } from "ascii-things/image";
@@ -437,13 +440,16 @@ text, dimensions, and per-cell colours.
   src="/portrait.png"
   columns="80"
   charset="classic"
+  brightness="0.05"
+  gamma="1.1"
   label="A portrait rendered in ASCII"
 ></ascii-image>
 ```
 
 The element dispatches bubbling, composed `ascii-ready` and `ascii-error`
 events. Attributes: `src`, `columns`, `charset`, `invert`, `dither`, `contrast`,
-`color`, `foreground`, `background`, `font-family`, and `label`.
+`brightness`, `gamma`, `color`, `foreground`, `background`, `font-family`, and
+`label`.
 
 | Option | Type | Default | |
 |---|---|---|---|
@@ -452,6 +458,8 @@ events. Attributes: `src`, `columns`, `charset`, `invert`, `dither`, `contrast`,
 | `invert` | `boolean` | `false` | Flip the ramp |
 | `dither` | `"none" \| "floyd-steinberg" \| "bayer"` | `"none"` | Opt-in error diffusion or ordered dithering |
 | `contrast` | `number` | `1` | Multiplier around mid-grey; 0.1–4 |
+| `brightness` | `number` | `0` | Luminance offset; −1–1 |
+| `gamma` | `number` | `1` | Gamma correction; 0.2–4 |
 | `color` | `boolean` | `false` | Draw from the source pixels |
 | `foreground` | `string` | `"#ece8df"` | Monochrome ink |
 | `background` | `string` | `"#070809"` | Canvas background |
@@ -459,11 +467,13 @@ events. Attributes: `src`, `columns`, `charset`, `invert`, `dither`, `contrast`,
 
 `imageToAscii` returns the plain text. `renderAsciiImage` returns
 `{ text, columns, rows, colors }` and draws to a canvas. Both accept `File`,
-`Blob`, `HTMLImageElement`, `ImageBitmap`, or a URL. Remote URLs must allow
-CORS; local files avoid that requirement.
+`Blob`, `HTMLImageElement`, `ImageBitmap`, `HTMLCanvasElement`, or a URL. Remote
+URLs must allow CORS; local files avoid that requirement.
 
-See the [image demo](examples/image/) for drag-and-drop, URL loading, live
-controls, copy, and download.
+Use the [live image studio](https://ascii-things-docs.pages.dev/image/) for
+drag-and-drop, paste, URL loading, crop, edge detection, batch conversion, and
+TXT, PNG, SVG, and ZIP export. The smaller [image demo](examples/image/) stays
+available as a minimal integration reference.
 
 ## Dither field
 
@@ -688,8 +698,10 @@ handle.
 - [Components](https://ascii-things-docs.pages.dev/components/) — copyable shadcn
   registry items for an ASCII box footer, koi card, dither card, surface card,
   scene console, and scene toolbar.
-- [Image to ASCII](examples/image/) — drag-and-drop portrait conversion with
-  charset, contrast, dithering, colour, copy, and download.
+- [Image to ASCII studio](https://ascii-things-docs.pages.dev/image/) — crop,
+  edge detection, batch conversion, and TXT/PNG/SVG/ZIP export.
+- [Image to ASCII example](examples/image/) — the minimal drag-and-drop
+  integration with charset, contrast, dithering, colour, copy, and download.
 - [Dither field](examples/dither/) — an ordered-dither wordmark with live matrix,
   density, scan, and motion controls, plus a custom-element variant.
 - [ASCII box footer](examples/ascii-box-footer/) — a copyable footer background made
@@ -853,7 +865,8 @@ npm run dev        # open the URL Vite prints (5173 by default)
 npm run check:all  # Biome, types, unit tests, build, package, size gates
 npm run test:e2e   # Playwright browser gates
 npm run build      # ESM + d.ts + ui.css in dist/
-npm --prefix site run build  # static docs site in site/dist
+npm --prefix site run build  # docs site in site/dist (plus root Pages Function)
+npm run test:docs            # built docs Playwright suite
 ```
 
 The root URL is the landing page. The query-string playground lives at

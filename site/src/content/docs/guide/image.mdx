@@ -1,13 +1,15 @@
 ---
 title: Image to ASCII
-description: Convert a local image, Blob, ImageBitmap, or URL into ASCII art in the browser.
+description: Convert a local image, Blob, ImageBitmap, canvas, or URL into ASCII art in the browser.
 ---
 
 `ascii-things/image` is a separate, tree-shakeable entry for turning images into
 ASCII. It is not a living scene: there is no loop, no world, and no canvas
 engine. You give it pixels; it gives you text or a drawn canvas.
 
-It has no runtime dependencies and runs entirely in the browser.
+It has no runtime dependencies and runs entirely in the browser. The docs also
+include a full studio at [`/image/`](/image/) with crop, tone, dither, edge,
+colour, batch, TXT, PNG, SVG, and ZIP export.
 
 ## Install
 
@@ -31,8 +33,8 @@ const text = await imageToAscii(file, {
 console.log(text);
 ```
 
-`imageToAscii()` accepts a `File`, `Blob`, `HTMLImageElement`, `ImageBitmap`, or
-a URL string. It resolves with the plain-text art.
+`imageToAscii()` accepts a `File`, `Blob`, `HTMLImageElement`, `ImageBitmap`,
+`HTMLCanvasElement`, or a URL string. It resolves with the plain-text art.
 
 ## Draw to a canvas
 
@@ -41,12 +43,17 @@ await renderAsciiImage(canvas, file, {
   columns: 80,
   color: true,
   background: "#070809",
+  brightness: 0.04,
+  gamma: 1.1,
 });
 ```
 
 `renderAsciiImage()` resolves with `{ text, columns, rows, colors }` and paints
 the characters into the supplied canvas. The canvas is sized from its rendered
 width, with the backing store capped at 2× DPR.
+
+A canvas source is useful when you want to crop or pre-process an image before
+conversion. The site studio passes a cropped canvas into the renderer.
 
 ## React
 
@@ -59,6 +66,8 @@ export function Portrait({ file }: { file: File }) {
       src={file}
       columns={80}
       dither="bayer"
+      brightness={0.05}
+      gamma={1.1}
       alt="A portrait rendered in ASCII"
     />
   );
@@ -79,6 +88,8 @@ to handle a failed load.
   columns="80"
   charset="classic"
   dither="bayer"
+  brightness="0.05"
+  gamma="1.1"
   label="A portrait rendered in ASCII"
 ></ascii-image>
 ```
@@ -91,13 +102,15 @@ events. The ready event carries `{ result }`; the error event carries `{ error }
 | Option | Type | Default | |
 |---|---|---|---|
 | `columns` | `number` | `80` | Characters across; clamped to 8–400 |
-| `charset` | `"classic" \| "blocks" \| "dots" \| string` | `"classic"` | A named ramp or any dark-to-light string |
+| `charset` | `"classic" \| "blocks" \| "dots" \| string` | `"classic"` | A named ramp or any custom string |
 | `invert` | `boolean` | `false` | Flip the luminance ramp |
 | `dither` | `"none" \| "floyd-steinberg" \| "bayer"` | `"none"` | Error diffusion or ordered dithering |
 | `contrast` | `number` | `1` | Multiplier around mid-grey; clamped to 0.1–4 |
+| `brightness` | `number` | `0` | Luminance offset; clamped to -1–1 |
+| `gamma` | `number` | `1` | Gamma correction; clamped to 0.2–4 |
 | `color` | `boolean` | `false` | Draw glyphs from the source pixels |
 | `foreground` | `string` | `"#ece8df"` | Monochrome ink |
-| `background` | `string` | `"#070809"` | Canvas background |
+| `background` | `string` | `"#070809"` | Canvas background; `"transparent"` keeps alpha |
 | `fontFamily` | `string` | Geist Mono stack | Font used when drawing |
 
 The named ramps are:
@@ -108,23 +121,46 @@ blocks; // "█▓▒░ "
 dots; // "●◉◎○· "
 ```
 
-Custom ramps are read from dark to light. Set `invert` when your ramp runs the
-other way.
+The first character in a ramp is used for black pixels and the last for white
+pixels. For cream glyphs on a dark canvas, start the ramp with a space, as the
+studio's presets do. Set `invert` when your ramp runs the other way.
+
+## The browser studio
+
+The live page at [`/image/`](/image/) adds controls around the library:
+
+- Drag and drop, file picker, clipboard paste, and a built-in demo
+- Crop and zoom before conversion
+- Columns, ramps, contrast, brightness, gamma, invert, and dither
+- Sobel edge mode, which forces a monochrome contour field
+- Mono or source-coloured glyphs, ink/paper colours, and transparent output
+- TXT, 2× PNG, and vector SVG exports
+- Batch mode with a TXT, PNG, and SVG per image inside a ZIP
+- Keyboard crop nudging, reduced-motion support, and light/dark UI
+
+Uploaded files are read locally. They are never uploaded to the site or to the
+image proxy.
 
 ## Loading images
 
 Remote URLs are subject to CORS. If the server does not send an
-`Access-Control-Allow-Origin` header, the browser cannot read the pixels.
-Local files selected by the user avoid the restriction.
+`Access-Control-Allow-Origin` header, the browser cannot read the pixels. The
+studio routes remote URLs through `/api/image-proxy`, a Cloudflare Pages
+Function that fetches only raster images from public hosts. The proxy:
 
-The custom element and React wrapper do not fetch anything until they are
-mounted in the browser. For server-rendered pages, render the canvas on the
-client.
+- accepts PNG, JPEG, WebP, GIF, and AVIF
+- caps responses at 10 MB and uses a short timeout
+- rejects localhost, private networks, credentials, non-standard ports, and
+  redirects into private networks
+- does not log image URLs at the application level
+
+Remote SVG is intentionally rejected by the proxy. Local SVG files still work
+because they never leave the browser.
 
 ## Demo
 
-The repository includes a full drag-and-drop demo with URL loading, live
-columns, contrast, charset, dither, invert, colour, copy, and download controls:
+The studio is at [`/image/`](/image/) and is the best place to try every option.
+The original Vite-only example remains in the repository:
 
 ```sh
 npm run dev

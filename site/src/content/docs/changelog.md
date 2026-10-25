@@ -8,7 +8,12 @@ description: Release notes for ascii-things.
 Everything below ships with 1.0.
 
 - `ascii-things/image` converts a local image to ASCII text or a canvas, with the
-  `AsciiImage` React wrapper and an `<ascii-image>` custom element.
+  `AsciiImage` React wrapper and an `<ascii-image>` custom element. It now
+  accepts `HTMLCanvasElement` sources and adds `brightness` and `gamma` tone
+  controls.
+- The docs site adds a full [image studio](/image/) with crop, edge detection,
+  batch conversion, and TXT, PNG, SVG, and ZIP export. Remote URL loading uses a
+  guarded Cloudflare Pages image proxy; local uploads stay in the browser.
 - Six ambient scenes — starlings, fireflies, ants, koi, city, and servers — join the
   original four with the shared scene API.
 - `ascii-things/dither` renders ordered-dither fields with `DitherField`, `AsciiDither`,

@@ -168,7 +168,8 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "changeset publish",
-    "prepublishOnly": "npm run check:all"
+    "prepublishOnly": "npm run check:all",
+    "test:docs": "playwright test -c playwright.docs.config.ts"
   },
   "peerDependencies": {
     "react": ">=18",

@@ -1,0 +1,12 @@
+# Cloudflare Pages configuration for the docs site and its single image proxy.
+#
+# Pages project root: repository root
+# Build command: npm ci && npm --prefix site ci && npm --prefix site run build
+# Build output: site/dist
+# Node version: 22
+#
+# The Pages Function is discovered from ./functions. It is only used for remote
+# image URLs in the /image/ studio; local uploads never leave the browser.
+name = "ascii-things-docs"
+pages_build_output_dir = "./site/dist"
+compatibility_date = "2026-10-20"

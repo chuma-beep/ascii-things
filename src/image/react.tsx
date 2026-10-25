@@ -31,6 +31,8 @@ export function AsciiImage({
   invert,
   dither,
   contrast,
+  brightness,
+  gamma,
   color,
   foreground,
   background,
@@ -54,6 +56,8 @@ export function AsciiImage({
       invert,
       dither,
       contrast,
+      brightness,
+      gamma,
       color,
       foreground,
       background,
@@ -68,7 +72,20 @@ export function AsciiImage({
     return () => {
       cancelled = true;
     };
-  }, [src, columns, charset, invert, dither, contrast, color, foreground, background, fontFamily]);
+  }, [
+    src,
+    columns,
+    charset,
+    invert,
+    dither,
+    contrast,
+    brightness,
+    gamma,
+    color,
+    foreground,
+    background,
+    fontFamily,
+  ]);
 
   return (
     <canvas

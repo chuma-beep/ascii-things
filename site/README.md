@@ -1,7 +1,8 @@
 # ascii-things docs site
 
 The landing page and documentation for [`ascii-things`](../README.md), built with
-**Astro + Starlight + React islands**. Static output, no server runtime.
+**Astro + Starlight + React islands**. Static output plus one Cloudflare Pages
+Function for the image studio's remote URL proxy.
 
 ## Requirements
 
@@ -48,7 +49,8 @@ npm run preview
 | `/guide/accessibility/` | Decorative default, labels, reduced motion |
 | `/guide/ssr/` | Next.js, Astro, hydration |
 | `/guide/troubleshooting/` | Blank canvas and other common problems |
-| `/guide/deployment/` | Cloudflare Pages, Vercel alternative |
+| `/guide/deployment/` | Cloudflare Pages, Vercel alternative, image proxy |
+| `/image/` | Image-to-ASCII studio: crop, tone, edge, batch, TXT/PNG/SVG/ZIP |
 | `/scenes/` | Four-scene overview |
 | `/scenes/sharks/` | Shark tank |
 | `/scenes/robots/` | Robot floor |
@@ -77,17 +79,16 @@ Use the repository root as the project root so both packages install.
 | Node version | `22` (`NODE_VERSION=22`) |
 | Environment variables | `NPM_CONFIG_PRODUCTION=false` |
 
-No Functions or bindings are required. The site is fully static.
-
-`public/_headers` adds security headers and immutable caching for `/_astro/*`.
-`wrangler.toml` is provided for CLI deploys:
+The site has one Pages Function at `functions/api/image-proxy.ts` for remote
+image URLs in `/image/`. Local uploads never reach it. Build from the repository
+root so the function is included, then deploy with the root `wrangler.toml`:
 
 ```sh
-cd site
-npm run build
-npx wrangler pages deploy dist --project-name ascii-things-docs
+npm --prefix site run build
+npx wrangler pages deploy site/dist --project-name ascii-things-docs --branch main
 ```
 
+`public/_headers` adds security headers and immutable caching for `/_astro/*`.
 If you attach a custom domain, update `site` in `astro.config.mjs`.
 
 ### Vercel
@@ -104,11 +105,14 @@ site/
     content.config.ts     Starlight docs collection
     content/docs/         Markdown and MDX pages
     pages/index.astro     Landing page
+    pages/image/          Image-to-ASCII studio
     components/           React islands + Astro demos
+    lib/image/            Crop, edge, SVG, ZIP, and studio helpers
     scripts/landing.ts    Landing page engine wiring
-    styles/               landing.css and docs.css
+    styles/               landing.css, docs.css, and image.css
   public/                 favicon, favicon motion script, _headers
-  wrangler.toml           CLI deploy config
+functions/api/            Image proxy Pages Function
+wrangler.toml             Root Pages config (site/dist + functions)
 ```
 
 ## Notes
@@ -118,7 +122,8 @@ site/
   self-contained.
 - Scene demos use fixed seeds (`7`, `11`, `12`, `3`) so docs stay reproducible.
 - Interactivity is provided by `@astrojs/react` islands. The custom-element demo uses no React.
-- The library package is untouched except for the README link to this site.
+- `/image/` reads uploaded files locally. Only remote URLs use `/api/image-proxy`.
+- The image studio imports the library through `ascii-things/image`; `prebuild` keeps that local build current.
 
 ## Verification
 
