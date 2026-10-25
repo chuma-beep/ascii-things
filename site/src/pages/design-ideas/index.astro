@@ -1,0 +1,255 @@
+---
+import DesignIdeaPreview from "../../components/DesignIdeaPreview.astro";
+import { DESIGN_IDEAS, UNIVERSAL_PROMPT } from "../../data/design-ideas";
+import "../../styles/design-ideas.css";
+
+const [featured, ...rest] = DESIGN_IDEAS;
+const title = "Design ideas — ascii-things";
+const description =
+  "Six living-ASCII layouts to steal, remix, and hand to your agent. Copy the starter code or the prompt.";
+const sceneCount = new Set(
+  DESIGN_IDEAS.flatMap((idea) =>
+    idea.ingredients
+      .filter((item) => item.href.startsWith("/scenes/"))
+      .map((item) => item.name),
+  ),
+).size;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f3eee4" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content="https://ascii-things-docs.pages.dev/design-ideas/" />
+    <meta property="og:site_name" content="ascii-things" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="canonical" href="https://ascii-things-docs.pages.dev/design-ideas/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="di-header">
+      <a class="di-brand" href="/">
+        ascii-things <span>/ design ideas</span>
+      </a>
+      <nav class="di-nav" aria-label="Design ideas">
+        <a href="/library/">Library</a>
+        <a href="/showcase/">Showcase</a>
+        <a href="/image/">Image studio</a>
+        <a href="/guide/">Docs</a>
+      </nav>
+      <span class="di-header__meta">06 recipes / {sceneCount} scenes</span>
+    </header>
+
+    <main>
+      <section class="di-hero" aria-labelledby="design-ideas-title">
+        <div class="di-hero__meta">
+          <span>ASCII-THINGS / FIELD NOTES</span>
+          <span>VOL. 01 / OCT 2026</span>
+          <span>OPEN TO REMIX</span>
+        </div>
+        <div class="di-hero__grid">
+          <div>
+            <p class="di-eyebrow">A FIELD GUIDE TO LIVING UI</p>
+            <h1 id="design-ideas-title">Steal the <em>idea.</em></h1>
+          </div>
+          <div class="di-hero__copy">
+            <p>
+              Six layouts built from the same ASCII parts. Take a composition, copy the
+              starter code, or hand the prompt to your agent and make it yours.
+            </p>
+            <p class="di-hero__note">
+              <span>BUILT FOR</span>
+              Claude Code · Cursor · Codex · a patient human
+            </p>
+          </div>
+        </div>
+        <div class="di-ticker" aria-label="Available ingredients">
+          <span>Robot dog</span>
+          <span>Koi</span>
+          <span>Servers</span>
+          <span>City</span>
+          <span>Starlings</span>
+          <span>Jellyfish</span>
+          <span>Ants</span>
+          <span>Fireflies</span>
+          <span>+ your own bad idea</span>
+        </div>
+      </section>
+
+      <section class="di-featured" id={featured.id} aria-labelledby={`${featured.id}-title`}>
+        <div class="di-featured__preview">
+          <DesignIdeaPreview id={featured.id} featured />
+          <span class="di-featured__stamp">01 / FEATURED</span>
+        </div>
+        <div class="di-featured__body">
+          <div class="di-meta">
+            <span>{featured.number} / {featured.category}</span>
+            <span class="di-live">● LIVE PREVIEW</span>
+          </div>
+          <h2 id={`${featured.id}-title`}>{featured.title}</h2>
+          <p class="di-lede">{featured.description}</p>
+          <ul class="di-ingredients" aria-label="Ingredients">
+            {featured.ingredients.map((ingredient) => (
+              <li>
+                <a href={ingredient.href}>{ingredient.name}</a>
+              </li>
+            ))}
+          </ul>
+          <p class="di-note">{featured.note}</p>
+          <div class="di-actions">
+            <button
+              class="di-copy di-copy--primary"
+              type="button"
+              data-copy={featured.code}
+              data-copy-label={`${featured.title} starter code`}
+            >
+              Copy starter code
+            </button>
+            <button
+              class="di-copy"
+              type="button"
+              data-copy={featured.prompt}
+              data-copy-label={`${featured.title} prompt`}
+            >
+              Copy prompt
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="di-grid" aria-label="More design ideas">
+        {
+          rest.map((idea) => (
+            <article class="di-card" id={idea.id}>
+              <div class="di-card__preview">
+                <DesignIdeaPreview id={idea.id} />
+              </div>
+              <div class="di-card__body">
+                <div class="di-meta">
+                  <span>{idea.number} / {idea.category}</span>
+                  <span class="di-live">● LIVE</span>
+                </div>
+                <h2>{idea.title}</h2>
+                <p>{idea.description}</p>
+                <ul class="di-ingredients" aria-label="Ingredients">
+                  {idea.ingredients.map((ingredient) => (
+                    <li>
+                      <a href={ingredient.href}>{ingredient.name}</a>
+                    </li>
+                  ))}
+                </ul>
+                <p class="di-note">{idea.note}</p>
+                <div class="di-actions">
+                  <button
+                    class="di-copy di-copy--primary"
+                    type="button"
+                    data-copy={idea.code}
+                    data-copy-label={`${idea.title} starter code`}
+                  >
+                    Copy code
+                  </button>
+                  <button
+                    class="di-copy"
+                    type="button"
+                    data-copy={idea.prompt}
+                    data-copy-label={`${idea.title} prompt`}
+                  >
+                    Copy prompt
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))
+        }
+
+        <article class="di-cta">
+          <p class="di-eyebrow">UNIVERSAL BRIEF / 07</p>
+          <h2>Now make<br /><em>the seventh.</em></h2>
+          <p>
+            Start with one scene, one overlay, and one point of view. The brief carries the
+            layout rules so your agent can carry the taste.
+          </p>
+          <button
+            class="di-copy di-copy--light"
+            type="button"
+            data-copy={UNIVERSAL_PROMPT}
+            data-copy-label="Universal design prompt"
+          >
+            Copy the universal prompt
+          </button>
+          <div class="di-cta__links">
+            <a href="/library/">Browse the parts ↗</a>
+            <a href="/playground/">Open playground ↗</a>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="di-footer">
+      <span>ascii-things / design ideas</span>
+      <span>
+        <a href="/library/">All parts ↗</a>
+        <a href="/showcase/">Visual archive ↗</a>
+      </span>
+    </footer>
+
+    <p class="di-toast" data-copy-status role="status" aria-live="polite"></p>
+
+    <script>
+      const toast = document.querySelector<HTMLElement>("[data-copy-status]");
+
+      const fallbackCopy = (text: string) => {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.append(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+      };
+
+      document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const text = button.dataset.copy;
+          if (!text) return;
+
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            fallbackCopy(text);
+          }
+
+          const original = button.textContent ?? "Copy";
+          button.textContent = "Copied";
+          button.dataset.copied = "true";
+          if (toast) {
+            toast.textContent = `${button.dataset.copyLabel ?? "Text"} copied.`;
+            toast.dataset.visible = "true";
+          }
+
+          window.setTimeout(() => {
+            button.textContent = original;
+            delete button.dataset.copied;
+            if (toast) toast.dataset.visible = "false";
+          }, 1900);
+        });
+      });
+    </script>
+  </body>
+</html>

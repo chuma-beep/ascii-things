@@ -1,0 +1,33 @@
+---
+interface Props {
+  name: string;
+  width?: number;
+  height?: number;
+  loading?: "eager" | "lazy";
+  class?: string;
+}
+
+const {
+  name,
+  width = 480,
+  height = 270,
+  loading = "lazy",
+  class: className = "",
+} = Astro.props;
+---
+
+<picture class:list={["design-idea-image", className]}>
+  <source
+    srcset={`/showcase/${name}.webp`}
+    type="image/webp"
+    media="(prefers-reduced-motion: no-preference)"
+  />
+  <img
+    src={`/showcase/${name}.jpg`}
+    width={width}
+    height={height}
+    alt=""
+    loading={loading}
+    decoding="async"
+  />
+</picture>

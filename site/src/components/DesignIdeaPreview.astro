@@ -1,0 +1,190 @@
+---
+import DesignIdeaImage from "./DesignIdeaImage.astro";
+
+interface Props {
+  id: string;
+  featured?: boolean;
+}
+
+const { id, featured = false } = Astro.props;
+const loading = featured ? "eager" : "lazy";
+---
+
+{
+  id === "command-deck" && (
+    <div class="di-preview di-preview--command" aria-hidden="true">
+      <DesignIdeaImage name="dog" loading={loading} class="di-preview__bg" />
+      <div class="di-meta di-command__top">
+        <span>YARD 04 / UNIT 01</span>
+        <span>LIVE CANVAS</span>
+      </div>
+      <div class="di-command__inset di-inset">
+        <DesignIdeaImage name="city" class="di-inset__media" />
+        <span>CITY / NIGHT FEED</span>
+      </div>
+      <div class="di-command__copy">
+        <p class="di-kicker">PRODUCT / HERO</p>
+        <h3>
+          Good boy.<br />
+          <em>Good interface.</em>
+        </h3>
+        <div class="di-command__prompt">
+          <span>›</span>
+          <span class="di-command__placeholder">Tell the dog what to fetch</span>
+          <kbd>THROW ↵</kbd>
+        </div>
+      </div>
+      <div class="di-command__telemetry">
+        <span>CELLS 12,480</span>
+        <span>STATE FETCH</span>
+        <span>60 FPS</span>
+      </div>
+    </div>
+  )
+}
+
+{
+  id === "signal-room" && (
+    <div class="di-preview di-preview--signal" aria-hidden="true">
+      <DesignIdeaImage name="servers" loading={loading} class="di-preview__bg" />
+      <div class="di-meta di-signal__top">
+        <span>OPS / SECTOR 04</span>
+        <span class="di-live">● LIVE</span>
+      </div>
+      <div class="di-signal__copy">
+        <p class="di-kicker">DASHBOARD / OPS</p>
+        <h3>
+          All systems.<br />
+          <em>All quiet.</em>
+        </h3>
+      </div>
+      <aside class="di-signal__rail">
+        <div>
+          <span>PACKETS</span>
+          <strong>18.4k</strong>
+          <i style="width:72%" />
+        </div>
+        <div>
+          <span>LATENCY</span>
+          <strong>12ms</strong>
+          <i style="width:18%" />
+        </div>
+        <div>
+          <span>QUEUE</span>
+          <strong>004</strong>
+          <i style="width:38%" />
+        </div>
+      </aside>
+      <div class="di-signal__inset di-inset">
+        <DesignIdeaImage name="ants" class="di-inset__media" />
+        <span>ANTS / TRAFFIC</span>
+      </div>
+    </div>
+  )
+}
+
+{
+  id === "quiet-pond" && (
+    <div class="di-preview di-preview--quiet" aria-hidden="true">
+      <DesignIdeaImage name="koi" loading={loading} class="di-preview__bg" />
+      <article class="di-quiet__card">
+        <p class="di-kicker">ISSUE 03 / WATER</p>
+        <h3>
+          A slower<br />
+          <em>interface.</em>
+        </h3>
+        <p class="di-quiet__line">
+          Let the pond do the moving. The page only needs one idea.
+        </p>
+        <span class="di-quiet__link">Read the field notes ↗</span>
+      </article>
+      <div class="di-quiet__inset di-inset">
+        <DesignIdeaImage name="jellyfish" class="di-inset__media" />
+        <span>BLOOM / AMBIENT</span>
+      </div>
+    </div>
+  )
+}
+
+{
+  id === "night-commute" && (
+    <div class="di-preview di-preview--night" aria-hidden="true">
+      <DesignIdeaImage name="city" loading={loading} class="di-preview__bg" />
+      <div class="di-night__copy">
+        <p class="di-kicker">ROUTE 04 / AFTER HOURS</p>
+        <h3>
+          The city<br />
+          <em>keeps moving.</em>
+        </h3>
+        <div class="di-night__route">
+          <span />
+          <span />
+          <span />
+          <span />
+          <b>18:42</b>
+        </div>
+      </div>
+      <div class="di-night__inset di-inset">
+        <DesignIdeaImage name="starlings" class="di-inset__media" />
+        <span>MURMURATION / WEATHER</span>
+      </div>
+    </div>
+  )
+}
+
+{
+  id === "specimen-sheet" && (
+    <div class="di-preview di-preview--specimen" aria-hidden="true">
+      <div class="di-specimen__sheet">
+        <div class="di-specimen__art">
+          <DesignIdeaImage name="dog" loading={loading} class="di-inset__media" />
+        </div>
+        <div class="di-specimen__notes">
+          <p>FIELD NOTE / 05</p>
+          <h3>
+            Canis<br />
+            <em>roboticus.</em>
+          </h3>
+          <dl>
+            <div>
+              <dt>HABITAT</dt>
+              <dd>Test yard</dd>
+            </div>
+            <div>
+              <dt>BEHAVIOR</dt>
+              <dd>Trot, sniff, fetch</dd>
+            </div>
+            <div>
+              <dt>STATUS</dt>
+              <dd>Good boy</dd>
+            </div>
+          </dl>
+          <span class="di-specimen__stamp">漢</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+{
+  id === "launch-sequence" && (
+    <div class="di-preview di-preview--launch" aria-hidden="true">
+      <DesignIdeaImage name="starlings" loading={loading} class="di-preview__bg" />
+      <div class="di-launch__center">
+        <p class="di-kicker">MURMURATION / LOADING</p>
+        <h3>
+          Ready<br />
+          <em>when you are.</em>
+        </h3>
+        <div class="di-launch__loader">
+          <i />
+        </div>
+        <span>LAUNCHING IN 03</span>
+      </div>
+      <div class="di-launch__inset di-inset">
+        <DesignIdeaImage name="fireflies" class="di-inset__media" />
+        <span>MEADOW / SIGNAL</span>
+      </div>
+    </div>
+  )
+}

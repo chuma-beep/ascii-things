@@ -69,6 +69,7 @@ export default defineConfig({
           items: [
             { label: "All items", link: "library/" },
             { label: "Showcase", link: "showcase/" },
+            { label: "Design ideas", link: "design-ideas/" },
             { label: "Scenes", link: "library/?type=scene" },
             { label: "WebGL", link: "library/?type=webgl" },
             { label: "Kanji", link: "library/?type=kanji" },

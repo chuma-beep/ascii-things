@@ -276,6 +276,14 @@ export const LIBRARY: LibraryItem[] = [
     tags: ["tools", "interactive"],
   },
   {
+    id: "design-ideas",
+    title: "Design ideas",
+    description: "Six living-ASCII layouts to remix, with copyable code and agent prompts.",
+    kind: "tool",
+    href: "/design-ideas/",
+    tags: ["tools", "design", "recipes", "prompts", "reference"],
+  },
+  {
     id: "image-to-ascii",
     title: "Image to ASCII",
     description: "Crop, tone, dither, and export images as ASCII text, PNG, SVG, or batch ZIP.",
