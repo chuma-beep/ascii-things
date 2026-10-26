@@ -6,6 +6,7 @@ import {
   type ChangeEvent,
   type DragEvent,
   type FormEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { renderAsciiImage, type AsciiImageResult } from "ascii-things/image";
 import ImageCrop from "./ImageCrop";
@@ -233,6 +234,10 @@ export default function ImageStudio() {
   const sourcesRef = useRef<StudioSource[]>([]);
   const activeIdRef = useRef<string | null>(null);
   const modeRef = useRef<Mode>("single");
+  const tabRefs = useRef<Record<View, HTMLButtonElement | null>>({
+    render: null,
+    text: null,
+  });
 
   sourcesRef.current = sources;
   activeIdRef.current = activeId;
@@ -454,6 +459,30 @@ export default function ImageStudio() {
       for (const source of sourcesRef.current) disposeSource(source);
     };
   }, [disposeSource]);
+
+  const focusView = useCallback((next: View) => {
+    setView(next);
+    window.requestAnimationFrame(() => tabRefs.current[next]?.focus());
+  }, []);
+
+  const onTabKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      event.preventDefault();
+      focusView(view === "render" ? "text" : "render");
+      return;
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      focusView("render");
+      return;
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+      focusView("text");
+    }
+  };
 
   const updateOption = useCallback((patch: Partial<StudioOptions>) => {
     setOptions((current) => ({ ...current, ...patch }));
@@ -1110,24 +1139,43 @@ export default function ImageStudio() {
                 ASCII field
               </h2>
             </div>
-            <div className="studio-tabs" role="tablist" aria-label="Output view">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={view === "render"}
-                onClick={() => setView("render")}
+            {activeSource ? (
+              <div
+                className="studio-tabs"
+                role="tablist"
+                aria-label="Output view"
+                onKeyDown={onTabKeyDown}
               >
-                Render
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={view === "text"}
-                onClick={() => setView("text")}
-              >
-                Text
-              </button>
-            </div>
+                <button
+                  ref={(node) => {
+                    tabRefs.current.render = node;
+                  }}
+                  type="button"
+                  id="studio-tab-render"
+                  role="tab"
+                  aria-selected={view === "render"}
+                  aria-controls="studio-panel-render"
+                  tabIndex={view === "render" ? 0 : -1}
+                  onClick={() => setView("render")}
+                >
+                  Render
+                </button>
+                <button
+                  ref={(node) => {
+                    tabRefs.current.text = node;
+                  }}
+                  type="button"
+                  id="studio-tab-text"
+                  role="tab"
+                  aria-selected={view === "text"}
+                  aria-controls="studio-panel-text"
+                  tabIndex={view === "text" ? 0 : -1}
+                  onClick={() => setView("text")}
+                >
+                  Text
+                </button>
+              </div>
+            ) : null}
           </div>
 
           {activeSource ? (
@@ -1136,17 +1184,29 @@ export default function ImageStudio() {
                 className={`studio-preview${options.transparent ? " is-transparent" : ""}`}
                 ref={previewWrapRef}
               >
-                <canvas
-                  ref={previewCanvasRef}
-                  className="studio-canvas"
-                  role="img"
-                  aria-label={`ASCII conversion of ${activeSource.name}`}
-                  aria-hidden={view !== "render"}
-                  style={{ display: view === "render" ? "block" : "none" }}
-                />
-                {view === "text" ? (
+                <div
+                  id="studio-panel-render"
+                  className="studio-tabpanel"
+                  role="tabpanel"
+                  aria-labelledby="studio-tab-render"
+                  hidden={view !== "render"}
+                >
+                  <canvas
+                    ref={previewCanvasRef}
+                    className="studio-canvas"
+                    role="img"
+                    aria-label={`ASCII conversion of ${activeSource.name}`}
+                  />
+                </div>
+                <div
+                  id="studio-panel-text"
+                  className="studio-tabpanel"
+                  role="tabpanel"
+                  aria-labelledby="studio-tab-text"
+                  hidden={view !== "text"}
+                >
                   <pre className="studio-text-output">{activeResult?.text ?? "Rendering…"}</pre>
-                ) : null}
+                </div>
                 {rendering ? <span className="studio-rendering">rendering…</span> : null}
                 {renderError ? (
                   <div className="studio-render-error" role="alert">

@@ -63,8 +63,12 @@ the element or its parent a height. The default is `320px`.
 
 ## Custom element
 
+After `npm install ascii-things`, import the element entry in your bundler:
+
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/webgl-element.js"></script>
+<script type="module">
+  import "ascii-things/webgl/element";
+</script>
 
 <ascii-surface
   text="ASCII-THINGS"

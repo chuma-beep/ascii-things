@@ -18,7 +18,7 @@ const paper = idea.id === "specimen-sheet";
 const title = `${idea.title} — design ideas — ascii-things`;
 const description = `${idea.description} A full-page ascii-things design idea with copyable starter code.`;
 const demoCode = idea.code.replace(
-  /<script type="module" src="https:\/\/cdn\.jsdelivr\.net\/npm\/ascii-things\/dist\/[^"]+"><\/script>\s*/g,
+  /<script type="module">\s*import "ascii-things\/(?:webgl\/)?element";\s*<\/script>\s*/g,
   "",
 );
 ---
@@ -159,6 +159,10 @@ const demoCode = idea.code.replace(
         min-height: calc(100svh - var(--demo-bar-h)) !important;
       }
 
+      .demo-main .command-deck__copy {
+        min-height: calc(100svh - var(--demo-bar-h));
+      }
+
       .demo-status {
         position: fixed;
         right: 14px;
@@ -240,8 +244,9 @@ const demoCode = idea.code.replace(
         area.style.opacity = "0";
         document.body.append(area);
         area.select();
-        document.execCommand("copy");
+        const copied = document.execCommand("copy");
         area.remove();
+        return copied;
       };
 
       document.querySelectorAll<HTMLButtonElement>("[data-demo-copy]").forEach((button) => {
@@ -249,17 +254,21 @@ const demoCode = idea.code.replace(
           const text = button.dataset.demoCopy;
           if (!text) return;
 
+          let copied = false;
           try {
             await navigator.clipboard.writeText(text);
+            copied = true;
           } catch {
-            fallbackCopy(text);
+            copied = fallbackCopy(text);
           }
 
           const original = button.textContent ?? "Copy code";
-          button.textContent = "Copied";
-          button.dataset.copied = "true";
+          button.textContent = copied ? "Copied" : "Failed";
+          button.dataset.copied = copied ? "true" : "false";
           if (status) {
-            status.textContent = `${button.dataset.demoLabel ?? "Code"} copied.`;
+            status.textContent = copied
+              ? `${button.dataset.demoLabel ?? "Code"} copied.`
+              : `Could not copy ${button.dataset.demoLabel ?? "code"}.`;
             status.dataset.visible = "true";
           }
 

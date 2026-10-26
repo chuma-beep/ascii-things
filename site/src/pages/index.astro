@@ -16,8 +16,9 @@ const reactSnippet = `<span class="tok-key">import</span> { AsciiDog } <span cla
   );
 }`;
 
-const htmlSnippet = `<span class="tok-tag">&lt;script</span> <span class="tok-attr">type</span>=<span class="tok-str">"module"</span>
-  <span class="tok-attr">src</span>=<span class="tok-str">"https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"</span><span class="tok-tag">&gt;&lt;/script&gt;</span>
+const htmlSnippet = `<span class="tok-tag">&lt;script</span> <span class="tok-attr">type</span>=<span class="tok-str">"module"</span><span class="tok-tag">&gt;</span>
+  <span class="tok-key">import</span> <span class="tok-str">"ascii-things/element"</span>;
+<span class="tok-tag">&lt;/script&gt;</span>
 
 <span class="tok-tag">&lt;ascii-dog</span>
   <span class="tok-attr">palette</span>=<span class="tok-str">"abyss"</span>
@@ -412,7 +413,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
                   id="tab-html"
                   aria-controls="panel-html"
                   data-tab="html"
-                  aria-selected="false">HTML</button
+                  aria-selected="false">Element</button
                 >
                 <button
                   type="button"

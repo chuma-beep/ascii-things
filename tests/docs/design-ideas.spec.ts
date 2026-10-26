@@ -27,7 +27,7 @@ test("loads six recipes, copy actions, and has no critical axe violations", asyn
   await expect(page.locator(".di-card")).toHaveCount(5);
   await expect(page.locator(".di-cta")).toHaveCount(1);
   await expect(page.locator("[data-copy]")).toHaveCount(13);
-  await expect(page.locator(".di-header__meta")).toContainText("06 recipes / 8 scenes");
+  await expect(page.locator(".di-header__meta")).toContainText("06 recipes / 9 scenes");
   await expectNoHorizontalOverflow(page);
 
   const results = await new AxeBuilder({ page }).analyze();
@@ -52,7 +52,7 @@ test("copies the featured starter code and agent prompt", async ({ page, context
     "Command deck starter code copied.",
   );
   const code = await page.evaluate(() => navigator.clipboard.readText());
-  expect(code).toContain("ascii-things/dist/element.js");
+  expect(code).toContain('import "ascii-things/element"');
   expect(code).toContain("command-deck");
   expect(code.length).toBeGreaterThan(1_000);
 
@@ -107,7 +107,7 @@ test("glyph specimen uses the live kanji field", async ({ page, context }) => {
     "Glyph specimen starter code copied.",
   );
   const code = await page.evaluate(() => navigator.clipboard.readText());
-  expect(code).toContain("ascii-things/dist/webgl-element.js");
+  expect(code).toContain('import "ascii-things/webgl/element"');
   expect(code).toContain('variant="field"');
   expect(code).toContain("漢字");
 });
@@ -136,6 +136,20 @@ test("recipe previews open their full-page demos", async ({ page }) => {
   await expect(page.locator("ascii-surface")).toBeVisible();
   await expectNoHorizontalOverflow(page);
   expect(errors).toEqual([]);
+});
+
+test("command deck demo fits the viewport", async ({ page }) => {
+  await page.goto("/design-ideas/command-deck/");
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator(".command-deck")).toBeVisible();
+  await waitForFonts(page);
+
+  const metrics = await page.evaluate(() => ({
+    scrollHeight: document.documentElement.scrollHeight,
+    innerHeight: window.innerHeight,
+  }));
+
+  expect(metrics.scrollHeight).toBeLessThanOrEqual(metrics.innerHeight + 1);
 });
 
 test("mobile keeps every recipe readable without horizontal overflow", async ({

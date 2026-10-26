@@ -1,16 +1,174 @@
 ---
-import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import "../styles/404.css";
+
+const title = "404 — Nothing at this address";
+const description = "That path is not part of ascii-things. Try the library, the docs, or the scene overview.";
 ---
 
-<StarlightPage
-  frontmatter={{
-    title: "Page not found",
-    description: "That page does not exist.",
-    template: "splash",
-  }}
->
-  <p>
-    That page does not exist. Try the <a href="/guide/">docs home</a> or the
-    <a href="/scenes/">scene overview</a>.
-  </p>
-</StarlightPage>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#e5dccd" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">ascii-things<sup>®</sup></a>
+      <nav class="nav" aria-label="Utility">
+        <span class="nav-status">Error index / 404</span>
+        <a href="/library/">Library ↗</a>
+        <a href="/guide/">Docs ↗</a>
+        <a href="/">Home ↗</a>
+      </nav>
+    </header>
+
+    <main class="page">
+      <div class="sheet">
+        <aside class="rail" aria-hidden="true">
+          <span class="rail-number">04 / 04</span>
+          <span class="rail-mark"></span>
+          <span class="rail-label">Not found · not filed · not here</span>
+          <span class="rail-mark"></span>
+          <span class="rail-number">File 404</span>
+        </aside>
+
+        <div class="sheet-main">
+          <div class="meta-row">
+            <span>Ascii-things / field note</span>
+            <span>Status: open</span>
+            <span>Error route / 404</span>
+          </div>
+
+          <div class="hero">
+            <div class="digits" aria-hidden="true">4<span class="zero">0</span>4</div>
+
+            <section class="copy" aria-labelledby="title">
+              <p class="eyebrow"><i class="live-dot"></i> Report / missing destination</p>
+              <h1 id="title">Nothing at <br />this <em>address.</em></h1>
+              <p class="lede">
+                The link is intact. The destination is not. We checked the index, the
+                shelf, and under the rug. This path returns only clean, quiet nothing.
+              </p>
+
+              <div class="request">
+                <span class="method">GET</span>
+                <code data-requested-path>/404</code>
+                <button type="button" data-copy-path>Copy</button>
+                <span class="status">404</span>
+                <span class="visually-hidden" data-copy-status role="status" aria-live="polite"></span>
+              </div>
+            </section>
+          </div>
+
+          <div class="lower">
+            <nav class="index" aria-label="Recovery index">
+              <div class="index-head">
+                <span>Recovery index</span>
+                <span>05 entries</span>
+              </div>
+              <a href="/"><span class="num">01</span><span class="name">Home</span><span class="path">/</span><span class="arrow">↗</span></a>
+              <a href="/guide/"><span class="num">02</span><span class="name">Documentation</span><span class="path">/guide</span><span class="arrow">↗</span></a>
+              <a href="/library/"><span class="num">03</span><span class="name">Library</span><span class="path">/library</span><span class="arrow">↗</span></a>
+              <a href="/image/"><span class="num">04</span><span class="name">Image studio</span><span class="path">/image</span><span class="arrow">↗</span></a>
+              <a href="/scenes/"><span class="num">05</span><span class="name">Scene overview</span><span class="path">/scenes</span><span class="arrow">↗</span></a>
+            </nav>
+
+            <aside class="search-unit" aria-label="Live search unit 01">
+              <div class="search-head">
+                <span><i class="live-dot"></i> Margin note / live</span>
+                <span>01 / 01</span>
+              </div>
+              <div class="search-scene">
+                <ascii-dog
+                  palette="paper"
+                  seed="7"
+                  count="1"
+                  dogs="1.5"
+                  scale="0.8"
+                  spread="0.6,0.6"
+                  columns="60"
+                  max-cells="4500"
+                  calm
+                  label="A robot dog searching the margin for the missing page"
+                ></ascii-dog>
+              </div>
+              <div class="search-foot">
+                <p class="search-line">
+                  <strong>Search unit 01</strong>
+                  Still looking. No fetch target.
+                </p>
+                <div class="search-status" aria-hidden="true">
+                  <span class="search-code">404</span>
+                  <span class="search-label">No signal<br />in this sector</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <div class="footnote">
+            <span class="stamp">Browse the parts, not the void</span>
+            <span>Still lost? <a href="https://github.com/chuma-beep/ascii-things/issues">Report this link ↗</a></span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      import "ascii-things/element";
+
+      const requestedPath = `${window.location.pathname}${window.location.search}`;
+      const pathElement = document.querySelector<HTMLElement>("[data-requested-path]");
+      const copyButton = document.querySelector<HTMLButtonElement>("[data-copy-path]");
+      const copyStatus = document.querySelector<HTMLElement>("[data-copy-status]");
+
+      if (pathElement) pathElement.textContent = requestedPath;
+
+      const fallbackCopy = (text: string) => {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.append(area);
+        area.select();
+        const copied = document.execCommand("copy");
+        area.remove();
+        return copied;
+      };
+
+      copyButton?.addEventListener("click", async () => {
+        let copied = false;
+        try {
+          await navigator.clipboard.writeText(requestedPath);
+          copied = true;
+        } catch {
+          copied = fallbackCopy(requestedPath);
+        }
+
+        const original = copyButton.textContent ?? "Copy";
+        copyButton.textContent = copied ? "Copied" : "Failed";
+        if (copyStatus) copyStatus.textContent = copied ? "Path copied." : "Could not copy the path.";
+        window.setTimeout(() => {
+          copyButton.textContent = original;
+          if (copyStatus) copyStatus.textContent = "";
+        }, 1600);
+      });
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.querySelector("ascii-dog")?.setAttribute("paused", "");
+      }
+    </script>
+  </body>
+</html>

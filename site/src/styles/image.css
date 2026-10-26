@@ -797,6 +797,18 @@ main:has(.image-studio) > .content-panel:first-of-type {
   background: var(--studio-screen);
 }
 
+.studio-tabpanel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.studio-tabpanel[hidden] {
+  display: none;
+}
+
 .studio-preview.is-transparent {
   background:
     linear-gradient(45deg, rgba(236, 232, 223, 0.045) 25%, transparent 25%),

@@ -41,7 +41,10 @@ export const DESIGN_IDEAS: DesignIdea[] = [
       { name: "City", href: "/scenes/city/" },
     ],
     note: "Best when the product has a personality. Keep the copy short enough to let the dog move.",
-    code: `<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"></script>
+    code: `<!-- Requires: npm install ascii-things + a bundler -->
+<script type="module">
+  import "ascii-things/element";
+</script>
 <section class="command-deck">
   <ascii-dog palette="abyss" seed="7" spread="0.7,0.7" count="1"></ascii-dog>
   <div class="command-deck__copy">
@@ -90,7 +93,10 @@ Keep the scene interactive and aria-labelled. Add a dark scrim behind the type, 
       { name: "Ants", href: "/scenes/ants/" },
     ],
     note: "Use this when the data is the atmosphere. Keep the numbers fake but believable.",
-    code: `<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"></script>
+    code: `<!-- Requires: npm install ascii-things + a bundler -->
+<script type="module">
+  import "ascii-things/element";
+</script>
 <section class="signal-room">
   <ascii-servers palette="abyss" seed="12" count="8"></ascii-servers>
   <header class="signal-room__top">
@@ -148,7 +154,10 @@ Keep the scene calm and accessible. Add reduced-motion behavior and a 390px layo
       { name: "Jellyfish", href: "/scenes/jellyfish/" },
     ],
     note: "The cream card is the trick: put the reading surface on top of the scene instead of beside it.",
-    code: `<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"></script>
+    code: `<!-- Requires: npm install ascii-things + a bundler -->
+<script type="module">
+  import "ascii-things/element";
+</script>
 <section class="quiet-pond">
   <ascii-koi palette="abyss" seed="4" count="4"></ascii-koi>
   <article class="quiet-pond__card">
@@ -196,7 +205,10 @@ Make the card stack above the scene on mobile, hide the inset at 390px, and resp
       { name: "Fireflies", href: "/scenes/fireflies/" },
     ],
     note: "The route line is a cheap way to make a scene feel like a product without adding a dashboard.",
-    code: `<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"></script>
+    code: `<!-- Requires: npm install ascii-things + a bundler -->
+<script type="module">
+  import "ascii-things/element";
+</script>
 <section class="night-commute">
   <ascii-city palette="abyss" seed="9" count="42"></ascii-city>
   <div class="night-commute__copy">
@@ -249,7 +261,10 @@ Use abyss, cream, and one orange. Add a reduced-motion fallback, hide the inset 
       { name: "ASCII symbols", href: "/symbols/" },
     ],
     note: "This is the most useful pattern for an about page, changelog, or case study: the scene becomes evidence.",
-    code: `<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/webgl-element.js"></script>
+    code: `<!-- Requires: npm install ascii-things + a bundler -->
+<script type="module">
+  import "ascii-things/webgl/element";
+</script>
 <section class="glyph-specimen">
   <div class="glyph-specimen__sheet">
     <div class="glyph-specimen__art">
@@ -318,7 +333,10 @@ Stack the art above the notes at 700px. Keep the surface aria-labelled and respe
       { name: "Jellyfish", href: "/scenes/jellyfish/" },
     ],
     note: "Use this for a launch page, a waitlist, or the pause before a product demo.",
-    code: `<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"></script>
+    code: `<!-- Requires: npm install ascii-things + a bundler -->
+<script type="module">
+  import "ascii-things/element";
+</script>
 <section class="launch-sequence">
   <ascii-starlings palette="abyss" seed="5" count="220"></ascii-starlings>
   <div class="launch-sequence__center">

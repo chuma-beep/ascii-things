@@ -10,7 +10,10 @@ const description =
 const sceneCount = new Set(
   DESIGN_IDEAS.flatMap((idea) =>
     idea.ingredients
-      .filter((item) => item.href.startsWith("/scenes/"))
+      .filter(
+        (item) =>
+          item.href.startsWith("/scenes/") || item.href === "/kanji/field/",
+      )
       .map((item) => item.name),
   ),
 ).size;
@@ -74,6 +77,9 @@ const sceneCount = new Set(
             <p class="di-hero__note">
               <span>BUILT FOR</span>
               Claude Code · Cursor · Codex · a patient human
+            </p>
+            <p class="di-hero__hint">
+              Snippets assume <code>npm install ascii-things</code> and a bundler.
             </p>
           </div>
         </div>
@@ -235,8 +241,9 @@ const sceneCount = new Set(
         area.style.opacity = "0";
         document.body.append(area);
         area.select();
-        document.execCommand("copy");
+        const copied = document.execCommand("copy");
         area.remove();
+        return copied;
       };
 
       document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => {
@@ -244,17 +251,21 @@ const sceneCount = new Set(
           const text = button.dataset.copy;
           if (!text) return;
 
+          let copied = false;
           try {
             await navigator.clipboard.writeText(text);
+            copied = true;
           } catch {
-            fallbackCopy(text);
+            copied = fallbackCopy(text);
           }
 
           const original = button.textContent ?? "Copy";
-          button.textContent = "Copied";
-          button.dataset.copied = "true";
+          button.textContent = copied ? "Copied" : "Failed";
+          button.dataset.copied = copied ? "true" : "false";
           if (toast) {
-            toast.textContent = `${button.dataset.copyLabel ?? "Text"} copied.`;
+            toast.textContent = copied
+              ? `${button.dataset.copyLabel ?? "Text"} copied.`
+              : `Could not copy ${button.dataset.copyLabel ?? "text"}.`;
             toast.dataset.visible = "true";
           }
 

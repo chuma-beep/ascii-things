@@ -39,10 +39,10 @@ npm install ascii-things
 `1.0.0-rc.0` is the release candidate and is not on npm yet. Until the 1.0
 publish, build from this repository or install the tarball from `npm pack`.
 
-Or use the custom elements from a CDN:
+Or, once the package is published, use the custom elements from a CDN:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/element.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@latest/dist/element.js"></script>
 
 <ascii-sharks palette="abyss" seed="42" style="height: 480px"></ascii-sharks>
 <ascii-robots palette="paper" seed="7" style="height: 420px"></ascii-robots>
@@ -434,7 +434,7 @@ text, dimensions, and per-cell colours.
 ### HTML custom element
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/image-element.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@latest/dist/image-element.js"></script>
 
 <ascii-image
   src="/portrait.png"
@@ -511,7 +511,7 @@ export function Card() {
 ### HTML custom element
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/dither-element.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@latest/dist/dither-element.js"></script>
 
 <ascii-dither
   text="ASCII-THINGS"
@@ -578,7 +578,7 @@ export function Hero() {
 ### HTML custom element
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things/dist/webgl-element.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@latest/dist/webgl-element.js"></script>
 
 <ascii-surface text="ASCII-THINGS" glyphs=".:-=+*#%@" density="0.16"></ascii-surface>
 ```

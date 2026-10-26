@@ -57,6 +57,30 @@ test("loads the demo, renders a canvas, and has no critical axe violations", asy
   const errors = collectPageErrors(page);
   await openStudio(page);
 
+  const renderTab = page.getByRole("tab", { name: "Render" });
+  const textTab = page.getByRole("tab", { name: "Text" });
+  await expect(renderTab).toHaveAttribute("aria-selected", "true");
+  await expect(renderTab).toHaveAttribute("aria-controls", "studio-panel-render");
+  await expect(renderTab).toHaveAttribute("tabindex", "0");
+  await expect(textTab).toHaveAttribute("aria-controls", "studio-panel-text");
+  await expect(textTab).toHaveAttribute("tabindex", "-1");
+  await expect(page.locator("#studio-panel-render")).toBeVisible();
+  await expect(page.locator("#studio-panel-text")).toBeHidden();
+
+  await renderTab.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(textTab).toBeFocused();
+  await expect(textTab).toHaveAttribute("aria-selected", "true");
+  await expect(textTab).toHaveAttribute("tabindex", "0");
+  await expect(renderTab).toHaveAttribute("tabindex", "-1");
+  await expect(page.locator("#studio-panel-text")).toBeVisible();
+  await expect(page.locator("#studio-panel-render")).toBeHidden();
+
+  await page.keyboard.press("ArrowLeft");
+  await expect(renderTab).toBeFocused();
+  await expect(renderTab).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#studio-panel-render")).toBeVisible();
+
   const pixels = await page.locator(".studio-preview canvas").evaluate((element) => {
     const canvas = element as HTMLCanvasElement;
     const context = canvas.getContext("2d");

@@ -210,6 +210,19 @@ a:focus-visible {
   letter-spacing: 0.14em;
 }
 
+.di-hero__hint {
+  margin-top: 9px !important;
+  color: var(--di-faint) !important;
+  font-size: 9px !important;
+  letter-spacing: 0.02em;
+  line-height: 1.6 !important;
+}
+
+.di-hero__hint code {
+  color: var(--di-orange);
+  font: inherit;
+}
+
 .di-ticker {
   display: flex;
   flex-wrap: wrap;
