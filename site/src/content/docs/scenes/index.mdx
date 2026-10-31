@@ -30,6 +30,11 @@ behavior. The scene owns state, rules, and drawing.
 
 <CardGrid>
   <LinkCard
+    title="Lagoon"
+    href="/scenes/lagoon/"
+    description="A full-canvas marine family with turtle, manta, seahorse, dolphin, hammerhead, and tang variants."
+  />
+  <LinkCard
     title="Shark tank"
     href="/scenes/sharks/"
     description="Schools, pursuit, splash, and wake. Eight shark kinds and five fish species."
@@ -85,6 +90,7 @@ behavior. The scene owns state, rules, and drawing.
 
 | Scene | `columns` | Population default | Interaction |
 | --- | --- | --- | --- |
+| Lagoon | `1944×1760` authoring stage | 8 variants | Passive |
 | Sharks | `124` | Four classic sharks, density `1` | Pointer flee, click splash |
 | Robots | `150` | Fleet scales with area | Pointer avoidance, click dispatch |
 | Jellyfish | `140` | Bloom scales with area | Pointer current, click shockwave |
@@ -100,6 +106,8 @@ All scenes share `maxCells: 16000` and `maxDpr: 2`.
 
 ## Choosing a scene
 
+- **Lagoon** is the immersive marine family. Use a variant when the scene needs a specific
+  animal or mood, not a generic ocean.
 - **Sharks** are the busiest and most narrative. Good for a large hero or a section divider.
 - **Robots** read as work and systems. Good for product, infrastructure, and developer tools.
 - **Jellyfish** are the calmest. Good behind text, in dark sections, and on slow pages.
@@ -120,6 +128,7 @@ Every scene is ambient. None of them should carry essential information. Read
 Each scene page has a live demo, behavior notes, its options table, events, stats, and
 copy-paste examples:
 
+- [Lagoon](/scenes/lagoon/)
 - [Sharks](/scenes/sharks/)
 - [Robots](/scenes/robots/)
 - [Jellyfish](/scenes/jellyfish/)

@@ -6,8 +6,8 @@
 
 **Living ASCII scenes.** A shark tank, robot factory, jellyfish bloom,
 robot dog, starling murmuration, firefly meadow, ant trail, koi pond, city
-grid, and server room — drawn as glyphs on a canvas. The collection keeps
-growing. Zero runtime dependencies. MIT.
+grid, server room, and a full-canvas lagoon family — drawn as glyphs on a
+canvas. The collection keeps growing. Zero runtime dependencies. MIT.
 
 The optional `ascii-things/ui` subpath adds a framed stage, command input, live
 readout, scene tabs, panels, toolbars, status readouts, and ready-made scene
@@ -54,6 +54,7 @@ Or, once the package is published, use the custom elements from a CDN:
 <ascii-koi palette="paper" seed="19" style="height: 420px"></ascii-koi>
 <ascii-city palette="neon" seed="23" style="height: 420px"></ascii-city>
 <ascii-servers palette="abyss" seed="29" style="height: 420px"></ascii-servers>
+<ascii-lagoon variant="turtle" style="height: 420px"></ascii-lagoon>
 ```
 
 ## Vanilla
@@ -154,6 +155,36 @@ returns to its dock when the battery gets low. Click anywhere to throw the
 ball; the nearest dog gives chase and nudges it. `getStats()` returns `dogs`,
 `charging`, `state`, `ball`, `cells`, and frame timing.
 
+## Lagoon
+
+```ts
+import { createLagoon } from "ascii-things/lagoon";
+
+const lagoon = createLagoon(canvas, {
+  variant: "turtle",
+  label: "A live ASCII honu in a sunlit lagoon",
+});
+
+lagoon.pause();
+lagoon.resume();
+lagoon.setOptions({ variant: "manta" });
+console.log(lagoon.getStats());
+```
+
+Lagoon is a full-canvas marine family with eight variants: `reef`, `night`,
+`turtle`, `manta`, `seahorse`, `dolphin`, `hammerhead`, and `tang`. It is
+deterministic and passive: `seed`, `speed`, and `palette` are accepted for
+interface compatibility but do not change this renderer in the current release.
+Use `variant` to choose the scene, and `paused` or `pause()` to hold a still
+frame. The [Immersive lagoon](/lagoon-lab/) demo shows the full-bleed treatment.
+Each sample also ships as a named React component (`AsciiLagoonDay`,
+`AsciiLagoonNight`, `AsciiLagoonTurtle`, `AsciiLagoonManta`,
+`AsciiLagoonSeahorse`, `AsciiLagoonDolphin`, `AsciiLagoonHammerhead`,
+`AsciiLagoonTang`) and as a named custom element (`<ascii-lagoon-day>` through
+`<ascii-lagoon-tang>`); the variant form remains for switching at runtime.
+Lagoon is the heaviest scene (about 33 kB gzipped); import
+`ascii-things/lagoon` directly when you only need this family.
+
 ## Ambient scenes
 
 Six ambient habitats share the same handle, options, and action API:
@@ -189,8 +220,8 @@ an alert when a ping completes. Every scene also exposes `trigger(action, x, y)`
 and the common lifecycle methods.
 
 Full scene pages: [starlings](/scenes/starlings/), [fireflies](/scenes/fireflies/),
-[ants](/scenes/ants/), [koi](/scenes/koi/), [city](/scenes/city/), and
-[servers](/scenes/servers/).
+[ants](/scenes/ants/), [koi](/scenes/koi/), [city](/scenes/city/),
+[servers](/scenes/servers/), and [lagoon](/scenes/lagoon/).
 
 ## React
 
@@ -284,8 +315,8 @@ default, and clean up on unmount. The ambient wrappers are `AsciiStarlings`,
 `AsciiFireflies`, `AsciiAnts`, `AsciiKoi`, `AsciiCity`, and `AsciiServers`.
 `palette`, `speed`, `columns`, `maxCells`, `adaptiveQuality`, `calm`, `label`,
 `paused`, and `fontFamily` update live. Structural options (`sharks`, `robots`,
-`jellies`, `dogs`, `seed`, `density`, `count`, `sharkScale`, `scale`) remount
-the scene when they change.
+`jellies`, `dogs`, `seed`, `density`, `count`, `sharkScale`, `orbitScale`,
+`fitSharks`, `glyphs`, `scale`) remount the scene when they change.
 
 Each wrapper also accepts `id`, `aspectRatio` (for example `"16 / 9"` or a
 number), and `onReady(scene)`, which fires after the scene engine mounts. Use
@@ -663,7 +694,8 @@ The ambient elements use the same attribute pattern:
 
 Shark attributes: `palette`, `seed`, `density`, `speed`, `columns`, `max-cells`,
 `max-dpr`, `adaptive-quality`, `calm`, `interactive`, `sharks`, `shark-scale`,
-`label`, `aspect-ratio`, `paused`, `font-family`.
+`orbit-scale`, `fit-sharks`, `glyphs`, `label`, `aspect-ratio`, `paused`,
+`font-family`.
 
 Robot attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
 `max-dpr`, `adaptive-quality`, `calm`, `interactive`, `robots`, `scale`,
@@ -671,7 +703,7 @@ Robot attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
 
 Jellyfish attributes: `palette`, `seed`, `count`, `speed`, `columns`,
 `max-cells`, `max-dpr`, `adaptive-quality`, `calm`, `interactive`, `jellies`,
-`scale`, `label`, `aspect-ratio`, `paused`, `font-family`.
+`glyphs`, `scale`, `label`, `aspect-ratio`, `paused`, `font-family`.
 
 Dog attributes: `palette`, `seed`, `count`, `speed`, `columns`, `max-cells`,
 `max-dpr`, `adaptive-quality`, `calm`, `interactive`, `dogs`, `spread`, `scale`,
@@ -681,6 +713,7 @@ Ambient elements (`ascii-starlings`, `ascii-fireflies`, `ascii-ants`,
 `ascii-koi`, `ascii-city`, `ascii-servers`) share: `palette`, `seed`, `count`,
 `scale`, `speed`, `columns`, `max-cells`, `max-dpr`, `adaptive-quality`,
 `calm`, `interactive`, `label`, `aspect-ratio`, `paused`, `font-family`.
+`ascii-koi` also accepts `glyphs`.
 
 Every custom element dispatches a bubbling, composed `ascii-ready` event after
 the engine mounts. The event detail is `{ scene }`, where `scene` is the engine
@@ -731,6 +764,9 @@ handle.
 | `maxCells` | `number` | `16000` | Grows cells instead of exploding the grid at 4K |
 | `calm` | `boolean` | `false` | Disables shimmer and glints |
 | `sharkScale` | `number` | `1` | Shark length multiplier |
+| `orbitScale` | `number` | `1` | Patrol-orbit radius; lower values suit small cards |
+| `fitSharks` | `boolean` | `false` | Keep initial shark spines inside the frame |
+| `glyphs` | `"ascii" \| "kanji"` | `"ascii"` | Original ASCII hide or separate kanji renderer |
 | `label` | `string` | — | Adds `role="img"` + `aria-label` |
 | `onEvent` | `(e) => void` | — | `{ kind: "eat" \| "splash", x, y }` |
 
@@ -836,6 +872,7 @@ scene-specific population and size hints, clamped by each simulation.
 | Koi | `feed(x, y)` | `"feed"` |
 | City | `rush(x, y)` | `"rush"` |
 | Servers | `ping(x, y)` | `"ping"` |
+| Lagoon | — (passive) | — |
 
 `trigger(action, x, y)` is the uniform handle method exposed through React
 `onReady` and the custom element's `ascii-ready` event. Coordinates are
@@ -909,4 +946,4 @@ The shark simulation and rendering were originally extracted from
 [`stackedlol/ascii-sharks`](https://github.com/stackedlol/ascii-sharks); see
 [`NOTICE`](./NOTICE). The library API, packaging, palettes, seeded worlds,
 adapters, and the robot, jellyfish, dog, starlings, fireflies, ants, koi, city,
-and server scenes are part of `ascii-things`. MIT licensed.
+server, and lagoon scenes are part of `ascii-things`. MIT licensed.

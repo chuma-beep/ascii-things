@@ -14,7 +14,8 @@ This reference tracks `main` and the current **1.0.0-rc.0** release.
 | `ascii-things/robots` | `createRobots`, `RobotEngine`, robot types |
 | `ascii-things/jellyfish` | `createJellyfish`, `JellyfishEngine`, jellyfish types |
 | `ascii-things/dog` | `createDog`, `DogEngine`, dog types |
-| `ascii-things/react` | Scene components: `AsciiSharks`, `AsciiRobots`, `AsciiJellyfish`, `AsciiDog`, ambient wrappers, `AsciiOcean` |
+| `ascii-things/lagoon` | `createLagoon`, `LagoonEngine`, `LAGOON_VARIANTS`, lagoon types |
+| `ascii-things/react` | Scene components: `AsciiSharks`, `AsciiRobots`, `AsciiJellyfish`, `AsciiDog`, ambient wrappers, `AsciiLagoon`, named Lagoon samples, `AsciiOcean` |
 | `ascii-things/element` | Registers the scene custom elements |
 | `ascii-things/ui` | `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, `AsciiSceneTabs`, `AsciiDogHero` |
 | `ascii-things/ui.css` | UI stylesheet |
@@ -56,10 +57,19 @@ interface AsciiSharksOptions {
   sharks?: SharkSpec[];
   density?: number;
   sharkScale?: number;
+  orbitScale?: number;
+  fitSharks?: boolean;
+  glyphs?: "ascii" | "kanji";
   // plus shared options
 }
 
-type SharkSpec = { kind: SharkKind; size: number };
+type SharkSpec = {
+  kind: SharkKind;
+  size: number;
+  x?: number;       // normalized body-centre position
+  y?: number;
+  heading?: number; // radians
+};
 type SharkKind =
   | "classic" | "hammerhead" | "zebra" | "tiger"
   | "greathammer" | "mako" | "thresher" | "nurse";
@@ -70,6 +80,9 @@ type SharkKind =
 | `sharks` | four classics | Roster |
 | `density` | `1` | Fish population multiplier |
 | `sharkScale` | `1` | Shark length multiplier |
+| `orbitScale` | `1` | Patrol-orbit radius; lower values suit small cards |
+| `fitSharks` | `false` | Keep initial shark spines inside the frame |
+| `glyphs` | `"ascii"` | Original ASCII hide or `"kanji"` renderer |
 | `columns` | `124` | Art-direction target |
 
 ### Robots
@@ -140,6 +153,32 @@ type DogState =
 | `spread` | `[0.28, 0.72]` | Normalized start band |
 | `columns` | `150` | Art-direction target |
 
+### Lagoon
+
+```ts
+interface AsciiLagoonOptions extends SceneOptions {
+  variant?: LagoonVariant;
+}
+
+type LagoonVariant =
+  | "reef" | "night" | "turtle" | "manta"
+  | "seahorse" | "dolphin" | "hammerhead" | "tang";
+```
+
+| Option | Default | |
+| --- | --- | --- |
+| `variant` | `"reef"` | Marine scene variant |
+| `paused` | `false` | Start on the static composition |
+| `label` | — | Accessible name |
+
+The Lagoon painter is a full-canvas renderer, not a cell-grid renderer. It is
+deterministic and passive; `seed`, `speed`, and `palette` do not affect this
+renderer. The `AsciiLagoonDay`, `AsciiLagoonNight`, `AsciiLagoonTurtle`,
+`AsciiLagoonManta`, `AsciiLagoonSeahorse`, `AsciiLagoonDolphin`,
+`AsciiLagoonHammerhead`, and `AsciiLagoonTang` React components fix `variant`
+for each sample. `LAGOON_VARIANTS` is the canonical ordered list
+for UI and docs.
+
 ## Engines
 
 Each scene has a class and a factory. The factory is the documented path.
@@ -198,6 +237,7 @@ type BaseStats = {
 | Robots | `robots`, `charging`, `docks` |
 | Jellyfish | `jellies`, `pulsing`, `plankton`, `rings` |
 | Dog | `dogs`, `charging`, `state` (`DogState`), `ball` |
+| Lagoon | `variant` |
 
 ## Events
 
@@ -250,10 +290,13 @@ See [Custom elements](/guide/custom-elements/) for the full attribute grammar.
 
 | Tag | Entry | Shared + extra attributes |
 | --- | --- | --- |
-| `<ascii-sharks>` | `ascii-things/element` | shared, `sharks`, `density`, `shark-scale` |
+| `<ascii-sharks>` | `ascii-things/element` | shared, `sharks`, `density`, `shark-scale`, `orbit-scale`, `fit-sharks`, `glyphs` |
 | `<ascii-robots>` | `ascii-things/element` | shared, `robots`, `count`, `scale` |
-| `<ascii-jellyfish>` | `ascii-things/element` | shared, `jellies`, `count`, `scale` |
+| `<ascii-jellyfish>` | `ascii-things/element` | shared, `jellies`, `count`, `scale`, `glyphs` |
+| `<ascii-koi>` | `ascii-things/element` | shared, `count`, `scale`, `glyphs` |
 | `<ascii-dog>` | `ascii-things/element` | shared, `dogs`, `count`, `scale`, `spread` |
+| `<ascii-lagoon>` | `ascii-things/element` | shared, `variant` |
+| `<ascii-lagoon-day>` … `<ascii-lagoon-tang>` | `ascii-things/element` | shared; fixed variant |
 
 Shared attributes: `palette`, `seed`, `speed`, `columns`, `max-cells`, `max-dpr`, `calm`,
 `interactive`, `label`.

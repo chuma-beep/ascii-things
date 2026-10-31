@@ -1,0 +1,129 @@
+---
+title: Lagoon
+description: A full-canvas ASCII lagoon with turtle, manta, seahorse, dolphin, hammerhead, and tang variants.
+---
+
+import LagoonDemo from "@components/LagoonDemo";
+
+Lagoon is the immersive marine family: one full-canvas ASCII renderer, eight
+selectable variants. It is part of the same package and lifecycle as the other
+scenes, even though its painter is not built on the shared cell-grid renderer.
+
+<LagoonDemo client:visible />
+
+The full-bleed version is still available as the [Immersive lagoon](/lagoon-lab/) demo.
+
+## Variants
+
+| Variant | Scene |
+| --- | --- |
+| `reef` | A sunlit lagoon with the whole reef in motion |
+| `night` | The same reef after dark |
+| `turtle` | A honu close-up |
+| `manta` | A wide manta flyby |
+| `seahorse` | A seahorse in warm seagrass |
+| `dolphin` | A dolphin pod crossing open water |
+| `hammerhead` | A hammerhead pass at the reef edge |
+| `tang` | A school of yellow tangs |
+
+`hammerhead` is a composition study, not a second shark species. The canonical
+shark roster remains in [Shark tank](/scenes/sharks/), which also supports
+`hammerhead` and `greathammer`.
+
+## Create a scene
+
+```ts
+import { createLagoon } from "ascii-things/lagoon";
+
+const lagoon = createLagoon(canvas, {
+  variant: "turtle",
+  label: "A live ASCII honu in a sunlit lagoon",
+});
+
+lagoon.pause();
+lagoon.resume();
+lagoon.setOptions({ variant: "manta" });
+```
+
+The painter is deterministic and passive. `seed`, `speed`, and `palette` are
+accepted as shared scene options but do not change this renderer in the current
+release. `paused` and `label` are supported.
+
+## React
+
+```tsx
+import { AsciiLagoon } from "ascii-things/react";
+
+<AsciiLagoon
+  variant="hammerhead"
+  aspectRatio="1944 / 1760"
+  label="A live ASCII hammerhead passing the reef edge"
+/>;
+```
+
+### Named components
+
+Each sample is also available as its own React component, so you can import only
+the one you need and skip the `variant` prop:
+
+```tsx
+import {
+  AsciiLagoonDay,
+  AsciiLagoonNight,
+  AsciiLagoonTurtle,
+  AsciiLagoonManta,
+  AsciiLagoonSeahorse,
+  AsciiLagoonDolphin,
+  AsciiLagoonHammerhead,
+  AsciiLagoonTang,
+} from "ascii-things/react";
+
+<AsciiLagoonDay label="A live ASCII day lagoon" aspectRatio="1944 / 1760" />;
+```
+
+All eight named components accept the same props as `AsciiLagoon` except
+`variant`.
+
+## Custom element
+
+```html
+<script type="module">
+  import "ascii-things/element";
+</script>
+
+<ascii-lagoon
+  variant="tang"
+  label="A live ASCII school of yellow tangs"
+  style="display: block; width: 100%; aspect-ratio: 1944 / 1760"
+></ascii-lagoon>
+```
+
+Named aliases are registered for the same eight samples:
+
+```html
+<ascii-lagoon-day></ascii-lagoon-day>
+<ascii-lagoon-night></ascii-lagoon-night>
+<ascii-lagoon-turtle></ascii-lagoon-turtle>
+<ascii-lagoon-manta></ascii-lagoon-manta>
+<ascii-lagoon-seahorse></ascii-lagoon-seahorse>
+<ascii-lagoon-dolphin></ascii-lagoon-dolphin>
+<ascii-lagoon-hammerhead></ascii-lagoon-hammerhead>
+<ascii-lagoon-tang></ascii-lagoon-tang>
+```
+
+The named tags default to their variant and still accept the shared attributes
+such as `label`, `paused`, and `aspect-ratio`.
+
+## Package exports
+
+| Entry | Exports |
+| --- | --- |
+| `ascii-things/lagoon` | `createLagoon`, `LagoonEngine`, `LAGOON_VARIANTS`, types |
+| `ascii-things/react` | `AsciiLagoon` |
+| `ascii-things/element` | `<ascii-lagoon>` |
+
+## Accessibility
+
+Lagoon is decorative ambient art. Pass `label` to make the canvas `role="img"`.
+With reduced motion enabled, the painter settles to a still frame at its
+static composition time.

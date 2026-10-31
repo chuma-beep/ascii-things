@@ -49,7 +49,14 @@ The script is idempotent: it only defines a tag if `customElements.get()` is emp
 <ascii-koi palette="neon" seed="2" interactive></ascii-koi>
 <ascii-city palette="abyss" seed="8" interactive></ascii-city>
 <ascii-servers palette="paper" seed="6" interactive></ascii-servers>
+<ascii-lagoon variant="turtle" interactive></ascii-lagoon>
 ```
+
+The eight Lagoon samples also have named tags: `<ascii-lagoon-day>`,
+`<ascii-lagoon-night>`, `<ascii-lagoon-turtle>`, `<ascii-lagoon-manta>`,
+`<ascii-lagoon-seahorse>`, `<ascii-lagoon-dolphin>`,
+`<ascii-lagoon-hammerhead>`, and `<ascii-lagoon-tang>`. They default to their
+variant; `<ascii-lagoon>` remains the explicit `variant` form.
 
 Each tag renders a shadow root containing a canvas. The host is `display: block`, fills its
 parent, and has `min-height: 240px`. Give the tag an explicit height when the parent does not
@@ -84,18 +91,20 @@ default. Boolean attributes are true when present, unless the value is `"false"`
 | `interactive` | boolean | Pointer input, true by default |
 | `paused` | boolean | Starts with the scene clock stopped |
 | `font-family` | string | Overrides the drawing font stack |
+| `glyphs` | `ascii` \| `kanji` | Texture for sharks, jellyfish, and koi; default `ascii` |
 | `aspect-ratio` | CSS ratio | Sets the host aspect ratio and `height: auto` |
 | `label` | string | Makes the canvas `role="img"` with this name |
 
 ### Shark attributes
 
-`sharks`, `density`, `shark-scale` in addition to the shared set.
+`sharks`, `density`, `shark-scale`, `orbit-scale`, `fit-sharks`, `glyphs` in addition to the shared set.
 
 ```html
 <ascii-sharks
   palette="paper"
   seed="7"
   density="0.7"
+  glyphs="kanji"
   sharks="tiger:1,thresher:0.85"
   interactive
 ></ascii-sharks>
@@ -151,6 +160,22 @@ Kinds: `moon`, `lion`, `box`, `atolla`, `crystal`.
 
 `dogs` is a comma-separated list of sizes. `spread` is two normalized values, `start,end`,
 across the width.
+
+### Lagoon attributes
+
+`variant` in addition to the shared set.
+
+```html
+<ascii-lagoon
+  variant="hammerhead"
+  label="A live ASCII hammerhead passing the reef edge"
+  style="display: block; width: 100%; aspect-ratio: 1944 / 1760"
+></ascii-lagoon>
+```
+
+`variant` is one of `reef`, `night`, `turtle`, `manta`, `seahorse`, `dolphin`,
+`hammerhead`, or `tang`. The Lagoon painter is deterministic and passive; `seed`,
+`speed`, and `palette` do not change this renderer in the current release.
 
 ## Attribute changes
 

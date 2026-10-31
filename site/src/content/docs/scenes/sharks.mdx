@@ -33,11 +33,20 @@ type SharkSpec = {
     | "thresher"
     | "nurse";
   size: number;
+  /** Normalized body-centre position; supplying this anchors the shark locally. */
+  x?: number;
+  y?: number;
+  /** Facing angle in radians. */
+  heading?: number;
 };
 ```
 
 Sizes are relative, not pixels. The default roster uses four classic sharks at different
 sizes. `sharkScale` multiplies every shark.
+
+Pass `x`, `y`, and `heading` together to compose a small tank: each placed shark patrols a
+local anchor instead of joining the shared centre orbit. This keeps a readable central shark
+without a ring around an empty centre.
 
 ```tsx
 <AsciiSharks
@@ -57,6 +66,8 @@ sizes. `sharkScale` multiplies every shark.
 | --- | --- | --- | --- |
 | `sharks` | `{ kind, size }[]` | four classics | Roster |
 | `sharkScale` | `number` | `1` | Length multiplier |
+| `orbitScale` | `number` | `1` | Patrol-orbit radius; lower values suit small cards |
+| `fitSharks` | `boolean` | `false` | Keep the initial spines inside the frame |
 | `density` | `number` | `1` | Fish population multiplier |
 | `seed` | `number` | random | Reproducible world |
 | `palette` | name \| `Palette` | `"abyss"` | Theme |

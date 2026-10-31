@@ -16,12 +16,32 @@ The React entry exports a component for every scene with one shape. Each renders
 import {
   AsciiDog,
   AsciiJellyfish,
+  AsciiLagoon,
+  AsciiLagoonDay,
+  AsciiLagoonNight,
+  AsciiLagoonTurtle,
+  AsciiLagoonManta,
+  AsciiLagoonSeahorse,
+  AsciiLagoonDolphin,
+  AsciiLagoonHammerhead,
+  AsciiLagoonTang,
   AsciiRobots,
   AsciiSharks,
 } from "ascii-things/react";
 ```
 
 `AsciiOcean` is a back-compat alias for `AsciiSharks`.
+
+`AsciiLagoon` is the full-canvas marine family. Pass one of the eight
+`variant` values (`reef`, `night`, `turtle`, `manta`, `seahorse`, `dolphin`,
+`hammerhead`, `tang`). It is a passive scene: there are no pointer actions, and
+`seed`, `speed`, and `palette` do not affect this renderer.
+
+The eight samples also ship as named components: `AsciiLagoonDay`,
+`AsciiLagoonNight`, `AsciiLagoonTurtle`, `AsciiLagoonManta`,
+`AsciiLagoonSeahorse`, `AsciiLagoonDolphin`, `AsciiLagoonHammerhead`, and
+`AsciiLagoonTang`. They accept the same props as `AsciiLagoon` except
+`variant`.
 
 The wrappers include the `"use client"` directive, so they work in Next.js App Router client
 components without extra ceremony.
@@ -87,9 +107,9 @@ Some options update the running engine. Others rebuild the world.
 | Updates live | Remounts the scene |
 | --- | --- |
 | `palette` | `seed` |
-| `speed` | `sharks`, `density`, `sharkScale` |
+| `speed` | `sharks`, `density`, `sharkScale`, `orbitScale`, `fitSharks`, `glyphs` |
 | `columns` | `robots`, `count`, `scale` |
-| `maxCells` | `jellies` |
+| `maxCells` | `jellies`, `variant` |
 | `adaptiveQuality` | `dogs`, `spread` |
 | `calm` | |
 | `label` | |
@@ -137,6 +157,7 @@ Event kinds:
 | Robots | `dock`, `undock`, `job`, `low` |
 | Jellyfish | `pulse`, `shock` |
 | Dog | `ball`, `nudge`, `charge`, `low`, `sit` |
+| Lagoon | — (passive) |
 
 ## Imperative controls
 
