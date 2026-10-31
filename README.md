@@ -39,10 +39,13 @@ npm install ascii-things
 `1.0.0-rc.0` is the release candidate and is not on npm yet. Until the 1.0
 publish, build from this repository or install the tarball from `npm pack`.
 
-Or, once the package is published, use the custom elements from a CDN:
+Or use the custom elements after installing the package. The snippets below assume a
+bundler or an import map:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@latest/dist/element.js"></script>
+<script type="module">
+  import "ascii-things/element";
+</script>
 
 <ascii-sharks palette="abyss" seed="42" style="height: 480px"></ascii-sharks>
 <ascii-robots palette="paper" seed="7" style="height: 420px"></ascii-robots>
@@ -465,7 +468,9 @@ text, dimensions, and per-cell colours.
 ### HTML custom element
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@latest/dist/image-element.js"></script>
+<script type="module">
+  import "ascii-things/image/element";
+</script>
 
 <ascii-image
   src="/portrait.png"
@@ -542,7 +547,9 @@ export function Card() {
 ### HTML custom element
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@latest/dist/dither-element.js"></script>
+<script type="module">
+  import "ascii-things/dither/element";
+</script>
 
 <ascii-dither
   text="ASCII-THINGS"
@@ -609,7 +616,9 @@ export function Hero() {
 ### HTML custom element
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@latest/dist/webgl-element.js"></script>
+<script type="module">
+  import "ascii-things/webgl/element";
+</script>
 
 <ascii-surface text="ASCII-THINGS" glyphs=".:-=+*#%@" density="0.16"></ascii-surface>
 ```

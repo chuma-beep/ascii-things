@@ -1,0 +1,191 @@
+---
+title: Integrations
+description: Use ascii-things with shadcn/ui, Tailwind, Next.js, Astro, and framework-free custom elements.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+`ascii-things` is a canvas component, not a design system. It can sit inside any card,
+panel, or hero that already owns layout and spacing. This page shows the patterns that work
+well with shadcn/ui and Tailwind, then the same idea in Next.js, Astro, and plain HTML.
+
+<Aside type="note" title="Install first">
+The examples assume `npm install ascii-things`. The package is not on npm or a CDN yet; build
+it from the repository or install the packed tarball until the release is published.
+</Aside>
+
+## shadcn/ui + Tailwind
+
+A scene belongs in the media slot of a card. Give that slot a height or aspect ratio, then
+let the canvas fill it. Keep the card's own background, border, and typography in charge.
+
+```tsx title="components/scene-card.tsx"
+import { AsciiDog } from "ascii-things/react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+export function SceneCard() {
+  return (
+    <Card className="overflow-hidden">
+      <div className="aspect-[16/10] w-full bg-black">
+        <AsciiDog
+          palette="abyss"
+          seed={7}
+          label="A robot dog patrolling a test yard"
+        />
+      </div>
+      <CardHeader>
+        <CardTitle>Test yard</CardTitle>
+        <CardDescription>
+          A live robot dog, rendered as text on a canvas.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground">
+          The scene fills the media slot. The card still owns the frame.
+        </p>
+      </CardContent>
+      <CardFooter>
+        <Button variant="outline">Open scene</Button>
+      </CardFooter>
+    </Card>
+  );
+}
+```
+
+A few rules prevent the most common layout bugs:
+
+- The canvas has no intrinsic height. Use a parent with `height`, `aspect-ratio`, or a grid
+  track that resolves to one.
+- Do not put `overflow-hidden` on the canvas itself. Put it on the media slot if the scene
+  should be clipped.
+- `className`, `style`, and `id` land on the canvas, not on a wrapper. Style the parent when
+  you need to control the frame.
+- Use `label` when the scene carries meaning. Without it, the canvas is hidden from
+  assistive technology.
+- For an inline hero, `AsciiStage` can own the aspect ratio and HUD:
+
+```tsx
+import { AsciiLagoon, AsciiStage } from "ascii-things/react";
+
+export function LagoonHero() {
+  return (
+    <AsciiStage
+      label="Live scene"
+      status="LAGOON / DAY"
+      aspectRatio="16 / 9"
+      className="rounded-xl border"
+    >
+      <AsciiLagoon variant="reef" seed={4} label="A live lagoon" />
+    </AsciiStage>
+  );
+}
+```
+
+## Next.js App Router
+
+`ascii-things/react` is marked `"use client"`. A server component can import a client
+component, but callbacks such as `onEvent` or `onReady` need a client component boundary.
+
+```tsx title="app/scene-panel.tsx"
+"use client";
+
+import { AsciiSharks } from "ascii-things/react";
+
+export function ScenePanel() {
+  return (
+    <div className="h-[420px] rounded-xl border bg-black">
+      <AsciiSharks
+        palette="abyss"
+        seed={42}
+        label="Sharks and fish in a live tank"
+        onEvent={(event) => console.log(event.type)}
+      />
+    </div>
+  );
+}
+```
+
+```tsx title="app/page.tsx"
+import { ScenePanel } from "./scene-panel";
+
+export default function Page() {
+  return (
+    <main className="mx-auto max-w-5xl p-8">
+      <h1 className="text-3xl font-semibold">Living interface</h1>
+      <div className="mt-6">
+        <ScenePanel />
+      </div>
+    </main>
+  );
+}
+```
+
+If you pass no callbacks, you can import a scene wrapper directly from a server component.
+The client boundary still exists inside the package. Keep event handlers in a client file.
+
+## Astro
+
+Use the React integration when you want props and callbacks. Use the custom-element entry when
+you only need rendering.
+
+```astro title="src/components/ScenePanel.astro"
+---
+import { AsciiDog } from "ascii-things/react";
+---
+
+<div class="h-[420px] rounded-xl border border-white/10 bg-black">
+  <AsciiDog
+    client:visible
+    palette="abyss"
+    seed={7}
+    label="A robot dog in a test yard"
+  />
+</div>
+```
+
+`client:visible` is the right default for scenes below the fold. The scene stays out of the
+hydration path until it is close to the viewport.
+
+## Vue, Svelte, and plain HTML
+
+The custom-element entry registers every scene tag and works without a framework runtime.
+
+```html
+<script type="module">
+  import "ascii-things/element";
+</script>
+
+<div style="height: 420px">
+  <ascii-dog
+    palette="abyss"
+    seed="7"
+    label="A robot dog in a test yard"
+    style="display: block; width: 100%; height: 100%"
+  ></ascii-dog>
+</div>
+```
+
+In Vue or Svelte, import the same module once in the app entry or the component that uses the
+tag. Follow the framework's custom-element configuration if its compiler needs to be told that
+`ascii-*` is a custom element.
+
+## Choosing the right adapter
+
+| You need | Use |
+| --- | --- |
+| React state, callbacks, and the UI components | `ascii-things/react` + `ascii-things/ui` |
+| Astro islands without a framework runtime | `ascii-things/element` |
+| Vue, Svelte, or static HTML | `ascii-things/element` |
+| A vanilla canvas and engine handle | `create*` from a scene subpath, such as `ascii-things/dog` |
+| Image, dither, or WebGL surfaces | `ascii-things/image`, `ascii-things/dither`, `ascii-things/webgl` |
+
+For the full component contracts, continue with [React](/guide/react/), [Custom elements](/guide/custom-elements/),
+and the [API reference](/api/).

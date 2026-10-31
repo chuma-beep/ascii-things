@@ -95,12 +95,14 @@ If you use the first-party UI components, import the stylesheet once:
 import "ascii-things/ui.css";
 ```
 
-## Plain HTML / CDN
+## Plain HTML / element bundle
 
-Once published, the element bundle can be loaded directly:
+After installing, import the element bundle from your bundler or an import map:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@latest/dist/element.js"></script>
+<script type="module">
+  import "ascii-things/element";
+</script>
 
 <ascii-dog
   palette="abyss"

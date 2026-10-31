@@ -86,6 +86,7 @@ export default defineConfig({
             { label: "Quickstart", link: "guide/quickstart/" },
             { label: "React", link: "guide/react/" },
             { label: "Custom elements", link: "guide/custom-elements/" },
+            { label: "Integrations", link: "guide/integrations/" },
             { label: "UI components", link: "guide/ui-components/" },
             { label: "Image to ASCII", link: "guide/image/" },
             { label: "Dither field", link: "guide/dither/" },

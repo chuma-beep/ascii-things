@@ -29,13 +29,13 @@ Every `create*` factory and React wrapper accepts these.
 
 | Option | Type | Default | |
 | --- | --- | --- | --- |
-| `palette` | `PaletteChoice` | `"abyss"` | Built-in name, `"auto"`, or a full palette object (0.5.0 adds `"auto"`) |
+| `palette` | `PaletteChoice` | `"abyss"` | Built-in name, `"auto"`, or a full palette object |
 | `seed` | `number` | random | Same seed + size = same world |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
 | `columns` | `number` | per scene | Art-direction target |
 | `maxCells` | `number` | `16000` | Grid cap |
 | `maxDpr` | `number` | `2` | Backing-store pixel-ratio cap |
-| `adaptiveQuality` | `boolean` | `true` | Lower DPR when frames stay slow (0.5.0) |
+| `adaptiveQuality` | `boolean` | `true` | Lower DPR when frames stay slow |
 | `calm` | `boolean` | `false` | Disables flicker and sparkle |
 | `interactive` | `boolean` | `true` | Pointer input |
 | `label` | `string` | — | Makes the canvas `role="img"` |
@@ -208,7 +208,7 @@ const scene = createSharks(canvas, options);
 
 Coordinates are canvas-local pixels. Actions are ignored under reduced motion. The same
 methods are available on React handles from `onReady` and custom-element handles from
-`ascii-ready` (0.5.0).
+`ascii-ready`.
 
 `setOptions` accepts a partial option object. Structural fields (`seed`, roster, `density`,
 `count`, `scale`, `spread`) rebuild the world. Palette, speed, columns, max cells, max DPR,

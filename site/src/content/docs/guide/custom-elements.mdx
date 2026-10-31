@@ -12,10 +12,12 @@ a canvas, and need no framework runtime.
 
 ## Load the script
 
-From a CDN, once the package is published:
+Import the element entry from your bundler or an import map:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ascii-things@latest/dist/element.js"></script>
+<script type="module">
+  import "ascii-things/element";
+</script>
 ```
 
 From a local checkout after `npm run build`:

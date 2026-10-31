@@ -7,9 +7,10 @@ import { CardGrid, LinkCard, Aside } from "@astrojs/starlight/components";
 import SceneDemo from "@components/SceneDemo";
 
 **ascii-things** is a collection of small artificial-life simulations drawn as glyphs on a
-canvas: a shark tank, a robot factory floor, a jellyfish bloom, a robot dog test yard, and
-ambient worlds for starlings, fireflies, ants, koi, city traffic, and servers. Each one runs
-on its own rules, respects reduced motion, and ships with no runtime dependencies.
+canvas: a full marine Lagoon, a shark tank, a robot factory floor, a jellyfish bloom, a robot
+dog test yard, and ambient worlds for starlings, fireflies, ants, koi, city traffic, and
+servers. Each one runs on its own rules, respects reduced motion, and ships with no runtime
+dependencies.
 
 Same seed and size produce the same scene. Different palette changes the ink, not the
 behavior. One canvas is the whole surface.
@@ -35,6 +36,11 @@ behavior. One canvas is the whole surface.
     description="Live props, remount rules, sizing, and the client-component contract."
   />
   <LinkCard
+    title="Integrations"
+    href="/guide/integrations/"
+    description="shadcn/ui, Tailwind, Next.js, Astro, and framework-free recipes."
+  />
+  <LinkCard
     title="API reference"
     href="/api/"
     description="Every option, default, event, statistic, and engine method in one table."
@@ -54,17 +60,18 @@ behavior. One canvas is the whole surface.
 
 ## Version
 
-<Aside type="note" title="This site tracks main">
-The current release candidate is `1.0.0-rc.0`. It freezes the public API introduced through
-`0.5.0` — `paused`, `aspectRatio`, `onReady`, `fontFamily`, `palette="auto"`, adaptive
-quality, and the uniform `trigger()` action — and adds the migration guide and API contract
-tests. The `0.5.0` feature notes below still apply.
+<Aside type="note" title="Release candidate">
+This site tracks `main`. The current candidate is `1.0.0-rc.0`; it is not on npm yet. The
+public API is frozen for 1.0, including `paused`, `aspectRatio`, `onReady`, `fontFamily`,
+`palette="auto"`, adaptive quality, and the uniform `trigger()` action. Build from the
+repository or install the packed tarball until the release is published.
 </Aside>
 
 ## The scenes
 
 | Scene | What it does | Import |
 | --- | --- | --- |
+| Lagoon | A full-canvas marine family: turtle, manta, seahorse, dolphin, hammerhead, and tang. | `ascii-things/lagoon` |
 | Shark tank | Fish school and flee; sharks hunt, splash, and settle. | `ascii-things/sharks` |
 | Robot floor | Robots patrol, scan, haul, queue for a dock, and recharge. | `ascii-things/robots` |
 | Jellyfish bloom | Jellies pulse on a current, trail tentacles, and ring on contraction. | `ascii-things/jellyfish` |
