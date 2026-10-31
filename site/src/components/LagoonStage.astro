@@ -1,0 +1,35 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={["lagoon-stage", className]} data-lagoon-stage data-lagoon-state="idle">
+  <canvas
+    class="lagoon-canvas"
+    data-lagoon-canvas
+    width="1944"
+    height="1760"
+    aria-hidden="true"></canvas>
+  <slot />
+</div>
+
+<style>
+  .lagoon-stage {
+    position: relative;
+    overflow: hidden;
+    background: #04222c;
+    isolation: isolate;
+  }
+
+  .lagoon-canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--lagoon-fit, contain);
+  }
+</style>

@@ -10,6 +10,7 @@
   --orange-soft: rgba(255, 122, 26, 0.14);
   --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --pad: clamp(18px, 4.5vw, 64px);
+  --showcase-header-height: 44px;
 }
 
 * {
@@ -63,7 +64,8 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 15px var(--pad);
+  height: var(--showcase-header-height);
+  padding: 0 var(--pad);
   border-bottom: 1px solid var(--line);
   background: rgba(7, 8, 9, 0.86);
   backdrop-filter: blur(14px);
@@ -71,8 +73,8 @@ button {
 
 .showcase-brand {
   display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 0.55rem;
   font-size: 11px;
   letter-spacing: -0.02em;
 }
@@ -106,6 +108,19 @@ button {
   width: min(100%, 1680px);
   margin: 0 auto;
   padding: 0 var(--pad);
+}
+
+.showcase-compositions {
+  margin-bottom: clamp(30px, 5vw, 68px);
+}
+
+.showcase-main .cmp-section {
+  width: 100%;
+  max-width: none;
+}
+
+.showcase-main .cmp-section--compact .cmp-head {
+  margin-bottom: 18px;
 }
 
 .showcase-hero {
@@ -152,7 +167,62 @@ button {
   line-height: 1.8;
 }
 
+.showcase-hero__stage {
+  position: relative;
+  margin-top: 34px;
+  border: 1px solid var(--line);
+  background: #070809;
+  overflow: hidden;
+}
+
+.showcase-hero__frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #070809;
+}
+
+.showcase-hero__frame > * {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.showcase-hero__caption {
+  position: absolute;
+  right: clamp(14px, 3vw, 26px);
+  bottom: clamp(14px, 3vw, 26px);
+  z-index: 2;
+  display: grid;
+  gap: 4px;
+  padding: 9px 11px;
+  border: 1px solid rgba(236, 232, 223, 0.18);
+  background: rgba(7, 8, 9, 0.72);
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+
+.showcase-hero__caption span {
+  color: var(--faint);
+  font-size: 7px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.showcase-hero__caption strong {
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
 .showcase-toolbar {
+  position: sticky;
+  top: var(--showcase-header-height);
+  z-index: 12;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -160,6 +230,7 @@ button {
   padding: 15px 0;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
+  background: var(--bg);
 }
 
 .showcase-filters {
@@ -217,7 +288,7 @@ button {
 .showcase-grid {
   columns: 4 280px;
   column-gap: 14px;
-  padding: 24px 0 70px;
+  padding: 24px 0;
 }
 
 .showcase-card {
@@ -237,12 +308,53 @@ button {
   border-color: rgba(255, 122, 26, 0.55);
 }
 
+.showcase-card__media {
+  display: block;
+}
+
 .showcase-card figure {
   margin: 0;
 }
 
 .showcase-card picture {
   display: block;
+}
+
+.showcase-card__frame {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #0b0d0f;
+}
+
+.showcase-card__preview {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+}
+
+.showcase-card__preview > * {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.showcase-card__live {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  background: #070809;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.showcase-card__live > * {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .showcase-card img {
@@ -276,6 +388,44 @@ button {
   color: var(--orange);
 }
 
+.showcase-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 10px 8px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--faint);
+  font-size: 7px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.showcase-card__actions a {
+  color: var(--muted);
+  transition: color 140ms ease;
+}
+
+.showcase-card__actions a:hover {
+  color: var(--orange);
+}
+
+.showcase-card__actions button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--faint);
+  font: inherit;
+  font-size: 7px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 140ms ease;
+}
+
+.showcase-card__actions button:hover {
+  color: var(--orange);
+}
+
 .showcase-card[data-category="scene"] figcaption span {
   color: #7fbcff;
 }
@@ -302,6 +452,35 @@ button {
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.showcase-more {
+  display: flex;
+  justify-content: center;
+  padding: 22px 0 70px;
+}
+
+.showcase-more button {
+  padding: 9px 13px;
+  border: 1px solid var(--orange);
+  background: transparent;
+  color: var(--orange);
+  font: inherit;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.showcase-more button:hover {
+  background: var(--orange);
+  color: var(--bg);
+}
+
+.showcase-more button[hidden] {
+  display: none;
 }
 
 .showcase-footer {
@@ -338,8 +517,12 @@ button {
 }
 
 @media (max-width: 620px) {
+  :root {
+    --showcase-header-height: 42px;
+  }
+
   .showcase-header {
-    padding: 14px var(--pad);
+    padding: 0 var(--pad);
   }
 
   .showcase-nav {
@@ -370,6 +553,10 @@ button {
     padding-top: 16px;
   }
 
+  .showcase-more {
+    padding-bottom: 44px;
+  }
+
   .showcase-footer {
     align-items: flex-start;
     flex-direction: column;
@@ -380,7 +567,8 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .showcase-nav a,
   .showcase-filter,
-  .showcase-card {
+  .showcase-card,
+  .showcase-card__live {
     transition: none;
   }
 }

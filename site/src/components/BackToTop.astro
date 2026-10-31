@@ -1,0 +1,107 @@
+---
+interface Props {
+  tone?: "light" | "dark";
+  sidebarOffset?: boolean;
+}
+
+const { tone = "light", sidebarOffset = false } = Astro.props;
+---
+
+<button
+  type="button"
+  class="back-to-top"
+  data-back-to-top
+  data-tone={tone}
+  data-sidebar-offset={sidebarOffset ? "true" : undefined}
+  aria-label="Back to top"
+  hidden
+>
+  <span aria-hidden="true">↑</span>
+  <span>Top</span>
+</button>
+
+<script>
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("[data-back-to-top]"));
+
+  if (buttons.length > 0) {
+    let visible = false;
+
+    const update = () => {
+      const next = window.scrollY > 640;
+      if (next === visible) return;
+      visible = next;
+      for (const button of buttons) button.hidden = !next;
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      });
+    }
+  }
+</script>
+
+<style>
+  .back-to-top {
+    position: fixed;
+    right: clamp(14px, 3vw, 32px);
+    bottom: clamp(14px, 3vw, 32px);
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.58rem 0.72rem;
+    border: 1px solid var(--sl-color-gray-5, rgba(0, 0, 0, 0.16));
+    background: var(--sl-color-bg, #fff);
+    color: var(--sl-color-text, #1a1a1a);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-family: var(--sl-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+    transition:
+      border-color 140ms ease,
+      color 140ms ease,
+      transform 140ms ease;
+  }
+
+  .back-to-top:hover {
+    border-color: var(--sl-color-text-accent, #ff7a1a);
+    color: var(--sl-color-text-accent, #ff7a1a);
+    transform: translateY(-2px);
+  }
+
+  .back-to-top[data-tone="dark"] {
+    border-color: rgba(236, 232, 223, 0.16);
+    background: #0b0d0f;
+    color: #ece8df;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  }
+
+  .back-to-top[data-tone="dark"]:hover {
+    border-color: #ff7a1a;
+    color: #ff7a1a;
+  }
+
+  @media (min-width: 72rem) {
+    .back-to-top[data-sidebar-offset="true"] {
+      right: calc(var(--sl-sidebar-width, 18.75rem) + clamp(14px, 3vw, 32px));
+    }
+  }
+
+  .back-to-top[hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .back-to-top {
+      transition: none;
+    }
+  }
+</style>

@@ -1,5 +1,8 @@
 ---
 import { LIBRARY } from "../../data/library";
+import BackToTop from "../../components/BackToTop.astro";
+import ShowcasePreview from "../../components/ShowcasePreview.astro";
+import LogoMark from "../../components/LogoMark.astro";
 import "../../styles/showcase.css";
 
 type ShowcaseCategory = "scene" | "webgl" | "kanji" | "component";
@@ -10,13 +13,6 @@ const CATEGORY_LABEL: Record<ShowcaseCategory, string> = {
   webgl: "WebGL",
   kanji: "Kanji",
   component: "Component",
-};
-
-const IMAGE_SIZE: Record<ShowcaseCategory, [number, number]> = {
-  scene: [718, 405],
-  webgl: [480, 462],
-  kanji: [480, 386],
-  component: [480, 386],
 };
 
 const pieces = LIBRARY.filter((item) => item.kind !== "tool").map((item) => ({
@@ -45,7 +41,7 @@ for (let index = 0; index < longestBucket; index += 1) {
   }
 }
 
-const featuredIndex = ordered.findIndex((item) => item.id === "dog");
+const featuredIndex = ordered.findIndex((item) => item.id === "lagoon");
 if (featuredIndex > 0) {
   const [featured] = ordered.splice(featuredIndex, 1);
   ordered.unshift(featured);
@@ -65,7 +61,7 @@ const filters = [
 ];
 
 const title = "Showcase — ascii-things";
-const description = "The visual archive of every scene, WebGL surface, kanji study, and component.";
+const description = "The full live archive of scenes, WebGL surfaces, kanji studies, and components.";
 ---
 
 <!doctype html>
@@ -80,6 +76,7 @@ const description = "The visual archive of every scene, WebGL surface, kanji stu
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline src="/favicon-motion.js" type="module"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -91,6 +88,7 @@ const description = "The visual archive of every scene, WebGL surface, kanji stu
   <body>
     <header class="showcase-header">
       <a class="showcase-brand" href="/">
+        <LogoMark />
         ascii-things <span>/ showcase</span>
       </a>
       <nav class="showcase-nav" aria-label="Showcase">
@@ -106,8 +104,26 @@ const description = "The visual archive of every scene, WebGL surface, kanji stu
         <p class="showcase-eyebrow">Visual archive / {pieces.length} pieces</p>
         <h1 id="showcase-title">All the <em>work.</em></h1>
         <p class="showcase-lede">
-          Every scene, WebGL surface, kanji study, and component. No docs, no install commands.
+          The full live archive of scenes, WebGL surfaces, kanji studies, and components.
+          Every card runs the real canvas or component — no archive stills.
         </p>
+
+        <div class="showcase-hero__stage" aria-label="Night reef live preview">
+          <div
+            class="showcase-hero__frame"
+            data-live-tag="ascii-lagoon-night"
+            data-live-attrs={JSON.stringify({
+              label: "Night reef live ASCII preview",
+              interactive: "false",
+              "max-dpr": "2",
+            })}
+            aria-hidden="true"
+          ></div>
+          <div class="showcase-hero__caption">
+            <span>Night reef / live</span>
+            <strong>The reef after dark.</strong>
+          </div>
+        </div>
       </section>
 
       <div class="showcase-toolbar">
@@ -134,34 +150,42 @@ const description = "The visual archive of every scene, WebGL surface, kanji stu
       <div class="showcase-grid">
         {
           ordered.map((item) => (
-            <a
+            <article
               class="showcase-card"
-              href={item.href}
               data-showcase-card
               data-category={item.category}
             >
-              <figure>
-                <picture>
-                  <source
-                    media="(prefers-reduced-motion: reduce)"
-                    srcset={`/showcase/${item.id}.jpg`}
-                    type="image/jpeg"
-                  />
-                  <img
-                    src={`/showcase/${item.id}.webp`}
-                    width={IMAGE_SIZE[item.category][0]}
-                    height={IMAGE_SIZE[item.category][1]}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </picture>
-                <figcaption>
-                  <span>{CATEGORY_LABEL[item.category]}</span>
-                  <strong>{item.title}</strong>
-                </figcaption>
-              </figure>
-            </a>
+              <a
+                class="showcase-card__media"
+                href={item.href}
+                aria-label={`Open ${item.title}`}
+              >
+                <figure>
+                  <div class="showcase-card__frame">
+                    <ShowcasePreview item={item} />
+                  </div>
+                  <figcaption>
+                    <span>{CATEGORY_LABEL[item.category]}</span>
+                    <strong>{item.title}</strong>
+                  </figcaption>
+                </figure>
+              </a>
+              <div class="showcase-card__actions">
+                <a
+                  href="/design-ideas/"
+                  aria-label={`Turn ${item.title} into a design recipe`}
+                >
+                  Recipe <span aria-hidden="true">↗</span>
+                </a>
+                <button
+                  type="button"
+                  data-showcase-copy={item.href}
+                  aria-label={`Copy link to ${item.title}`}
+                >
+                  Copy link
+                </button>
+              </div>
+            </article>
           ))
         }
       </div>
@@ -170,12 +194,14 @@ const description = "The visual archive of every scene, WebGL surface, kanji stu
     </main>
 
     <footer class="showcase-footer">
-      <span>ascii-things / visual archive</span>
+      <span>ascii-things / live archive</span>
       <span>
         <a href="/library/">Browse the library ↗</a>
         <a href="/design-ideas/">Steal a layout ↗</a>
       </span>
     </footer>
+
+    <BackToTop tone="dark" />
 
     <script>
       const root = document.querySelector<HTMLElement>("[data-showcase]");
@@ -185,46 +211,111 @@ const description = "The visual archive of every scene, WebGL surface, kanji stu
         const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-showcase-filter]"));
         const count = root.querySelector<HTMLElement>("[data-showcase-count]");
         const empty = root.querySelector<HTMLElement>("[data-showcase-empty]");
+        const copyButtons = Array.from(
+          root.querySelectorAll<HTMLButtonElement>("[data-showcase-copy]"),
+        );
+        const liveHosts = Array.from(root.querySelectorAll<HTMLElement>("[data-live-tag]"));
         const valid = new Set(buttons.map((button) => button.dataset.showcaseFilter));
+
+        let active = "all";
+        let sceneLoader: Promise<unknown> | undefined;
+        let surfaceLoader: Promise<unknown> | undefined;
+
+        const loadScenes = () => (sceneLoader ??= import("ascii-things/element"));
+        const loadSurfaces = () => (surfaceLoader ??= import("ascii-things/webgl/element"));
+
+        const mountHost = async (host: HTMLElement) => {
+          if (host.dataset.mounted === "true" || host.dataset.mounted === "pending") return;
+
+          const tag = host.dataset.liveTag;
+          if (!tag) return;
+
+          host.dataset.mounted = "pending";
+
+          try {
+            await (tag === "ascii-surface" ? loadSurfaces() : loadScenes());
+          } catch {
+            delete host.dataset.mounted;
+            return;
+          }
+
+          if (host.dataset.mounted !== "pending") return;
+
+          const element = document.createElement(tag);
+          const attrs = JSON.parse(host.dataset.liveAttrs ?? "{}") as Record<string, string>;
+
+          for (const [name, value] of Object.entries(attrs)) {
+            element.setAttribute(name, value);
+          }
+
+          element.setAttribute("aria-hidden", "true");
+          element.setAttribute("paused", "");
+          host.replaceChildren(element);
+          host.dataset.mounted = "true";
+
+          requestAnimationFrame(() => {
+            element.removeAttribute("paused");
+          });
+        };
+
+        const unmountHost = (host: HTMLElement) => {
+          host.replaceChildren();
+          delete host.dataset.mounted;
+        };
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              const host = entry.target as HTMLElement;
+              if (entry.isIntersecting) void mountHost(host);
+              else unmountHost(host);
+            }
+          },
+          { rootMargin: "0px 0px", threshold: 0.1 },
+        );
+
+        for (const host of liveHosts) observer.observe(host);
 
         const readFilter = () => {
           const value = new URLSearchParams(window.location.search).get("type");
           return value && valid.has(value) ? value : "all";
         };
 
-        const apply = (filter: string) => {
-          let visible = 0;
+        const apply = () => {
+          const matching = cards.filter(
+            (card) => active === "all" || card.dataset.category === active,
+          );
+          const visibleSet = new Set(matching);
 
           for (const card of cards) {
-            const matches = filter === "all" || card.dataset.category === filter;
-            card.hidden = !matches;
-            if (matches) visible += 1;
+            card.hidden = !visibleSet.has(card);
           }
 
           for (const button of buttons) {
-            const active = button.dataset.showcaseFilter === filter;
-            button.classList.toggle("is-active", active);
-            button.setAttribute("aria-pressed", active ? "true" : "false");
+            const on = button.dataset.showcaseFilter === active;
+            button.classList.toggle("is-active", on);
+            button.setAttribute("aria-pressed", on ? "true" : "false");
           }
 
           if (count) {
-            count.textContent = `${visible} ${visible === 1 ? "piece" : "pieces"}`;
+            count.textContent = `${matching.length} ${matching.length === 1 ? "piece" : "pieces"}`;
           }
 
           if (empty) {
-            empty.hidden = visible > 0;
+            empty.hidden = matching.length > 0;
           }
         };
 
         const setFilter = (filter: string, push: boolean) => {
-          apply(filter);
+          active = filter && valid.has(filter) ? filter : "all";
+          apply();
 
           if (push) {
             const url = new URL(window.location.href);
-            if (filter === "all") {
+            if (active === "all") {
               url.searchParams.delete("type");
             } else {
-              url.searchParams.set("type", filter);
+              url.searchParams.set("type", active);
             }
             window.history.pushState({}, "", url);
           }
@@ -236,8 +327,39 @@ const description = "The visual archive of every scene, WebGL surface, kanji stu
           });
         }
 
-        window.addEventListener("popstate", () => apply(readFilter()));
-        apply(readFilter());
+        for (const button of copyButtons) {
+          button.addEventListener("click", async () => {
+            const path = button.dataset.showcaseCopy;
+            if (!path) return;
+
+            const url = new URL(path, window.location.origin).href;
+            let copied = false;
+
+            try {
+              await navigator.clipboard.writeText(url);
+              copied = true;
+            } catch {
+              const area = document.createElement("textarea");
+              area.value = url;
+              area.setAttribute("readonly", "");
+              area.style.position = "fixed";
+              area.style.opacity = "0";
+              document.body.append(area);
+              area.select();
+              copied = document.execCommand("copy");
+              area.remove();
+            }
+
+            const original = button.textContent ?? "Copy link";
+            button.textContent = copied ? "Copied" : "Failed";
+            window.setTimeout(() => {
+              button.textContent = original;
+            }, 1600);
+          });
+        }
+
+        window.addEventListener("popstate", () => setFilter(readFilter(), false));
+        setFilter(readFilter(), false);
       }
     </script>
   </body>

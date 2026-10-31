@@ -1,12 +1,15 @@
 ---
+import CompositionStage from "../../components/CompositionStage.astro";
 import DesignIdeaPreview from "../../components/DesignIdeaPreview.astro";
+import LogoMark from "../../components/LogoMark.astro";
 import { DESIGN_IDEAS, UNIVERSAL_PROMPT } from "../../data/design-ideas";
 import "../../styles/design-ideas.css";
+import "../../styles/compositions.css";
 
 const [featured, ...rest] = DESIGN_IDEAS;
 const title = "Design ideas — ascii-things";
 const description =
-  "Six living-ASCII layouts to steal, remix, and hand to your agent. Copy the starter code or the prompt.";
+  "Six living-ASCII layouts to borrow, remix, and hand to your agent. Copy the starter code or the prompt.";
 const sceneCount = new Set(
   DESIGN_IDEAS.flatMap((idea) =>
     idea.ingredients
@@ -17,6 +20,11 @@ const sceneCount = new Set(
       .map((item) => item.name),
   ),
 ).size;
+
+const searchText = (idea: (typeof DESIGN_IDEAS)[number]) =>
+  [idea.title, idea.category, idea.description, idea.note, ...idea.ingredients.map((item) => item.name)]
+    .join(" ")
+    .toLowerCase();
 ---
 
 <!doctype html>
@@ -36,6 +44,7 @@ const sceneCount = new Set(
     <meta name="twitter:card" content="summary" />
     <link rel="canonical" href="https://ascii-things-docs.pages.dev/design-ideas/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline src="/favicon-motion.js" type="module"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -46,9 +55,11 @@ const sceneCount = new Set(
   <body>
     <header class="di-header">
       <a class="di-brand" href="/">
+        <LogoMark />
         ascii-things <span>/ design ideas</span>
       </a>
       <nav class="di-nav" aria-label="Design ideas">
+        <a href="#compositions">Compositions</a>
         <a href="/library/">Library</a>
         <a href="/showcase/">Showcase</a>
         <a href="/image/">Image studio</a>
@@ -67,7 +78,7 @@ const sceneCount = new Set(
         <div class="di-hero__grid">
           <div>
             <p class="di-eyebrow">A FIELD GUIDE TO LIVING UI</p>
-            <h1 id="design-ideas-title">Steal the <em>idea.</em></h1>
+            <h1 id="design-ideas-title">Design ideas<em>.</em></h1>
           </div>
           <div class="di-hero__copy">
             <p>
@@ -97,7 +108,41 @@ const sceneCount = new Set(
         </div>
       </section>
 
-      <section class="di-featured" id={featured.id} aria-labelledby={`${featured.id}-title`}>
+      <CompositionStage />
+
+      <section class="di-search" aria-labelledby="di-search-title">
+        <div class="di-search__scene" data-design-scene aria-hidden="true">
+          <template>
+            <ascii-sharks
+              palette="abyss"
+              seed="11"
+              density="1.15"
+              columns="72"
+              max-cells="4200"
+              calm
+              label="A live shark tank behind the recipe search"
+            ></ascii-sharks>
+          </template>
+        </div>
+        <div class="di-search__inner">
+          <p class="di-eyebrow">Search the field guide</p>
+          <h2 id="di-search-title">What are you <em>building?</em></h2>
+          <div class="di-search__form" role="search">
+            <label class="di-search__label" for="di-search-input">Search recipes</label>
+            <input
+              id="di-search-input"
+              type="search"
+              placeholder="Search recipes, ingredients, prompts…"
+              autocomplete="off"
+            />
+            <p class="di-search__status" id="di-search-status" data-search-status aria-live="polite">
+              {DESIGN_IDEAS.length} recipes
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="di-featured" data-search={searchText(featured)} id={featured.id} aria-labelledby={`${featured.id}-title`}>
         <a
           class="di-featured__preview"
           href={`/design-ideas/${featured.id}/`}
@@ -148,7 +193,7 @@ const sceneCount = new Set(
       <section class="di-grid" aria-label="More design ideas">
         {
           rest.map((idea) => (
-            <article class="di-card" id={idea.id}>
+            <article class="di-card" data-search={searchText(idea)} id={idea.id}>
               <a
                 class="di-card__preview"
                 href={`/design-ideas/${idea.id}/`}
@@ -328,5 +373,29 @@ const sceneCount = new Set(
         sceneHosts.forEach((host) => void mountScene(host));
       }
     </script>
+  <script>
+    const searchInput = document.querySelector<HTMLInputElement>("#di-search-input");
+    const searchStatus = document.querySelector<HTMLElement>("[data-search-status]");
+    const searchable = [...document.querySelectorAll<HTMLElement>("[data-search]")];
+    const totalRecipes = searchable.length;
+
+    const applySearch = () => {
+      const query = (searchInput?.value ?? "").trim().toLowerCase();
+      let shown = 0;
+      for (const recipe of searchable) {
+        const matches = !query || (recipe.dataset.search ?? "").includes(query);
+        recipe.hidden = !matches;
+        if (matches) shown++;
+      }
+      if (searchStatus) {
+        searchStatus.textContent = query
+          ? `${shown} of ${totalRecipes} recipes`
+          : `${totalRecipes} recipes`;
+      }
+    };
+
+    searchInput?.addEventListener("input", applySearch);
+    searchInput?.addEventListener("search", applySearch);
+  </script>
   </body>
 </html>

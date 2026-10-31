@@ -1,0 +1,91 @@
+---
+import { ALL_KANJI } from "../data/kanji";
+import FooterThumb from "./FooterThumb.astro";
+import KanjiStatic from "./KanjiStatic.astro";
+import KanjiMarkArt from "./KanjiMarkArt.astro";
+import { ConsoleThumb, DitherThumb, KoiThumb, SurfaceThumb, ToolbarThumb } from "./ComponentThumbs";
+
+interface Props {
+  item: {
+    id: string;
+    title: string;
+    href: string;
+    kind: string;
+    category: "scene" | "webgl" | "kanji" | "component";
+  };
+}
+
+const { item } = Astro.props;
+const slug = item.href.split("/").filter(Boolean)[1] ?? item.id;
+const kanji = ALL_KANJI.find((entry) => entry.slug === slug);
+const isStaticKanji = kanji?.kind === "static" || kanji?.kind === "mark";
+const isComponent = item.category === "component";
+
+let tag = "";
+let attrs: Record<string, string> = {};
+
+if (!isComponent && !isStaticKanji) {
+  if (item.id === "lagoon") {
+    tag = "ascii-lagoon-night";
+    attrs = {
+      label: `${item.title} live ASCII preview`,
+      interactive: "false",
+      "max-dpr": "2",
+    };
+  } else if (item.category === "scene") {
+    tag = `ascii-${item.id}`;
+    attrs = {
+      label: `${item.title} live ASCII preview`,
+      interactive: "false",
+      columns: "55",
+      "max-cells": "6400",
+      "max-dpr": "2",
+    };
+  } else if (kanji?.kind === "webgl") {
+    tag = "ascii-surface";
+    attrs = {
+      variant: kanji.variant,
+      text: kanji.text,
+      glyphs: kanji.glyphs,
+      density: String(kanji.density),
+      cell: String(kanji.cell),
+      foreground: kanji.foreground,
+      accent: kanji.accent,
+      label: `${item.title} live ASCII preview`,
+      "max-dpr": "2",
+    };
+  } else {
+    tag = "ascii-surface";
+    attrs = {
+      variant: item.id,
+      text: "",
+      density: "0.3",
+      label: `${item.title} live ASCII preview`,
+      "max-dpr": "2",
+      ...(item.id === "globe" ? { cell: "5", foreground: "#7fbcff", accent: "#c7e8a4" } : {}),
+      ...(item.id === "ripple" ? { pointer: "true" } : {}),
+    };
+  }
+}
+---
+
+<div class="showcase-card__preview">
+  {isComponent && item.id === "ascii-box-footer" && <FooterThumb />}
+  {isComponent && item.id === "koi-card" && <KoiThumb client:visible />}
+  {isComponent && item.id === "dither-card" && <DitherThumb client:visible />}
+  {isComponent && item.id === "surface-card" && <SurfaceThumb client:visible />}
+  {isComponent && item.id === "scene-console" && <ConsoleThumb client:visible />}
+  {isComponent && item.id === "scene-toolbar" && <ToolbarThumb client:visible />}
+
+  {kanji?.kind === "static" && <KanjiStatic art={kanji.art} />}
+  {kanji?.kind === "mark" && <KanjiMarkArt mark={kanji.id} />}
+
+  {tag && (
+    <div
+      class="showcase-card__live"
+      data-live-tag={tag}
+      data-live-attrs={JSON.stringify(attrs)}
+      aria-hidden="true"
+    ></div>
+  )}
+</div>

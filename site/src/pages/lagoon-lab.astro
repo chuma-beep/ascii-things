@@ -1,0 +1,1947 @@
+---
+import LagoonStage from "../components/LagoonStage.astro";
+import LogoMark from "../components/LogoMark.astro";
+
+const links = [
+  {
+    title: "Shark tank",
+    kind: "scene",
+    description: "A reef of sharks, dithering in the deep.",
+    href: "/scenes/sharks/",
+  },
+  {
+    title: "Jellyfish bloom",
+    kind: "scene",
+    description: "Soft bells and tentacles in slow motion.",
+    href: "/scenes/jellyfish/",
+  },
+  {
+    title: "Koi pond",
+    kind: "scene",
+    description: "Koi drift through a quiet ASCII pond.",
+    href: "/scenes/koi/",
+  },
+  {
+    title: "Robot dog",
+    kind: "scene",
+    description: "A test yard for one very good unit.",
+    href: "/scenes/dog/",
+  },
+  {
+    title: "Starlings",
+    kind: "scene",
+    description: "Murmurations over a field of glyphs.",
+    href: "/scenes/starlings/",
+  },
+  {
+    title: "Fireflies",
+    kind: "scene",
+    description: "A summer field that blinks in ASCII.",
+    href: "/scenes/fireflies/",
+  },
+  {
+    title: "City",
+    kind: "scene",
+    description: "Traffic and towers, one character at a time.",
+    href: "/scenes/city/",
+  },
+  {
+    title: "Server room",
+    kind: "scene",
+    description: "Blinking racks and cooling fans.",
+    href: "/scenes/servers/",
+  },
+  {
+    title: "Image studio",
+    kind: "tool",
+    description: "Turn any image into living ASCII.",
+    href: "/image/",
+  },
+  {
+    title: "Dither field",
+    kind: "guide",
+    description: "Ordered dithering for surfaces and cards.",
+    href: "/guide/dither/",
+  },
+  {
+    title: "ASCII box footer",
+    kind: "component",
+    description: "A living wordmark for the footer.",
+    href: "/components/ascii-box-footer/",
+  },
+  {
+    title: "Design ideas",
+    kind: "guide",
+    description: "Layouts to borrow, remix, and hand to an agent.",
+    href: "/design-ideas/",
+  },
+].map((link) => ({
+  ...link,
+  searchText: `${link.title} ${link.kind} ${link.description}`.toLowerCase(),
+}));
+
+const modes = [
+  {
+    id: "ambient",
+    index: "01",
+    name: "Ambient",
+    desc: "A full-bleed lagoon with almost no chrome. The stage runs until it leaves the viewport, and settles into a still frame when motion is reduced.",
+    use: "Hero / screensaver / quiet intro",
+  },
+  {
+    id: "search",
+    index: "02",
+    name: "Search",
+    desc: "The frosted dock becomes a local search field. Typing filters twelve demo links, with a live result count and an empty state that offers a way back.",
+    use: "Command palette / site index / jump menu",
+  },
+  {
+    id: "chat",
+    index: "03",
+    name: "Chat",
+    desc: "The original chat interaction, wired without a backend. Enter sends, Shift+Enter adds a line, and the local reply stays on the page.",
+    use: "Prompt box / concierge / local demo",
+  },
+  {
+    id: "embed",
+    index: "04",
+    name: "Embedded card",
+    desc: "A smaller framed version of the same canvas. One scene instance changes layout; the 25 KB of scene code is never duplicated.",
+    use: "Feature card / hero panel / editorial embed",
+  },
+];
+
+const ambient = modes[0];
+const search = modes[1];
+const chat = modes[2];
+const embed = modes[3];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Immersive lagoon — ascii-things</title>
+    <meta
+      name="description"
+      content="Four uses for one living ASCII lagoon — Day lagoon, Night reef, Turtle close-up, Manta flyby, Seahorse, Dolphin pod, Hammerhead pass, and Tang school — as an ambient hero, search overlay, chat overlay, and embedded card."
+    />
+    <meta name="theme-color" content="#031820" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline src="/favicon-motion.js" type="module"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Manrope:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style is:global>
+      :root {
+        color-scheme: dark;
+        --lab-bg: #031820;
+        --lab-ink: #ecf7f5;
+        --lab-muted: #8ba7ab;
+        --lab-line: rgba(212, 245, 240, 0.14);
+        --lab-accent: #6fe6da;
+        --lab-coral: #ff7a6a;
+        --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        --display: "Manrope", "Helvetica Neue", Arial, sans-serif;
+        --topbar: 74px;
+        --lagoon-ink: #06303f;
+        --lagoon-soft: #24505e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      html {
+        background: var(--lab-bg);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        background:
+          radial-gradient(110% 80% at 58% 0%, rgba(26, 168, 202, 0.14), transparent 56%),
+          var(--lab-bg);
+        color: var(--lab-ink);
+        font-family: var(--mono);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .skip-link {
+        position: fixed;
+        top: -52px;
+        left: 14px;
+        z-index: 30;
+        padding: 10px 14px;
+        border: 1px solid var(--lab-accent);
+        border-radius: 8px;
+        background: #04222c;
+        color: var(--lab-accent);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .skip-link:focus {
+        top: 12px;
+      }
+
+      .topbar {
+        position: relative;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        min-height: var(--topbar);
+        padding: 10px clamp(14px, 2.5vw, 32px);
+        border-bottom: 1px solid var(--lab-line);
+        background: rgba(4, 27, 36, 0.96);
+        backdrop-filter: blur(14px);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        color: var(--lab-ink);
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-decoration: none;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .brand:hover span {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .brand span {
+        color: var(--lab-accent);
+      }
+
+      .mode-tabs {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        margin-left: auto;
+        padding: 3px;
+        border: 1px solid var(--lab-line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .mode-tab {
+        appearance: none;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 7px;
+        padding: 9px 13px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--lab-muted);
+        font: 500 9px/1 var(--mono);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      .mode-tab:hover {
+        color: var(--lab-ink);
+      }
+
+      .mode-tab[aria-selected="true"] {
+        background: var(--lab-accent);
+        color: #04222c;
+      }
+
+      .mode-tab:focus-visible {
+        outline: 2px solid var(--lab-accent);
+        outline-offset: 2px;
+      }
+
+      .mode-tab[aria-selected="true"]:focus-visible {
+        outline-color: var(--lab-ink);
+      }
+
+      .tab-num {
+        opacity: 0.9;
+      }
+
+      .scene-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        margin: 0;
+        padding: 3px;
+        border: 1px solid var(--lab-line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.03);
+        min-width: 0;
+      }
+
+      .scene-option {
+        position: relative;
+        display: inline-flex;
+      }
+
+      .scene-option input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .scene-option span {
+        display: inline-flex;
+        align-items: baseline;
+        padding: 9px 11px;
+        border-radius: 999px;
+        color: var(--lab-muted);
+        font: 500 9px/1 var(--mono);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+
+      .scene-option:hover span {
+        color: var(--lab-ink);
+      }
+
+      .scene-option input:checked + span {
+        background: var(--lab-accent);
+        color: #04222c;
+      }
+
+      .scene-option input:focus-visible + span {
+        outline: 2px solid var(--lab-accent);
+        outline-offset: 2px;
+      }
+
+      .scene-option input:checked:focus-visible + span {
+        outline-color: var(--lab-ink);
+      }
+
+      .back-link {
+        color: var(--lab-muted);
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        text-decoration: none;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .back-link:hover {
+        color: var(--lab-accent);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .lab-main {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(20px, 3vw, 48px);
+        height: calc(100vh - var(--topbar));
+        height: calc(100dvh - var(--topbar));
+        min-height: 540px;
+        padding: 0 clamp(12px, 2vw, 28px);
+        overflow: hidden;
+      }
+
+      .lagoon-shell {
+        flex: 0 1 auto;
+        height: 100%;
+        max-width: calc(100% - 288px);
+        aspect-ratio: 1944 / 1760;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 20px;
+        box-shadow:
+          0 34px 90px rgba(0, 0, 0, 0.46),
+          0 0 0 1px rgba(0, 0, 0, 0.18);
+        --lagoon-fit: contain;
+      }
+
+      .rail {
+        display: flex;
+        flex: 0 0 240px;
+        flex-direction: column;
+        gap: 16px;
+        align-self: center;
+        width: 240px;
+      }
+
+      .rail-eyebrow {
+        margin: 0;
+        color: var(--lab-accent);
+        font-size: 9px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .rail-title {
+        margin: 0;
+        color: var(--lab-ink);
+        font-size: clamp(24px, 2.2vw, 32px);
+        font-weight: 600;
+        letter-spacing: -0.055em;
+        line-height: 1.02;
+      }
+
+      .rail-desc {
+        margin: 0;
+        color: #9fb9bd;
+        font-size: 10px;
+        line-height: 1.75;
+      }
+
+      .rail-stats {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+        padding: 14px 0;
+        border-top: 1px solid var(--lab-line);
+        border-bottom: 1px solid var(--lab-line);
+      }
+
+      .rail-stats div {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .rail-stats dt {
+        color: #6f8a8f;
+        font-size: 8px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .rail-stats dd {
+        margin: 0;
+        color: #dcebed;
+        font-size: 9px;
+        font-weight: 500;
+        text-align: right;
+      }
+
+      .rail-use {
+        margin: 0;
+        color: #cde3e1;
+        font-size: 10px;
+        line-height: 1.6;
+      }
+
+      .rail-use span {
+        display: block;
+        margin-bottom: 4px;
+        color: #6f8a8f;
+        font-size: 8px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .rail-use b {
+        color: #dcebed;
+        font-weight: 400;
+      }
+
+      .rail-note {
+        margin: 0;
+        color: #6f8a8f;
+        font-size: 9px;
+        line-height: 1.7;
+      }
+
+      .rail-back {
+        margin-top: 2px;
+        color: var(--lab-accent);
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .rail-back:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+      }
+
+      .overlay-panel {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        padding: clamp(20px, 3.6vw, 46px);
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+
+      .panel-head {
+        width: min(680px, 100%);
+        margin-bottom: clamp(14px, 2.2vw, 24px);
+        text-align: center;
+      }
+
+      .panel-kicker {
+        margin: 0 0 8px;
+        color: var(--lagoon-soft);
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.82;
+      }
+
+      .panel-head .panel-kicker {
+        display: inline-block;
+        margin-bottom: 10px;
+        padding: 5px 9px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 999px;
+        background: rgba(244, 255, 253, 0.28);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+
+      .lagoon-heading {
+        margin: 0;
+        color: var(--lagoon-ink);
+        font-family: var(--display);
+        font-size: clamp(32px, 4.4vw, 58px);
+        font-weight: 300;
+        letter-spacing: -0.045em;
+        line-height: 1.02;
+        text-wrap: balance;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.16);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        border: 1.5px solid rgba(255, 255, 255, 0.85);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.62);
+        box-shadow: 0 10px 30px rgba(6, 70, 90, 0.18);
+        color: var(--lagoon-soft);
+        font: 500 14px/1 var(--display);
+        white-space: nowrap;
+      }
+
+      .pill svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .pill-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #16a085;
+        box-shadow: 0 0 0 4px rgba(22, 160, 133, 0.14);
+      }
+
+      .panel-ambient {
+        justify-content: center;
+      }
+
+      .ambient-top {
+        position: absolute;
+        top: clamp(16px, 3.2vw, 32px);
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .ambient-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        text-align: center;
+      }
+
+      .ambient-kicker {
+        margin: 0;
+        color: var(--lagoon-soft);
+        font-size: 9px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.8;
+      }
+
+      .ambient-sub {
+        margin: 0;
+        color: var(--lagoon-soft);
+        font-family: var(--display);
+        font-size: clamp(13px, 1.4vw, 16px);
+        font-weight: 400;
+        line-height: 1.5;
+        opacity: 0.78;
+      }
+
+      .ambient-foot {
+        position: absolute;
+        bottom: clamp(16px, 3vw, 30px);
+        left: 50%;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        transform: translateX(-50%);
+        color: var(--lagoon-soft);
+        font-size: 8px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.7;
+        white-space: nowrap;
+      }
+
+      .status-dot {
+        display: inline-block;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #16a085;
+      }
+
+      .ghost-link {
+        appearance: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 16px;
+        border: 1px solid rgba(6, 48, 63, 0.28);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.38);
+        color: var(--lagoon-ink);
+        font: 500 10px/1 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .ghost-link:hover {
+        background: rgba(255, 255, 255, 0.62);
+      }
+
+      .ghost-link:focus-visible {
+        outline: 2px solid rgba(6, 48, 63, 0.55);
+        outline-offset: 3px;
+      }
+
+      .dock {
+        position: relative;
+        width: min(680px, 100%);
+        border: 1.5px solid rgba(255, 255, 255, 0.85);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.5);
+        box-shadow:
+          0 24px 60px rgba(6, 70, 90, 0.16),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+
+      .dock:focus-within {
+        border-color: rgba(255, 255, 255, 1);
+        box-shadow:
+          0 24px 60px rgba(6, 70, 90, 0.2),
+          0 0 0 4px rgba(255, 255, 255, 0.22),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+
+      .chat-dock {
+        display: block;
+        min-height: 118px;
+        padding: 16px 18px 12px;
+        cursor: text;
+      }
+
+      .chat-input {
+        display: block;
+        width: calc(100% - 64px);
+        height: 54px;
+        max-height: 96px;
+        padding: 4px 0;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--lagoon-soft);
+        font: 300 17px/1.35 var(--display);
+        letter-spacing: -0.015em;
+        resize: none;
+        overflow-y: auto;
+      }
+
+      .chat-input::placeholder {
+        color: #4f7782;
+        opacity: 1;
+      }
+
+      .dock-icons {
+        position: absolute;
+        bottom: 14px;
+        left: 18px;
+        display: flex;
+        gap: 20px;
+        color: #3d6b78;
+        pointer-events: none;
+      }
+
+      .dock-icons svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .dock-hint {
+        margin: 0;
+        color: #46636b;
+        font: 500 9px/1.2 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        pointer-events: none;
+      }
+
+      .chat-dock .dock-hint {
+        position: absolute;
+        right: 76px;
+        bottom: 17px;
+      }
+
+      .dock-send {
+        position: absolute;
+        right: 12px;
+        bottom: 10px;
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border: 0;
+        border-radius: 13px;
+        background: rgba(6, 60, 80, 0.12);
+        color: #3d6b78;
+        cursor: pointer;
+      }
+
+      .dock-send:hover {
+        background: rgba(6, 60, 80, 0.2);
+      }
+
+      .dock-send:focus-visible {
+        outline: 2px solid rgba(6, 60, 80, 0.45);
+        outline-offset: 3px;
+      }
+
+      .dock-send svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .search-dock {
+        display: block;
+        padding: 14px 16px 12px;
+        cursor: text;
+      }
+
+      .search-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .search-icon {
+        flex: 0 0 auto;
+        width: 20px;
+        height: 20px;
+        color: #3d6b78;
+        pointer-events: none;
+      }
+
+      .search-input {
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 44px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--lagoon-soft);
+        font: 300 clamp(16px, 1.8vw, 20px)/1.2 var(--display);
+        letter-spacing: -0.02em;
+      }
+
+      .search-input::placeholder {
+        color: #4f7782;
+        opacity: 1;
+      }
+
+      .search-kbd {
+        flex: 0 0 auto;
+        padding: 4px 7px;
+        border: 1px solid rgba(6, 60, 80, 0.18);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.28);
+        color: #46636b;
+        font: 500 10px/1 var(--mono);
+        pointer-events: none;
+      }
+
+      .dock-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 2px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(6, 60, 80, 0.08);
+      }
+
+      .dock-hint--muted {
+        color: #6b929c;
+      }
+
+      .search-body {
+        width: min(680px, 100%);
+        margin-top: 10px;
+      }
+
+      .search-results {
+        display: grid;
+        gap: 2px;
+        max-height: clamp(160px, 28vh, 284px);
+        margin: 0;
+        padding: 6px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        border: 1.5px solid rgba(255, 255, 255, 0.6);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.34);
+        box-shadow: 0 18px 46px rgba(6, 70, 90, 0.12);
+        backdrop-filter: blur(12px) saturate(1.05);
+        -webkit-backdrop-filter: blur(12px) saturate(1.05);
+        list-style: none;
+      }
+
+      .search-result a {
+        display: grid;
+        grid-template-columns: 64px minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 9px 12px;
+        border-radius: 12px;
+        color: var(--lagoon-soft);
+        text-decoration: none;
+      }
+
+      .search-result a:hover {
+        background: rgba(255, 255, 255, 0.42);
+      }
+
+      .search-result a:focus-visible {
+        outline: 2px solid rgba(6, 48, 63, 0.55);
+        outline-offset: -2px;
+      }
+
+      .result-kind {
+        color: #3d6b78;
+        font: 500 8px/1.2 var(--mono);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .result-title {
+        display: block;
+        font: 500 14px/1.25 var(--display);
+      }
+
+      .result-desc {
+        display: block;
+        margin-top: 2px;
+        color: #4f7782;
+        font: 400 11px/1.35 var(--display);
+      }
+
+      .result-arrow {
+        color: #3d6b78;
+        font-size: 14px;
+      }
+
+      .search-empty {
+        padding: 18px 20px;
+        border: 1.5px solid rgba(255, 255, 255, 0.6);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(12px) saturate(1.05);
+        -webkit-backdrop-filter: blur(12px) saturate(1.05);
+        color: var(--lagoon-soft);
+      }
+
+      .search-empty-title {
+        margin: 0 0 4px;
+        font: 500 16px/1.35 var(--display);
+      }
+
+      .search-empty-copy {
+        margin: 0 0 12px;
+        color: #4f7782;
+        font: 400 12px/1.5 var(--display);
+      }
+
+      .reply {
+        width: min(680px, 100%);
+        margin-top: 10px;
+        padding: 12px 16px;
+        border: 1.5px solid rgba(255, 255, 255, 0.6);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.34);
+        color: var(--lagoon-soft);
+        font: 400 13px/1.5 var(--display);
+        white-space: pre-wrap;
+        opacity: 0;
+        transform: translateY(-4px);
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+        pointer-events: none;
+      }
+
+      .reply.is-visible {
+        opacity: 1;
+        transform: none;
+      }
+
+      .reply:empty {
+        display: none;
+      }
+
+      .panel-foot {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 12px 0 0;
+        color: var(--lagoon-soft);
+        font: 500 8px/1.3 var(--mono);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.64;
+      }
+
+      .panel-embed {
+        align-items: flex-start;
+        justify-content: center;
+        padding: clamp(18px, 3vw, 36px);
+      }
+
+      .embed-badge {
+        position: absolute;
+        top: clamp(18px, 3vw, 32px);
+        left: clamp(18px, 3vw, 32px);
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 12px;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.32);
+        backdrop-filter: blur(10px);
+        color: var(--lagoon-ink);
+        font: 500 9px/1 var(--mono);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        pointer-events: none;
+      }
+
+      .embed-copy {
+        width: min(430px, 100%);
+        padding: clamp(18px, 2.6vw, 28px);
+        border: 1.5px solid rgba(255, 255, 255, 0.82);
+        border-radius: 22px;
+        background: rgba(244, 255, 253, 0.54);
+        box-shadow: 0 22px 54px rgba(6, 70, 90, 0.2);
+        backdrop-filter: blur(16px) saturate(1.08);
+        -webkit-backdrop-filter: blur(16px) saturate(1.08);
+      }
+
+      .embed-title {
+        margin: 0 0 8px;
+        color: var(--lagoon-ink);
+        font: 300 clamp(28px, 3.4vw, 42px) / 1 var(--display);
+        letter-spacing: -0.045em;
+      }
+
+      .embed-desc {
+        margin: 0 0 16px;
+        color: var(--lagoon-soft);
+        font: 400 13px/1.55 var(--display);
+      }
+
+      .embed-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .ghost-link--light {
+        background: rgba(255, 255, 255, 0.62);
+      }
+
+      .lab-main[data-mode="embed"] {
+        padding: clamp(18px, 3vw, 44px);
+      }
+
+      .lab-main[data-mode="embed"] .rail {
+        display: none;
+      }
+
+      .lab-main[data-mode="embed"] .lagoon-shell {
+        flex: 0 1 auto;
+        width: min(980px, 100%);
+        max-width: 980px;
+        height: auto;
+        aspect-ratio: 16 / 10;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 28px;
+        --lagoon-fit: cover;
+      }
+
+      .noscript {
+        max-width: 680px;
+        margin: 24px auto;
+        padding: 16px 20px;
+        border: 1px solid var(--lab-line);
+        border-radius: 12px;
+        color: var(--lab-muted);
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      /* Night reef keeps the same frosted furniture, tinted deep indigo. */
+      .lab-main[data-scene="night"] {
+        --lagoon-ink: #edf9ff;
+        --lagoon-soft: #a9c9d8;
+      }
+
+      .lab-main[data-scene="night"] [data-lagoon-stage] {
+        background: #020814;
+      }
+
+      .lab-main[data-scene="turtle"] [data-lagoon-stage] {
+        background: #cdbf86;
+      }
+
+      .lab-main[data-scene="turtle"] .lagoon-shell {
+        --lagoon-fit: cover;
+      }
+
+      .lab-main[data-scene="manta"] [data-lagoon-stage] {
+        background: #0a5a78;
+      }
+
+      .lab-main[data-scene="seahorse"] [data-lagoon-stage] {
+        background: #e9ddad;
+      }
+
+      .lab-main[data-scene="dolphin"] [data-lagoon-stage] {
+        background: #0a7d9b;
+      }
+
+      .lab-main[data-scene="hammer"] [data-lagoon-stage] {
+        background: #0b6a92;
+      }
+
+      .lab-main[data-scene="tang"] [data-lagoon-stage] {
+        background: #0c8f92;
+      }
+
+      .lab-main[data-scene="manta"] .lagoon-heading {
+        color: #f2fffd;
+        text-shadow:
+          0 2px 26px rgba(2, 30, 44, 0.55),
+          0 1px 2px rgba(2, 26, 38, 0.7);
+      }
+
+      .lab-main[data-scene="manta"] .ambient-kicker,
+      .lab-main[data-scene="manta"] .ambient-sub,
+      .lab-main[data-scene="manta"] .ambient-foot,
+      .lab-main[data-scene="manta"] .panel-foot {
+        color: #e7fbf7;
+        text-shadow: 0 1px 12px rgba(2, 32, 46, 0.7);
+      }
+
+      .lab-main[data-scene="night"] .lagoon-heading {
+        color: #edf9ff;
+        text-shadow: 0 0 34px rgba(104, 220, 255, 0.16);
+      }
+
+      .lab-main[data-scene="night"] .panel-head .panel-kicker,
+      .lab-main[data-scene="night"] .embed-badge {
+        border-color: rgba(150, 232, 255, 0.34);
+        background: rgba(4, 18, 34, 0.62);
+        color: #c6ecf7;
+      }
+
+      .lab-main[data-scene="night"] .pill {
+        border-color: rgba(150, 232, 255, 0.44);
+        background: rgba(4, 18, 34, 0.68);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.38);
+        color: #d9f6ff;
+      }
+
+      .lab-main[data-scene="night"] .pill-dot,
+      .lab-main[data-scene="night"] .status-dot {
+        background: #6fe6da;
+        box-shadow: 0 0 0 4px rgba(111, 230, 218, 0.14);
+      }
+
+      .lab-main[data-scene="night"] .ghost-link {
+        border-color: rgba(150, 232, 255, 0.32);
+        background: rgba(5, 21, 38, 0.64);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.26);
+        color: #d8f4ff;
+      }
+
+      .lab-main[data-scene="night"] .ghost-link:hover {
+        background: rgba(17, 45, 68, 0.74);
+      }
+
+      .lab-main[data-scene="night"] .ghost-link:focus-visible {
+        outline-color: rgba(150, 232, 255, 0.72);
+      }
+
+      .lab-main[data-scene="night"] .ghost-link--light {
+        background: rgba(6, 24, 42, 0.68);
+      }
+
+      .lab-main[data-scene="night"] .dock {
+        border-color: rgba(150, 232, 255, 0.32);
+        background: rgba(4, 16, 30, 0.62);
+        box-shadow:
+          0 24px 60px rgba(0, 0, 0, 0.42),
+          inset 0 1px 0 rgba(190, 245, 255, 0.08);
+      }
+
+      .lab-main[data-scene="night"] .dock:focus-within {
+        border-color: rgba(170, 240, 255, 0.62);
+        box-shadow:
+          0 24px 60px rgba(0, 0, 0, 0.46),
+          0 0 0 4px rgba(111, 230, 218, 0.12),
+          inset 0 1px 0 rgba(190, 245, 255, 0.1);
+      }
+
+      .lab-main[data-scene="night"] .chat-input,
+      .lab-main[data-scene="night"] .search-input {
+        color: #dcf5ff;
+      }
+
+      .lab-main[data-scene="night"] .chat-input::placeholder,
+      .lab-main[data-scene="night"] .search-input::placeholder {
+        color: #7597a8;
+      }
+
+      .lab-main[data-scene="night"] .dock-icons,
+      .lab-main[data-scene="night"] .search-icon,
+      .lab-main[data-scene="night"] .result-arrow {
+        color: #7fa4b6;
+      }
+
+      .lab-main[data-scene="night"] .dock-hint,
+      .lab-main[data-scene="night"] .search-kbd {
+        color: #86aab9;
+      }
+
+      .lab-main[data-scene="night"] .dock-hint--muted {
+        color: #7e9aa8;
+      }
+
+      .lab-main[data-scene="night"] .search-kbd {
+        border-color: rgba(150, 232, 255, 0.2);
+        background: rgba(9, 30, 50, 0.6);
+      }
+
+      .lab-main[data-scene="night"] .dock-foot {
+        border-top-color: rgba(140, 220, 255, 0.12);
+      }
+
+      .lab-main[data-scene="night"] .dock-send {
+        background: rgba(111, 230, 218, 0.13);
+        color: #9fe9f0;
+      }
+
+      .lab-main[data-scene="night"] .dock-send:hover {
+        background: rgba(111, 230, 218, 0.22);
+      }
+
+      .lab-main[data-scene="night"] .dock-send:focus-visible {
+        outline-color: rgba(150, 232, 255, 0.6);
+      }
+
+      .lab-main[data-scene="night"] .search-results,
+      .lab-main[data-scene="night"] .search-empty,
+      .lab-main[data-scene="night"] .reply {
+        border-color: rgba(140, 225, 255, 0.28);
+        background: rgba(4, 17, 32, 0.66);
+        box-shadow: 0 18px 46px rgba(0, 0, 0, 0.32);
+      }
+
+      .lab-main[data-scene="night"] .search-result a {
+        color: #c9e7f2;
+      }
+
+      .lab-main[data-scene="night"] .search-result a:hover {
+        background: rgba(111, 230, 218, 0.1);
+      }
+
+      .lab-main[data-scene="night"] .search-result a:focus-visible {
+        outline-color: rgba(150, 232, 255, 0.7);
+      }
+
+      .lab-main[data-scene="night"] .result-kind {
+        color: #7fa8b8;
+      }
+
+      .lab-main[data-scene="night"] .result-desc,
+      .lab-main[data-scene="night"] .search-empty-copy {
+        color: #8fb2c2;
+      }
+
+      .lab-main[data-scene="night"] .embed-copy {
+        border-color: rgba(150, 232, 255, 0.34);
+        background: rgba(4, 18, 34, 0.68);
+        box-shadow: 0 22px 54px rgba(0, 0, 0, 0.4);
+      }
+
+      .lab-main[data-scene="night"] .embed-desc {
+        color: #a9c9d8;
+      }
+
+      @media (max-width: 1520px) {
+        .scene-option span {
+          padding: 8px 9px;
+        }
+
+        .scene-option .scene-suffix {
+          display: none;
+        }
+      }
+
+      @media (max-width: 1180px) {
+        .rail {
+          display: none;
+        }
+
+        .lagoon-shell {
+          width: 100%;
+          max-width: 100%;
+          aspect-ratio: auto;
+          border-radius: 16px;
+        }
+
+        .mode-tab {
+          padding: 8px 9px;
+          font-size: 8px;
+        }
+
+        .scene-option span {
+          padding: 8px 8px;
+          font-size: 8px;
+        }
+
+        .scene-option .scene-suffix {
+          display: none;
+        }
+      }
+
+      @media (max-width: 900px) {
+        :root {
+          --topbar: 122px;
+        }
+
+        .topbar {
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 10px 14px;
+        }
+
+        .brand {
+          order: 1;
+        }
+
+        .back-link {
+          order: 2;
+          margin-left: auto;
+        }
+
+        .mode-tabs {
+          order: 3;
+          flex: 1 1 auto;
+          width: auto;
+          margin-left: 0;
+          justify-content: space-between;
+        }
+
+        .mode-tab {
+          flex: 1 1 auto;
+          justify-content: center;
+          padding: 8px 6px;
+          font-size: 8px;
+        }
+
+        .scene-switch {
+          order: 4;
+          flex: 1 1 100%;
+          width: 100%;
+          margin-left: 0;
+          justify-content: space-between;
+        }
+
+        .scene-option {
+          flex: 1 1 0;
+        }
+
+        .scene-option span {
+          flex: 1 1 auto;
+          justify-content: center;
+          padding: 8px 5px;
+          font-size: 8px;
+        }
+
+        .scene-option .scene-suffix {
+          display: none;
+        }
+
+        .lab-main {
+          height: calc(100vh - var(--topbar));
+          height: calc(100dvh - var(--topbar));
+          min-height: 580px;
+          padding: 0;
+          overflow: hidden;
+          background: var(--lab-bg);
+        }
+
+        .lagoon-shell {
+          width: 100%;
+          height: 100%;
+          max-width: none;
+          border: 0;
+          border-radius: 0;
+          box-shadow: none;
+          --lagoon-fit: cover;
+        }
+
+        .overlay-panel {
+          padding: 18px 16px;
+        }
+
+        .panel-head {
+          margin-bottom: 12px;
+        }
+
+        .lagoon-heading {
+          font-size: clamp(30px, 8.6vw, 44px);
+        }
+
+        .dock {
+          border-radius: 18px;
+        }
+
+        .search-results {
+          max-height: clamp(140px, 26vh, 240px);
+        }
+
+        .search-result a {
+          grid-template-columns: 48px minmax(0, 1fr) auto;
+          gap: 8px;
+          padding: 8px 10px;
+        }
+
+        .result-desc {
+          display: none;
+        }
+
+        .lab-main[data-mode="embed"] {
+          height: auto;
+          min-height: calc(100dvh - var(--topbar));
+          padding: 20px 16px 28px;
+          overflow: visible;
+        }
+
+        .lab-main[data-mode="embed"] .lagoon-shell {
+          width: 100%;
+          aspect-ratio: 4 / 5;
+          max-height: min(64dvh, 560px);
+          border-radius: 24px;
+        }
+
+        .lab-main[data-mode="embed"] .panel-embed {
+          justify-content: center;
+        }
+
+        .embed-copy {
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 600px) {
+        :root {
+          --topbar: 122px;
+        }
+
+        .scene-switch {
+          order: 4;
+          flex: 1 1 100%;
+          width: 100%;
+          margin-left: 0;
+          justify-content: space-between;
+        }
+
+        .scene-option {
+          flex: 1 1 0;
+        }
+
+        .scene-option span {
+          flex: 1 1 auto;
+          justify-content: center;
+          padding: 7px 3px;
+          font-size: 7px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .brand {
+          font-size: 9px;
+        }
+
+        .back-link {
+          font-size: 8px;
+        }
+
+        .tab-num {
+          display: none;
+        }
+
+        .panel-kicker {
+          font-size: 8px;
+        }
+
+        .chat-dock {
+          min-height: 126px;
+        }
+
+        .chat-input {
+          width: calc(100% - 56px);
+          height: 58px;
+          font-size: 16px;
+        }
+
+        .chat-dock .dock-hint {
+          right: 68px;
+          font-size: 8px;
+        }
+
+        .dock-icons {
+          gap: 16px;
+        }
+
+        .dock-send {
+          right: 10px;
+          bottom: 10px;
+          width: 42px;
+          height: 42px;
+        }
+
+        .ambient-foot {
+          font-size: 7px;
+        }
+
+        .search-kbd {
+          display: none;
+        }
+
+        .dock-hint--muted {
+          display: none;
+        }
+
+        .embed-copy {
+          padding: 18px;
+          border-radius: 18px;
+        }
+
+        .embed-desc {
+          font-size: 12px;
+        }
+      }
+
+      @media (max-height: 620px) and (min-width: 901px) {
+        .rail-note {
+          display: none;
+        }
+
+        .panel-ambient .ambient-sub {
+          display: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
+      .search-results { scrollbar-width: none; }
+      .search-results::-webkit-scrollbar { display: none; }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#lagoon-stage">Skip to the lagoon</a>
+
+    <header class="topbar">
+      <a class="brand" href="/">
+        <LogoMark />
+        ascii-things <span>/ immersive</span>
+      </a>
+
+      <div class="mode-tabs" role="tablist" aria-label="Lagoon uses">
+        {
+          modes.map((mode) => (
+            <button
+              class="mode-tab"
+              type="button"
+              role="tab"
+              id={`tab-${mode.id}`}
+              aria-controls={`panel-${mode.id}`}
+              aria-selected={mode.id === "ambient" ? "true" : "false"}
+              tabindex={mode.id === "ambient" ? "0" : "-1"}
+              data-mode-tab={mode.id}
+              data-index={mode.index}
+              data-name={mode.name}
+              data-desc={mode.desc}
+              data-use={mode.use}
+            >
+              <span class="tab-num" aria-hidden="true">{mode.index}</span>
+              <span>{mode.name === "Embedded card" ? "Card" : mode.name}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <fieldset class="scene-switch">
+        <legend class="visually-hidden">Lagoon scene</legend>
+        <label class="scene-option">
+          <input
+            type="radio"
+            name="lagoon-scene"
+            value="day"
+            aria-label="Day lagoon"
+            checked
+            data-scene-input
+          />
+          <span>Day<span class="scene-suffix"> lagoon</span></span>
+        </label>
+        <label class="scene-option">
+          <input
+            type="radio"
+            name="lagoon-scene"
+            value="night"
+            aria-label="Night reef"
+            data-scene-input
+          />
+          <span>Night<span class="scene-suffix"> reef</span></span>
+        </label>
+        <label class="scene-option">
+          <input
+            type="radio"
+            name="lagoon-scene"
+            value="turtle"
+            aria-label="Turtle close-up"
+            data-scene-input
+          />
+          <span>Turtle<span class="scene-suffix"> close-up</span></span>
+        </label>
+        <label class="scene-option">
+          <input
+            type="radio"
+            name="lagoon-scene"
+            value="manta"
+            aria-label="Manta flyby"
+            data-scene-input
+          />
+          <span>Manta<span class="scene-suffix"> flyby</span></span>
+        </label>
+        <label class="scene-option">
+          <input
+            type="radio"
+            name="lagoon-scene"
+            value="seahorse"
+            aria-label="Seahorse"
+            data-scene-input
+          />
+          <span>Seahorse</span>
+        </label>
+        <label class="scene-option">
+          <input
+            type="radio"
+            name="lagoon-scene"
+            value="dolphin"
+            aria-label="Dolphin pod"
+            data-scene-input
+          />
+          <span>Dolphin<span class="scene-suffix"> pod</span></span>
+        </label>
+        <label class="scene-option">
+          <input
+            type="radio"
+            name="lagoon-scene"
+            value="hammer"
+            aria-label="Hammerhead pass"
+            data-scene-input
+          />
+          <span>Hammerhead<span class="scene-suffix"> pass</span></span>
+        </label>
+        <label class="scene-option">
+          <input
+            type="radio"
+            name="lagoon-scene"
+            value="tang"
+            aria-label="Tang school"
+            data-scene-input
+          />
+          <span>Tang<span class="scene-suffix"> school</span></span>
+        </label>
+      </fieldset>
+
+      <a class="back-link" href="/design-ideas/#compositions">← Compositions</a>
+    </header>
+
+    <main
+      class="lab-main"
+      data-mode="ambient"
+      data-scene="day"
+      data-lagoon-lab
+      id="lagoon-stage"
+    >
+      <h1 class="visually-hidden">Immersive lagoon — four uses for one ASCII lagoon</h1>
+
+      <LagoonStage class="lagoon-shell">
+        <div class="overlay">
+          <section
+            class="overlay-panel panel-ambient"
+            id="panel-ambient"
+            role="tabpanel"
+            aria-labelledby="tab-ambient"
+            data-panel="ambient"
+          >
+            <div class="ambient-top">
+              <span class="pill">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 12c3-4 6-4 9 0s6 4 9 0"></path>
+                  <path d="M3 17c3-4 6-4 9 0s6 4 9 0"></path>
+                </svg>
+                <span>Honu · lagoon</span>
+                <span class="pill-dot" aria-hidden="true"></span>
+              </span>
+            </div>
+
+            <div class="ambient-center">
+              <p class="ambient-kicker">{ambient.index} / live ASCII · 1944 × 1760</p>
+              <h2 class="lagoon-heading">breathe with the tide.</h2>
+              <p class="ambient-sub">A full-screen lagoon for heroes and screensavers.</p>
+              <button class="ghost-link" type="button" data-go-mode="search">
+                Search the reef <span aria-hidden="true">→</span>
+              </button>
+            </div>
+
+            <p class="ambient-foot">
+              <span class="status-dot" aria-hidden="true"></span>
+              24.5s seamless loop · pauses offscreen
+            </p>
+          </section>
+
+          <section
+            class="overlay-panel panel-search"
+            id="panel-search"
+            role="tabpanel"
+            aria-labelledby="tab-search"
+            data-panel="search"
+            hidden
+          >
+            <div class="panel-head">
+              <p class="panel-kicker">{search.index} / local index</p>
+              <h2 class="lagoon-heading">what are you looking for?</h2>
+            </div>
+
+            <form class="dock search-dock" role="search" data-search-form>
+              <div class="search-top">
+                <svg
+                  class="search-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="11" cy="11" r="7"></circle>
+                  <path d="m20 20-3.5-3.5"></path>
+                </svg>
+                <input
+                  class="search-input"
+                  id="lagoon-search"
+                  type="search"
+                  placeholder="Search the reef..."
+                  aria-label="Search the lagoon index"
+                  autocomplete="off"
+                  spellcheck="false"
+                  data-search-input
+                />
+                <kbd class="search-kbd" aria-hidden="true">/</kbd>
+              </div>
+              <div class="dock-foot">
+                <span class="dock-hint" data-search-count role="status" aria-live="polite">
+                  {links.length} results
+                </span>
+                <span class="dock-hint dock-hint--muted">local demo · no backend</span>
+              </div>
+            </form>
+
+            <div class="search-body">
+              <ul class="search-results" aria-label="Lagoon index results" data-search-results>
+                {
+                  links.map((link) => (
+                    <li class="search-result" data-search-item data-search-text={link.searchText}>
+                      <a href={link.href}>
+                        <span class="result-kind">{link.kind}</span>
+                        <span>
+                          <span class="result-title">{link.title}</span>
+                          <span class="result-desc">{link.description}</span>
+                        </span>
+                        <span class="result-arrow" aria-hidden="true">
+                          ↗
+                        </span>
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+
+              <div class="search-empty" data-search-empty hidden>
+                <p class="search-empty-title">
+                  No matches for <span data-search-term>“that”</span>.
+                </p>
+                <p class="search-empty-copy">
+                  Try “koi”, “scene”, or clear the search to see the whole reef index.
+                </p>
+                <button class="ghost-link" type="button" data-search-clear>Clear search</button>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="overlay-panel panel-chat"
+            id="panel-chat"
+            role="tabpanel"
+            aria-labelledby="tab-chat"
+            data-panel="chat"
+            hidden
+          >
+            <div class="panel-head">
+              <p class="panel-kicker">{chat.index} / Honu, locally</p>
+              <h2 class="lagoon-heading">what’s on your mind?</h2>
+            </div>
+
+            <form class="dock chat-dock" id="lagoon-chat" data-chat-form>
+              <textarea
+                class="chat-input"
+                id="lagoon-chat-input"
+                rows="1"
+                placeholder="Ask Honu anything..."
+                aria-label="Message Honu"
+                aria-describedby="chat-key-help"
+                autocomplete="off"
+                data-chat-input></textarea>
+              <span class="visually-hidden" id="chat-key-help">
+                Press Enter to send. Press Shift and Enter for a new line.
+              </span>
+              <div class="dock-icons" aria-hidden="true">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                >
+                  <rect x="9" y="3" width="6" height="11" rx="3"></rect>
+                  <path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path>
+                </svg>
+              </div>
+              <p class="dock-hint" aria-hidden="true">↵ send · ⇧↵ newline</p>
+              <button class="dock-send" type="submit" aria-label="Send message">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <path d="M7 17 17 7M8 7h9v9"></path>
+                </svg>
+              </button>
+            </form>
+
+            <div
+              class="reply"
+              data-chat-reply
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"></div>
+
+            <p class="panel-foot">
+              <span class="status-dot" aria-hidden="true"></span>
+              local reply · no network · input clears after send
+            </p>
+          </section>
+
+          <section
+            class="overlay-panel panel-embed"
+            id="panel-embed"
+            role="tabpanel"
+            aria-labelledby="tab-embed"
+            data-panel="embed"
+            hidden
+          >
+            <span class="embed-badge">
+              <span class="status-dot" aria-hidden="true"></span>
+              live ascii
+            </span>
+
+            <div class="embed-copy">
+              <p class="panel-kicker">{embed.index} / embedded card</p>
+              <h2 class="embed-title">a lagoon,<br />on a card.</h2>
+              <p class="embed-desc">
+                The same stage, framed and cropped for a hero card. One canvas instance changes
+                layout with the mode — the scene code is never copied.
+              </p>
+              <div class="embed-actions">
+                <button class="ghost-link ghost-link--light" type="button" data-go-mode="search">
+                  Try search
+                </button>
+                <button class="ghost-link ghost-link--light" type="button" data-go-mode="chat">
+                  Ask Honu
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </LagoonStage>
+
+      <aside class="rail" aria-label="About this mode">
+        <p class="rail-eyebrow"><span data-rail-index>{ambient.index}</span> / 04 · Immersive</p>
+        <h2 class="rail-title" data-rail-title>{ambient.name}</h2>
+        <p class="rail-desc" data-rail-desc>{ambient.desc}</p>
+
+        <dl class="rail-stats">
+          <div>
+            <dt>Stage</dt>
+            <dd>1944 × 1760</dd>
+          </div>
+          <div>
+            <dt>Loop</dt>
+            <dd>24.5 s</dd>
+          </div>
+          <div>
+            <dt>Look</dt>
+            <dd data-rail-scene>Day lagoon</dd>
+          </div>
+          <div>
+            <dt>Scene</dt>
+            <dd data-rail-state>idle</dd>
+          </div>
+        </dl>
+
+        <p class="rail-use"><span>Good for</span><b data-rail-use>{ambient.use}</b></p>
+        <p class="rail-note">
+          Eight scenes, four overlays, one canvas. Motion pauses when the stage leaves the viewport
+          and freezes for reduced-motion visitors.
+        </p>
+        <a class="rail-back" href="/design-ideas/#compositions">← Compositions</a>
+      </aside>
+    </main>
+
+    <noscript>
+      <p class="noscript">
+        The lagoon, mode switching, search, and chat need JavaScript. The rest of the site is
+        available from the <a href="/">home page</a>.
+      </p>
+    </noscript>
+
+    <script>
+      import "../scripts/lagoon-lab";
+    </script>
+  </body>
+</html>

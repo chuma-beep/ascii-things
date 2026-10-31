@@ -2,8 +2,8 @@
 import config from "virtual:starlight/user-config";
 
 import LanguageSelect from "virtual:starlight/components/LanguageSelect";
+import LogoMark from "./LogoMark.astro";
 import Search from "virtual:starlight/components/Search";
-import SiteTitle from "virtual:starlight/components/SiteTitle";
 import SocialIcons from "virtual:starlight/components/SocialIcons";
 import ThemeSelect from "virtual:starlight/components/ThemeSelect";
 import MobileNav from "./MobileNav.astro";
@@ -14,7 +14,12 @@ const shouldRenderSearch =
 
 <div class="docs-header">
   <div class="docs-header-top">
-    <div class="title-wrapper sl-flex"><SiteTitle /></div>
+    <div class="title-wrapper sl-flex">
+      <a class="docs-brand" href="/">
+        <LogoMark />
+        ascii-things
+      </a>
+    </div>
     <nav class="docs-primary-nav" aria-label="Primary">
       <details class="docs-library">
         <summary>Library</summary>
@@ -22,6 +27,7 @@ const shouldRenderSearch =
           <a href="/library/">All items</a>
           <a href="/showcase/">Showcase</a>
           <a href="/design-ideas/">Design ideas</a>
+          <a href="/design-ideas/#compositions">Compositions</a>
           <a href="/library/#library-search">Search the library</a>
           <a href="/library/?type=scene">Scenes</a>
           <a href="/library/?type=webgl">WebGL</a>

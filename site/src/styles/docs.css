@@ -148,6 +148,24 @@ h4 {
   gap: 6px;
 }
 
+.scene-demo-glyphs {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.scene-demo-glyphs legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .scene-demo-button {
   min-height: 42px;
   padding: 0 14px;
@@ -340,6 +358,7 @@ h4 {
 .sidebar-content a[aria-current="page"]:hover,
 .sidebar-content a[aria-current="page"]:focus-visible {
   border-radius: 0;
+  color: var(--sl-color-accent-high);
 }
 
 .right-sidebar a[aria-current="true"],
@@ -387,10 +406,29 @@ site-search kbd kbd {
 
 .docs-header-top .title-wrapper {
   order: 1;
+  display: inline-flex;
+  align-items: center;
   overflow: clip;
   padding: 0.25rem;
   margin: -0.25rem;
   min-width: 0;
+}
+
+.docs-header-top .docs-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--sl-color-white);
+  font-family: var(--sl-font);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.docs-header-top .docs-brand:hover {
+  color: var(--sl-color-accent-high);
 }
 
 .docs-search {

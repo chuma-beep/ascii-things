@@ -1,5 +1,6 @@
 ---
 import { LIBRARY } from "../data/library";
+import BackToTop from "./BackToTop.astro";
 
 const filters = [
   { id: "all", label: "All", count: LIBRARY.length },
@@ -80,6 +81,12 @@ const filters = [
   </div>
 
   <p class="library-empty" data-library-empty hidden>No items match that search.</p>
+
+  <div class="library-more">
+    <button type="button" data-library-more hidden>Load more</button>
+  </div>
+
+  <BackToTop sidebarOffset />
 </section>
 
 <script>
@@ -91,27 +98,43 @@ const filters = [
     const cards = Array.from(root.querySelectorAll(".library-card"));
     const count = root.querySelector("[data-library-count]");
     const empty = root.querySelector("[data-library-empty]");
+    const more = root.querySelector<HTMLButtonElement>("[data-library-more]");
     const filterIds = new Set(
       buttons.map((button) => button.dataset.filter).filter((id): id is string => Boolean(id)),
     );
+    const PAGE_SIZE = 9;
     let active = "all";
+    let page = 1;
 
     const apply = () => {
       const query = (search?.value || "").trim().toLowerCase();
-      let shown = 0;
-
-      cards.forEach((card) => {
+      const matches = cards.filter((card) => {
         const matchesKind =
           active === "all" ||
           (active === "kanji" ? card.dataset.kanji === "true" : card.dataset.kind === active);
         const matchesQuery = !query || (card.dataset.search || "").includes(query);
-        const visible = matchesKind && matchesQuery;
-        card.hidden = !visible;
-        if (visible) shown++;
+        return matchesKind && matchesQuery;
+      });
+      const visible = matches.slice(0, page * PAGE_SIZE);
+      const visibleSet = new Set(visible);
+
+      cards.forEach((card) => {
+        card.hidden = !visibleSet.has(card);
       });
 
-      if (count) count.textContent = `${shown} item${shown === 1 ? "" : "s"}`;
-      if (empty) empty.hidden = shown !== 0;
+      if (count) {
+        count.textContent =
+          visible.length === matches.length
+            ? `${matches.length} item${matches.length === 1 ? "" : "s"}`
+            : `${visible.length} of ${matches.length} items`;
+      }
+      if (empty) empty.hidden = matches.length !== 0;
+
+      if (more) {
+        const remaining = matches.length - visible.length;
+        more.hidden = remaining <= 0;
+        more.textContent = `Load more · ${remaining} remaining`;
+      }
     };
 
     const readFilter = () => {
@@ -121,6 +144,7 @@ const filters = [
 
     const setActive = (next: string, push = false) => {
       active = filterIds.has(next) ? next : "all";
+      page = 1;
       buttons.forEach((button) => {
         const on = button.dataset.filter === active;
         button.classList.toggle("is-active", on);
@@ -135,7 +159,15 @@ const filters = [
       window.history.pushState({}, "", url);
     };
 
-    search?.addEventListener("input", apply);
+    search?.addEventListener("input", () => {
+      page = 1;
+      apply();
+    });
+
+    more?.addEventListener("click", () => {
+      page += 1;
+      apply();
+    });
 
     const focusFromHash = () => {
       if (window.location.hash === "#library-search") search?.focus();
@@ -161,11 +193,15 @@ const filters = [
   }
 
   .library-toolbar {
+    position: sticky;
+    top: var(--sl-nav-height, 3.5rem);
+    z-index: 8;
     display: grid;
     gap: 0.85rem;
     padding: 1rem;
     border: 1px solid var(--sl-color-gray-5, rgba(0, 0, 0, 0.15));
     background: var(--sl-color-bg-nav, #f5f3ef);
+    box-shadow: 0 1px 0 var(--sl-color-gray-6, rgba(0, 0, 0, 0.08));
   }
 
   .library-search input {
@@ -297,6 +333,36 @@ const filters = [
   .library-empty {
     margin-top: 1rem;
     color: var(--sl-color-gray-3, rgba(0, 0, 0, 0.6));
+  }
+
+  .library-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.4rem;
+  }
+
+  .library-more button {
+    border: 1px solid var(--sl-color-text-accent, #ff7a1a);
+    background: transparent;
+    color: var(--sl-color-text-accent, #ff7a1a);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    padding: 0.7rem 1rem;
+    text-transform: uppercase;
+    transition:
+      background-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .library-more button:hover {
+    background: var(--sl-color-text-accent, #ff7a1a);
+    color: var(--sl-color-bg, #fff);
+  }
+
+  .library-more button[hidden] {
+    display: none;
   }
 
   .library-sr {

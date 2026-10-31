@@ -73,7 +73,8 @@ button {
 
 .brand {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.045em;

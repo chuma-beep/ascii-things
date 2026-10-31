@@ -9,6 +9,7 @@ import {
   createServers,
   createSharks,
   createStarlings,
+  createLagoon,
   type DogEngine,
 } from "ascii-things";
 
@@ -22,7 +23,8 @@ type CardEngine =
   | ReturnType<typeof createAnts>
   | ReturnType<typeof createKoi>
   | ReturnType<typeof createCity>
-  | ReturnType<typeof createServers>;
+  | ReturnType<typeof createServers>
+  | ReturnType<typeof createLagoon>;
 
 const heroCanvas = document.querySelector<HTMLCanvasElement>("#hero-canvas");
 if (heroCanvas) {
@@ -111,46 +113,46 @@ function startCard(canvas: HTMLCanvasElement) {
       engine = createRobots(canvas, {
         palette: "abyss",
         seed: 12,
-        count: 5,
-        columns: 66,
-        maxCells: 4200,
+        count: 6,
+        columns: 110,
         interactive: false,
-        calm: true,
+        calm: false,
       });
       break;
     case "jellyfish":
       engine = createJellyfish(canvas, {
         palette: "abyss",
         seed: 13,
-        count: 4,
-        columns: 72,
-        maxCells: 4200,
+        count: 5,
+        columns: 110,
         interactive: false,
-        calm: true,
+        calm: false,
       });
       break;
-    case "dog":
+    case "dog": {
+      const isComposition = canvas.dataset.composition === "true";
+      const surface = canvas.closest<HTMLElement>(".composition-mini")?.dataset.surface;
       engine = createDog(canvas, {
-        palette: "abyss",
-        seed: 14,
+        palette: isComposition && surface === "paper" ? "paper" : "abyss",
+        seed: isComposition ? 7 : 14,
         count: 1,
-        dogs: [{ size: 1.15 }],
-        spread: [0.5, 0.5],
-        columns: 66,
-        maxCells: 4200,
+        dogs: isComposition ? [{ size: 1.35 }] : undefined,
+        spread: isComposition ? [0.68, 0.68] : undefined,
+        columns: isComposition ? 72 : 110,
+        maxCells: isComposition ? 5200 : undefined,
         interactive: false,
-        calm: true,
+        calm: isComposition,
       });
       break;
+    }
     case "starlings":
       engine = createStarlings(canvas, {
         palette: "abyss",
         seed: 21,
-        count: 110,
-        columns: 72,
-        maxCells: 4200,
+        count: 120,
+        columns: 110,
         interactive: false,
-        calm: true,
+        calm: false,
       });
       break;
     case "fireflies":
@@ -158,43 +160,43 @@ function startCard(canvas: HTMLCanvasElement) {
         palette: "abyss",
         seed: 23,
         count: 70,
-        columns: 72,
-        maxCells: 4200,
+        columns: 110,
         interactive: false,
-        calm: true,
+        calm: false,
       });
       break;
     case "ants":
       engine = createAnts(canvas, {
         palette: "abyss",
         seed: 25,
-        count: 44,
-        columns: 72,
-        maxCells: 4200,
+        count: 45,
+        columns: 110,
         interactive: false,
-        calm: true,
+        calm: false,
       });
       break;
-    case "koi":
+    case "koi": {
+      const isComposition = canvas.dataset.composition === "true";
+      const surface = canvas.closest<HTMLElement>(".composition-mini")?.dataset.surface;
       engine = createKoi(canvas, {
-        palette: "abyss",
-        seed: 27,
-        count: 7,
-        columns: 72,
-        maxCells: 4200,
+        palette: isComposition && surface === "paper" ? "paper" : "abyss",
+        seed: isComposition ? 4 : 27,
+        count: isComposition ? 4 : 6,
+        columns: isComposition ? 72 : 110,
+        maxCells: isComposition ? 4600 : undefined,
         interactive: false,
-        calm: true,
+        calm: isComposition,
       });
       break;
+    }
     case "city":
       engine = createCity(canvas, {
         palette: "abyss",
         seed: 29,
         count: 18,
-        columns: 76,
-        maxCells: 4200,
+        columns: 110,
         interactive: false,
-        calm: true,
+        calm: false,
       });
       break;
     case "servers":
@@ -202,33 +204,35 @@ function startCard(canvas: HTMLCanvasElement) {
         palette: "abyss",
         seed: 31,
         count: 8,
-        columns: 72,
-        maxCells: 4200,
+        columns: 110,
         interactive: false,
-        calm: true,
+        calm: false,
+      });
+      break;
+    case "lagoon":
+      engine = createLagoon(canvas, {
+        variant: "reef",
+        interactive: false,
+        label: "A live ASCII day lagoon",
       });
       break;
     default:
       engine = createSharks(canvas, {
         palette: "abyss",
         seed: 11,
-        density: 1,
-        columns: 66,
-        maxCells: 4200,
+        density: 0.85,
+        columns: 110,
         interactive: false,
-        calm: true,
-        sharks: [
-          { kind: "thresher", size: 1.1 },
-          { kind: "hammerhead", size: 1 },
-          { kind: "mako", size: 0.8 },
-        ],
+        calm: false,
       });
   }
   cards.set(canvas, engine);
 }
 
 const cardCanvases = Array.from(
-  document.querySelectorAll<HTMLCanvasElement>(".scene-preview canvas[data-scene]"),
+  document.querySelectorAll<HTMLCanvasElement>(
+    ".scene-preview canvas[data-scene], .composition-mini canvas[data-scene]",
+  ),
 );
 for (const canvas of cardCanvases) startCard(canvas);
 

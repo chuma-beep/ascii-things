@@ -11,6 +11,15 @@ export interface LibraryItem {
 
 export const LIBRARY: LibraryItem[] = [
   {
+    id: "lagoon",
+    title: "Lagoon",
+    description:
+      "Turtle, manta, seahorse, dolphin, hammerhead, and tang in one full-canvas family.",
+    kind: "scene",
+    href: "/scenes/lagoon/",
+    tags: ["ocean", "marine", "immersive"],
+  },
+  {
     id: "sharks",
     title: "Shark tank",
     description: "Schools, pursuit, splash, and wake in open water.",

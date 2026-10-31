@@ -1,5 +1,6 @@
 ---
 import "../styles/404.css";
+import LogoMark from "../components/LogoMark.astro";
 
 const title = "404 — Nothing at this address";
 const description = "That path is not part of ascii-things. Try the library, the docs, or the scene overview.";
@@ -16,6 +17,7 @@ const description = "That path is not part of ascii-things. Try the library, the
     <meta name="robots" content="noindex" />
     <meta name="theme-color" content="#e5dccd" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline src="/favicon-motion.js" type="module"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -25,7 +27,7 @@ const description = "That path is not part of ascii-things. Try the library, the
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="/">ascii-things<sup>®</sup></a>
+      <a class="brand" href="/"><LogoMark />ascii-things<sup>®</sup></a>
       <nav class="nav" aria-label="Utility">
         <span class="nav-status">Error index / 404</span>
         <a href="/library/">Library ↗</a>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { PaletteName } from "ascii-things";
+import type { GlyphStyle, PaletteName } from "ascii-things";
 import { createJellyfish } from "ascii-things/jellyfish";
 import type { JellyfishStats } from "ascii-things/jellyfish";
 import { createDog } from "ascii-things/dog";
@@ -142,6 +142,7 @@ function buildEngine(
   calm: boolean,
   seed: number,
   columns: number,
+  glyphs: GlyphStyle,
 ): DemoEngine {
   const shared = {
     palette,
@@ -154,11 +155,11 @@ function buildEngine(
 
   switch (scene) {
     case "sharks":
-      return createSharks(canvas, { ...shared, density: 0.85 }) as unknown as DemoEngine;
+      return createSharks(canvas, { ...shared, density: 0.85, glyphs }) as unknown as DemoEngine;
     case "robots":
       return createRobots(canvas, { ...shared, count: 6 }) as unknown as DemoEngine;
     case "jellyfish":
-      return createJellyfish(canvas, { ...shared, count: 5 }) as unknown as DemoEngine;
+      return createJellyfish(canvas, { ...shared, count: 5, glyphs }) as unknown as DemoEngine;
     case "dog":
       return createDog(canvas, {
         ...shared,
@@ -173,7 +174,7 @@ function buildEngine(
     case "ants":
       return createAnts(canvas, { ...shared, count: 45 }) as unknown as DemoEngine;
     case "koi":
-      return createKoi(canvas, { ...shared, count: 6 }) as unknown as DemoEngine;
+      return createKoi(canvas, { ...shared, count: 6, glyphs }) as unknown as DemoEngine;
     case "city":
       return createCity(canvas, shared) as unknown as DemoEngine;
     case "servers":
@@ -290,6 +291,7 @@ export default function SceneDemo({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<DemoEngine | null>(null);
   const [palette, setPalette] = useState<PaletteName>(initialPalette);
+  const [glyphs, setGlyphs] = useState<GlyphStyle>("ascii");
   const [calm, setCalm] = useState(false);
   const [paused, setPaused] = useState(false);
   const [stats, setStats] = useState<DemoStats | null>(null);
@@ -297,12 +299,13 @@ export default function SceneDemo({
   const reducedMotion = useReducedMotion();
   const effectiveCalm = calm || reducedMotion;
   const meta = SCENES[scene];
+  const showGlyphSelector = scene === "sharks" || scene === "jellyfish" || scene === "koi";
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const engine = buildEngine(scene, canvas, palette, effectiveCalm, seed, columns);
+    const engine = buildEngine(scene, canvas, palette, effectiveCalm, seed, columns, glyphs);
     engine.setOptions({ speed });
     engineRef.current = engine;
 
@@ -315,8 +318,9 @@ export default function SceneDemo({
       engine.destroy();
       engineRef.current = null;
     };
-    // Palette and calm are applied live below; only the world identity remounts.
-  }, [scene, seed, columns]);
+    // Palette and calm are applied live below; only the world identity or the
+    // glyph variant remounts.
+  }, [scene, seed, columns, glyphs]);
 
   useEffect(() => {
     engineRef.current?.setOptions({ palette, calm: effectiveCalm, speed });
@@ -442,6 +446,22 @@ export default function SceneDemo({
           ariaLabel="Demo palette"
         />
         <div className="scene-demo-actions">
+          {showGlyphSelector && (
+            <fieldset className="scene-demo-glyphs">
+              <legend>Glyph style</legend>
+              {(["ascii", "kanji"] as const).map((style) => (
+                <button
+                  key={style}
+                  type="button"
+                  className="scene-demo-button"
+                  aria-pressed={glyphs === style}
+                  onClick={() => setGlyphs(style)}
+                >
+                  {style === "ascii" ? "ASCII" : "Kanji"}
+                </button>
+              ))}
+            </fieldset>
+          )}
           <button
             type="button"
             className="scene-demo-button"

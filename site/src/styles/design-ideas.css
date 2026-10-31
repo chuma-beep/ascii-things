@@ -76,7 +76,8 @@ a:focus-visible {
 
 .di-brand {
   display: inline-flex;
-  gap: 7px;
+  align-items: center;
+  gap: 0.55rem;
   color: var(--di-ink);
   font-size: 12px;
   font-weight: 600;
@@ -1423,5 +1424,139 @@ a:focus-visible {
 
   .di-copy {
     transition: none;
+  }
+}
+
+
+/* ── design idea search ─────────────────────────────────────────── */
+
+.di-search {
+  position: relative;
+  width: min(var(--di-max), calc(100% - var(--di-pad) * 2));
+  min-height: 264px;
+  margin: 0 auto 28px;
+  overflow: hidden;
+  border: 1px solid var(--di-line-strong);
+  background: #050607;
+  color: var(--di-paper);
+}
+
+.di-search__scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.di-search__scene ascii-sharks {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.di-search__scene::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(5, 6, 7, 0.97) 0%, rgba(5, 6, 7, 0.78) 52%, rgba(5, 6, 7, 0.2) 100%),
+    linear-gradient(0deg, rgba(5, 6, 7, 0.52), transparent 55%);
+  content: "";
+  pointer-events: none;
+}
+
+.di-search__inner {
+  position: relative;
+  z-index: 2;
+  width: min(680px, 100%);
+  padding: clamp(24px, 4vw, 48px);
+}
+
+.di-search .di-eyebrow {
+  margin-bottom: 14px;
+}
+
+.di-search h2 {
+  max-width: 14ch;
+  margin: 0;
+  color: var(--di-paper);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.94;
+}
+
+.di-search h2 em {
+  color: var(--di-orange);
+  font-style: normal;
+}
+
+.di-search__form {
+  margin-top: 24px;
+}
+
+.di-search__label {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(243, 238, 228, 0.55);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.di-search input {
+  width: 100%;
+  height: 58px;
+  padding: 0 18px;
+  border: 1px solid rgba(243, 238, 228, 0.32);
+  border-radius: 0;
+  background: rgba(243, 238, 228, 0.96);
+  color: var(--di-ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.di-search input::placeholder {
+  color: var(--di-muted);
+}
+
+.di-search input:focus-visible {
+  outline: 2px solid var(--di-orange);
+  outline-offset: 2px;
+}
+
+.di-search__status {
+  margin: 9px 0 0;
+  color: rgba(243, 238, 228, 0.55);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+[data-search][hidden] {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .di-search {
+    width: calc(100% - 36px);
+    min-height: 300px;
+    margin-bottom: 22px;
+  }
+
+  .di-search__inner {
+    padding: 24px 20px;
+  }
+
+  .di-search h2 {
+    max-width: 12ch;
+    font-size: clamp(2rem, 10vw, 2.8rem);
+  }
+
+  .di-search input {
+    height: 54px;
+    font-size: 12px;
   }
 }

@@ -1,0 +1,394 @@
+---
+import {
+  COMPOSITION_SCENES,
+  COMPOSITION_SURFACES,
+  DEFAULT_COMPOSITION_SCENE,
+  findCompositionScene,
+} from "../data/compositions";
+
+interface Props {
+  compact?: boolean;
+  tone?: "paper" | "dark";
+}
+
+const { compact = false, tone = "paper" } = Astro.props;
+const defaultScene = findCompositionScene(DEFAULT_COMPOSITION_SCENE);
+---
+
+<section
+  class:list={["cmp-section", compact && "cmp-section--compact", tone === "dark" && "cmp-section--dark"]}
+  id="compositions"
+  data-composition-stage
+  data-composition-scene={defaultScene.id}
+  aria-labelledby="cmp-title"
+>
+  <div class="cmp-head">
+    <p class="cmp-eyebrow"><span class="cmp-dot" aria-hidden="true"></span> Compositions / live</p>
+    <div class="cmp-head__row">
+      <h2 id="cmp-title">One scene. <em>Three surfaces.</em></h2>
+      <p>
+        Same canvas, three existing ascii-things languages. Swap the scene; keep the
+        surface. Take the one that fits.
+      </p>
+    </div>
+  </div>
+
+  <div class="cmp-rail" role="group" aria-label="Choose a scene">
+    {
+      COMPOSITION_SCENES.map((scene, index) => (
+        <button
+          class:list={["cmp-pick", scene.id === defaultScene.id && "is-active"]}
+          type="button"
+          data-composition-pick={scene.id}
+          aria-pressed={scene.id === defaultScene.id ? "true" : "false"}
+        >
+          <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+          {scene.name}
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="cmp-grid">
+    {
+      COMPOSITION_SURFACES.map((surface, index) => (
+        <article
+          class="cmp-panel"
+          data-composition-panel
+          data-surface={surface.id}
+          data-scene={defaultScene.id}
+        >
+          <div class="cmp-panel__scene" data-composition-live data-live="false">
+            <img
+              src={`/showcase/${defaultScene.image}.jpg`}
+              alt=""
+              loading={index === 0 ? "eager" : "lazy"}
+              decoding="async"
+              data-composition-fallback
+            />
+          </div>
+          <div class="cmp-panel__top">
+            <span>{surface.kicker}</span>
+            <span data-composition-meta>{surface.meta}</span>
+          </div>
+          <div class="cmp-panel__copy">
+            <p class="cmp-panel__kicker">{surface.name} / ASCII-THINGS</p>
+            <h3>{surface.title}</h3>
+            <p>{surface.body}</p>
+          </div>
+          <div class="cmp-panel__actions">
+            <button type="button" data-composition-prompt>
+              Copy prompt
+            </button>
+            <button type="button" data-composition-download>
+              Download HTML
+            </button>
+            {surface.id === "immersive" && (
+              <a href="/lagoon-lab/">Open immersive demo <span aria-hidden="true">↗</span></a>
+            )}
+          </div>
+        </article>
+      ))
+    }
+  </div>
+
+  <div class="cmp-foot">
+    <span>Same composition data / Design ideas + Showcase</span>
+    <span>
+      <a href="/showcase/#compositions">See the archive <span aria-hidden="true">↗</span></a>
+      <a href="/guide/installation/">Install <span aria-hidden="true">↗</span></a>
+    </span>
+  </div>
+</section>
+
+<script type="module">
+  import {
+    COMPOSITION_SCENES,
+    COMPOSITION_SURFACES,
+    buildCompositionHtml,
+    compositionAttributes,
+    compositionPrompt,
+    findCompositionScene,
+    findCompositionSurface,
+  } from "../data/compositions";
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let sceneLoader: Promise<unknown> | undefined;
+  const loadScenes = () => (sceneLoader ??= import("ascii-things/element"));
+
+  const fallbackCopy = (text: string) => {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.opacity = "0";
+    document.body.append(area);
+    area.select();
+    const copied = document.execCommand("copy");
+    area.remove();
+    return copied;
+  };
+
+  const copyText = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      return fallbackCopy(text);
+    }
+  };
+
+  const flash = (button: HTMLButtonElement, label: string, next: string) => {
+    const original = label;
+    button.textContent = next;
+    window.setTimeout(() => {
+      button.textContent = original;
+    }, 1700);
+  };
+
+  let sharedCleanup: (() => void) | undefined;
+
+  const preparePanel = (
+    host: HTMLElement,
+    scene: ReturnType<typeof findCompositionScene>,
+    surface: ReturnType<typeof findCompositionSurface>,
+  ) => {
+    host.querySelector("[data-composition-scene]")?.remove();
+    host.querySelectorAll("[data-composition-mirror]").forEach((element) => element.remove());
+    host.dataset.live = "false";
+
+    const fallback = host.querySelector<HTMLImageElement>("[data-composition-fallback]");
+    if (fallback) fallback.src = `/showcase/${scene.image}.jpg`;
+
+    const meta = host
+      .closest("[data-composition-panel]")
+      ?.querySelector<HTMLElement>("[data-composition-meta]");
+    if (meta) meta.textContent = surface.meta;
+  };
+
+  const createSceneElement = (
+    scene: ReturnType<typeof findCompositionScene>,
+    surface: ReturnType<typeof findCompositionSurface>,
+  ) => {
+    const element = document.createElement(scene.tag);
+    for (const [name, value] of Object.entries(compositionAttributes(scene, surface))) {
+      if (value === "") element.setAttribute(name, "");
+      else element.setAttribute(name, value);
+    }
+    element.dataset.compositionScene = "true";
+    if (reducedMotion.matches) {
+      element.setAttribute("paused", "");
+      element.setAttribute("calm", "");
+    }
+    return element;
+  };
+
+  const mountPanelScene = (
+    host: HTMLElement,
+    scene: ReturnType<typeof findCompositionScene>,
+    surface: ReturnType<typeof findCompositionSurface>,
+  ) => {
+    const element = createSceneElement(scene, surface);
+    element.addEventListener(
+      "ascii-ready",
+      () => {
+        host.dataset.live = "true";
+      },
+      { once: true },
+    );
+    host.append(element);
+  };
+
+  const mountSharedScene = (
+    panels: HTMLElement[],
+    scene: ReturnType<typeof findCompositionScene>,
+  ) => {
+    const [sourcePanel] = panels;
+    if (!sourcePanel) return;
+
+    const sourceSurface = findCompositionSurface(
+      sourcePanel.dataset.surface ?? COMPOSITION_SURFACES[0].id,
+    );
+    const sourceHost = sourcePanel.querySelector<HTMLElement>("[data-composition-live]");
+    if (!sourceHost) return;
+
+    const mirrors = panels.slice(1).flatMap((panel) => {
+      const host = panel.querySelector<HTMLElement>("[data-composition-live]");
+      if (!host) return [];
+      const canvas = document.createElement("canvas");
+      canvas.dataset.compositionMirror = "true";
+      canvas.setAttribute("aria-hidden", "true");
+      host.append(canvas);
+      return [{ host, canvas }];
+    });
+
+    const source = createSceneElement(scene, sourceSurface);
+    source.addEventListener(
+      "ascii-ready",
+      () => {
+        for (const panel of panels) {
+          panel.querySelector<HTMLElement>("[data-composition-live]")!.dataset.live = "true";
+        }
+
+        const sourceCanvas = source.shadowRoot?.querySelector("canvas");
+        if (!sourceCanvas) return;
+
+        const draw = () => {
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          for (const { host, canvas } of mirrors) {
+            const rect = host.getBoundingClientRect();
+            if (!rect.width || !rect.height) continue;
+
+            const width = Math.max(1, Math.round(rect.width * dpr));
+            const height = Math.max(1, Math.round(rect.height * dpr));
+            if (canvas.width !== width || canvas.height !== height) {
+              canvas.width = width;
+              canvas.height = height;
+            }
+
+            const context = canvas.getContext("2d");
+            if (!context) continue;
+
+            const scale = Math.max(width / sourceCanvas.width, height / sourceCanvas.height);
+            const sw = width / scale;
+            const sh = height / scale;
+            context.drawImage(
+              sourceCanvas,
+              (sourceCanvas.width - sw) / 2,
+              (sourceCanvas.height - sh) / 2,
+              sw,
+              sh,
+              0,
+              0,
+              width,
+              height,
+            );
+          }
+        };
+
+        draw();
+        if (reducedMotion.matches) return;
+
+        let raf = 0;
+        let last = 0;
+        const tick = (now: number) => {
+          if (now - last >= 1000 / 24) {
+            draw();
+            last = now;
+          }
+          raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+        sharedCleanup = () => cancelAnimationFrame(raf);
+      },
+      { once: true },
+    );
+
+    sourceHost.append(source);
+  };
+
+  const initStage = (root: HTMLElement) => {
+    const panels = [...root.querySelectorAll<HTMLElement>("[data-composition-panel]")];
+    const picks = [...root.querySelectorAll<HTMLButtonElement>("[data-composition-pick]")];
+    let current = root.dataset.compositionScene ?? COMPOSITION_SCENES[0].id;
+    let mounted = false;
+
+    const mount = () => {
+      sharedCleanup?.();
+      sharedCleanup = undefined;
+
+      const scene = findCompositionScene(current);
+      const surfaces = panels.map((panel) => ({
+        panel,
+        host: panel.querySelector<HTMLElement>("[data-composition-live]")!,
+        surface: findCompositionSurface(
+          panel.dataset.surface ?? COMPOSITION_SURFACES[0].id,
+        ),
+      }));
+
+      for (const { host, surface } of surfaces) {
+        preparePanel(host, scene, surface);
+      }
+
+      if (scene.shared) {
+        mountSharedScene(panels, scene);
+        return;
+      }
+
+      for (const { host, surface } of surfaces) {
+        mountPanelScene(host, scene, surface);
+      }
+    };
+
+    const select = (sceneId: string) => {
+      current = findCompositionScene(sceneId).id;
+      root.dataset.compositionScene = current;
+      for (const pick of picks) {
+        const active = pick.dataset.compositionPick === current;
+        pick.classList.toggle("is-active", active);
+        pick.setAttribute("aria-pressed", active ? "true" : "false");
+      }
+      for (const panel of panels) panel.dataset.scene = current;
+      if (mounted) mount();
+    };
+
+    for (const pick of picks) {
+      pick.addEventListener("click", () => select(pick.dataset.compositionPick ?? current));
+    }
+
+    for (const panel of panels) {
+      const prompt = panel.querySelector<HTMLButtonElement>("[data-composition-prompt]");
+      const download = panel.querySelector<HTMLButtonElement>("[data-composition-download]");
+      const surfaceId = panel.dataset.surface ?? COMPOSITION_SURFACES[0].id;
+
+      prompt?.addEventListener("click", async () => {
+        const text = compositionPrompt(
+          findCompositionScene(panel.dataset.scene ?? current),
+          findCompositionSurface(surfaceId),
+        );
+        const label = prompt.textContent ?? "Copy prompt";
+        flash(prompt, label, (await copyText(text)) ? "Copied" : "Failed");
+      });
+
+      download?.addEventListener("click", () => {
+        const scene = findCompositionScene(panel.dataset.scene ?? current);
+        const surface = findCompositionSurface(surfaceId);
+        const html = buildCompositionHtml(scene, surface);
+        const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `ascii-things-${surface.id}-${scene.id}.html`;
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        flash(download, download.textContent ?? "Download HTML", "Saved");
+      });
+    }
+
+    const start = async () => {
+      if (mounted) return;
+      mounted = true;
+      try {
+        await loadScenes();
+        mount();
+      } catch {
+        mounted = false;
+      }
+    };
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          observer.disconnect();
+          void start();
+        },
+        { rootMargin: "320px 0px" },
+      );
+      observer.observe(root);
+    } else {
+      void start();
+    }
+  };
+
+  document.querySelectorAll<HTMLElement>("[data-composition-stage]").forEach(initStage);
+</script>

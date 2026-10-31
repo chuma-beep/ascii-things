@@ -1,6 +1,7 @@
 ---
 import "../styles/landing.css";
 import KanjiMarks from "../components/KanjiMarks.astro";
+import LogoMark from "../components/LogoMark.astro";
 import MobileNav from "../components/MobileNav.astro";
 
 const reactSnippet = `<span class="tok-key">import</span> { AsciiDog } <span class="tok-key">from</span> <span class="tok-str">"ascii-things/react"</span>;
@@ -78,7 +79,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="#top">ascii-things<span>®</span></a>
+      <a class="brand" href="#top"><LogoMark />ascii-things<span>®</span></a>
       <nav class="site-nav" aria-label="Primary">
         <details class="nav-library">
           <summary>Library</summary>
@@ -86,6 +87,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <a href="/library/">All items</a>
             <a href="/showcase/">Showcase</a>
             <a href="/design-ideas/">Design ideas</a>
+            <a href="/design-ideas/#compositions">Compositions</a>
             <a href="/library/#library-search">Search the library</a>
             <a href="/library/?type=scene">Scenes</a>
             <a href="/library/?type=webgl">WebGL</a>
@@ -169,6 +171,41 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         <a class="scroll-cue" href="#scenes">SCROLL ↓</a>
       </section>
 
+      <section class="composition-band" aria-labelledby="composition-band-title">
+        <div class="wrap">
+          <div class="composition-band__head">
+            <div>
+              <p class="eyebrow">COMPOSITIONS / LIVE</p>
+              <h2 id="composition-band-title">One scene. <em>Every surface.</em></h2>
+            </div>
+            <div class="composition-band__copy">
+              <p>
+                The same canvas in the paper, product, and immersive languages. Swap the
+                scene; keep the surface.
+              </p>
+              <a class="button ghost" href="/design-ideas/#compositions">Open compositions ↗</a>
+            </div>
+          </div>
+          <div class="composition-band__grid">
+            <a class="composition-mini" data-surface="paper" href="/design-ideas/#compositions">
+              <canvas data-scene="dog" data-composition="true" aria-hidden="true"></canvas>
+              <span>Paper / editorial</span>
+              <strong>A quieter interface.</strong>
+            </a>
+            <a class="composition-mini" data-surface="abyss" href="/design-ideas/#compositions">
+              <canvas data-scene="dog" data-composition="true" aria-hidden="true"></canvas>
+              <span>Abyss / product</span>
+              <strong>Make it move.</strong>
+            </a>
+            <a class="composition-mini" data-surface="immersive" href="/design-ideas/#compositions">
+              <canvas data-scene="dog" data-composition="true" aria-hidden="true"></canvas>
+              <span>Immersive / Lagoon</span>
+              <strong>Let it fill the room.</strong>
+            </a>
+          </div>
+        </div>
+      </section>
+
       <section id="scenes" class="section scenes" aria-labelledby="scenes-title">
         <div class="wrap">
           <div class="section-head">
@@ -183,8 +220,25 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
           <div class="scene-grid">
             <article class="scene-card">
               <div class="scene-preview">
-                <canvas data-scene="sharks" aria-hidden="true"></canvas>
+                <canvas data-scene="lagoon" aria-hidden="true"></canvas>
                 <span class="scene-index">01</span>
+              </div>
+              <div class="scene-body">
+                <div class="scene-title-row">
+                  <h3>Lagoon</h3>
+                  <a class="scene-open" href="/scenes/lagoon/" aria-label="Open lagoon docs"
+                    >OPEN ↗</a
+                  >
+                </div>
+                <p>A full-canvas marine family: turtle, manta, seahorse, dolphin, hammerhead, tang.</p>
+                <span class="scene-meta">MARINE · VARIANTS · IMMERSIVE</span>
+              </div>
+            </article>
+
+            <article class="scene-card">
+              <div class="scene-preview">
+                <canvas data-scene="sharks" aria-hidden="true"></canvas>
+                <span class="scene-index">02</span>
               </div>
               <div class="scene-body">
                 <div class="scene-title-row">
@@ -193,7 +247,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
                     >OPEN ↗</a
                   >
                 </div>
-                <p>Schools, hunts, panic, and settles. Eight sharks, five fish species.</p>
+                <p>Schools, hunts, panic, and settles. Four sharks, five fish species.</p>
                 <span class="scene-meta">BOIDS · PURSUIT · WAKE</span>
               </div>
             </article>
@@ -201,7 +255,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <article class="scene-card">
               <div class="scene-preview">
                 <canvas data-scene="robots" aria-hidden="true"></canvas>
-                <span class="scene-index">02</span>
+                <span class="scene-index">03</span>
               </div>
               <div class="scene-body">
                 <div class="scene-title-row">
@@ -220,7 +274,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <article class="scene-card">
               <div class="scene-preview">
                 <canvas data-scene="jellyfish" aria-hidden="true"></canvas>
-                <span class="scene-index">03</span>
+                <span class="scene-index">04</span>
               </div>
               <div class="scene-body">
                 <div class="scene-title-row">
@@ -239,7 +293,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <article class="scene-card">
               <div class="scene-preview">
                 <canvas data-scene="dog" aria-hidden="true"></canvas>
-                <span class="scene-index">04</span>
+                <span class="scene-index">05</span>
               </div>
               <div class="scene-body">
                 <div class="scene-title-row">
@@ -256,7 +310,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <article class="scene-card">
               <div class="scene-preview">
                 <canvas data-scene="starlings" aria-hidden="true"></canvas>
-                <span class="scene-index">05</span>
+                <span class="scene-index">06</span>
               </div>
               <div class="scene-body">
                 <div class="scene-title-row">
@@ -273,7 +327,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <article class="scene-card">
               <div class="scene-preview">
                 <canvas data-scene="fireflies" aria-hidden="true"></canvas>
-                <span class="scene-index">06</span>
+                <span class="scene-index">07</span>
               </div>
               <div class="scene-body">
                 <div class="scene-title-row">
@@ -290,7 +344,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <article class="scene-card">
               <div class="scene-preview">
                 <canvas data-scene="ants" aria-hidden="true"></canvas>
-                <span class="scene-index">07</span>
+                <span class="scene-index">08</span>
               </div>
               <div class="scene-body">
                 <div class="scene-title-row">
@@ -307,7 +361,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <article class="scene-card">
               <div class="scene-preview">
                 <canvas data-scene="koi" aria-hidden="true"></canvas>
-                <span class="scene-index">08</span>
+                <span class="scene-index">09</span>
               </div>
               <div class="scene-body">
                 <div class="scene-title-row">
@@ -324,7 +378,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <article class="scene-card">
               <div class="scene-preview">
                 <canvas data-scene="city" aria-hidden="true"></canvas>
-                <span class="scene-index">09</span>
+                <span class="scene-index">10</span>
               </div>
               <div class="scene-body">
                 <div class="scene-title-row">
@@ -341,7 +395,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <article class="scene-card">
               <div class="scene-preview">
                 <canvas data-scene="servers" aria-hidden="true"></canvas>
-                <span class="scene-index">10</span>
+                <span class="scene-index">11</span>
               </div>
               <div class="scene-body">
                 <div class="scene-title-row">
