@@ -22,7 +22,7 @@ test("loads six recipes, copy actions, and has no critical axe violations", asyn
   const errors = collectPageErrors(page);
   await openIdeas(page);
 
-  await expect(page.locator("h1")).toHaveText("Steal the idea.");
+  await expect(page.locator("h1")).toHaveText("Design ideas.");
   await expect(page.locator(".di-featured")).toContainText("Command deck");
   await expect(page.locator(".di-card")).toHaveCount(5);
   await expect(page.locator(".di-cta")).toHaveCount(1);
@@ -56,7 +56,7 @@ test("copies the featured starter code and agent prompt", async ({ page, context
   expect(code).toContain("command-deck");
   expect(code.length).toBeGreaterThan(1_000);
 
-  await page.getByRole("button", { name: "Copy prompt" }).first().click();
+  await page.locator(".di-featured").getByRole("button", { name: "Copy prompt" }).click();
   await expect(page.locator("[data-copy-status]")).toContainText("Command deck prompt copied.");
   const prompt = await page.evaluate(() => navigator.clipboard.readText());
   expect(prompt).toContain("Using ascii-things");
@@ -70,6 +70,7 @@ test("featured preview mounts a crisp live scene", async ({ page }) => {
   await openIdeas(page);
 
   const scene = page.locator(".di-featured [data-design-scene]");
+  await page.locator(".di-featured").scrollIntoViewIfNeeded();
   await expect(scene).toHaveAttribute("data-live", "true", { timeout: 5_000 });
 
   const metrics = await scene.evaluate((element) => {
@@ -177,4 +178,22 @@ test("reduced motion keeps a static image fallback", async ({ page }) => {
     .first()
     .evaluate((image) => (image as HTMLImageElement).currentSrc);
   expect(source).toContain(".jpg");
+});
+
+test("searches and filters design ideas", async ({ page }) => {
+  await page.goto("/design-ideas/");
+  await page.waitForLoadState("networkidle");
+
+  const input = page.locator("#di-search-input");
+  const status = page.locator("[data-search-status]");
+  await expect(input).toBeVisible();
+  await expect(page.locator("[data-search]:visible")).toHaveCount(6);
+
+  await input.fill("koi");
+  await expect(page.locator("[data-search]:visible")).toHaveCount(1);
+  await expect(status).toHaveText("1 of 6 recipes");
+
+  await input.fill("zzzz");
+  await expect(page.locator("[data-search]:visible")).toHaveCount(0);
+  await expect(status).toHaveText("0 of 6 recipes");
 });
