@@ -18,6 +18,8 @@ import { createAnts } from "./ants";
 import { createKoi } from "./koi";
 import { createCity } from "./city";
 import { createServers } from "./servers";
+import { createLagoon, type LagoonEngine, type LagoonVariant } from "./lagoon";
+import type { AsciiLagoonOptions } from "./lagoon/options";
 import type { SceneHandle } from "./core/scene";
 
 export interface AsciiSharksProps extends AsciiSharksOptions {
@@ -59,6 +61,9 @@ export function AsciiSharks({
     seed: options.seed,
     density: options.density,
     sharkScale: options.sharkScale,
+    orbitScale: options.orbitScale,
+    fitSharks: options.fitSharks,
+    glyphs: options.glyphs,
   });
 
   useEffect(() => {
@@ -277,6 +282,7 @@ export function AsciiJellyfish({
     count: options.count,
     seed: options.seed,
     scale: options.scale,
+    glyphs: options.glyphs,
   });
 
   useEffect(() => {
@@ -507,6 +513,7 @@ function AmbientCanvas({
     seed: options.seed,
     count: options.count,
     scale: options.scale,
+    glyphs: options.glyphs,
   });
 
   useEffect(() => {
@@ -603,4 +610,103 @@ export function AsciiServers(props: AsciiServersProps) {
   return <AmbientCanvas {...props} kind="servers" create={createServers} />;
 }
 
+export interface AsciiLagoonProps extends AsciiLagoonOptions {
+  className?: string;
+  style?: CSSProperties;
+  id?: string;
+  width?: number | string;
+  height?: number | string;
+  /** Sets CSS aspect-ratio and lets height follow it. */
+  aspectRatio?: number | string;
+  /** Called after the engine is created, including after remounts. */
+  onReady?: (scene: SceneHandle) => void;
+}
+
+/**
+ * React wrapper for the full-canvas Lagoon family. Changing `variant`
+ * remounts the painter; paused and label changes update live.
+ */
+export function AsciiLagoon({
+  className,
+  style,
+  id,
+  aspectRatio,
+  onReady,
+  width = "100%",
+  height = "100%",
+  ...options
+}: AsciiLagoonProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const engineRef = useRef<LagoonEngine | null>(null);
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
+
+  const structuralKey = JSON.stringify({ variant: options.variant });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const engine = createLagoon(canvas, optionsRef.current);
+    engineRef.current = engine;
+    onReadyRef.current?.(engine as unknown as SceneHandle);
+    return () => {
+      engine.destroy();
+      engineRef.current = null;
+    };
+  }, [structuralKey]);
+
+  const { variant, paused, label } = options;
+
+  useEffect(() => {
+    engineRef.current?.setOptions({ variant, paused, label });
+  }, [variant, paused, label]);
+
+  return (
+    <canvas
+      id={id}
+      ref={canvasRef}
+      className={["ascii-things", "ascii-lagoon", className].filter(Boolean).join(" ")}
+      role={label ? "img" : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
+      style={{
+        display: "block",
+        width,
+        height: aspectRatio ? "auto" : height,
+        ...(aspectRatio ? { aspectRatio } : null),
+        ...style,
+      }}
+    />
+  );
+}
+
 export const AsciiOcean = AsciiSharks;
+
+/** Props shared by the named Lagoon components; the variant is fixed. */
+export type AsciiLagoonPresetProps = Omit<AsciiLagoonProps, "variant">;
+
+function lagoonPreset(variant: LagoonVariant, displayName: string) {
+  return Object.assign(
+    (props: AsciiLagoonPresetProps) => <AsciiLagoon {...props} variant={variant} />,
+    { displayName },
+  );
+}
+
+/** Day lagoon, the sunlit reef scene. */
+export const AsciiLagoonDay = lagoonPreset("reef", "AsciiLagoonDay");
+/** Night reef, the same lagoon after dark. */
+export const AsciiLagoonNight = lagoonPreset("night", "AsciiLagoonNight");
+/** Turtle close-up. */
+export const AsciiLagoonTurtle = lagoonPreset("turtle", "AsciiLagoonTurtle");
+/** Manta flyby. */
+export const AsciiLagoonManta = lagoonPreset("manta", "AsciiLagoonManta");
+/** Seahorse in seagrass. */
+export const AsciiLagoonSeahorse = lagoonPreset("seahorse", "AsciiLagoonSeahorse");
+/** Dolphin pod. */
+export const AsciiLagoonDolphin = lagoonPreset("dolphin", "AsciiLagoonDolphin");
+/** Hammerhead pass. */
+export const AsciiLagoonHammerhead = lagoonPreset("hammerhead", "AsciiLagoonHammerhead");
+/** Tang school. */
+export const AsciiLagoonTang = lagoonPreset("tang", "AsciiLagoonTang");

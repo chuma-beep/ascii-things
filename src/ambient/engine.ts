@@ -1,5 +1,6 @@
 import { SceneRuntime } from "../core/runtime";
 import type { SceneAction, SceneStats } from "../core/scene";
+import { KanjiKoiRenderer } from "../kanji/koi-renderer";
 import type { AmbientEvent, AmbientKind, AsciiAmbientOptions } from "./options";
 import { AmbientRenderer } from "./renderer";
 import { AmbientWorld } from "./world";
@@ -46,12 +47,20 @@ export class AmbientEngine {
       count: options.count,
       scale: options.scale,
     });
-    this.renderer = new AmbientRenderer(canvas, kind, {
-      palette: options.palette,
-      columns: options.columns,
-      maxCells: options.maxCells,
-      calm: options.calm,
-    });
+    this.renderer =
+      kind === "koi" && options.glyphs === "kanji"
+        ? new KanjiKoiRenderer(canvas, kind, {
+            palette: options.palette,
+            columns: options.columns,
+            maxCells: options.maxCells,
+            calm: options.calm,
+          })
+        : new AmbientRenderer(canvas, kind, {
+            palette: options.palette,
+            columns: options.columns,
+            maxCells: options.maxCells,
+            calm: options.calm,
+          });
     this.runtime = new SceneRuntime({
       canvas,
       world: this.world,

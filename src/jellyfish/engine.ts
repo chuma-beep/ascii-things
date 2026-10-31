@@ -1,5 +1,6 @@
 import type { SceneAction } from "../core/scene";
 import { SceneRuntime } from "../core/runtime";
+import { KanjiJellyfishRenderer } from "../kanji/jellyfish-renderer";
 import type { AsciiJellyfishOptions } from "./options";
 import { JellyfishRenderer } from "./renderer";
 import { JellyfishWorld } from "./world";
@@ -36,12 +37,20 @@ export class JellyfishEngine {
       seed: options.seed,
       scale: options.scale,
     });
-    this.renderer = new JellyfishRenderer(canvas, {
-      palette: options.palette,
-      columns: options.columns,
-      maxCells: options.maxCells,
-      calm: options.calm,
-    });
+    this.renderer =
+      options.glyphs === "kanji"
+        ? new KanjiJellyfishRenderer(canvas, {
+            palette: options.palette,
+            columns: options.columns,
+            maxCells: options.maxCells,
+            calm: options.calm,
+          })
+        : new JellyfishRenderer(canvas, {
+            palette: options.palette,
+            columns: options.columns,
+            maxCells: options.maxCells,
+            calm: options.calm,
+          });
     this.runtime = new SceneRuntime({
       canvas,
       world: this.world,

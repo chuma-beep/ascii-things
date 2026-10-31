@@ -15,6 +15,11 @@ export interface CellGridOptions {
   columns?: number;
   /** Adaptive quality cap. Default 16,000 cells. */
   maxCells?: number;
+  /**
+   * Smallest cell edge in CSS pixels. Defaults to 8 so the original ASCII
+   * scenes keep their exact glyph density; denser variants can opt down to 6.
+   */
+  minCell?: number;
 }
 
 export const DEFAULT_COLUMNS = 124;
@@ -39,6 +44,7 @@ export class CellGrid {
   protected fontFamily = "ui-monospace, Menlo, monospace";
   private targetColumns: number;
   private maxCells: number;
+  protected minCell = 8;
 
   constructor(
     protected canvas: HTMLCanvasElement,
@@ -50,6 +56,7 @@ export class CellGrid {
     this.bg = document.createElement("canvas");
     this.targetColumns = options.columns ?? DEFAULT_COLUMNS;
     this.maxCells = options.maxCells ?? DEFAULT_MAX_CELLS;
+    this.minCell = Math.max(4, options.minCell ?? 8);
   }
 
   get cellWidth() {
@@ -100,9 +107,11 @@ export class CellGrid {
 
     // Keep glyphs at a readable size (8–13 px) at normal viewports. Only
     // when the cell budget would be exceeded do we grow the cell, which is
-    // what keeps 4K from exploding to 33k cells.
+    // what keeps 4K from exploding to 33k cells. The kanji variants lower
+    // the floor to 6px for their denser textures without touching this
+    // default.
     const targetColumns = Math.max(24, this.targetColumns);
-    let cw = clamp(Math.round(width / targetColumns), 8, 13);
+    let cw = clamp(Math.round(width / targetColumns), this.minCell, 13);
     let ch = Math.round(cw * 1.45);
     let cols = Math.ceil(width / cw);
     let rows = Math.ceil(height / ch);

@@ -1,9 +1,16 @@
 import type { PaletteChoice } from "../palette";
+import type { GlyphStyle } from "../core/scene";
 import type { JellyfishSpec, JellyfishWorldEvent } from "./world";
 
 export interface AsciiJellyfishOptions {
   /** Roster of jellyfish. Defaults to a mixed bloom. */
   jellies?: JellyfishSpec[];
+  /**
+   * Glyph texture. `"ascii"` keeps the original scene; `"kanji"` uses a
+   * separate kanji-dominant renderer with the same world and motion.
+   * Default "ascii".
+   */
+  glyphs?: GlyphStyle;
   /** Bloom size when `jellies` is not given. Default scales with the canvas. */
   count?: number;
   /** Reproducible bloom. Same seed + same size = same scene. */

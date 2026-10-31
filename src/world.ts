@@ -30,7 +30,19 @@ export type SharkKind =
   | "nurse";
 
 /** Which sharks to put in the water; size is relative to the biggest. */
-export type SharkSpec = { kind: SharkKind; size: number };
+export type SharkSpec = {
+  kind: SharkKind;
+  size: number;
+  /**
+   * Optional normalized body-centre position (0..1). Supplying any placement
+   * field anchors the shark to a local patrol instead of the shared orbit,
+   * which is how small cards compose a deliberate group.
+   */
+  x?: number;
+  y?: number;
+  /** Facing angle in radians. Only used with explicit placement. */
+  heading?: number;
+};
 
 export interface WorldOptions {
   sharks?: SharkSpec[];
@@ -40,6 +52,13 @@ export interface WorldOptions {
   density?: number;
   /** Shark length multiplier. */
   sharkScale?: number;
+  /**
+   * Patrol-orbit radius multiplier. The default is 1. Smaller values keep the
+   * sharks closer to the centre, which is useful in small cards.
+   */
+  orbitScale?: number;
+  /** Keep the initial shark spines fully inside the canvas. Default false. */
+  fitSharks?: boolean;
 }
 
 // The landing hero: four of the same shark at different depths.
@@ -90,6 +109,11 @@ export interface Shark {
   retargetAt: number;
   /** 0 far / dim → 1 near / bright. */
   depth: number;
+  /** Local patrol centre for explicitly placed sharks. */
+  centerX: number;
+  centerY: number;
+  /** True when the roster supplied a position or heading. */
+  composed: boolean;
 }
 
 export interface WorldEvent {
@@ -132,6 +156,8 @@ export class World {
   private rng: Rng;
   private density: number;
   private sharkScale: number;
+  private orbitScale: number;
+  private fitSharks: boolean;
 
   /** fishCount overrides the area-based population (the sidebar wants a single small school). */
   constructor(options: WorldOptions = {}) {
@@ -140,6 +166,8 @@ export class World {
     this.rng = createRng(options.seed);
     this.density = options.density ?? 1;
     this.sharkScale = options.sharkScale ?? 1;
+    this.orbitScale = options.orbitScale ?? 1;
+    this.fitSharks = options.fitSharks ?? false;
   }
 
   /**
@@ -162,6 +190,14 @@ export class World {
     }
     if (options.sharkScale !== undefined) {
       this.sharkScale = options.sharkScale;
+      reseed = true;
+    }
+    if (options.orbitScale !== undefined) {
+      this.orbitScale = options.orbitScale;
+      reseed = true;
+    }
+    if (options.fitSharks !== undefined) {
+      this.fitSharks = options.fitSharks;
       reseed = true;
     }
     if (options.seed !== undefined) {
@@ -202,20 +238,31 @@ export class World {
     this.events.length = 0;
     this.sharks = [];
     for (let i = 0; i < sharkCount; i++) {
-      const { kind, size } = this.sharkSpecs[i];
+      const spec = this.sharkSpecs[i];
+      const { kind, size } = spec;
       const length = baseLength * size;
-      const orbitRadius = minSide * this.rng.range(0.28, 0.4);
       const a = (i / sharkCount) * TAU + this.rng.range(-0.4, 0.4);
       const orbitDir: 1 | -1 = i % 2 === 0 ? 1 : -1;
-      const x = W / 2 + Math.cos(a) * orbitRadius * (W / minSide) * 0.9;
-      const y = H / 2 + Math.sin(a) * orbitRadius;
-      const heading = a + (orbitDir * Math.PI) / 2;
+      const composed = spec.x !== undefined || spec.y !== undefined || spec.heading !== undefined;
+      const anchorX = clamp(spec.x ?? 0.5, 0, 1) * W;
+      const anchorY = clamp(spec.y ?? 0.5, 0, 1) * H;
+      const orbitRadius = composed
+        ? minSide * 0.07
+        : minSide * this.rng.range(0.28, 0.4) * this.orbitScale;
+      const heading = spec.heading ?? a + (orbitDir * Math.PI) / 2;
+      const x = composed
+        ? anchorX + Math.cos(heading) * length * 0.5
+        : W / 2 + Math.cos(a) * orbitRadius * (W / minSide) * 0.9;
+      const y = composed
+        ? anchorY + Math.sin(heading) * length * 0.5
+        : H / 2 + Math.sin(a) * orbitRadius;
       const nodes = new Float32Array(SHARK_NODES * 2);
       const seg = length / (SHARK_NODES - 1);
       for (let n = 0; n < SHARK_NODES; n++) {
         nodes[n * 2] = x - Math.cos(heading) * seg * n;
         nodes[n * 2 + 1] = y - Math.sin(heading) * seg * n;
       }
+      const offset = this.fitSharks ? this.fitSpine(nodes, minSide * 0.03) : { dx: 0, dy: 0 };
       this.sharks.push({
         id: i + 1,
         kind,
@@ -232,12 +279,15 @@ export class World {
         target: null,
         retargetAt: 0,
         depth: size,
+        centerX: (composed ? anchorX : W / 2) + offset.dx,
+        centerY: (composed ? anchorY : H / 2) + offset.dy,
+        composed,
       });
     }
     // Smaller (farther) sharks draw first so the big one swims over them.
     this.sharks.sort((a, b) => a.length - b.length);
 
-    const total = this.fishCount ?? clamp(Math.round(((W * H) / 4400) * this.density), 20, 340);
+    const total = this.fishCount ?? clamp(Math.round(((W * H) / 4400) * this.density), 85, 340);
     this.fish = [];
     while (this.fish.length < total) {
       const species = pickSpecies(this.rng.next);
@@ -269,6 +319,32 @@ export class World {
       }
     }
     this.bucketNext = new Int32Array(this.fish.length);
+  }
+
+  /** Translate a straight seed spine until it fits inside the frame. */
+  private fitSpine(nodes: Float32Array, margin: number) {
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (let n = 0; n < SHARK_NODES; n++) {
+      minX = Math.min(minX, nodes[n * 2]);
+      maxX = Math.max(maxX, nodes[n * 2]);
+      minY = Math.min(minY, nodes[n * 2 + 1]);
+      maxY = Math.max(maxY, nodes[n * 2 + 1]);
+    }
+    let dx = 0;
+    let dy = 0;
+    if (minX < margin) dx = margin - minX;
+    else if (maxX > this.width - margin) dx = this.width - margin - maxX;
+    if (minY < margin) dy = margin - minY;
+    else if (maxY > this.height - margin) dy = this.height - margin - maxY;
+    if (dx === 0 && dy === 0) return { dx: 0, dy: 0 };
+    for (let n = 0; n < SHARK_NODES * 2; n += 2) {
+      nodes[n] += dx;
+      nodes[n + 1] += dy;
+    }
+    return { dx, dy };
   }
 
   splash(x: number, y: number) {
@@ -531,6 +607,11 @@ export class World {
       const hx = nodes[0];
       const hy = nodes[1];
 
+      if (sh.composed) {
+        this.stepComposedShark(sh, dt);
+        continue;
+      }
+
       sh.hunger = Math.min(1, sh.hunger + dt * 0.03);
 
       // Momentum.
@@ -588,14 +669,17 @@ export class World {
       }
 
       // Keep the headline mostly clear: a soft elliptical no-swim zone.
-      const ex = (hx - cxW) / (W * 0.3);
-      const ey = (hy - cyW) / (H * 0.16);
-      const e2 = ex * ex + ey * ey;
-      if (e2 < 1) {
-        const e = Math.sqrt(e2) || 1e-3;
-        const w = (1 - e) * (hunting ? 1 : 2.5);
-        dx += (ex / e) * w;
-        dy += (ey / e) * w;
+      // Composed card sharks use their own anchors, so they opt out.
+      if (!sh.composed) {
+        const ex = (hx - cxW) / (W * 0.3);
+        const ey = (hy - cyW) / (H * 0.16);
+        const e2 = ex * ex + ey * ey;
+        if (e2 < 1) {
+          const e = Math.sqrt(e2) || 1e-3;
+          const w = (1 - e) * (hunting ? 1 : 2.5);
+          dx += (ex / e) * w;
+          dy += (ey / e) * w;
+        }
       }
 
       // Turn back once the snout leaves the frame, so bodies dip off-screen
@@ -657,6 +741,66 @@ export class World {
         }
       }
     }
+  }
+
+  /**
+   * A composed shark holds a local station instead of joining the shared
+   * headline orbit. It follows a slow target around its normalized anchor, so
+   * a card can guarantee a readable group without hard-freezing the scene.
+   */
+  private stepComposedShark(sh: Shark, dt: number) {
+    const { nodes } = sh;
+    const L = sh.length;
+    const hx = nodes[0];
+    const hy = nodes[1];
+    const phase = this.time * 0.22 + sh.id * 1.3;
+    const targetX = sh.centerX + Math.cos(phase) * sh.orbitRadius;
+    const targetY = sh.centerY + Math.sin(phase * 0.75) * sh.orbitRadius * 0.6;
+    const desired = Math.atan2(targetY - hy, targetX - hx);
+    const agility = Math.min(0.75, sh.speed / (L * 0.22));
+    const maxTurn = agility * dt;
+    const turned = clamp(angleDiff(sh.heading, desired), -maxTurn, maxTurn);
+    sh.heading += turned;
+    sh.turn += (turned / dt - sh.turn) * Math.min(1, dt * 3);
+
+    const targetSpeed = 24 + L * 0.03;
+    sh.speed += (targetSpeed - sh.speed) * Math.min(1, dt * 1.1);
+    sh.phase += dt * (2 + sh.speed / 24);
+
+    nodes[0] += Math.cos(sh.heading) * sh.speed * dt;
+    nodes[1] += Math.sin(sh.heading) * sh.speed * dt;
+
+    const seg = L / (SHARK_NODES - 1);
+    const maxBend = 0.16;
+    let prevAngle = sh.heading + Math.PI;
+    for (let k = 1; k < SHARK_NODES; k++) {
+      const px = nodes[(k - 1) * 2];
+      const py = nodes[(k - 1) * 2 + 1];
+      let angle = Math.atan2(nodes[k * 2 + 1] - py, nodes[k * 2] - px);
+      angle = prevAngle + clamp(angleDiff(prevAngle, angle), -maxBend, maxBend);
+      nodes[k * 2] = px + Math.cos(angle) * seg;
+      nodes[k * 2 + 1] = py + Math.sin(angle) * seg;
+      prevAngle = angle;
+    }
+
+    // Keep the body centre within a small station around its anchor. This is
+    // the guarantee that the composed card never collapses into a ring or
+    // lets the central shark wander out of frame.
+    const mid = (SHARK_NODES - 1) >> 1;
+    const cx = nodes[mid * 2];
+    const cy = nodes[mid * 2 + 1];
+    const ox = cx - sh.centerX;
+    const oy = cy - sh.centerY;
+    const offset = Math.hypot(ox, oy);
+    const limit = sh.orbitRadius * 1.8;
+    if (offset > limit) {
+      const k = (offset - limit) / offset;
+      for (let n = 0; n < SHARK_NODES * 2; n += 2) {
+        nodes[n] -= ox * k;
+        nodes[n + 1] -= oy * k;
+      }
+    }
+    if (this.fitSharks) this.fitSpine(nodes, Math.min(this.width, this.height) * 0.03);
   }
 
   /**

@@ -13,6 +13,7 @@ export default defineConfig({
     koi: "src/koi/index.ts",
     city: "src/city/index.ts",
     servers: "src/servers/index.ts",
+    lagoon: "src/lagoon/index.ts",
     react: "src/react.tsx",
     ui: "src/ui.tsx",
     element: "src/element.ts",

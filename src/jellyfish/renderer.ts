@@ -17,8 +17,8 @@ export interface JellyfishRendererOptions {
  * The glyph grid matches the other ascii-things scenes.
  */
 export class JellyfishRenderer extends CellGrid {
-  private calm = false;
-  private palette: Palette = resolvePalette();
+  protected calm = false;
+  protected palette: Palette = resolvePalette();
 
   constructor(canvas: HTMLCanvasElement, options: JellyfishRendererOptions = {}) {
     super(canvas, { columns: options.columns ?? 140, maxCells: options.maxCells });
@@ -91,7 +91,7 @@ export class JellyfishRenderer extends CellGrid {
     }
   }
 
-  private tint(kind: JellyfishKind | "shock"): RGB {
+  protected tint(kind: JellyfishKind | "shock"): RGB {
     switch (kind) {
       case "lion":
         return this.palette.heatHot;
@@ -158,7 +158,7 @@ export class JellyfishRenderer extends CellGrid {
   }
 
   /** Four gonads and a mouth, drawn over the bell so the anatomy reads cleanly. */
-  private drawAnatomy(
+  protected drawAnatomy(
     jelly: Jellyfish,
     x: number,
     y: number,
@@ -184,7 +184,7 @@ export class JellyfishRenderer extends CellGrid {
     }
   }
 
-  private drawBell(
+  protected drawBell(
     jelly: Jellyfish,
     x: number,
     y: number,
@@ -237,7 +237,7 @@ export class JellyfishRenderer extends CellGrid {
     });
   }
 
-  private drawTentacles(
+  protected drawTentacles(
     jelly: Jellyfish,
     x: number,
     y: number,
@@ -283,7 +283,7 @@ export class JellyfishRenderer extends CellGrid {
     }
   }
 
-  private drawOralArms(
+  protected drawOralArms(
     jelly: Jellyfish,
     x: number,
     y: number,
@@ -322,7 +322,7 @@ export class JellyfishRenderer extends CellGrid {
     }
   }
 
-  private edgeGlyph(u: number, v: number) {
+  protected edgeGlyph(u: number, v: number) {
     const angle = Math.atan2(v, u);
     const index = Math.floor(((angle + Math.PI) / TAU) * 6) % 6;
     return ["'", "'", "-", "|", "+", "|"][index];

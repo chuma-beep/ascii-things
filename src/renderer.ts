@@ -33,13 +33,13 @@ const RIDGE_GLYPHS = "@8%";
 const EDGE_HEAVY = ":;";
 const EDGE_LIGHT = ".',`";
 
-const FLAG_BODY = 1;
-const FLAG_EDGE = 2;
-const FLAG_FIN = 3;
-const FLAG_RIDGE = 4;
-const FLAG_EYE = 5;
+export const FLAG_BODY = 1;
+export const FLAG_EDGE = 2;
+export const FLAG_FIN = 3;
+export const FLAG_RIDGE = 4;
+export const FLAG_EYE = 5;
 /** Dark skin markings: tiger bars, zebra-shark spots. */
-const FLAG_MARK = 6;
+export const FLAG_MARK = 6;
 const MARK_GLYPHS = "#%@";
 
 // Sub-cell sample offsets for anti-aliased silhouettes.
@@ -266,8 +266,8 @@ export interface RendererOptions {
 export { paintGrid };
 
 export class AsciiRenderer extends CellGrid {
-  private calm = false;
-  private palette: Palette = resolvePalette();
+  protected calm = false;
+  protected palette: Palette = resolvePalette();
   private onEvent?: (event: WorldEvent) => void;
 
   private dotKind = new Uint8Array(0); // 0 none, 1 blue, 2 green, 3 red, 4 pale
@@ -283,11 +283,11 @@ export class AsciiRenderer extends CellGrid {
   private bucketCursor = new Int32Array(DOT_RGB.length * ALPHA_LEVELS + 1);
   private dotStyles: string[] = [];
 
-  private sharkFlag = new Uint8Array(0);
-  private sharkShade = new Float32Array(0);
-  private sharkKey = new Uint32Array(0);
-  private sharkDepth = new Float32Array(0);
-  private sharkKind = new Uint8Array(0);
+  protected sharkFlag = new Uint8Array(0);
+  protected sharkShade = new Float32Array(0);
+  protected sharkKey = new Uint32Array(0);
+  protected sharkDepth = new Float32Array(0);
+  protected sharkKind = new Uint8Array(0);
   /** Cells darkened by a shark's shadow on the seabed. */
   private sharkShadow = new Uint8Array(0);
   private spine = new Float32Array(SHARK_NODES * 2);
@@ -749,7 +749,12 @@ export class AsciiRenderer extends CellGrid {
     }
   }
 
-  private drawSharks(t: number) {
+  /** Species tint, exposed for the alternative glyph renderers. */
+  protected sharkTint(kindIndex: number) {
+    return SHAPES[KINDS[kindIndex]].tint;
+  }
+
+  protected drawSharks(t: number) {
     const { ctx, cols, rows, cw, ch, sharkFlag, sharkShade, sharkKey, sharkDepth, sharkKind } =
       this;
     const n = cols * rows;
@@ -773,13 +778,21 @@ export class AsciiRenderer extends CellGrid {
       if (flag === FLAG_EDGE) {
         // Soft, anti-aliased silhouette: no block, just a light glyph.
         const set = shade >= 0.5 ? EDGE_HEAVY : EDGE_LIGHT;
-        const base = palette.dark ? 70 + shade * 80 : 190 - shade * 100;
-        const [er, eg, eb] = palette.edge;
-        const k = base / 170;
-        ctx.fillStyle =
-          roll < 0.07
-            ? palette.accents[key % palette.accents.length]
-            : `rgb(${Math.round(er * k)},${Math.round(eg * k)},${Math.round(eb * k)})`;
+        if (palette.dark) {
+          const g = (70 + shade * 80) * dim;
+          ctx.fillStyle =
+            roll < 0.07
+              ? palette.accents[key % palette.accents.length]
+              : `rgb(${Math.min(255, Math.round(g * tr))},${Math.min(255, Math.round(g * tg))},${Math.min(255, Math.round(g * tb + 6))})`;
+        } else {
+          const base = 190 - shade * 100;
+          const [er, eg, eb] = palette.edge;
+          const k = base / 170;
+          ctx.fillStyle =
+            roll < 0.07
+              ? palette.accents[key % palette.accents.length]
+              : `rgb(${Math.round(er * k)},${Math.round(eg * k)},${Math.round(eb * k)})`;
+        }
         ctx.fillText(set[(key >>> 8) % set.length], x + cw / 2, y + ch / 2 + 1);
         continue;
       }

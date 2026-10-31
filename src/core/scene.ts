@@ -1,5 +1,8 @@
 import type { PaletteChoice } from "../palette";
 
+/** Texture family used by scenes that ship a kanji replica. */
+export type GlyphStyle = "ascii" | "kanji";
+
 /** Fields shared by every scene's options. */
 export interface SceneOptions {
   /** Reproducible world. Same seed + same size = same scene. */

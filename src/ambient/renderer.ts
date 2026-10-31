@@ -18,8 +18,8 @@ export interface AmbientRendererOptions {
  */
 export class AmbientRenderer extends CellGrid {
   readonly kind: AmbientKind;
-  private palette: Palette;
-  private calm: boolean;
+  protected palette: Palette;
+  protected calm: boolean;
 
   constructor(canvas: HTMLCanvasElement, kind: AmbientKind, options: AmbientRendererOptions = {}) {
     super(canvas, { columns: options.columns, maxCells: options.maxCells });
@@ -71,7 +71,7 @@ export class AmbientRenderer extends CellGrid {
     }
   }
 
-  private glyph(x: number, y: number, char: string, color: string, alpha = 1) {
+  protected glyph(x: number, y: number, char: string, color: string, alpha = 1) {
     const { ctx, cw, ch } = this;
     const gx = Math.round(x / cw) * cw + cw / 2;
     const gy = Math.round(y / ch) * ch + ch / 2;
@@ -266,7 +266,7 @@ export class AmbientRenderer extends CellGrid {
     }
   }
 
-  private koiProfile(u: number) {
+  protected koiProfile(u: number) {
     let profile = Math.sin(Math.PI * (0.04 + u * 0.92)) ** 0.7;
     if (u < 0.22) profile *= 0.45 + 0.55 * (u / 0.22);
     if (u > 0.82) {
@@ -275,7 +275,13 @@ export class AmbientRenderer extends CellGrid {
     return profile;
   }
 
-  private koiBodyPath(fish: Koi, cos: number, sin: number, bodyLength: number, halfWidth: number) {
+  protected koiBodyPath(
+    fish: Koi,
+    cos: number,
+    sin: number,
+    bodyLength: number,
+    halfWidth: number,
+  ) {
     const path = new Path2D();
     const steps = 28;
     const left: Array<[number, number]> = [];
@@ -297,7 +303,87 @@ export class AmbientRenderer extends CellGrid {
     return path;
   }
 
-  private drawKoiFish(fish: Koi) {
+  /**
+   * Paint the body fill and scale texture. Split out so the kanji renderer can
+   * replace only the texture while reusing the tail, fins, eyes, and motion.
+   */
+  protected paintKoiBody(
+    fish: Koi,
+    bodyPath: Path2D,
+    bodyLength: number,
+    halfWidth: number,
+    cos: number,
+    sin: number,
+  ) {
+    const { ctx, cw, ch } = this;
+    const orange = rgba(this.palette.heatHot, 1);
+    const warm = this.palette.dark ? "rgba(255, 246, 230, 0.95)" : "rgba(38, 42, 50, 0.92)";
+    // Body: a smooth tapered shape. A translucent calico patch layer and a
+    // sparse glyph scale pattern keep it in the same visual family as the
+    // cell-rendered sharks without turning the fish into a block of cells.
+    const bodyGradient = ctx.createLinearGradient(
+      fish.x - cos * bodyLength * 0.5,
+      fish.y - sin * bodyLength * 0.5,
+      fish.x + cos * bodyLength * 0.5,
+      fish.y + sin * bodyLength * 0.5,
+    );
+    bodyGradient.addColorStop(
+      0,
+      this.palette.dark ? "rgba(205, 195, 180, 0.55)" : "rgba(70, 60, 52, 0.5)",
+    );
+    bodyGradient.addColorStop(0.55, warm);
+    bodyGradient.addColorStop(
+      1,
+      this.palette.dark ? "rgba(255, 250, 240, 0.98)" : "rgba(24, 28, 34, 0.96)",
+    );
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = bodyGradient;
+    ctx.fill(bodyPath);
+    ctx.clip(bodyPath);
+
+    ctx.save();
+    ctx.translate(fish.x, fish.y);
+    ctx.rotate(fish.heading);
+    ctx.fillStyle = orange;
+    const patches = [
+      { u: 0.78, across: 0, rx: bodyLength * 0.12, ry: halfWidth * 0.9 },
+      { u: 0.56, across: halfWidth * 0.3, rx: bodyLength * 0.14, ry: halfWidth * 0.65 },
+      { u: 0.3, across: -halfWidth * 0.2, rx: bodyLength * 0.1, ry: halfWidth * 0.55 },
+    ];
+    for (const patch of patches) {
+      ctx.beginPath();
+      ctx.ellipse(
+        (patch.u - 0.5) * bodyLength,
+        patch.across,
+        patch.rx,
+        patch.ry,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Sparse scale marks. The clip keeps them inside the silhouette.
+    const texture = this.palette.dark ? "rgba(68, 48, 38, 0.18)" : "rgba(255, 255, 255, 0.18)";
+    ctx.font = `400 ${Math.round(ch * 0.42)}px ${this.fontFamily}`;
+    const reach = bodyLength * 0.5 + halfWidth * 2;
+    const startX = Math.round((fish.x - reach) / cw) * cw;
+    const startY = Math.round((fish.y - reach) / ch) * ch;
+    for (let gy = startY; gy <= fish.y + reach; gy += ch) {
+      for (let gx = startX; gx <= fish.x + reach; gx += cw) {
+        if ((Math.floor(gx / cw) + Math.floor(gy / ch)) % 3 !== 0) continue;
+        if (!ctx.isPointInPath(bodyPath, gx + cw * 0.5, gy + ch * 0.5)) continue;
+        this.glyph(gx + cw * 0.5, gy + ch * 0.5, "'", texture, 0.6);
+      }
+    }
+    ctx.restore();
+  }
+
+  protected drawKoiFish(fish: Koi) {
     const { ctx, cw, ch } = this;
     const cos = Math.cos(fish.heading);
     const sin = Math.sin(fish.heading);
@@ -306,7 +392,6 @@ export class AmbientRenderer extends CellGrid {
     const bodyCells = Math.round(14 + fish.size * 5);
     const bodyLength = bodyCells * cw;
     const halfWidth = (1.8 + fish.size * 0.8) * cw;
-    const orange = rgba(this.palette.heatHot, 1);
     const warm = this.palette.dark ? "rgba(255, 246, 230, 0.95)" : "rgba(38, 42, 50, 0.92)";
     const rim = this.palette.dark ? "rgba(255, 248, 234, 0.9)" : "rgba(255, 246, 230, 0.8)";
     const eye = this.palette.dark ? "rgba(8, 12, 14, 0.96)" : "rgba(12, 14, 18, 0.96)";
@@ -390,69 +475,7 @@ export class AmbientRenderer extends CellGrid {
       ctx.restore();
     }
 
-    // Body: a smooth tapered shape. A translucent calico patch layer and a
-    // sparse glyph scale pattern keep it in the same visual family as the
-    // cell-rendered sharks without turning the fish into a block of cells.
-    const bodyGradient = ctx.createLinearGradient(
-      fish.x - cos * bodyLength * 0.5,
-      fish.y - sin * bodyLength * 0.5,
-      fish.x + cos * bodyLength * 0.5,
-      fish.y + sin * bodyLength * 0.5,
-    );
-    bodyGradient.addColorStop(
-      0,
-      this.palette.dark ? "rgba(205, 195, 180, 0.55)" : "rgba(70, 60, 52, 0.5)",
-    );
-    bodyGradient.addColorStop(0.55, warm);
-    bodyGradient.addColorStop(
-      1,
-      this.palette.dark ? "rgba(255, 250, 240, 0.98)" : "rgba(24, 28, 34, 0.96)",
-    );
-    ctx.save();
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = "source-over";
-    ctx.fillStyle = bodyGradient;
-    ctx.fill(bodyPath);
-    ctx.clip(bodyPath);
-
-    ctx.save();
-    ctx.translate(fish.x, fish.y);
-    ctx.rotate(fish.heading);
-    ctx.fillStyle = orange;
-    const patches = [
-      { u: 0.78, across: 0, rx: bodyLength * 0.12, ry: halfWidth * 0.9 },
-      { u: 0.56, across: halfWidth * 0.3, rx: bodyLength * 0.14, ry: halfWidth * 0.65 },
-      { u: 0.3, across: -halfWidth * 0.2, rx: bodyLength * 0.1, ry: halfWidth * 0.55 },
-    ];
-    for (const patch of patches) {
-      ctx.beginPath();
-      ctx.ellipse(
-        (patch.u - 0.5) * bodyLength,
-        patch.across,
-        patch.rx,
-        patch.ry,
-        0,
-        0,
-        Math.PI * 2,
-      );
-      ctx.fill();
-    }
-    ctx.restore();
-
-    // Sparse scale marks. The clip keeps them inside the silhouette.
-    const texture = this.palette.dark ? "rgba(68, 48, 38, 0.18)" : "rgba(255, 255, 255, 0.18)";
-    ctx.font = `400 ${Math.round(ch * 0.42)}px ${this.fontFamily}`;
-    const reach = bodyLength * 0.5 + halfWidth * 2;
-    const startX = Math.round((fish.x - reach) / cw) * cw;
-    const startY = Math.round((fish.y - reach) / ch) * ch;
-    for (let gy = startY; gy <= fish.y + reach; gy += ch) {
-      for (let gx = startX; gx <= fish.x + reach; gx += cw) {
-        if ((Math.floor(gx / cw) + Math.floor(gy / ch)) % 3 !== 0) continue;
-        if (!ctx.isPointInPath(bodyPath, gx + cw * 0.5, gy + ch * 0.5)) continue;
-        this.glyph(gx + cw * 0.5, gy + ch * 0.5, "'", texture, 0.6);
-      }
-    }
-    ctx.restore();
+    this.paintKoiBody(fish, bodyPath, bodyLength, halfWidth, cos, sin);
 
     // Rim and a thin spine highlight.
     ctx.save();

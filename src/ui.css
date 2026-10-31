@@ -265,8 +265,14 @@
   display: grid;
   gap: 5px;
   min-width: 0;
+  margin: 0;
   padding: 12px 14px;
   background: var(--ascii-bg);
+}
+
+/* Starlight's prose `dl > div + div` margin leaks into composed readouts. */
+.ascii-readout > .ascii-readout-item {
+  margin: 0;
 }
 
 .ascii-readout dt {

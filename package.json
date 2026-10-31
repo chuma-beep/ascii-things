@@ -80,6 +80,10 @@
       "types": "./dist/servers.d.ts",
       "import": "./dist/servers.js"
     },
+    "./lagoon": {
+      "types": "./dist/lagoon.d.ts",
+      "import": "./dist/lagoon.js"
+    },
     "./react": {
       "types": "./dist/react.d.ts",
       "import": "./dist/react.js"
@@ -145,7 +149,9 @@
     "dithering",
     "webgl",
     "shader",
-    "ascii-surface"
+    "ascii-surface",
+    "lagoon",
+    "marine"
   ],
   "scripts": {
     "dev": "vite",

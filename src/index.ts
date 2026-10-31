@@ -8,7 +8,9 @@ export * from "./ants";
 export * from "./koi";
 export * from "./city";
 export * from "./servers";
+export * from "./lagoon";
 export type {
+  GlyphStyle,
   SceneAction,
   SceneHandle,
   SceneOptions,

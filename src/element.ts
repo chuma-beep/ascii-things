@@ -16,6 +16,8 @@ import { createAnts } from "./ants";
 import { createKoi } from "./koi";
 import { createCity } from "./city";
 import { createServers } from "./servers";
+import { createLagoon } from "./lagoon";
+import type { AsciiLagoonOptions, LagoonVariant } from "./lagoon/options";
 import type { AmbientEngine } from "./ambient/engine";
 import type { AmbientKind, AsciiAmbientOptions } from "./ambient/options";
 
@@ -83,6 +85,10 @@ abstract class AsciiSceneElement extends Base {
     return raw !== "false" && raw !== "0";
   }
 
+  protected glyphStyle(): "ascii" | "kanji" {
+    return this.getAttribute("glyphs") === "kanji" ? "kanji" : "ascii";
+  }
+
   private mount() {
     this.engine?.destroy();
     if (!this.shadowRoot) {
@@ -90,7 +96,7 @@ abstract class AsciiSceneElement extends Base {
       root.innerHTML = `
         <style>
           :host { display: block; position: relative; width: 100%; height: 100%; min-height: 240px; }
-          canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; font-family: inherit; }
+          canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; font-family: inherit; }
         </style>
         <canvas></canvas>
       `;
@@ -145,6 +151,9 @@ export class AsciiSharksElement extends AsciiSceneElement {
     "interactive",
     "sharks",
     "shark-scale",
+    "orbit-scale",
+    "fit-sharks",
+    "glyphs",
     "label",
   ];
 
@@ -179,6 +188,9 @@ export class AsciiSharksElement extends AsciiSceneElement {
       maxDpr: this.num("max-dpr"),
       adaptiveQuality: this.bool("adaptive-quality", true),
       sharkScale: this.num("shark-scale"),
+      orbitScale: this.num("orbit-scale"),
+      fitSharks: this.bool("fit-sharks", false),
+      glyphs: this.glyphStyle(),
       calm: this.bool("calm", false),
       paused: this.bool("paused", false),
       interactive: this.bool("interactive", true),
@@ -277,6 +289,7 @@ export class AsciiJellyfishElement extends AsciiSceneElement {
     "calm",
     "interactive",
     "jellies",
+    "glyphs",
     "label",
   ];
 
@@ -311,6 +324,7 @@ export class AsciiJellyfishElement extends AsciiSceneElement {
       maxCells: this.num("max-cells"),
       maxDpr: this.num("max-dpr"),
       adaptiveQuality: this.bool("adaptive-quality", true),
+      glyphs: this.glyphStyle(),
       calm: this.bool("calm", false),
       paused: this.bool("paused", false),
       interactive: this.bool("interactive", true),
@@ -407,6 +421,7 @@ const AMBIENT_ATTRIBUTES = [
   "font-family",
   "calm",
   "interactive",
+  "glyphs",
   "label",
 ];
 
@@ -431,6 +446,7 @@ abstract class AsciiAmbientElement extends AsciiSceneElement {
       maxCells: this.num("max-cells"),
       maxDpr: this.num("max-dpr"),
       adaptiveQuality: this.bool("adaptive-quality", true),
+      glyphs: this.glyphStyle(),
       calm: this.bool("calm", false),
       paused: this.bool("paused", false),
       interactive: this.bool("interactive", true),
@@ -470,6 +486,106 @@ export class AsciiServersElement extends AsciiAmbientElement {
   protected create = createServers;
 }
 
+/** `<ascii-lagoon variant="turtle" …>` */
+export class AsciiLagoonElement extends AsciiSceneElement {
+  static observedAttributes = [
+    "variant",
+    "palette",
+    "seed",
+    "speed",
+    "max-dpr",
+    "aspect-ratio",
+    "paused",
+    "font-family",
+    "calm",
+    "interactive",
+    "label",
+  ];
+
+  protected createEngine(canvas: HTMLCanvasElement) {
+    return createLagoon(canvas, this.readOptions());
+  }
+
+  /** Fixed variant for the named <ascii-lagoon-*> aliases. */
+  protected get variantOverride(): LagoonVariant | undefined {
+    return undefined;
+  }
+
+  private readOptions(): AsciiLagoonOptions {
+    return {
+      variant:
+        this.variantOverride ??
+        (this.getAttribute("variant") as AsciiLagoonOptions["variant"]) ??
+        undefined,
+      seed: this.num("seed"),
+      speed: this.num("speed"),
+      fontFamily: this.getAttribute("font-family") ?? undefined,
+      maxDpr: this.num("max-dpr"),
+      calm: this.bool("calm", false),
+      paused: this.bool("paused", false),
+      interactive: this.bool("interactive", true),
+      palette: (this.getAttribute("palette") as AsciiLagoonOptions["palette"]) ?? undefined,
+      label: this.getAttribute("label") ?? undefined,
+    };
+  }
+}
+
+/** `<ascii-lagoon-day>` — day lagoon alias. */
+export class AsciiLagoonDayElement extends AsciiLagoonElement {
+  protected get variantOverride(): LagoonVariant {
+    return "reef";
+  }
+}
+
+/** `<ascii-lagoon-night>` — night reef alias. */
+export class AsciiLagoonNightElement extends AsciiLagoonElement {
+  protected get variantOverride(): LagoonVariant {
+    return "night";
+  }
+}
+
+/** `<ascii-lagoon-turtle>` — turtle close-up alias. */
+export class AsciiLagoonTurtleElement extends AsciiLagoonElement {
+  protected get variantOverride(): LagoonVariant {
+    return "turtle";
+  }
+}
+
+/** `<ascii-lagoon-manta>` — manta flyby alias. */
+export class AsciiLagoonMantaElement extends AsciiLagoonElement {
+  protected get variantOverride(): LagoonVariant {
+    return "manta";
+  }
+}
+
+/** `<ascii-lagoon-seahorse>` — seahorse alias. */
+export class AsciiLagoonSeahorseElement extends AsciiLagoonElement {
+  protected get variantOverride(): LagoonVariant {
+    return "seahorse";
+  }
+}
+
+/** `<ascii-lagoon-dolphin>` — dolphin pod alias. */
+export class AsciiLagoonDolphinElement extends AsciiLagoonElement {
+  protected get variantOverride(): LagoonVariant {
+    return "dolphin";
+  }
+}
+
+/** `<ascii-lagoon-hammerhead>` — hammerhead pass alias. */
+export class AsciiLagoonHammerheadElement extends AsciiLagoonElement {
+  protected get variantOverride(): LagoonVariant {
+    return "hammerhead";
+  }
+}
+
+/** `<ascii-lagoon-tang>` — tang school alias. */
+export class AsciiLagoonTangElement extends AsciiLagoonElement {
+  protected get variantOverride(): LagoonVariant {
+    return "tang";
+  }
+}
+
 if (typeof customElements !== "undefined" && !customElements.get("ascii-sharks")) {
   customElements.define("ascii-sharks", AsciiSharksElement);
 }
@@ -499,4 +615,21 @@ if (typeof customElements !== "undefined" && !customElements.get("ascii-city")) 
 }
 if (typeof customElements !== "undefined" && !customElements.get("ascii-servers")) {
   customElements.define("ascii-servers", AsciiServersElement);
+}
+if (typeof customElements !== "undefined" && !customElements.get("ascii-lagoon")) {
+  customElements.define("ascii-lagoon", AsciiLagoonElement);
+}
+if (typeof customElements !== "undefined") {
+  for (const [tag, element] of [
+    ["ascii-lagoon-day", AsciiLagoonDayElement],
+    ["ascii-lagoon-night", AsciiLagoonNightElement],
+    ["ascii-lagoon-turtle", AsciiLagoonTurtleElement],
+    ["ascii-lagoon-manta", AsciiLagoonMantaElement],
+    ["ascii-lagoon-seahorse", AsciiLagoonSeahorseElement],
+    ["ascii-lagoon-dolphin", AsciiLagoonDolphinElement],
+    ["ascii-lagoon-hammerhead", AsciiLagoonHammerheadElement],
+    ["ascii-lagoon-tang", AsciiLagoonTangElement],
+  ] as const) {
+    if (!customElements.get(tag)) customElements.define(tag, element);
+  }
 }

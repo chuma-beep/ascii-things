@@ -1,7 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { AmbientRenderer } from "./ambient/renderer";
 import { createDog, DogEngine } from "./dog";
+import { JellyfishRenderer } from "./jellyfish/renderer";
 import { createJellyfish, JellyfishEngine } from "./jellyfish";
+import { KanjiJellyfishRenderer } from "./kanji/jellyfish-renderer";
+import { KanjiKoiRenderer } from "./kanji/koi-renderer";
+import { KanjiSharkRenderer } from "./kanji/shark-renderer";
+import { createKoi } from "./koi";
 import { PALETTES, resolvePalette } from "./palette";
+import { AsciiRenderer } from "./renderer";
 import { createRobots, RobotEngine } from "./robots";
 import { OceanEngine } from "./sharks";
 
@@ -26,6 +33,7 @@ function makeContext() {
     setLineDash: () => {},
     createLinearGradient: () => gradient,
     fillText: () => {},
+    strokeText: () => {},
     measureText: () => ({ width: 0 }),
     drawImage: () => {},
     globalAlpha: 1,
@@ -36,6 +44,10 @@ function makeContext() {
     textAlign: "center",
     textBaseline: "middle",
   };
+}
+
+function rendererOf(engine: object) {
+  return (engine as unknown as { renderer: object }).renderer;
 }
 
 function makeCanvas() {
@@ -176,5 +188,46 @@ describe("engine migration", () => {
     robots.destroy();
     jellyfish.destroy();
     dog.destroy();
+  });
+
+  it("defaults to the original ASCII renderer and mounts the kanji variants", () => {
+    const sharkAscii = new OceanEngine(makeCanvas() as unknown as HTMLCanvasElement, { seed: 1 });
+    const sharkKanji = new OceanEngine(makeCanvas() as unknown as HTMLCanvasElement, {
+      seed: 1,
+      glyphs: "kanji",
+    });
+    expect(rendererOf(sharkAscii)).toBeInstanceOf(AsciiRenderer);
+    expect(rendererOf(sharkAscii)).not.toBeInstanceOf(KanjiSharkRenderer);
+    expect(rendererOf(sharkKanji)).toBeInstanceOf(KanjiSharkRenderer);
+    expect(sharkAscii.getStats().columns).toBe(100);
+    expect(sharkKanji.getStats().columns).toBe(134);
+
+    const jellyAscii = new JellyfishEngine(makeCanvas() as unknown as HTMLCanvasElement, {
+      seed: 1,
+    });
+    const jellyKanji = new JellyfishEngine(makeCanvas() as unknown as HTMLCanvasElement, {
+      seed: 1,
+      glyphs: "kanji",
+    });
+    expect(rendererOf(jellyAscii)).toBeInstanceOf(JellyfishRenderer);
+    expect(rendererOf(jellyAscii)).not.toBeInstanceOf(KanjiJellyfishRenderer);
+    expect(rendererOf(jellyKanji)).toBeInstanceOf(KanjiJellyfishRenderer);
+    expect(jellyAscii.getStats().columns).toBe(100);
+    expect(jellyKanji.getStats().columns).toBe(134);
+
+    const koiAscii = createKoi(makeCanvas() as unknown as HTMLCanvasElement, { seed: 1 });
+    const koiKanji = createKoi(makeCanvas() as unknown as HTMLCanvasElement, {
+      seed: 1,
+      glyphs: "kanji",
+    });
+    expect(rendererOf(koiAscii)).toBeInstanceOf(AmbientRenderer);
+    expect(rendererOf(koiAscii)).not.toBeInstanceOf(KanjiKoiRenderer);
+    expect(rendererOf(koiKanji)).toBeInstanceOf(KanjiKoiRenderer);
+    expect(koiAscii.getStats().columns).toBe(100);
+    expect(koiKanji.getStats().columns).toBe(100);
+
+    for (const engine of [sharkAscii, sharkKanji, jellyAscii, jellyKanji, koiAscii, koiKanji]) {
+      engine.destroy();
+    }
   });
 });

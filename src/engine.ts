@@ -1,5 +1,6 @@
 import type { SceneAction } from "./core/scene";
 import { SceneRuntime } from "./core/runtime";
+import { KanjiSharkRenderer } from "./kanji/shark-renderer";
 import type { AsciiSharksOptions } from "./options";
 import { AsciiRenderer, type RendererOptions } from "./renderer";
 import { World, type SharkSpec } from "./world";
@@ -35,14 +36,25 @@ export class OceanEngine {
       seed: opts.seed,
       density: opts.density,
       sharkScale: opts.sharkScale,
+      orbitScale: opts.orbitScale,
+      fitSharks: opts.fitSharks,
     });
-    this.renderer = new AsciiRenderer(canvas, {
-      palette: opts.palette,
-      columns: opts.columns,
-      maxCells: opts.maxCells,
-      calm: opts.calm,
-      onEvent: opts.onEvent,
-    });
+    this.renderer =
+      opts.glyphs === "kanji"
+        ? new KanjiSharkRenderer(canvas, {
+            palette: opts.palette,
+            columns: opts.columns,
+            maxCells: opts.maxCells,
+            calm: opts.calm,
+            onEvent: opts.onEvent,
+          })
+        : new AsciiRenderer(canvas, {
+            palette: opts.palette,
+            columns: opts.columns,
+            maxCells: opts.maxCells,
+            calm: opts.calm,
+            onEvent: opts.onEvent,
+          });
     this.runtime = new SceneRuntime({
       canvas,
       world: this.world,
@@ -105,13 +117,17 @@ export class OceanEngine {
       partial.sharks !== undefined ||
       partial.seed !== undefined ||
       partial.density !== undefined ||
-      partial.sharkScale !== undefined;
+      partial.sharkScale !== undefined ||
+      partial.orbitScale !== undefined ||
+      partial.fitSharks !== undefined;
     if (structural) {
       this.world.setOptions({
         sharks: partial.sharks,
         seed: partial.seed,
         density: partial.density,
         sharkScale: partial.sharkScale,
+        orbitScale: partial.orbitScale,
+        fitSharks: partial.fitSharks,
       });
     }
 

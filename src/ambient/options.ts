@@ -1,4 +1,4 @@
-import type { SceneOptions } from "../core/scene";
+import type { GlyphStyle, SceneOptions } from "../core/scene";
 
 export type AmbientKind = "starlings" | "fireflies" | "ants" | "koi" | "city" | "servers";
 
@@ -13,6 +13,11 @@ export interface AsciiAmbientOptions extends SceneOptions {
   count?: number;
   /** Scene-specific scale hint. */
   scale?: number;
+  /**
+   * Glyph texture for scenes that ship a kanji replica. Koi supports
+   * `"kanji"`; other ambient scenes ignore this option. Default "ascii".
+   */
+  glyphs?: GlyphStyle;
   onEvent?: (event: AmbientEvent) => void;
 }
 

@@ -1,9 +1,16 @@
 import type { PaletteChoice } from "./palette";
+import type { GlyphStyle } from "./core/scene";
 import type { SharkSpec, WorldEvent } from "./world";
 
 export interface AsciiSharksOptions {
   /** Roster of sharks. Defaults to four classic sharks at different depths. */
   sharks?: SharkSpec[];
+  /**
+   * Glyph texture. `"ascii"` keeps the original scene; `"kanji"` uses a
+   * separate kanji-dominant renderer with the same world and motion.
+   * Default "ascii".
+   */
+  glyphs?: GlyphStyle;
   /** Reproducible world. Same seed + same size = same scene. */
   seed?: number;
   /** Art-direction target for the number of columns. Default 124. */
@@ -26,6 +33,10 @@ export interface AsciiSharksOptions {
   palette?: PaletteChoice;
   /** Shark length multiplier. Default 1. */
   sharkScale?: number;
+  /** Patrol-orbit radius multiplier. Lower values suit small cards. Default 1. */
+  orbitScale?: number;
+  /** Keep initial shark spines inside the frame. Default false. */
+  fitSharks?: boolean;
   /** Start with the clock stopped. Default false. */
   paused?: boolean;
   /** Font family used for the ASCII canvas. Defaults to the canvas CSS font. */
