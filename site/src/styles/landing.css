@@ -591,6 +591,7 @@ button {
   display: flex;
   justify-content: flex-end;
   flex-direction: column;
+  min-width: 0;
   min-height: 250px;
   padding: 18px;
   overflow: hidden;
@@ -645,6 +646,12 @@ button {
 .composition-mini:hover img,
 .composition-mini:hover canvas {
   transform: scale(1.035);
+}
+
+.composition-mini span,
+.composition-mini strong {
+  position: relative;
+  z-index: 1;
 }
 
 .composition-mini span {

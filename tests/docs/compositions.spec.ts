@@ -71,6 +71,17 @@ test("design ideas compositions switch scenes, copy prompts, and download starte
   expect(errors).toEqual([]);
 });
 
+test("landing composition band exposes three surfaces", async ({ page }) => {
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  await waitForFonts(page);
+
+  const band = page.locator(".composition-band");
+  await band.scrollIntoViewIfNeeded();
+  await expect(band.locator(".composition-mini")).toHaveCount(3);
+  await expectNoHorizontalOverflow(page);
+});
+
 test("shared Lagoon mirrors one live painter across all surfaces", async ({ page }) => {
   const errors = collectPageErrors(page);
   const stage = await openStage(page);

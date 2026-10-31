@@ -52,44 +52,44 @@ const defaultScene = findCompositionScene(DEFAULT_COMPOSITION_SCENE);
   <div class="cmp-grid">
     {
       COMPOSITION_SURFACES.map((surface, index) => (
-        <article
-          class="cmp-panel"
-          data-composition-panel
-          data-surface={surface.id}
-          data-scene={defaultScene.id}
-        >
-          <div class="cmp-panel__scene" data-composition-live data-live="false">
-            <img
-              src={`/showcase/${defaultScene.image}.jpg`}
-              alt=""
-              loading={index === 0 ? "eager" : "lazy"}
-              decoding="async"
-              data-composition-fallback
-            />
-          </div>
-          <div class="cmp-panel__top">
-            <span>{surface.kicker}</span>
-            <span data-composition-meta>{surface.meta}</span>
-          </div>
-          <div class="cmp-panel__copy">
-            <p class="cmp-panel__kicker">{surface.name} / ASCII-THINGS</p>
-            <h3>{surface.title}</h3>
-            <p>{surface.body}</p>
-          </div>
-          <div class="cmp-panel__actions">
-            <button type="button" data-composition-prompt>
-              Copy prompt
-            </button>
-            <button type="button" data-composition-download>
-              Download HTML
-            </button>
-            {surface.id === "immersive" && (
-              <a href="/lagoon-lab/">Open immersive demo <span aria-hidden="true">↗</span></a>
-            )}
-          </div>
-        </article>
-      ))
-    }
+          <article
+            class="cmp-panel"
+            data-composition-panel
+            data-surface={surface.id}
+            data-scene={defaultScene.id}
+          >
+            <div class="cmp-panel__scene" data-composition-live data-live="false">
+              <img
+                src={`/showcase/${defaultScene.image}.jpg`}
+                alt=""
+                loading={index === 0 ? "eager" : "lazy"}
+                decoding="async"
+                data-composition-fallback
+              />
+            </div>
+            <div class="cmp-panel__top">
+              <span>{surface.kicker}</span>
+              <span data-composition-meta>{surface.meta}</span>
+            </div>
+            <div class="cmp-panel__copy">
+              <p class="cmp-panel__kicker">{surface.name} / ASCII-THINGS</p>
+              <h3>{surface.title}</h3>
+              <p>{surface.body}</p>
+            </div>
+            <div class="cmp-panel__actions">
+              <button type="button" data-composition-prompt>
+                Copy prompt
+              </button>
+              <button type="button" data-composition-download>
+                Download HTML
+              </button>
+              {surface.id === "immersive" && (
+                <a href="/lagoon-lab/">Open immersive demo <span aria-hidden="true">↗</span></a>
+              )}
+            </div>
+          </article>
+        ))
+      }
   </div>
 
   <div class="cmp-foot">
