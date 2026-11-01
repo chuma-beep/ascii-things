@@ -299,6 +299,77 @@ installCopy?.addEventListener("click", async () => {
   if (await copyText(command)) flash(installCopy, "COPIED");
 });
 
+const aiPrompts: Record<string, string> = {
+  claude:
+    "Read https://ascii-things-docs.pages.dev/guide/framework/ and use ascii-things to build a custom ASCII simulation. Install with npm i ascii-things. Start from createSimulation in ascii-things/core; keep CellGrid optional, use ascii-things/rendering only when it helps, and preserve custom action types.",
+  chatgpt:
+    "Plan a custom ASCII simulation using the ascii-things public framework, then implement it. Read https://ascii-things-docs.pages.dev/guide/framework/ first. Install with npm i ascii-things. Use createSimulation from ascii-things/core and keep the renderer independent of CellGrid unless a grid genuinely fits.",
+  opencode:
+    "Use the ascii-things public framework in this repo to build a new simulation. Read https://ascii-things-docs.pages.dev/guide/framework/ and use createSimulation from ascii-things/core. Install with npm i ascii-things. Keep CellGrid optional, preserve custom action types, and verify the lifecycle and cleanup.",
+  cursor:
+    "Use ascii-things for this project. Read https://ascii-things-docs.pages.dev/guide/framework/ and install with npm i ascii-things. Build the scene with createSimulation from ascii-things/core, use ascii-things/rendering only if a cell grid helps, and keep the simulation React-independent.",
+};
+
+const aiTriggers = Array.from(
+  document.querySelectorAll<HTMLButtonElement>(".ai-picker [data-ai-tool]"),
+);
+const aiPanel = document.querySelector<HTMLElement>("#ai-panel");
+const aiClose = document.querySelector<HTMLButtonElement>("#ai-panel .ai-close");
+let activeAiTrigger: HTMLButtonElement | null = null;
+
+if (aiTriggers.length && aiPanel) {
+  const setAiOpen = (open: boolean, tool?: string) => {
+    aiPanel.hidden = !open;
+    for (const trigger of aiTriggers) trigger.setAttribute("aria-expanded", String(open));
+    for (const row of aiPanel.querySelectorAll<HTMLElement>(".ai-tool")) {
+      row.classList.remove("is-active");
+    }
+    if (!open) return;
+
+    const copy = tool
+      ? aiPanel.querySelector<HTMLButtonElement>(`[data-ai-copy="${tool}"]`)
+      : aiPanel.querySelector<HTMLButtonElement>("[data-ai-copy]");
+    copy?.closest(".ai-tool")?.classList.add("is-active");
+    copy?.scrollIntoView({ block: "nearest" });
+    copy?.focus();
+  };
+
+  for (const trigger of aiTriggers) {
+    trigger.addEventListener("click", (event) => {
+      event.stopPropagation();
+      activeAiTrigger = trigger;
+      setAiOpen(true, trigger.dataset.aiTool);
+    });
+  }
+
+  aiClose?.addEventListener("click", () => {
+    setAiOpen(false);
+    activeAiTrigger?.focus();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !aiPanel.hidden) {
+      setAiOpen(false);
+      activeAiTrigger?.focus();
+    }
+  });
+
+  document.addEventListener("pointerdown", (event) => {
+    if (aiPanel.hidden) return;
+    const target = event.target as Node;
+    if (aiPanel.contains(target)) return;
+    if (aiTriggers.some((trigger) => trigger.contains(target))) return;
+    setAiOpen(false);
+  });
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-ai-copy]")) {
+    button.addEventListener("click", async () => {
+      const prompt = aiPrompts[button.dataset.aiCopy ?? ""];
+      if (prompt && (await copyText(prompt))) flash(button);
+    });
+  }
+}
+
 function fnv1a(text: string) {
   let hash = 0x811c9dc5;
   for (let i = 0; i < text.length; i++) {

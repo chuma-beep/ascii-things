@@ -105,12 +105,123 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         <a href="/api/">API</a>
         <a href="/playground/">Playground ↗</a>
       </nav>
+      <div class="ai-picker" role="group" aria-label="AI tool prompts">
+        <button
+          class="ai-pick"
+          type="button"
+          data-ai-tool="claude"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="ai-panel"
+          aria-label="Open the Claude Code prompt"
+        >
+          <img src="/assets/ai/claude.svg" alt="" width="17" height="17" />
+        </button>
+        <button
+          class="ai-pick"
+          type="button"
+          data-ai-tool="chatgpt"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="ai-panel"
+          aria-label="Open the ChatGPT prompt"
+        >
+          <img src="/assets/ai/chatgpt.png" alt="" width="18" height="18" />
+        </button>
+        <button
+          class="ai-pick"
+          type="button"
+          data-ai-tool="cursor"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="ai-panel"
+          aria-label="Open the Cursor prompt"
+        >
+          <img src="/assets/ai/cursor.svg" alt="" width="17" height="17" />
+        </button>
+      </div>
       <div class="header-end">
         <span class="version">v1.0.0-rc.0</span>
         <a class="github" href="https://github.com/chuma-beep/ascii-things">GitHub ↗</a>
       </div>
       <MobileNav />
     </header>
+
+    <div
+      class="ai-panel"
+      id="ai-panel"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="ai-panel-title"
+      aria-describedby="ai-panel-intro"
+      hidden
+    >
+      <div class="ai-panel-head">
+        <div>
+          <p class="ai-eyebrow">USE WITH AI</p>
+          <h2 id="ai-panel-title">Bring your own agent.</h2>
+        </div>
+        <button class="ai-close" type="button" aria-label="Close AI tool prompts">×</button>
+      </div>
+      <p class="ai-intro" id="ai-panel-intro">
+        Copy a prompt into your tool. It already points at the docs, the install command and the
+        public simulation framework.
+      </p>
+      <div class="ai-tools">
+        <article class="ai-tool">
+          <div class="ai-tool-head">
+            <span class="ai-tool-icon" aria-hidden="true">
+              <img src="/assets/ai/claude.svg" alt="" width="14" height="14" />
+            </span>
+            <span class="ai-tool-name">Claude Code</span>
+            <span class="ai-tool-meta">TERMINAL</span>
+          </div>
+          <p>Reads the repo, installs the package and writes a simulation beside your app.</p>
+          <button class="ai-copy" type="button" data-ai-copy="claude">COPY PROMPT</button>
+        </article>
+
+        <article class="ai-tool">
+          <div class="ai-tool-head">
+            <span class="ai-tool-icon" aria-hidden="true">
+              <img src="/assets/ai/chatgpt.png" alt="" width="15" height="15" />
+            </span>
+            <span class="ai-tool-name">ChatGPT / Codex</span>
+            <span class="ai-tool-meta">AGENT</span>
+          </div>
+          <p>Good for planning the scene, then handing the implementation to a coding agent.</p>
+          <button class="ai-copy" type="button" data-ai-copy="chatgpt">COPY PROMPT</button>
+        </article>
+
+        <article class="ai-tool">
+          <div class="ai-tool-head">
+            <span class="ai-tool-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16" />
+              </svg>
+            </span>
+            <span class="ai-tool-name">OpenCode</span>
+            <span class="ai-tool-meta">CLI</span>
+          </div>
+          <p>Works directly in this repo with the public core, rendering utilities and React hook.</p>
+          <button class="ai-copy" type="button" data-ai-copy="opencode">COPY PROMPT</button>
+        </article>
+
+        <article class="ai-tool">
+          <div class="ai-tool-head">
+            <span class="ai-tool-icon" aria-hidden="true">
+              <img src="/assets/ai/cursor.svg" alt="" width="14" height="14" />
+            </span>
+            <span class="ai-tool-name">Cursor</span>
+            <span class="ai-tool-meta">EDITOR</span>
+          </div>
+          <p>Drop the prompt into chat, or add it to the project rules for persistent context.</p>
+          <button class="ai-copy" type="button" data-ai-copy="cursor">COPY PROMPT</button>
+        </article>
+      </div>
+      <a class="ai-docs" href="https://ascii-things-docs.pages.dev/guide/framework/">
+        READ THE FRAMEWORK DOCS ↗
+      </a>
+    </div>
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">

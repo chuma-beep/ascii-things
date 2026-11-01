@@ -77,7 +77,7 @@ button {
   z-index: 30;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 24px;
   padding: 22px var(--pad);
   border-bottom: 1px solid transparent;
@@ -117,6 +117,10 @@ button {
   text-transform: uppercase;
 }
 
+.site-nav {
+  margin-left: auto;
+}
+
 .site-nav a {
   color: var(--muted);
   transition: color 160ms ease;
@@ -139,6 +143,267 @@ button {
 .header-end .github {
   color: var(--orange);
   transition: color 160ms ease;
+}
+
+.ai-picker {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--line-soft);
+  background: rgba(11, 13, 15, 0.72);
+  backdrop-filter: blur(12px);
+  translate: -50% -50%;
+}
+
+.ai-pick {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    scale 160ms ease;
+}
+
+.ai-pick img {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+  opacity: 0.72;
+  transition:
+    opacity 160ms ease,
+    scale 160ms ease;
+}
+
+.ai-pick:hover,
+.ai-pick[aria-expanded="true"] {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.ai-pick:hover img,
+.ai-pick[aria-expanded="true"] img {
+  opacity: 1;
+  scale: 1.08;
+}
+
+.ai-pick:focus-visible,
+.ai-close:focus-visible,
+.ai-copy:focus-visible,
+.ai-docs:focus-visible {
+  outline: 1px solid var(--orange);
+  outline-offset: 3px;
+}
+
+.ai-panel {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  z-index: 45;
+  width: min(392px, calc(100vw - 40px));
+  translate: -50% 0;
+  max-height: calc(100svh - 92px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 20px;
+  border: 1px solid var(--line);
+  background: rgba(11, 13, 15, 0.97);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(18px);
+  animation: ai-panel-in 180ms ease both;
+}
+
+.ai-panel[hidden] {
+  display: none;
+}
+
+.ai-panel::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--orange), transparent);
+  content: "";
+  opacity: 0.7;
+}
+
+.ai-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ai-eyebrow {
+  margin: 0 0 8px;
+  color: var(--orange);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+}
+
+.ai-panel h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.ai-close {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--faint);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.ai-close:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.ai-intro {
+  margin: 14px 0 18px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+.ai-tools {
+  display: grid;
+  gap: 8px;
+}
+
+.ai-tool {
+  padding: 12px;
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.012);
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.ai-tool:hover,
+.ai-tool.is-active {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ai-tool.is-active {
+  border-color: var(--orange);
+}
+
+.ai-tool-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.ai-tool-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  color: var(--orange);
+}
+
+.ai-tool-icon svg,
+.ai-tool-icon img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.ai-tool-icon svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.4;
+}
+
+.ai-tool-name {
+  color: var(--ink);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.ai-tool-meta {
+  margin-left: auto;
+  color: var(--faint);
+  font-size: 7px;
+  letter-spacing: 0.14em;
+}
+
+.ai-tool p {
+  margin: 8px 0 10px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.ai-copy {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--faint);
+  font: inherit;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.ai-copy:hover,
+.ai-copy.is-copied {
+  border-color: var(--orange);
+  background: var(--orange-soft);
+  color: var(--orange);
+}
+
+.ai-docs {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--orange);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+}
+
+@keyframes ai-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .install-pill .prompt-caret {
@@ -1058,12 +1323,35 @@ button {
   }
 
   .site-nav {
-    gap: 14px;
-    font-size: 8px;
+    display: none;
   }
 
-  .site-nav a[href="#scenes"] {
-    display: none;
+  .header-end {
+    margin-left: auto;
+  }
+
+  .ai-picker {
+    gap: 1px;
+    padding: 2px;
+  }
+
+  .ai-pick {
+    width: 28px;
+    height: 28px;
+  }
+
+  .ai-panel {
+    top: 62px;
+    right: 20px;
+    left: 20px;
+    width: auto;
+    max-height: calc(100svh - 82px);
+    padding: 16px;
+    translate: 0 0;
+  }
+
+  .ai-panel h2 {
+    font-size: 17px;
   }
 
   .hero-copy {
