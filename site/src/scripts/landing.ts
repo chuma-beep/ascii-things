@@ -10,7 +10,6 @@ import {
   createSharks,
   createStarlings,
   createLagoon,
-  type DogEngine,
 } from "ascii-things";
 
 type CardEngine =
@@ -28,69 +27,23 @@ type CardEngine =
 
 const heroCanvas = document.querySelector<HTMLCanvasElement>("#hero-canvas");
 if (heroCanvas) {
-  const compact = window.matchMedia("(max-width: 620px)").matches;
-  const hero = createDog(heroCanvas, {
-    palette: "abyss",
-    seed: 7,
-    count: 1,
-    dogs: [{ size: compact ? 1 : 1.15 }],
-    spread: compact ? [0.72, 0.86] : [0.68, 0.68],
-    interactive: true,
-    columns: 150,
-    maxCells: 16000,
-    label: "A live ASCII robot dog test yard",
+  const hero = createLagoon(heroCanvas, {
+    variant: "night",
+    label: "A live ASCII night lagoon",
   });
-  (window as unknown as { asciiScene: DogEngine }).asciiScene = hero;
-
-  const form = document.querySelector<HTMLFormElement>("#prompt");
-  const input = document.querySelector<HTMLInputElement>("#command");
-  if (compact && input) input.placeholder = "Tell the dog…";
-  const echo = document.querySelector<HTMLElement>("#echo");
-  const reply = document.querySelector<HTMLElement>("#reply");
-  const replies = [
-    "BALL LAUNCHED · UNIT 01 ON IT",
-    "VECTOR LOCKED · UNIT 01 ON IT",
-    "FETCH QUEUED · GOOD BOY",
-    "THROW CONFIRMED · GO GET IT",
-  ];
-
-  form?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const text = input?.value.trim() || "the moon";
-    const hash = fnv1a(text);
-    hero.throwBall(
-      window.innerWidth * (0.2 + ((hash % 1000) / 1000) * 0.6),
-      window.innerHeight * 0.7,
-    );
-    if (echo) echo.textContent = `> ${text}`;
-    if (reply) reply.textContent = replies[hash % replies.length];
-    if (input) {
-      input.value = "";
-      input.focus();
-    }
-  });
-
-  hero.setOptions({
-    onEvent: (event) => {
-      if (!reply) return;
-      if (event.kind === "nudge") reply.textContent = "FETCH COMPLETE · GOOD BOY";
-      if (event.kind === "charge" || event.kind === "low") {
-        reply.textContent = "LOW BATTERY · RETURNING TO DOCK";
-      }
-    },
-  });
+  (window as unknown as { asciiScene: ReturnType<typeof createLagoon> }).asciiScene = hero;
 
   const cells = document.querySelector<HTMLElement>("#stat-cells");
-  const dogs = document.querySelector<HTMLElement>("#stat-dogs");
-  const state = document.querySelector<HTMLElement>("#stat-state");
-  const fps = document.querySelector<HTMLElement>("#stat-fps");
+  const mode = document.querySelector<HTMLElement>("#stat-mode");
+  const columns = document.querySelector<HTMLElement>("#stat-columns");
+  const rows = document.querySelector<HTMLElement>("#stat-rows");
 
   const refresh = () => {
     const stats = hero.getStats();
     if (cells) cells.textContent = stats.cells.toLocaleString("en-US");
-    if (dogs) dogs.textContent = String(stats.dogs).padStart(2, "0");
-    if (state) state.textContent = stats.state.toUpperCase();
-    if (fps) fps.textContent = String(Math.round(stats.fps));
+    if (mode) mode.textContent = stats.variant.toUpperCase();
+    if (columns) columns.textContent = String(stats.columns);
+    if (rows) rows.textContent = String(stats.rows);
   };
   refresh();
   window.setInterval(refresh, 500);
@@ -368,13 +321,4 @@ if (aiTriggers.length && aiPanel) {
       if (prompt && (await copyText(prompt))) flash(button);
     });
   }
-}
-
-function fnv1a(text: string) {
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < text.length; i++) {
-    hash ^= text.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return hash >>> 0;
 }
