@@ -12,7 +12,6 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
-  type RefObject,
 } from "react";
 import { createDog } from "./dog";
 import { createJellyfish } from "./jellyfish";
@@ -24,7 +23,7 @@ import { createAnts } from "./ants";
 import { createKoi } from "./koi";
 import { createCity } from "./city";
 import { createServers } from "./servers";
-import type { SceneAction, SceneHandle, SceneOptions, SceneReady, SceneStats } from "./core/scene";
+import type { SceneAction, SceneHandle, SceneOptions } from "./core/scene";
 import type { AsciiDogOptions, DogStats, DogWorldEvent } from "./dog";
 import type { AsciiJellyfishOptions } from "./jellyfish/options";
 import type { AsciiSharksOptions } from "./options";
@@ -35,6 +34,13 @@ import type { AsciiAntsOptions } from "./ants/options";
 import type { AsciiKoiOptions } from "./koi/options";
 import type { AsciiCityOptions } from "./city/options";
 import type { AsciiServersOptions } from "./servers/options";
+import { useSimulation } from "./use-simulation";
+
+export { useSimulation as useAsciiScene } from "./use-simulation";
+export type {
+  UseSimulationOptions as UseAsciiSceneOptions,
+  UseSimulationResult as UseAsciiSceneResult,
+} from "./use-simulation";
 
 export type { AsciiDogOptions, DogStats, DogWorldEvent };
 
@@ -502,82 +508,6 @@ export function AsciiDogHero({
 /* Hooks                                                                      */
 /* ------------------------------------------------------------------------- */
 
-export interface UseAsciiSceneOptions<
-  S extends SceneStats = SceneStats,
-  O extends SceneOptions = SceneOptions,
-> {
-  /** Scene factory, usually one of `createSharks`, `createRobots`, `createJellyfish`, `createDog`. */
-  create: (canvas: HTMLCanvasElement, options: O) => SceneHandle<S>;
-  options: O;
-  /** Change this when a structural scene option changes and the engine must be recreated. */
-  remountKey?: string;
-  onReady?: SceneReady<S>;
-}
-
-export interface UseAsciiSceneResult<S extends SceneStats = SceneStats> {
-  canvasRef: RefObject<HTMLCanvasElement | null>;
-  scene: SceneHandle<S> | null;
-  stats: S | null;
-  refresh: () => void;
-}
-
-/**
- * Owns a canvas scene for a React component: construction, teardown, live
- * options, a 500ms stats sample, and the ready handle.
- */
-export function useAsciiScene<
-  S extends SceneStats = SceneStats,
-  O extends SceneOptions = SceneOptions,
->({
-  create,
-  options,
-  remountKey = "",
-  onReady,
-}: UseAsciiSceneOptions<S, O>): UseAsciiSceneResult<S> {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const sceneRef = useRef<SceneHandle<S> | null>(null);
-  const optionsRef = useRef(options);
-  const createRef = useRef(create);
-  const onReadyRef = useRef(onReady);
-  const [scene, setScene] = useState<SceneHandle<S> | null>(null);
-  const [stats, setStats] = useState<S | null>(null);
-
-  optionsRef.current = options;
-  createRef.current = create;
-  onReadyRef.current = onReady;
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const engine = createRef.current(canvas, optionsRef.current);
-    sceneRef.current = engine;
-    setScene(engine);
-    setStats(engine.getStats());
-    onReadyRef.current?.(engine);
-
-    const timer = window.setInterval(() => setStats(engine.getStats()), 500);
-    return () => {
-      window.clearInterval(timer);
-      engine.destroy();
-      if (sceneRef.current === engine) sceneRef.current = null;
-    };
-  }, [remountKey]);
-
-  useEffect(() => {
-    sceneRef.current?.setOptions(options);
-  }, [options]);
-
-  return {
-    canvasRef,
-    scene,
-    stats,
-    refresh: () => {
-      if (sceneRef.current) setStats(sceneRef.current.getStats());
-    },
-  };
-}
-
 /* ------------------------------------------------------------------------- */
 /* Primitives                                                                 */
 /* ------------------------------------------------------------------------- */
@@ -1021,7 +951,7 @@ export interface AsciiSceneHeroProps<K extends AsciiSceneKind = AsciiSceneKind> 
   className?: string;
   style?: CSSProperties;
   onCommand?: (value: string) => void;
-  onReady?: SceneReady;
+  onReady?: (scene: SceneHandle) => void;
 }
 
 export function AsciiSceneHero<K extends AsciiSceneKind>({
@@ -1042,7 +972,7 @@ export function AsciiSceneHero<K extends AsciiSceneKind>({
 }: AsciiSceneHeroProps<K>) {
   const copy = SCENE_COPY[kind];
   const resolvedOptions = (options ?? EMPTY_OPTIONS) as SceneOptions;
-  const { canvasRef, scene, stats } = useAsciiScene({
+  const { canvasRef, scene, stats } = useSimulation({
     create: SCENE_FACTORIES[kind],
     options: resolvedOptions,
     remountKey: sceneKey(kind, resolvedOptions),

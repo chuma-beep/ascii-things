@@ -1,0 +1,133 @@
+---
+title: Custom simulations
+description: Build a new ASCII simulation with the shared runtime, rendering utilities, and React hook.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+`ascii-things/core` exposes the same runtime used by the built-in living scenes. A custom
+simulation owns its world and renderer; the runtime owns scheduling, fixed timesteps, canvas
+sizing, visibility, reduced motion, pointer plumbing, labels, and disposal.
+
+<Aside type="note" title="Optional rendering">
+`ascii-things/rendering` provides `CellGrid` when a cell-based canvas helps. It is not required.
+A renderer can address the canvas directly for free-positioned glyphs, particles, or any other
+Canvas 2D scene.
+</Aside>
+
+## The contract
+
+```ts
+import type {
+  RuntimeRenderer,
+  RuntimeWorld,
+  SceneAction,
+  SceneStats,
+} from "ascii-things/core";
+```
+
+`RuntimeWorld` only requires `step(dt)` and `resize(...)`. Events, pointer state, and simulated
+time are optional. `RuntimeRenderer` only requires canvas sizing, a render call, and font
+updates. Neither contract requires entities, `CellGrid`, or a particular simulation model.
+
+## Create a simulation
+
+```ts
+import { createSimulation } from "ascii-things/core";
+
+const simulation = createSimulation({
+  canvas,
+  world,
+  renderer,
+  label: "A custom ASCII simulation",
+  onPointerDown(x, y) {
+    world.toggle(x, y);
+  },
+  onAction(action, x, y) {
+    world.act(action, x, y);
+  },
+  getStats(base, current) {
+    return { ...base, generation: current.generation };
+  },
+});
+```
+
+The returned handle implements the shared `SceneHandle` lifecycle:
+
+```ts
+simulation.pause();
+simulation.resume();
+simulation.resize();
+simulation.setOptions({ speed: 0.5, paused: false, maxDpr: 2 });
+simulation.trigger("reset", 0, 0);
+simulation.getStats();
+simulation.destroy();
+```
+
+`trigger()` uses the action type supplied by the simulation. A custom action union such as
+`"explode" | "reset"` survives through `createSimulation`, `useSimulation`, `onReady`, and the
+handle.
+
+## Use the grid optionally
+
+```ts
+import { CellGrid } from "ascii-things/rendering";
+
+class LifeRenderer extends CellGrid {
+  render(world: LifeWorld) {
+    const { ctx } = this;
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    ctx.fillStyle = "#070809";
+    ctx.fillRect(0, 0, this.width, this.height);
+    ctx.fillStyle = "#ff9a4d";
+    // Draw world.cells using this.cw, this.ch, this.cols, and this.rows.
+  }
+}
+```
+
+For free-positioned rendering, implement `RuntimeRenderer` directly and use the canvas
+`CanvasRenderingContext2D` yourself. `paintGrid`, `resolvePalette`, `PALETTES`, and the math
+helpers are also available from `ascii-things/rendering`.
+
+## React
+
+```tsx
+import { useSimulation } from "ascii-things/core/react";
+import type { SceneHandle } from "ascii-things/core";
+
+function createOrbit(
+  canvas: HTMLCanvasElement,
+  options: { seed: number },
+): SceneHandle {
+  // Build the world and renderer, then return a SceneHandle.
+}
+
+export function Orbit() {
+  const { canvasRef } = useSimulation({
+    create: createOrbit,
+    options: { seed: 7 },
+    remountKey: "orbit/7",
+  });
+
+  return <canvas ref={canvasRef} style={{ width: "100%", height: 420 }} />;
+}
+```
+
+The hook does not import built-in scenes. `ascii-things/ui` continues to export
+`useAsciiScene` as a compatibility alias.
+
+## Lifecycle rules
+
+- A world may omit `events`, `pointer`, and `time`. Reduced motion renders a still frame.
+- The canvas needs a real height. Use a sized parent, `height`, or an aspect ratio.
+- Change structural options by recreating the simulation or changing `remountKey`.
+- Call `destroy()` when you own the simulation outside React. It disconnects observers,
+  removes listeners, and cancels the frame.
+- Pass `getStats` only when you have real measurements. The default is the runtime's measured
+  base stats; do not fabricate FPS.
+
+## Examples
+
+- [Cellular automaton](https://github.com/chuma-beep/ascii-things/tree/main/examples/framework-ca)
+- Built-in shark scene: `ascii-things/sharks`
+- React and custom-element adapters: [React](/guide/react/) and [Custom elements](/guide/custom-elements/)

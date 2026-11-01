@@ -14,9 +14,12 @@ export interface RuntimeOptions {
 
 /** The small surface a world must expose to the runtime. */
 export interface RuntimeWorld {
-  events: { length: number };
-  pointer: { x: number; y: number; active: boolean };
-  time: number;
+  /** Optional event queue, cleared on pause and teardown. */
+  events?: { length: number };
+  /** Optional pointer state, updated when interaction is enabled. */
+  pointer?: { x: number; y: number; active: boolean };
+  /** Optional simulated time, used to settle reduced-motion frames. */
+  time?: number;
   step(dt: number): void;
   resize(width: number, height: number, cellWidth: number, cellHeight: number): void;
 }
@@ -54,6 +57,8 @@ export interface SceneRuntimeConfig<W extends RuntimeWorld, R extends RuntimeRen
   timing?: "fixed" | "scaled";
   /** Called for a non-touch primary pointer inside the canvas. */
   onPointerDown?: (x: number, y: number) => void;
+  /** Called for pointer movement, whether or not the world keeps pointer state. */
+  onPointerMove?: (x: number, y: number, inside: boolean) => void;
   /** Deliver and clear queued world events. Omit when the renderer consumes them. */
   flushEvents?: () => void;
 }
@@ -86,6 +91,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
   private frameMs = 16.7;
   private timing: "fixed" | "scaled";
   private onPointerDown?: (x: number, y: number) => void;
+  private onPointerMoveHandler?: (x: number, y: number, inside: boolean) => void;
   private flushEventsHandler?: () => void;
 
   constructor(private config: SceneRuntimeConfig<W, R>) {
@@ -99,6 +105,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     this.paused = config.paused ?? false;
     this.timing = config.timing ?? "fixed";
     this.onPointerDown = config.onPointerDown;
+    this.onPointerMoveHandler = config.onPointerMove;
     this.flushEventsHandler = config.flushEvents;
 
     renderer.setFontFamily(this.fontFamily ?? getComputedStyle(canvas).fontFamily);
@@ -141,7 +148,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     this.paused = paused;
     cancelAnimationFrame(this.raf);
     if (paused) {
-      this.config.world.events.length = 0;
+      if (this.config.world.events) this.config.world.events.length = 0;
       return;
     }
     this.last = performance.now();
@@ -188,6 +195,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
 
   setMaxDpr(maxDpr: number | undefined) {
     this.maxDpr = maxDpr;
+    this.resize();
   }
 
   setAdaptiveQuality(enabled: boolean) {
@@ -250,7 +258,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     this.intersectionObserver.disconnect();
     this.reducedMotion.removeEventListener("change", this.onMotionPreference);
     this.unbindPointer();
-    this.config.world.events.length = 0;
+    if (this.config.world.events) this.config.world.events.length = 0;
   }
 
   private get world() {
@@ -344,7 +352,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     // each simulation step still uses the real speed (which may be below 0.25).
     const stepScale = this.timing === "scaled" ? this.speed : 1;
     const settleScale = this.timing === "scaled" ? Math.max(0.25, this.speed) : 1;
-    if (this.world.time < 4) {
+    if (this.world.time !== undefined && this.world.time < 4) {
       const steps = Math.ceil(240 / settleScale);
       for (let i = 0; i < steps; i++) this.world.step(FIXED_STEP * stepScale);
     }
@@ -372,10 +380,13 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
   private onPointerMove = (e: PointerEvent) => {
     if (!this.interactive) return;
     const { x, y, inside } = this.toLocal(e);
-    const p = this.world.pointer;
-    p.x = x;
-    p.y = y;
-    p.active = inside && e.pointerType !== "touch";
+    const pointer = this.world.pointer;
+    if (pointer) {
+      pointer.x = x;
+      pointer.y = y;
+      pointer.active = inside && e.pointerType !== "touch";
+    }
+    this.onPointerMoveHandler?.(x, y, inside);
   };
 
   private onPointerDownHandler = (e: PointerEvent) => {
@@ -385,6 +396,6 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
   };
 
   private onPointerLeave = () => {
-    this.world.pointer.active = false;
+    if (this.world.pointer) this.world.pointer.active = false;
   };
 }

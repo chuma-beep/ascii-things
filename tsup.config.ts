@@ -3,6 +3,9 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   entry: {
     index: "src/index.ts",
+    core: "src/core/index.ts",
+    rendering: "src/rendering.ts",
+    "core-react": "src/core/react.tsx",
     sharks: "src/sharks.ts",
     robots: "src/robots/index.ts",
     jellyfish: "src/jellyfish/index.ts",

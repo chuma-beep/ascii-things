@@ -54,16 +54,18 @@ export type SceneAction =
   | "ping";
 
 /** The lifecycle surface shared by every engine. */
-export interface SceneHandle<S extends SceneStats = SceneStats> {
+export interface SceneHandle<S extends SceneStats = SceneStats, A extends string = SceneAction> {
   pause(): void;
   resume(): void;
   resize(): void;
   setOptions(options: Partial<SceneOptions>): void;
   /** Trigger the scene's signature action at canvas-local coordinates. */
-  trigger(action: SceneAction, x: number, y: number): void;
+  trigger(action: A, x: number, y: number): void;
   getStats(): S;
   destroy(): void;
 }
 
 /** Called once a wrapper has created its engine. */
-export type SceneReady<S extends SceneStats = SceneStats> = (scene: SceneHandle<S>) => void;
+export type SceneReady<S extends SceneStats = SceneStats, A extends string = SceneAction> = (
+  scene: SceneHandle<S, A>,
+) => void;

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ascii-things — custom React orbital scene</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #070809;
+        color: #ece8df;
+        font: 13px/1.6 "Geist Mono", ui-monospace, monospace;
+      }
+      main {
+        width: min(1100px, 100%);
+        margin: 0 auto;
+        padding: 32px;
+      }
+      header { display: flex; justify-content: space-between; gap: 20px; align-items: end; }
+      h1 { margin: 0; font-size: clamp(2rem, 5vw, 4rem); line-height: .95; letter-spacing: -.07em; }
+      p { color: #9b9387; }
+      .stage {
+        height: min(68vh, 600px);
+        margin: 24px 0 16px;
+        border: 1px solid #39352f;
+        background: #050607;
+      }
+      canvas { display: block; width: 100%; height: 100%; }
+      button {
+        border: 1px solid #4b463e;
+        background: transparent;
+        color: #ece8df;
+        padding: 9px 12px;
+        font: inherit;
+        cursor: pointer;
+      }
+      button:hover { border-color: #ff7a1a; color: #ff7a1a; }
+      .stats { display: flex; gap: 20px; color: #9b9387; }
+      .stats strong { color: #ff7a1a; font-weight: 500; }
+      @media (max-width: 600px) { main { padding: 18px; } header { display: block; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <p>FRAMEWORK EXAMPLE / REACT + FREE POSITION</p>
+          <h1>Orbit, <em>not cells.</em></h1>
+        </div>
+      </header>
+      <p>A custom React scene. The renderer draws free-positioned glyphs and does not use CellGrid.</p>
+      <div id="root"></div>
+    </main>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

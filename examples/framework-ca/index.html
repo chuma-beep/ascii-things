@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ascii-things — custom cellular automaton</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 32px;
+        background: #070809;
+        color: #ece8df;
+        font: 13px/1.6 "Geist Mono", ui-monospace, monospace;
+      }
+      main { width: min(1100px, 100%); margin: 0 auto; }
+      header { display: flex; justify-content: space-between; gap: 20px; align-items: end; }
+      h1 { margin: 0; font-size: clamp(2rem, 5vw, 4rem); line-height: .95; letter-spacing: -.07em; }
+      p { color: #9b9387; }
+      .canvas-wrap { height: min(66vh, 560px); margin: 24px 0 16px; border: 1px solid #39352f; }
+      canvas { display: block; width: 100%; height: 100%; }
+      button {
+        border: 1px solid #4b463e; background: transparent; color: #ece8df;
+        padding: 9px 12px; font: inherit; cursor: pointer;
+      }
+      button:hover { border-color: #ff7a1a; color: #ff7a1a; }
+      .stats { display: flex; gap: 24px; color: #9b9387; }
+      .stats strong { color: #ff7a1a; font-weight: 500; }
+      @media (max-width: 600px) { body { padding: 18px; } header { display: block; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <p>FRAMEWORK EXAMPLE / 01</p>
+          <h1>Life, <em>but live.</em></h1>
+        </div>
+        <div class="stats" aria-live="polite">
+          <span>GEN <strong id="gen">0</strong></span>
+          <span>ALIVE <strong id="alive">0</strong></span>
+        </div>
+      </header>
+      <p>Click the grid to toggle a cell. Reset or randomize with the buttons.</p>
+      <div class="canvas-wrap"><canvas id="life" aria-label="Conway's Game of Life"></canvas></div>
+      <button type="button" id="reset">RESET</button>
+      <button type="button" id="randomize">RANDOMIZE</button>
+      <button type="button" id="pause">PAUSE</button>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
