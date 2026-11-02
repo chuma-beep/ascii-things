@@ -12,7 +12,7 @@ These are now part of the package and the 1.0 surface.
 ## Shipped registry components
 
 The Component docs now publish copyable shadcn registry items. Each item installs with
-`npx shadcn@latest add https://ascii-things-docs.pages.dev/r/<name>.json`; the registry JSON is
+`npx shadcn@latest add https://ascii-things.dev/r/<name>.json`; the registry JSON is
 generated from the same source files in `registry/`.
 
 - `ascii-box-footer`

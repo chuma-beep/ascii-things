@@ -416,8 +416,8 @@ for page chrome, or put your own controls over `AsciiStage` and use only the
 scene beneath.
 
 See the [UI example](examples/ui/) for the full composition. The
-[scene console](https://ascii-things-docs.pages.dev/components/scene-console/) and
-[scene toolbar](https://ascii-things-docs.pages.dev/components/scene-toolbar/)
+[scene console](https://ascii-things.dev/components/scene-console/) and
+[scene toolbar](https://ascii-things.dev/components/scene-toolbar/)
 registry items show the same primitives as copyable source.
 
 ## Image to ASCII
@@ -426,7 +426,7 @@ registry items show the same primitives as copyable source.
 into monochrome or colour ASCII. It is a separate tree-shakeable entry, not a
 living scene, and has no runtime dependencies.
 
-The docs site includes a full [image-to-ASCII studio](https://ascii-things-docs.pages.dev/image/)
+The docs site includes a full [image-to-ASCII studio](https://ascii-things.dev/image/)
 with crop, edge detection, batch conversion, and TXT, PNG, SVG, and ZIP export.
 
 ```ts
@@ -506,7 +506,7 @@ events. Attributes: `src`, `columns`, `charset`, `invert`, `dither`, `contrast`,
 `Blob`, `HTMLImageElement`, `ImageBitmap`, `HTMLCanvasElement`, or a URL. Remote
 URLs must allow CORS; local files avoid that requirement.
 
-Use the [live image studio](https://ascii-things-docs.pages.dev/image/) for
+Use the [live image studio](https://ascii-things.dev/image/) for
 drag-and-drop, paste, URL loading, crop, edge detection, batch conversion, and
 TXT, PNG, SVG, and ZIP export. The smaller [image demo](examples/image/) stays
 available as a minimal integration reference.
@@ -735,12 +735,12 @@ handle.
 - [Playground](examples/playground/) — the query-string demo for every scene.
 - [UI layer](examples/ui/) — first-party React components composing the dog,
   stage, prompt, readout, and palette tabs.
-- [Design system recipes](https://ascii-things-docs.pages.dev/guide/design-systems/) —
+- [Design system recipes](https://ascii-things.dev/guide/design-systems/) —
   shadcn/ui, Material UI, Tailwind, and custom-element integration patterns.
-- [Components](https://ascii-things-docs.pages.dev/components/) — copyable shadcn
+- [Components](https://ascii-things.dev/components/) — copyable shadcn
   registry items for an ASCII box footer, koi card, dither card, surface card,
   scene console, and scene toolbar.
-- [Image to ASCII studio](https://ascii-things-docs.pages.dev/image/) — crop,
+- [Image to ASCII studio](https://ascii-things.dev/image/) — crop,
   edge detection, batch conversion, and TXT/PNG/SVG/ZIP export.
 - [Image to ASCII example](examples/image/) — the minimal drag-and-drop
   integration with charset, contrast, dithering, colour, copy, and download.

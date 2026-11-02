@@ -15,7 +15,7 @@ export interface DesignIdea {
   prompt: string;
 }
 
-export const UNIVERSAL_PROMPT = `You are working with ascii-things, a library of live ASCII scenes for the web (https://ascii-things-docs.pages.dev/).
+export const UNIVERSAL_PROMPT = `You are working with ascii-things, a library of live ASCII scenes for the web (https://ascii-things.dev/).
 
 Design a single page or section that uses one ASCII scene as the focal point and, at most, one supporting scene. Follow these rules:
 

@@ -91,7 +91,7 @@ remote URLs. Local uploads always work.
 `astro.config.mjs` sets:
 
 ```js
-site: "https://ascii-things-docs.pages.dev",
+site: "https://ascii-things.dev",
 ```
 
 Update that value if you attach a custom domain. It is used for canonical URLs

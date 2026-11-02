@@ -20,7 +20,7 @@ test("AI picker opens the matching prompt and copies it", async ({ page }) => {
 
   const clipboard = await page.evaluate(() => navigator.clipboard.readText());
   expect(clipboard).toContain("ascii-things/core");
-  expect(clipboard).toContain("https://ascii-things-docs.pages.dev/guide/framework/");
+  expect(clipboard).toContain("https://ascii-things.dev/guide/framework/");
 
   await page.keyboard.press("Escape");
   await expect(panel).toBeHidden();
