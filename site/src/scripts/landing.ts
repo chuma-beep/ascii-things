@@ -25,29 +25,70 @@ type CardEngine =
   | ReturnType<typeof createServers>
   | ReturnType<typeof createLagoon>;
 
+const initialTheme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
 const heroCanvas = document.querySelector<HTMLCanvasElement>("#hero-canvas");
+const statCells = document.querySelector<HTMLElement>("#stat-cells");
+const statMode = document.querySelector<HTMLElement>("#stat-mode");
+const statColumns = document.querySelector<HTMLElement>("#stat-columns");
+const statRows = document.querySelector<HTMLElement>("#stat-rows");
+const tryMode = document.querySelector<HTMLElement>("#try-mode");
+const echo = document.querySelector<HTMLElement>("#echo");
+const reply = document.querySelector<HTMLElement>("#reply");
+let hero: ReturnType<typeof createLagoon> | null = null;
+
 if (heroCanvas) {
-  const hero = createLagoon(heroCanvas, {
-    variant: "night",
-    label: "A live ASCII night lagoon",
+  hero = createLagoon(heroCanvas, {
+    variant: initialTheme === "light" ? "reef" : "night",
+    label: initialTheme === "light" ? "A live ASCII day lagoon" : "A live ASCII night lagoon",
   });
   (window as unknown as { asciiScene: ReturnType<typeof createLagoon> }).asciiScene = hero;
 
-  const cells = document.querySelector<HTMLElement>("#stat-cells");
-  const mode = document.querySelector<HTMLElement>("#stat-mode");
-  const columns = document.querySelector<HTMLElement>("#stat-columns");
-  const rows = document.querySelector<HTMLElement>("#stat-rows");
-
   const refresh = () => {
+    if (!hero) return;
     const stats = hero.getStats();
-    if (cells) cells.textContent = stats.cells.toLocaleString("en-US");
-    if (mode) mode.textContent = stats.variant.toUpperCase();
-    if (columns) columns.textContent = String(stats.columns);
-    if (rows) rows.textContent = String(stats.rows);
+    if (statCells) statCells.textContent = stats.cells.toLocaleString("en-US");
+    if (statMode) statMode.textContent = stats.variant === "reef" ? "DAY" : "NIGHT";
+    if (statColumns) statColumns.textContent = String(stats.columns);
+    if (statRows) statRows.textContent = String(stats.rows);
   };
   refresh();
   window.setInterval(refresh, 500);
 }
+
+function applyTheme(theme: "light" | "dark") {
+  document.documentElement.dataset.theme = theme;
+  try {
+    localStorage.setItem("ascii-things-theme", theme);
+  } catch {
+    // Storage can be unavailable in private or restricted contexts.
+  }
+
+  const day = theme === "light";
+  document
+    .querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+    ?.setAttribute("content", day ? "#f3eee4" : "#070809");
+  themeToggle?.setAttribute("aria-label", day ? "Switch to dark mode" : "Switch to light mode");
+
+  hero?.setOptions({
+    variant: day ? "reef" : "night",
+    label: day ? "A live ASCII day lagoon" : "A live ASCII night lagoon",
+  });
+  if (statMode) statMode.textContent = day ? "DAY" : "NIGHT";
+  if (tryMode) tryMode.textContent = day ? "LIVE DAY REEF" : "LIVE NIGHT REEF";
+  if (echo) echo.textContent = day ? "lagoon@day · sun current" : "lagoon@night · moon current";
+  if (reply) {
+    reply.textContent = day
+      ? "DAY REEF · TURTLE · MANTA · DOLPHIN"
+      : "NIGHT REEF · TURTLE · MANTA · DOLPHIN";
+  }
+}
+
+const themeToggle = document.querySelector<HTMLButtonElement>("#theme-toggle");
+themeToggle?.addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+  applyTheme(next);
+});
+applyTheme(initialTheme);
 
 const header = document.querySelector<HTMLElement>(".site-header");
 const onScroll = () => header?.classList.toggle("is-scrolled", window.scrollY > 16);
@@ -261,6 +302,10 @@ const aiPrompts: Record<string, string> = {
     "Use the ascii-things public framework in this repo to build a new simulation. Read https://ascii-things-docs.pages.dev/guide/framework/ and use createSimulation from ascii-things/core. Install with npm i ascii-things. Keep CellGrid optional, preserve custom action types, and verify the lifecycle and cleanup.",
   cursor:
     "Use ascii-things for this project. Read https://ascii-things-docs.pages.dev/guide/framework/ and install with npm i ascii-things. Build the scene with createSimulation from ascii-things/core, use ascii-things/rendering only if a cell grid helps, and keep the simulation React-independent.",
+  musecode:
+    "Use Muse Code in this project to build a custom ASCII simulation with ascii-things. Read https://ascii-things-docs.pages.dev/guide/framework/ and install with npm i ascii-things. Start from createSimulation in ascii-things/core, keep CellGrid optional, preserve custom action types, and verify the lifecycle and cleanup.",
+  antigravity:
+    "Use Google Antigravity in this project to build a custom ASCII simulation with ascii-things. Read https://ascii-things-docs.pages.dev/guide/framework/ and install with npm i ascii-things. Start from createSimulation in ascii-things/core, keep CellGrid optional, preserve custom action types, and verify the lifecycle and cleanup.",
 };
 
 const aiTriggers = Array.from(

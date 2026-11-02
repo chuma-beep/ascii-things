@@ -1,9 +1,21 @@
 const WORD = "ASCII-THINGS";
 const FONT_STACK = '"Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace';
-const ORANGE = "rgba(255, 122, 26, 0.9)";
-const IVORY = "rgba(236, 232, 223, 0.7)";
-const FIELD = "rgba(236, 232, 223, 0.15)";
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+
+function footerColors() {
+  const light = document.documentElement.dataset.theme === "light";
+  return light
+    ? {
+        orange: "rgba(184, 74, 18, 0.9)",
+        ink: "rgba(24, 21, 18, 0.58)",
+        field: "rgba(24, 21, 18, 0.12)",
+      }
+    : {
+        orange: "rgba(255, 122, 26, 0.9)",
+        ink: "rgba(236, 232, 223, 0.7)",
+        field: "rgba(236, 232, 223, 0.15)",
+      };
+}
 
 const canvas = document.querySelector<HTMLCanvasElement>(".footer-canvas");
 
@@ -63,6 +75,7 @@ if (canvas) {
 
       ctx.clearRect(0, 0, width, height);
       ctx.lineCap = "butt";
+      const colors = footerColors();
 
       const step = Math.max(2.2, width / 240);
       const scanX = time === 0 ? width * 0.18 : ((time * 0.055) % (width + 260)) - 130;
@@ -82,7 +95,7 @@ if (canvas) {
           const nearScan = Math.abs(x + step / 2 - scanX) < 58;
           const dot = step * (isWord ? (nearScan ? 0.92 : 0.62) : nearScan ? 0.58 : 0.34);
 
-          ctx.fillStyle = nearScan ? ORANGE : isWord ? IVORY : FIELD;
+          ctx.fillStyle = nearScan ? colors.orange : isWord ? colors.ink : colors.field;
           ctx.fillRect(x + (step - dot) / 2, y + (step - dot) / 2, dot, dot);
         }
       }
@@ -130,6 +143,11 @@ if (canvas) {
     };
 
     resize();
+
+    new MutationObserver(() => draw(0)).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
 
     if (reduced) draw(0);
 

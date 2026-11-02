@@ -1,0 +1,38 @@
+---
+import type { KanjiMark } from "../data/kanji";
+
+interface Props {
+  mark: KanjiMark["id"];
+}
+
+const { mark } = Astro.props;
+const label =
+  mark === "ink"
+    ? "Live Kanji ink field with the characters 永, 風, 水, and 空"
+    : "Live Kanji murmuration of 飛, 鳥, 風, and 空 glyphs";
+---
+
+<div class="kanji-mark-live">
+  <canvas data-kanji-mark={mark} role="img" aria-label={label}></canvas>
+</div>
+
+<script>
+  import { mountKanjiMarks } from "../scripts/kanji-marks";
+
+  mountKanjiMarks();
+  document.addEventListener("astro:page-load", mountKanjiMarks);
+</script>
+
+<style>
+  .kanji-mark-live {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .kanji-mark-live canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>

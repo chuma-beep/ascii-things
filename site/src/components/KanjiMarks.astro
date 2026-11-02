@@ -1,7 +1,7 @@
 ---
 import { AsciiSurface } from "ascii-things/webgl/react";
 import CopyCode from "./CopyCode.astro";
-import KanjiMarkArt from "./KanjiMarkArt.astro";
+import KanjiMarkLive from "./KanjiMarkLive.astro";
 import { KANJI_MARKS } from "../data/kanji";
 
 interface Props {
@@ -56,7 +56,7 @@ const kanjiFont = "'Noto Serif CJK JP', 'Yu Mincho', 'Hiragino Mincho ProN', ser
     KANJI_MARKS.map((mark) => (
       <article class="kanji-mark" id={mark.id}>
         <div class="kanji-mark__stage">
-          <KanjiMarkArt mark={mark.id} />
+          <KanjiMarkLive mark={mark.id} />
         </div>
         <div class="kanji-mark__body">
           <p class="kanji-mark__family">{mark.family}</p>

@@ -43,7 +43,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -53,6 +53,16 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
       content="Living ASCII scenes you can drop behind any UI: a night lagoon, a shark tank, a robot floor, and a jellyfish bloom. Zero dependencies. One canvas. MIT."
     />
     <meta name="theme-color" content="#070809" />
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem("ascii-things-theme");
+          document.documentElement.dataset.theme = stored === "light" ? "light" : "dark";
+        } catch {
+          document.documentElement.dataset.theme = "dark";
+        }
+      })();
+    </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script is:inline src="/favicon-motion.js" type="module"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -152,6 +162,24 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         </button>
       </div>
       <div class="header-end">
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          type="button"
+          aria-label="Switch to light mode"
+        >
+          <span class="theme-toggle-sun" aria-hidden="true">
+            <svg viewBox="0 0 16 16">
+              <circle cx="8" cy="8" r="3.2"></circle>
+              <path d="M8 1.5v1.4M8 13.1v1.4M1.5 8h1.4M13.1 8h1.4M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1"></path>
+            </svg>
+          </span>
+          <span class="theme-toggle-moon" aria-hidden="true">
+            <svg viewBox="0 0 16 16">
+              <path d="M13.2 9.8A5.6 5.6 0 0 1 6.2 2.8a5.6 5.6 0 1 0 7 7Z"></path>
+            </svg>
+          </span>
+        </button>
         <span class="version">v1.0.0-rc.0</span>
         <a class="github" href="https://github.com/chuma-beep/ascii-things">GitHub ↗</a>
       </div>
@@ -226,6 +254,30 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
           <p>Drop the prompt into chat, or add it to the project rules for persistent context.</p>
           <button class="ai-copy" type="button" data-ai-copy="cursor">COPY PROMPT</button>
         </article>
+
+        <article class="ai-tool">
+          <div class="ai-tool-head">
+            <span class="ai-tool-icon" aria-hidden="true">
+              <img src="/assets/ai/musecode.svg" alt="" width="14" height="14" />
+            </span>
+            <span class="ai-tool-name">Muse Code</span>
+            <span class="ai-tool-meta">META</span>
+          </div>
+          <p>Run Muse Code in the project and let it plan, edit and verify the simulation.</p>
+          <button class="ai-copy" type="button" data-ai-copy="musecode">COPY PROMPT</button>
+        </article>
+
+        <article class="ai-tool">
+          <div class="ai-tool-head">
+            <span class="ai-tool-icon" aria-hidden="true">
+              <img src="/assets/ai/antigravity.svg" alt="" width="14" height="14" />
+            </span>
+            <span class="ai-tool-name">Google Antigravity</span>
+            <span class="ai-tool-meta">GOOGLE</span>
+          </div>
+          <p>Use Antigravity's agent to build and review the scene inside your project.</p>
+          <button class="ai-copy" type="button" data-ai-copy="antigravity">COPY PROMPT</button>
+        </article>
       </div>
       <a class="ai-docs" href="https://ascii-things-docs.pages.dev/guide/framework/">
         READ THE FRAMEWORK DOCS ↗
@@ -259,7 +311,10 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
           </div>
 
           <div class="try-scene">
-            <p class="try-label">LIVE NIGHT REEF <span>· ambient simulation</span></p>
+            <p class="try-label">
+              <span id="try-mode">LIVE NIGHT REEF</span>
+              <span>· ambient simulation</span>
+            </p>
             <div class="prompt-meta" aria-live="polite">
               <span id="echo">lagoon@night · moon current</span>
               <span id="reply">REEF · TURTLE · MANTA · DOLPHIN</span>
@@ -524,9 +579,9 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <p class="eyebrow">02 / KANJI</p>
             <h2 id="kanji-title">The alphabet<br />is the artwork.</h2>
             <p class="section-lede">
-              Fifteen studies and two print marks. The same engine, switched to kanji:
-              a live helix, fields, water, sky, land, a torii, seasons, a fan, a carved seal,
-              and a paper scroll.
+              Fifteen studies and two live marks. The same engine, switched to kanji:
+              a live helix, fields, water, sky, land, a torii, seasons, a fan, an ink
+              field, and a glyph murmuration.
             </p>
           </div>
           <KanjiMarks showHelix />

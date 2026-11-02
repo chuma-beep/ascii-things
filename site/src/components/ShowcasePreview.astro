@@ -2,7 +2,7 @@
 import { ALL_KANJI } from "../data/kanji";
 import FooterThumb from "./FooterThumb.astro";
 import KanjiStatic from "./KanjiStatic.astro";
-import KanjiMarkArt from "./KanjiMarkArt.astro";
+import KanjiMarkLive from "./KanjiMarkLive.astro";
 import { ConsoleThumb, DitherThumb, KoiThumb, SurfaceThumb, ToolbarThumb } from "./ComponentThumbs";
 
 interface Props {
@@ -78,7 +78,7 @@ if (!isComponent && !isStaticKanji) {
   {isComponent && item.id === "scene-toolbar" && <ToolbarThumb client:visible />}
 
   {kanji?.kind === "static" && <KanjiStatic art={kanji.art} />}
-  {kanji?.kind === "mark" && <KanjiMarkArt mark={kanji.id} />}
+  {kanji?.kind === "mark" && <KanjiMarkLive mark={kanji.id} />}
 
   {tag && (
     <div

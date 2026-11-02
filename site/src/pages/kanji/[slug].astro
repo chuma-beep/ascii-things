@@ -2,7 +2,7 @@
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 import { AsciiSurface } from "ascii-things/webgl/react";
 import CopyCode from "@components/CopyCode.astro";
-import KanjiMarkArt from "@components/KanjiMarkArt.astro";
+import KanjiMarkLive from "@components/KanjiMarkLive.astro";
 import KanjiStatic from "@components/KanjiStatic.astro";
 import { ALL_KANJI, type KanjiItem } from "../../data/kanji";
 
@@ -59,7 +59,7 @@ const next = ALL_KANJI[(index + 1) % ALL_KANJI.length];
         )
       }
       {item.kind === "static" && <KanjiStatic art={item.art} />}
-      {item.kind === "mark" && <KanjiMarkArt mark={item.id} />}
+      {item.kind === "mark" && <KanjiMarkLive mark={item.id} />}
     </div>
 
     <dl class="kanji-detail__meta">
@@ -73,7 +73,7 @@ const next = ALL_KANJI[(index + 1) % ALL_KANJI.length];
       </div>
       <div>
         <dt>Type</dt>
-        <dd>{item.kind === "webgl" ? "WebGL" : item.kind === "static" ? "CSS / type" : "Print"}</dd>
+        <dd>{item.kind === "webgl" ? "WebGL" : item.kind === "static" ? "CSS / type" : "Live"}</dd>
       </div>
     </dl>
 

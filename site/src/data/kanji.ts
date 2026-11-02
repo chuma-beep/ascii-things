@@ -30,8 +30,8 @@ export type KanjiStatic = KanjiBase & {
 
 export type KanjiMark = KanjiBase & {
   kind: "mark";
-  id: "seal" | "scroll";
-  slug: "seal" | "scroll";
+  id: "ink" | "murmuration";
+  slug: "ink" | "murmuration";
 };
 
 export type KanjiStudy = KanjiWebgl | KanjiStatic;
@@ -270,26 +270,26 @@ export const KANJI_STUDIES: KanjiStudy[] = [
 
 export const KANJI_MARKS: KanjiMark[] = [
   {
-    id: "seal",
-    slug: "seal",
-    title: "Hanko seal",
-    family: "Mark",
-    description: "A carved vermilion seal with four characters in a square block.",
-    glyphs: "永龍風水",
+    id: "ink",
+    slug: "ink",
+    title: "Kanji ink field",
+    family: "Ink",
+    description: "Sumi ink drifts across warm paper and slowly resolves into characters.",
+    glyphs: "永風水空",
     kind: "mark",
-    code: "CSS · 永龍風水",
-    copy: "永龍風水",
+    code: "INK · 永風水空",
+    copy: "永風水空",
   },
   {
-    id: "scroll",
-    slug: "scroll",
-    title: "Kanji scroll",
-    family: "Paper",
-    description: "A vertical seasonal scroll with a small red seal.",
-    glyphs: "春夏秋冬",
+    id: "murmuration",
+    slug: "murmuration",
+    title: "Kanji murmuration",
+    family: "Flock",
+    description: "Hundreds of glyphs gather into a character, scatter, and re-form.",
+    glyphs: "飛鳥風空",
     kind: "mark",
-    code: "CSS · 春夏秋冬",
-    copy: "春夏秋冬",
+    code: "FLOCK · 飛鳥風空",
+    copy: "飛鳥風空",
   },
 ];
 

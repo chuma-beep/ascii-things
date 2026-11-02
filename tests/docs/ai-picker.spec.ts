@@ -53,3 +53,21 @@ test("AI picker stays usable at mobile width", async ({ page }) => {
   await expect(panel).toBeVisible();
   await expect(panel.locator(".ai-tool.is-active")).toContainText("Cursor");
 });
+
+test("Muse Code and Antigravity prompts are available and copy", async ({ page }) => {
+  await page.goto("/");
+  await page.locator('.ai-picker [data-ai-tool="claude"]').click();
+
+  const panel = page.locator("#ai-panel");
+  const musecode = panel.locator('[data-ai-copy="musecode"]');
+  const antigravity = panel.locator('[data-ai-copy="antigravity"]');
+
+  await expect(musecode).toBeVisible();
+  await musecode.click();
+  await expect(musecode).toHaveText("COPIED");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("Muse Code");
+
+  await antigravity.click();
+  await expect(antigravity).toHaveText("COPIED");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("Google Antigravity");
+});
