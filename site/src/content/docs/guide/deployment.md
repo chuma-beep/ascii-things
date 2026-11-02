@@ -45,13 +45,31 @@ So `npm --prefix site run build` builds the library first, then the docs.
 | `NODE_VERSION` | `22` | Astro 7 requires Node 22.22 or newer |
 | `NPM_CONFIG_PRODUCTION` | `false` | Ensure dev dependencies are installed for the build |
 
-No secrets are required. The image proxy has no application-level logging of
-image URLs.
+No secrets are required at runtime. The image proxy has no application-level
+logging of image URLs.
+
+### GitHub Actions deploy
+
+The Cloudflare Pages project is a Direct Upload project with no Git provider.
+Pushes to `main` deploy through the `deploy` job in
+`.github/workflows/ci.yml` after both the Verify and Playwright jobs pass.
+
+Add two repository secrets under **Settings → Secrets and variables → Actions**:
+
+| Secret | Value |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | API token with **Account → Cloudflare Pages → Edit** |
+| `CLOUDFLARE_ACCOUNT_ID` | The Cloudflare account ID that owns the Pages project |
+
+The deploy job skips cleanly with a notice until both secrets exist. After
+adding them, run the **CI** workflow manually from the Actions tab (or push to
+`main`) to deploy.
 
 ### Wrangler CLI
 
 `wrangler.toml` at the repository root points at `site/dist` and discovers
-`functions/`. Deploy from the repository root:
+`functions/`. The workflow uses `cloudflare/wrangler-action`; for a manual
+deploy from the repository root:
 
 ```sh
 npm --prefix site run build
@@ -59,7 +77,8 @@ npx wrangler pages deploy site/dist --project-name ascii-things-docs --branch ma
 ```
 
 At the time of writing, the repository uses `npx wrangler` rather than a local
-Wrangler dependency. The Pages dashboard build does not need Wrangler.
+Wrangler dependency. The Git-connected Pages dashboard build is not used for
+this Direct Upload project.
 
 ### Pages Function
 
