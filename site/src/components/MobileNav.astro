@@ -117,11 +117,11 @@ const isActive = (href: string) =>
 
 <style>
   .mobile-nav {
-    --mn-bg: var(--sl-color-bg-nav, #070809);
-    --mn-fg: var(--sl-color-text, #ece8df);
-    --mn-muted: var(--sl-color-gray-3, #8b877f);
-    --mn-line: var(--sl-color-hairline, rgba(236, 232, 223, 0.16));
-    --mn-accent: var(--sl-color-accent, #ff7a1a);
+    --mn-bg: var(--sl-color-bg-nav, var(--bg, #070809));
+    --mn-fg: var(--sl-color-text, var(--ink, #ece8df));
+    --mn-muted: var(--sl-color-gray-3, var(--muted, #8b877f));
+    --mn-line: var(--sl-color-hairline, var(--line, rgba(236, 232, 223, 0.16)));
+    --mn-accent: var(--sl-color-accent, var(--orange, #ff7a1a));
     --mn-panel-width: min(22rem, calc(100vw - 1.5rem));
   }
 
