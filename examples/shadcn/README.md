@@ -10,14 +10,14 @@ Each card is a standalone file. Copy one into a project that has shadcn set up, 
 from the registry:
 
 ```sh
-npx shadcn@latest add https://ascii-things-docs.pages.dev/r/koi-card.json
-npx shadcn@latest add https://ascii-things-docs.pages.dev/r/dither-card.json
-npx shadcn@latest add https://ascii-things-docs.pages.dev/r/surface-card.json
+npx shadcn@latest add https://ascii-things.dev/r/koi-card.json
+npx shadcn@latest add https://ascii-things.dev/r/dither-card.json
+npx shadcn@latest add https://ascii-things.dev/r/surface-card.json
 ```
 
 The registry item installs `ascii-things` and the shadcn `card`, `badge`, and `button`
 primitives it needs. The full component reference is at
-[`/components/`](https://ascii-things-docs.pages.dev/components/).
+[`/components/`](https://ascii-things.dev/components/).
 
 ## Run it
 

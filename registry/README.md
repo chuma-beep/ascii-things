@@ -1,7 +1,7 @@
 # Registry sources
 
 The files here are the source for the shadcn registry served at
-`https://ascii-things-docs.pages.dev/r/`.
+`https://ascii-things.dev/r/`.
 
 `registry.json` is the manifest. Each item lists one or more source files and the target path
 the shadcn CLI should write to. The source path is relative to the repository root.
