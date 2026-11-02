@@ -5,11 +5,13 @@ description: Live ASCII WebGL elements built on ascii-things/webgl.
 
 import WebglGallery from "@components/WebglGallery.astro";
 
-`ascii-things/webgl` is no longer one surface. The same engine now ships twelve
-glyph-rendered scenes: a rotating globe, water rings, a flow field, a tunnel,
-falling code, a woven torus, terrain, a galaxy, voronoi cells, plasma, caustics,
-and a constellation. Each runs on the GPU, falls back to a 2D glyph field, and
-respects reduced motion and page visibility.
+`ascii-things/webgl` is no longer one surface. The same engine ships nineteen
+variants. The twelve gallery scenes are a rotating globe, water rings, a flow
+field, a tunnel, falling code, a woven torus, terrain, a galaxy, voronoi cells,
+plasma, caustics, and a constellation. The four 3D objects are on their own
+page, and the `field`, `moon`, and `koi` presets are used elsewhere on this site.
+Each runs on the GPU, falls back to a 2D glyph field, and respects reduced motion
+and page visibility.
 
 <WebglGallery to={6} />
 
@@ -33,6 +35,7 @@ The custom element uses the same name as an attribute:
 
 ## Next
 
-Twelve variants now ship. The second six live on [More WebGL](/webgl/more/).
-Next: a searchable WebGL library with install commands, reduced-motion stills,
-and more worlds, particles, and fields.
+Nineteen variants now ship. The second six scenes live on
+[More WebGL](/webgl/more/), and the four 3D objects are on
+[3D Objects](/webgl/3d/). Next: a searchable WebGL library with install commands,
+reduced-motion stills, and more worlds, particles, and fields.

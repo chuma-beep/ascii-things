@@ -15,23 +15,24 @@ returns to its dock when the battery gets low.
 
 - **Walk / trot** move the dog across the yard. Gait changes are stateful, not random noise.
 - **Sniff and sit** are short idle states between patrols.
-- **Alert** reacts to the pointer.
-- **Chase** starts when a ball is thrown. The nearest dog goes after it and nudges it.
+- **Alert** tracks the pointer when it fires.
+- **Chase** starts when a ball is thrown. A dog that finishes its current state while the ball is waiting to be fetched chases it and nudges it when it arrives.
 - **Charge** sends a low-battery dog to the dock for a while.
-- The tail and antenna settle when the dog sits. `calm` removes sparks and tail flicker.
+- The tail and antenna settle when the dog sits. `calm` disables eye blink and charge sparks and holds the antenna glow steady; the tail still moves.
 
-The dog is the only scene with an imperative interaction method: `throwBall(x, y)`.
+The dog's imperative interaction method is `throwBall(x, y)`.
 
 ## Roster
 
 ```ts
 type DogSpec = {
-  size: number;
+  size?: number;
 };
 ```
 
-`count` is clamped to 1–3 when `dogs` is omitted. `scale` multiplies every dog. `spread` is a
-normalized start band across the width; with one dog, the midpoint is used.
+`size` is optional and defaults to `1`. `count` is clamped to 1–3 when `dogs` is omitted.
+`scale` multiplies every dog. `spread` is a normalized start band across the width; with one
+dog, the midpoint is used.
 
 ```tsx
 <AsciiDog
@@ -52,18 +53,21 @@ A single dog placed on the right side of a hero:
 
 | Option | Type | Default | |
 | --- | --- | --- | --- |
-| `dogs` | `{ size }[]` | responsive | Roster |
+| `dogs` | `{ size? }[]` | responsive | Roster |
 | `count` | `number` | scales with width, 1–3 | Dog count when `dogs` is omitted |
 | `scale` | `number` | `1` | Dog size multiplier |
 | `spread` | `[number, number]` | `[0.28, 0.72]` | Normalized start band; one dog uses the midpoint |
 | `seed` | `number` | random | Reproducible yard |
-| `palette` | name \| `Palette` | `"abyss"` | Theme |
+| `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
 | `columns` | `number` | `150` | Art-direction target |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
 | `interactive` | `boolean` | `true` | Pointer tracking + click throw |
 | `maxDpr` | `number` | `2` | Backing-store cap |
 | `maxCells` | `number` | `16000` | Grid cap |
-| `calm` | `boolean` | `false` | Disable sparks, beacons, tail flicker |
+| `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
+| `calm` | `boolean` | `false` | Disable eye blink and charge sparks; hold antenna glow steady |
+| `paused` | `boolean` | `false` | Start with the clock stopped |
+| `fontFamily` | `string` | canvas CSS font | Drawing font |
 | `label` | `string` | — | Accessible name |
 | `onEvent` | `(event) => void` | — | Ball, nudge, charge, low, sit events |
 

@@ -61,8 +61,9 @@ animate. Users who prefer less motion get a postcard, not a blank box.
 
 ## Calm mode
 
-`calm` removes flicker, sparkle, blinking beacons, and tail flicker. It does not stop the
-simulation; creatures still move at a lower visual frequency.
+In cell-grid scenes, `calm` removes flicker, sparkle, blinking beacons, and tail
+flicker. It does not stop the simulation; creatures still move at a lower visual frequency.
+Ambient scenes accept `calm` for API consistency but currently do not change behavior.
 
 ```tsx
 <AsciiRobots palette="paper" calm />
@@ -112,9 +113,10 @@ function Yard() {
 }
 ```
 
-The `DogEngine` exposes `throwBall(x, y)` for this. Every scene also exposes
-`trigger(action, x, y)` plus the named `splash()`, `dispatch()`, and `shockwave()` actions.
-Pointer clicks remain optional enhancements.
+The `DogEngine` exposes `throwBall(x, y)` for this. Each engine also exposes
+`trigger(action, x, y)` and its own named action: sharks `splash`, robots `dispatch`,
+jellyfish `shockwave`, and dog `throwBall`. Ambient scenes use `scatter`, `flare`, `crumb`,
+`feed`, `rush`, or `ping` through `trigger()`. Pointer clicks remain optional enhancements.
 
 ## Pause controls
 

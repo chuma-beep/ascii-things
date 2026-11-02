@@ -7,7 +7,8 @@ import CardPreview from "@components/CardPreview.astro";
 import { AsciiSurface } from "ascii-things/webgl/react";
 
 The WebGL surface renders glyphs in a shader and falls back to a 2D glyph field when WebGL is
-unavailable. The card keeps the controls and the frame; the surface fills the sized box.
+unavailable. The card keeps the controls and the frame; give the surface `height: 100%` so it
+fills the sized box — its default height is 320px.
 
 <CardPreview title="WebGL surface" description="ascii-things/webgl · shader field" badge="webgl">
   <div style="height: 300px">
@@ -18,6 +19,7 @@ unavailable. The card keeps the controls and the frame; the surface fills the si
       glyphs=".:-=+*#%@"
       pointer
       label="A shader-backed ASCII glyph field"
+      style={{ height: "100%" }}
     />
   </div>
 </CardPreview>
@@ -51,6 +53,7 @@ export function Field() {
     glyphs=".:-=+*#%@"
     pointer
     label="A shader-backed ASCII glyph field"
+    style={{ height: "100%" }}
   />
 </div>
 ```

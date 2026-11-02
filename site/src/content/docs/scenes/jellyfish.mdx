@@ -25,11 +25,12 @@ contraction.
 
 ```ts
 type JellyfishSpec = {
-  kind: "moon" | "lion" | "box" | "atolla" | "crystal";
-  size: number;
+  kind?: "moon" | "lion" | "box" | "atolla" | "crystal";
+  size?: number;
 };
 ```
 
+Both fields are optional: `kind` defaults to `"moon"` and `size` to `1`.
 `count` sets the bloom size when `jellies` is omitted. The default scales with the canvas.
 `scale` multiplies every jelly.
 
@@ -48,17 +49,21 @@ type JellyfishSpec = {
 
 | Option | Type | Default | |
 | --- | --- | --- | --- |
-| `jellies` | `{ kind, size }[]` | mixed bloom | Roster |
+| `jellies` | `{ kind?, size? }[]` | mixed bloom | Roster |
+| `glyphs` | `"ascii"` \| `"kanji"` | `"ascii"` | Glyph texture; `"kanji"` uses the kanji renderer |
 | `count` | `number` | scales with area | Bloom size when `jellies` is omitted |
 | `scale` | `number` | `1` | Jelly size multiplier |
 | `seed` | `number` | random | Reproducible bloom |
-| `palette` | name \| `Palette` | `"abyss"` | Theme |
+| `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
 | `columns` | `number` | `140` | Art-direction target |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
 | `interactive` | `boolean` | `true` | Pointer current + click shockwave |
 | `maxDpr` | `number` | `2` | Backing-store cap |
 | `maxCells` | `number` | `16000` | Grid cap |
+| `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
 | `calm` | `boolean` | `false` | Disable shimmer and twinkle |
+| `paused` | `boolean` | `false` | Start with the clock stopped |
+| `fontFamily` | `string` | canvas CSS font | Drawing font |
 | `label` | `string` | — | Accessible name |
 | `onEvent` | `(event) => void` | — | Pulse and shock events |
 

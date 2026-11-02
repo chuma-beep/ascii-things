@@ -22,9 +22,11 @@ It has no runtime dependencies of its own. It expects React 18+.
 import "ascii-things/ui.css";
 ```
 
-All components use the same CSS custom properties. Containers are square by default;
-set `--ascii-radius` on a wrapper if your host needs rounding. Import the stylesheet from your app
-shell or root layout, not from every component.
+All components use the same CSS custom properties. Containers are square by default.
+The stylesheet sets its variables on each component selector, so set overrides on the
+component selector (for example `.ascii-stage`) or with an inline `style`; setting them on
+`:root` or a wrapper does not override the component declarations. Import the stylesheet from
+your app shell or root layout, not from every component.
 
 ## Components
 
@@ -132,7 +134,7 @@ Keyboard-navigable tabs for switching scenes, palettes, or variants.
 
 ```tsx
 import { useState } from "react";
-import type { PaletteName } from "ascii-things";
+import type { PaletteName } from "ascii-things/rendering";
 import { AsciiSceneTabs } from "ascii-things/ui";
 
 const [palette, setPalette] = useState<PaletteName>("abyss");
@@ -397,7 +399,7 @@ The UI layer uses CSS variables, not Tailwind. Set them on `:root` or on a wrapp
   --ascii-panel: #0b0d0f;
   --ascii-ink: #ece8df;
   --ascii-muted: rgba(236, 232, 223, 0.56);
-  --ascii-faint: rgba(236, 232, 223, 0.32);
+  --ascii-faint: rgba(236, 232, 223, 0.55);
   --ascii-line: rgba(236, 232, 223, 0.14);
   --ascii-line-soft: rgba(236, 232, 223, 0.08);
   --ascii-accent-soft: rgba(255, 122, 26, 0.14);

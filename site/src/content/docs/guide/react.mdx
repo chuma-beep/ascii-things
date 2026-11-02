@@ -83,7 +83,7 @@ component also adds `ascii-things` and `ascii-<scene>` classes, which you can ta
 <AsciiDog
   palette="abyss"
   seed={7}
-  onReady={(scene) => scene.throwBall(600, 360)}
+  onReady={(scene) => scene.trigger("throwBall", 600, 360)}
 />
 ```
 
@@ -97,8 +97,8 @@ component also adds `ascii-things` and `ascii-<scene>` classes, which you can ta
 ```
 
 `aspectRatio` sets the canvas `aspect-ratio` and switches its height to `auto`. `onReady`
-receives the live `SceneHandle` after each mount, so you can call `throwBall`, `pause`,
-`setOptions`, or read `getStats` without a separate effect.
+receives the live `SceneHandle` after each mount, so you can call `trigger("throwBall", x, y)`,
+`pause`, `setOptions`, or read `getStats` without a separate effect.
 
 ## Live and structural props
 
@@ -115,18 +115,23 @@ Some options update the running engine. Others rebuild the world.
 | `label` | |
 | `paused` | |
 | `fontFamily` | |
+| `maxDpr` | |
 | `onEvent` | |
 
-`interactive` and `maxDpr` are read when the engine is constructed. Change them by remounting
-the component (for example, with a React `key`), or use the vanilla API if you need to toggle
-them at runtime.
+`columns` and `maxCells` update live where the scene supports them: robots, jellyfish, dog,
+and the ambient scenes. Sharks and Lagoon ignore them.
+
+`interactive` is read when the engine is constructed. Change it by remounting the component
+(for example, with a React `key`), or use the vanilla API if you need to toggle it at runtime.
 
 The wrapper computes a structural key from the remounting props. Changing a roster array
 literal on every render will remount the scene every time. Hoist the array or memoize it.
 
 ```tsx
+import type { SharkSpec } from "ascii-things/sharks";
+
 // Stable roster: no remount between renders.
-const SHARKS = [{ kind: "hammerhead", size: 1 }] as const;
+const SHARKS: SharkSpec[] = [{ kind: "hammerhead", size: 1 }];
 
 <AsciiSharks sharks={SHARKS} seed={42} />;
 ```

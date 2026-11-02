@@ -59,8 +59,9 @@ export function Field() {
 }
 ```
 
-`AsciiDither` renders a canvas with `role="img"`. The host owns the frame: give
-the element or its parent a height. The default is `240px`.
+`AsciiDither` renders a canvas with `role="img"`. The element owns the frame:
+set its own height (for example `style={{ height: "100%" }}`). A parent height alone does
+not resize the React or custom-element canvas; the default is `240px`.
 
 ## Custom element
 

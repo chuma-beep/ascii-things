@@ -15,8 +15,10 @@ mostly the number of cells and the device pixel ratio.
 | `maxCells` | `16000` | Caps the grid; cell size grows instead of exploding the count |
 | `maxDpr` | `2` | Caps backing-store resolution |
 | `adaptiveQuality` | `true` | Lowers DPR when frames stay slow |
-| `simulation` | fixed 60 Hz | Up to 4 steps per frame |
-| `calm` | `false` | Removes flicker and sparkle work |
+| `calm` | `false` | Removes flicker and sparkle work in cell-grid scenes |
+
+The runtime uses a fixed 60 Hz step and caps catch-up at four steps; these are internal
+constants, not options.
 
 The renderer keeps cells roughly 8–13 px and raises the cell size when `maxCells` would be
 exceeded. That is why a 4K canvas stays within the cell budget instead of rendering a
@@ -73,7 +75,8 @@ scene.destroy();
 ```
 
 `pause()` cancels the loop and clears queued events. `resume()` restarts the clock.
-`destroy()` disconnects observers, removes pointer listeners, and clears the world.
+`destroy()` disconnects observers, removes pointer listeners, and clears queued events. It does
+not reset world state.
 
 React wrappers handle teardown on unmount. Use `onReady` to keep the handle for manual
 control:
@@ -145,8 +148,8 @@ Turn it off when you need deterministic pixels or already manage quality yoursel
 ```
 
 The other quality controls are `maxCells`, `maxDpr`, `columns`, `calm`, `interactive`, and
-pause/resume. You can still lower `columns` or `maxCells` through `setOptions()` for a
-coarser, host-owned policy.
+pause/resume. `columns` and `maxCells` update live on Robots, Jellyfish, Dog, and the ambient
+scenes; Sharks and Lagoon ignore them after mount. Lagoon uses a fixed stage for its painter.
 
 ## Layout stability
 

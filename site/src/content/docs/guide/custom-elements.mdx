@@ -89,13 +89,15 @@ default. Boolean attributes are true when present, unless the value is `"false"`
 | `max-cells` | number | Quality cap, default `16000` |
 | `max-dpr` | number | Backing-store cap, default `2` |
 | `adaptive-quality` | boolean | Lower DPR when frames stay slow, default `true` |
-| `calm` | boolean | Disables flicker and sparkle |
+| `calm` | boolean | Disables flicker and sparkle in cell-grid scenes; ambient scenes accept it for API consistency |
 | `interactive` | boolean | Pointer input, true by default |
 | `paused` | boolean | Starts with the scene clock stopped |
 | `font-family` | string | Overrides the drawing font stack |
 | `glyphs` | `ascii` \| `kanji` | Texture for sharks, jellyfish, and koi; default `ascii` |
 | `aspect-ratio` | CSS ratio | Sets the host aspect ratio and `height: auto` |
 | `label` | string | Makes the canvas `role="img"` with this name |
+
+Lagoon does not observe `columns`, `max-cells`, `adaptive-quality`, or `glyphs`.
 
 ### Shark attributes
 
@@ -165,7 +167,7 @@ across the width.
 
 ### Lagoon attributes
 
-`variant` in addition to the shared set.
+`variant`, plus the shared `palette`, `seed`, `speed`, `label`, `interactive`, `paused`, `font-family`, `calm`, and `aspect-ratio` attributes.
 
 ```html
 <ascii-lagoon
@@ -176,8 +178,8 @@ across the width.
 ```
 
 `variant` is one of `reef`, `night`, `turtle`, `manta`, `seahorse`, `dolphin`,
-`hammerhead`, or `tang`. The Lagoon painter is deterministic and passive; `seed`,
-`speed`, and `palette` do not change this renderer in the current release.
+`hammerhead`, or `tang`. The Lagoon painter is deterministic and passive; it accepts
+`seed`, `speed`, and `palette`, but they do not change this renderer in the current release.
 
 ## Attribute changes
 
@@ -207,8 +209,10 @@ The element itself still has no `onEvent` attribute. Use the handle to call
 `destroy()`, or use the vanilla factory when you already own the canvas.
 
 `trigger(action, x, y)` takes `"splash"` for sharks, `"dispatch"` for robots,
-`"shockwave"` for jellyfish, and `"throwBall"` for the dog. The same actions are also
-available as named methods (`splash`, `dispatch`, `shockwave`, `throwBall`).
+`"shockwave"` for jellyfish, `"throwBall"` for the dog, and one action per ambient scene:
+`"scatter"` (starlings), `"flare"` (fireflies), `"crumb"` (ants), `"feed"` (koi),
+`"rush"` (city), and `"ping"` (servers). Named methods exist only on the scenes that
+expose them (`splash`, `dispatch`, `shockwave`, `throwBall`).
 
 ```ts
 import { createDog } from "ascii-things/dog";

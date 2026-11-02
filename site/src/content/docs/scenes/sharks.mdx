@@ -16,7 +16,7 @@ and settle. The water carries a subtle current, and every splash disturbs the sc
   Alarm spreads through the school rather than teleporting every fish at once.
 - **Sharks** use pursuit and turn-rate limits. They are not omniscient; the school can escape.
 - **Splash** pushes fish outward from the click and adds a short wake.
-- **Wake and glints** are decorative. `calm` removes the high-frequency parts.
+- **Wake and glints** are decorative. `calm` freezes the shark-hide shimmer; fish glints and water twinkle continue.
 - The scene is deterministic for a given seed and canvas size. Resize changes the world.
 
 ## Roster
@@ -44,7 +44,7 @@ type SharkSpec = {
 Sizes are relative, not pixels. The default roster uses four classic sharks at different
 sizes. `sharkScale` multiplies every shark.
 
-Pass `x`, `y`, and `heading` together to compose a small tank: each placed shark patrols a
+Supplying any of `x`, `y`, or `heading` composes a small tank: each placed shark patrols a
 local anchor instead of joining the shared centre orbit. This keeps a readable central shark
 without a ring around an empty centre.
 
@@ -65,18 +65,22 @@ without a ring around an empty centre.
 | Option | Type | Default | |
 | --- | --- | --- | --- |
 | `sharks` | `{ kind, size }[]` | four classics | Roster |
+| `glyphs` | `"ascii"` \| `"kanji"` | `"ascii"` | Glyph texture; `"kanji"` uses the kanji renderer |
 | `sharkScale` | `number` | `1` | Length multiplier |
 | `orbitScale` | `number` | `1` | Patrol-orbit radius; lower values suit small cards |
 | `fitSharks` | `boolean` | `false` | Keep the initial spines inside the frame |
 | `density` | `number` | `1` | Fish population multiplier |
 | `seed` | `number` | random | Reproducible world |
-| `palette` | name \| `Palette` | `"abyss"` | Theme |
+| `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
 | `columns` | `number` | `124` | Art-direction target |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
 | `interactive` | `boolean` | `true` | Pointer flee + click splash |
 | `maxDpr` | `number` | `2` | Backing-store cap |
 | `maxCells` | `number` | `16000` | Grid cap |
-| `calm` | `boolean` | `false` | Disable shimmer and glints |
+| `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
+| `calm` | `boolean` | `false` | Freeze shark-hide shimmer |
+| `paused` | `boolean` | `false` | Start with the clock stopped |
+| `fontFamily` | `string` | canvas CSS font | Drawing font |
 | `label` | `string` | — | Accessible name |
 | `onEvent` | `(event) => void` | — | Eat and splash events |
 

@@ -21,10 +21,10 @@ behavior. The scene owns state, rules, and drawing.
 | Columns | Art-direction target; cell size adjusts |
 | Max cells | Caps the grid at 4K and other large surfaces |
 | Speed | Time scale; `0` freezes |
-| Calm | Removes flicker and sparkle |
+| Calm | Removes flicker and sparkle in the cell-grid scenes; currently no-op for ambient scenes |
 | Interactive | Pointer input, on by default |
 | Label | Makes the canvas `role="img"` with a name |
-| Events | `onEvent` receives scene-specific moments |
+| Events | `onEvent` receives scene-specific moments (cell-grid scenes; Lagoon is passive) |
 
 ## The scenes
 
@@ -67,7 +67,7 @@ behavior. The scene owns state, rules, and drawing.
   <LinkCard
     title="Ants"
     href="/scenes/ants/"
-    description="A colony forages pheromone trails and carries crumbs back to the nest."
+    description="A colony forages for crumbs and carries them back to the nest."
   />
   <LinkCard
     title="Koi"
@@ -95,14 +95,14 @@ behavior. The scene owns state, rules, and drawing.
 | Robots | `150` | Fleet scales with area | Pointer avoidance, click dispatch |
 | Jellyfish | `140` | Bloom scales with area | Pointer current, click shockwave |
 | Dog | `150` | One dog, count scales 1–3 | Pointer tracking, click throw |
-| Starlings | `124` | 110 birds | Pointer scatter, click scatter |
-| Fireflies | `124` | 70 fireflies | Pointer flare, click flare |
+| Starlings | `124` | 110 birds | Click scatter |
+| Fireflies | `124` | 70 fireflies | Click flare |
 | Ants | `124` | 44 ants | Click crumb |
 | Koi | `124` | 7 koi | Click feed |
 | City | `124` | 18 cars | Click rush |
 | Servers | `124` | 8 racks | Click ping |
 
-All scenes share `maxCells: 16000` and `maxDpr: 2`.
+All cell-grid scenes share `maxCells: 16000` and `maxDpr: 2`; Lagoon uses its fixed 1944×1760 authoring stage.
 
 ## Choosing a scene
 

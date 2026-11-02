@@ -7,8 +7,9 @@ description: Release notes for ascii-things.
 
 Everything below ships with 1.0.
 
-- `ascii-things/image` converts a local image to ASCII text or a canvas, with the
-  `AsciiImage` React wrapper and an `<ascii-image>` custom element. It now
+- `ascii-things/image` converts a local image to ASCII text or a canvas. The
+  `AsciiImage` React wrapper lives in `ascii-things/image/react`, and the
+  `<ascii-image>` custom element lives in `ascii-things/image/element`. It now
   accepts `HTMLCanvasElement` sources and adds `brightness` and `gamma` tone
   controls.
 - The docs site adds a full [image studio](/image/) with crop, edge detection,
@@ -16,10 +17,13 @@ Everything below ships with 1.0.
   guarded Cloudflare Pages image proxy; local uploads stay in the browser.
 - Six ambient scenes — starlings, fireflies, ants, koi, city, and servers — join the
   original four with the shared scene API.
-- `ascii-things/dither` renders ordered-dither fields with `DitherField`, `AsciiDither`,
-  and `<ascii-dither>`.
-- `ascii-things/webgl` renders a shader-backed ASCII glyph field with `AsciiSurfaceEngine`,
-  `AsciiSurface`, and `<ascii-surface>`, and falls back to a 2D glyph field without WebGL.
+- `ascii-things/dither` renders ordered-dither fields with `DitherField`.
+  `AsciiDither` lives in `ascii-things/dither/react`, and `<ascii-dither>` lives
+  in `ascii-things/dither/element`.
+- `ascii-things/webgl` renders a shader-backed ASCII glyph field with
+  `AsciiSurfaceEngine`. `AsciiSurface` lives in `ascii-things/webgl/react`, and
+  `<ascii-surface>` lives in `ascii-things/webgl/element`; the surface falls back
+  to a 2D glyph field without WebGL.
 - New guides for image-to-ASCII, dither fields, WebGL surfaces, and design-system recipes,
   plus runnable shadcn/ui and Material UI examples.
 

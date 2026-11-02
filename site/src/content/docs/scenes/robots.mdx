@@ -26,11 +26,12 @@ not a visual effect.
 
 ```ts
 type RobotSpec = {
-  kind: "scout" | "hauler" | "sentinel";
-  size: number;
+  kind?: "scout" | "hauler" | "sentinel";
+  size?: number;
 };
 ```
 
+Both fields are optional: kinds default round-robin across the roster and `size` defaults to `1`.
 `count` sets the fleet size when `robots` is omitted. The default scales with the canvas area.
 `scale` multiplies every robot.
 
@@ -52,17 +53,20 @@ type RobotSpec = {
 
 | Option | Type | Default | |
 | --- | --- | --- | --- |
-| `robots` | `{ kind, size }[]` | mixed fleet | Roster |
+| `robots` | `{ kind?, size? }[]` | mixed fleet | Roster |
 | `count` | `number` | scales with area | Fleet size when `robots` is omitted |
 | `scale` | `number` | `1` | Robot size multiplier |
 | `seed` | `number` | random | Reproducible floor |
-| `palette` | name \| `Palette` | `"abyss"` | Theme |
+| `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
 | `columns` | `number` | `150` | Art-direction target |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
 | `interactive` | `boolean` | `true` | Pointer avoidance + click dispatch |
 | `maxDpr` | `number` | `2` | Backing-store cap |
 | `maxCells` | `number` | `16000` | Grid cap |
-| `calm` | `boolean` | `false` | Disable beacons, sparks, scan shimmer |
+| `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
+| `calm` | `boolean` | `false` | Disable dock shimmer and charge sparks; steady the low-battery beacon |
+| `paused` | `boolean` | `false` | Start with the clock stopped |
+| `fontFamily` | `string` | canvas CSS font | Drawing font |
 | `label` | `string` | — | Accessible name |
 | `onEvent` | `(event) => void` | — | Dock, undock, job, low events |
 

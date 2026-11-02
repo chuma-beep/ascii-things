@@ -5,7 +5,7 @@ description: Choose a built-in palette, author a custom palette, and keep canvas
 
 ## Built-in palettes
 
-Four palettes ship with every scene:
+Four palettes ship with the cell-grid and ambient scenes. Lagoon is a fixed painted scene and ignores `palette`.
 
 | Name | Mood | Background |
 | --- | --- | --- |
@@ -135,23 +135,25 @@ The default is the inherited monospace face. You can also set it directly with t
 `ascii-things/ui.css` uses its own variables:
 
 ```css
-:root {
+/* Defaults are declared on each component selector. Override on that selector or inline. */
+.ascii-stage {
   --ascii-accent: #ff7a1a;
   --ascii-bg: #070809;
   --ascii-panel: #0b0d0f;
   --ascii-ink: #ece8df;
   --ascii-muted: rgba(236, 232, 223, 0.56);
-  --ascii-faint: rgba(236, 232, 223, 0.32);
+  --ascii-faint: rgba(236, 232, 223, 0.55);
   --ascii-line: rgba(236, 232, 223, 0.14);
   --ascii-line-soft: rgba(236, 232, 223, 0.08);
   --ascii-accent-soft: rgba(255, 122, 26, 0.14);
   --ascii-font: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --ascii-radius: 2px;
+  --ascii-radius: 0;
 }
 ```
 
-Changing these variables restyles the stage, prompt, readout, tabs, and hero. It does not
-change canvas pixels. To theme the scene itself, pass a palette.
+Set overrides on the component class or inline style; a value inherited from `:root` or a
+wrapper can be shadowed by the component's own declaration. These variables restyle the DOM
+chrome only. They do not change canvas pixels. To theme the scene itself, pass a palette.
 
 This split is deliberate:
 

@@ -63,8 +63,27 @@ Import only the scene you need. Every scene has its own subpath, which keeps the
 | `ascii-things/robots` | `createRobots`, `RobotEngine`, robot types |
 | `ascii-things/jellyfish` | `createJellyfish`, `JellyfishEngine`, jellyfish types |
 | `ascii-things/dog` | `createDog`, `DogEngine`, dog types |
-| `ascii-things/react` | `AsciiSharks`, `AsciiRobots`, `AsciiJellyfish`, `AsciiDog` |
-| `ascii-things/element` | Registers `<ascii-sharks>`, `<ascii-robots>`, `<ascii-jellyfish>`, `<ascii-dog>` |
+| `ascii-things/lagoon` | `createLagoon`, `LagoonEngine`, `LAGOON_VARIANTS`, lagoon types |
+| `ascii-things/starlings` | `createStarlings`, ambient types |
+| `ascii-things/fireflies` | `createFireflies`, ambient types |
+| `ascii-things/ants` | `createAnts`, ambient types |
+| `ascii-things/koi` | `createKoi`, ambient types |
+| `ascii-things/city` | `createCity`, ambient types |
+| `ascii-things/servers` | `createServers`, ambient types |
+| `ascii-things/core` | `createSimulation`, `SceneRuntime`, core types |
+| `ascii-things/core/react` | `useSimulation` |
+| `ascii-things/rendering` | `CellGrid`, `paintGrid`, palettes, and math helpers |
+| `ascii-things/image` | `imageToAscii`, `pixelsToAscii`, `renderAsciiImage`, charsets |
+| `ascii-things/image/react` | React image wrapper |
+| `ascii-things/image/element` | `<ascii-image>` custom element |
+| `ascii-things/dither` | `DitherField`, `ditherThreshold`, `shouldDither`, matrices |
+| `ascii-things/dither/react` | React dither wrapper |
+| `ascii-things/dither/element` | `<ascii-dither>` custom element |
+| `ascii-things/webgl` | `AsciiSurfaceEngine`, surface helpers |
+| `ascii-things/webgl/react` | React WebGL surface wrapper |
+| `ascii-things/webgl/element` | `<ascii-surface>` custom element |
+| `ascii-things/react` | React wrappers for every scene |
+| `ascii-things/element` | Registers every `<ascii-*>` scene element |
 | `ascii-things/ui` | `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, `AsciiSceneTabs`, `AsciiDogHero` |
 | `ascii-things/ui.css` | Styles for the optional UI layer |
 | `ascii-things` | Convenience re-exports of the vanilla scenes |

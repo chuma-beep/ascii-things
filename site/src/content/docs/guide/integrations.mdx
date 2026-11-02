@@ -73,7 +73,9 @@ A few rules prevent the most common layout bugs:
 - For an inline hero, `AsciiStage` can own the aspect ratio and HUD:
 
 ```tsx
-import { AsciiLagoon, AsciiStage } from "ascii-things/react";
+import { AsciiLagoon } from "ascii-things/react";
+import { AsciiStage } from "ascii-things/ui";
+import "ascii-things/ui.css";
 
 export function LagoonHero() {
   return (
@@ -106,7 +108,7 @@ export function ScenePanel() {
         palette="abyss"
         seed={42}
         label="Sharks and fish in a live tank"
-        onEvent={(event) => console.log(event.type)}
+        onEvent={(event) => console.log(event.kind)}
       />
     </div>
   );

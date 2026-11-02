@@ -21,22 +21,23 @@ the Pages Function are available.
 | Node version | `22` (`NODE_VERSION=22`) |
 
 Why the root: `site/package.json` depends on the library with `file:..`, and the
-site's `prebuild` script runs the library build. The Pages Function lives in
-`functions/` at the repository root, so putting the project root anywhere else
-would drop the function from the deployment.
+site's `prebuild` script runs the library build and registry generation. The
+Pages Function lives in `functions/` at the repository root, so putting the
+project root anywhere else would drop the function from the deployment.
 
 The site's `package.json` also has a `prebuild` hook:
 
 ```json
 {
   "scripts": {
-    "prebuild": "npm --prefix .. run build",
+    "prebuild": "npm --prefix .. run build && npm --prefix .. run registry",
     "build": "astro build"
   }
 }
 ```
 
-So `npm --prefix site run build` builds the library first, then the docs.
+So `npm --prefix site run build` builds the library, regenerates the registry JSON, then
+builds the docs.
 
 ### Environment variables
 

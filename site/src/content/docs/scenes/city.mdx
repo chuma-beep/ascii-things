@@ -15,9 +15,9 @@ the grid.
 
 - **Skyline** — seeded buildings with a grid of windows.
 - **Traffic** — cars wrap around the streets in alternating directions.
-- **Signals** — window lights and traffic marks blink on their own phases.
+- **Windows** — a seeded pattern of lit windows; the rush pulse lights extra ones.
 - **Rush** — a click adds a short speed pulse to the whole grid.
-- **Calm** — removes the brightest window flicker.
+- **Calm** — accepted for parity; currently no effect on this scene.
 
 ## Interaction
 
@@ -38,8 +38,8 @@ grid.rush(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
 | Option | Type | Default | |
 | --- | --- | --- | --- |
 | `count` | `number` | `18` | Cars in the grid |
-| `scale` | `number` | `1` | Scene scale hint, clamped 0.5–2 |
-| `seed` | `number` | random | Reproducible skyline |
+| `scale` | `number` | `1` | Accepted and clamped 0.5–2; currently no visual effect |
+| `seed` | `number` | `1` | Reproducible skyline |
 | `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
 | `columns` | `number` | `124` | Art-direction target |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
@@ -47,7 +47,7 @@ grid.rush(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
 | `maxDpr` | `number` | `2` | Backing-store cap |
 | `maxCells` | `number` | `16000` | Grid cap |
 | `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
-| `calm` | `boolean` | `false` | Remove bright window flicker |
+| `calm` | `boolean` | `false` | Accepted; currently no effect |
 | `paused` | `boolean` | `false` | Start with the clock stopped |
 | `fontFamily` | `string` | canvas CSS font | Drawing font |
 | `label` | `string` | — | Accessible name |
@@ -55,7 +55,7 @@ grid.rush(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
 
 ## Stats
 
-`CityStats` adds `cars`, `buildings`, and `lights`:
+`CityStats` adds optional `cars`, `buildings`, and `lights` fields:
 
 ```ts
 type CityStats = {
@@ -64,11 +64,13 @@ type CityStats = {
   cells: number;
   columns: number;
   rows: number;
-  cars: number;
-  buildings: number;
-  lights: number;
+  cars?: number;
+  buildings?: number;
+  lights?: number;
 };
 ```
+
+The exported type is the shared ambient stats shape, so scene-specific fields are optional.
 
 ## React
 

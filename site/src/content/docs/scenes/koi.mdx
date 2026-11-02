@@ -5,18 +5,18 @@ description: A koi pond with lily pads, ripples, and food that pulls the fish to
 
 import SceneDemo from "@components/SceneDemo";
 
-Koi circle a quiet pond, turning around lily pads and leaving rings on the surface. A click
-scatters food and sends a ripple outward; nearby koi converge on the pellets.
+Koi drift around a quiet pond, passing decorative lily pads and leaving rings on the surface.
+A click scatters food and sends a ripple outward; nearby koi converge on the pellets.
 
 <SceneDemo client:visible scene="koi" seed={19} columns={110} />
 
 ## Behavior
 
-- **Swim** — koi turn smoothly and avoid the pond edges and lily pads.
+- **Swim** — koi turn smoothly and bounce off the pond edges; lily pads are decorative.
 - **Feed** — a click creates a cluster of pellets and a surface ripple.
 - **Ripple** — rings expand and fade, independent of the fish.
 - **Nibble** — a koi that reaches a pellet emits a `nibble` event.
-- **Calm** — removes extra surface shimmer.
+- **Calm** — accepted for parity; currently no effect on this scene.
 
 ## Interaction
 
@@ -37,8 +37,9 @@ pond.feed(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
 | Option | Type | Default | |
 | --- | --- | --- | --- |
 | `count` | `number` | `7` | Koi in the pond |
-| `scale` | `number` | `1` | Scene scale hint, clamped 0.5–2 |
-| `seed` | `number` | random | Reproducible pond |
+| `glyphs` | `"ascii"` \| `"kanji"` | `"ascii"` | Glyph texture; `"kanji"` uses the kanji renderer |
+| `scale` | `number` | `1` | Accepted and clamped 0.5–2; currently no visual effect |
+| `seed` | `number` | `1` | Reproducible pond |
 | `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
 | `columns` | `number` | `124` | Art-direction target |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
@@ -46,7 +47,7 @@ pond.feed(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
 | `maxDpr` | `number` | `2` | Backing-store cap |
 | `maxCells` | `number` | `16000` | Grid cap |
 | `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
-| `calm` | `boolean` | `false` | Remove surface shimmer |
+| `calm` | `boolean` | `false` | Accepted; currently no effect |
 | `paused` | `boolean` | `false` | Start with the clock stopped |
 | `fontFamily` | `string` | canvas CSS font | Drawing font |
 | `label` | `string` | — | Accessible name |
@@ -54,7 +55,7 @@ pond.feed(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
 
 ## Stats
 
-`KoiStats` adds `koi` and `ripples`:
+`KoiStats` adds optional `koi` and `ripples` fields:
 
 ```ts
 type KoiStats = {
@@ -63,10 +64,12 @@ type KoiStats = {
   cells: number;
   columns: number;
   rows: number;
-  koi: number;
-  ripples: number;
+  koi?: number;
+  ripples?: number;
 };
 ```
+
+The exported type is the shared ambient stats shape, so scene-specific fields are optional.
 
 ## React
 

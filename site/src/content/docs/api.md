@@ -9,19 +9,37 @@ This reference tracks `main` and the current **1.0.0-rc.0** release.
 
 | Entry | Exports |
 | --- | --- |
-| `ascii-things` | All scenes (convenience re-exports) |
-| `ascii-things/sharks` | `createSharks`, `OceanEngine`, shark types, palette helpers |
+| `ascii-things` | All 11 scenes and the shared core types |
+| `ascii-things/core` | `SceneRuntime`, `createSimulation`, `createRng`, `FIXED_STEP`, `MAX_STEPS`, core types |
+| `ascii-things/core/react` | `useSimulation` |
+| `ascii-things/rendering` | `CellGrid`, `paintGrid`, `resolvePalette`, `PALETTES`, math helpers |
+| `ascii-things/sharks` | `createSharks`, `OceanEngine`, shark types |
 | `ascii-things/robots` | `createRobots`, `RobotEngine`, robot types |
 | `ascii-things/jellyfish` | `createJellyfish`, `JellyfishEngine`, jellyfish types |
 | `ascii-things/dog` | `createDog`, `DogEngine`, dog types |
+| `ascii-things/starlings` | `createStarlings`, ambient types |
+| `ascii-things/fireflies` | `createFireflies`, ambient types |
+| `ascii-things/ants` | `createAnts`, ambient types |
+| `ascii-things/koi` | `createKoi`, ambient types |
+| `ascii-things/city` | `createCity`, ambient types |
+| `ascii-things/servers` | `createServers`, ambient types |
 | `ascii-things/lagoon` | `createLagoon`, `LagoonEngine`, `LAGOON_VARIANTS`, lagoon types |
-| `ascii-things/react` | Scene components: `AsciiSharks`, `AsciiRobots`, `AsciiJellyfish`, `AsciiDog`, ambient wrappers, `AsciiLagoon`, named Lagoon samples, `AsciiOcean` |
-| `ascii-things/element` | Registers the scene custom elements |
+| `ascii-things/react` | React wrappers for every scene, `AsciiOcean`, and named Lagoon samples |
+| `ascii-things/element` | Registers every scene custom element |
 | `ascii-things/ui` | `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, `AsciiSceneTabs`, `AsciiDogHero` |
+| `ascii-things/image` | `imageToAscii`, `pixelsToAscii`, `renderAsciiImage`, `ASCII_CHARSETS`, image types |
+| `ascii-things/image/react` | React image wrapper |
+| `ascii-things/image/element` | Image custom element |
+| `ascii-things/dither` | `DitherField`, `DITHER_MATRICES`, `DITHER_DEFAULTS`, dither helpers |
+| `ascii-things/dither/react` | React dither wrapper |
+| `ascii-things/dither/element` | Dither custom element |
+| `ascii-things/webgl` | `AsciiSurfaceEngine`, `SURFACE_DEFAULTS`, glyph and colour helpers |
+| `ascii-things/webgl/react` | React WebGL surface wrapper |
+| `ascii-things/webgl/element` | WebGL surface custom element |
 | `ascii-things/ui.css` | UI stylesheet |
 
-`PALETTES`, `resolvePalette`, `Palette`, `PaletteName`, `PaletteChoice`, and `RGB` are
-exported from the scene entries and from the root entry.
+`PALETTES`, `resolvePalette`, `Palette`, and `PaletteChoice` are exported from the scene
+entries and the root entry. `PaletteName` and `RGB` come from `ascii-things/rendering`.
 
 ## Shared options
 
@@ -41,7 +59,9 @@ Every `create*` factory and React wrapper accepts these.
 | `label` | `string` | — | Makes the canvas `role="img"` |
 | `paused` | `boolean` | `false` | Start with the scene clock stopped |
 | `fontFamily` | `string` | canvas CSS | Override the canvas font stack |
-| `onEvent` | `(event) => void` | — | Scene-specific events |
+
+`onEvent` is not part of `SceneOptions`. Each scene declares its own handler type; see
+[Events](#events).
 
 `PaletteName` is `"abyss" | "neon" | "mono" | "paper"`. `PaletteChoice` adds `"auto"` and a
 custom `Palette`. `"auto"` resolves to `paper` when the host prefers a light colour scheme and
@@ -179,6 +199,32 @@ renderer. The `AsciiLagoonDay`, `AsciiLagoonNight`, `AsciiLagoonTurtle`,
 for each sample. `LAGOON_VARIANTS` is the canonical ordered list
 for UI and docs.
 
+### Ambient scenes
+
+`starlings`, `fireflies`, `ants`, `koi`, `city`, and `servers` share the
+`AsciiAmbientOptions` shape:
+
+```ts
+interface AsciiAmbientOptions extends SceneOptions {
+  count?: number;
+  scale?: number;
+  glyphs?: "ascii" | "kanji"; // koi only
+  onEvent?: (event: AmbientEvent) => void;
+}
+```
+
+| Scene | Factory | Population | Notes |
+| --- | --- | --- | --- |
+| Starlings | `createStarlings` | `count` birds | `scatter` scatters the murmuration |
+| Fireflies | `createFireflies` | `count` fireflies | `flare` brightens the meadow |
+| Ants | `createAnts` | `count` ants | `crumb` drops food |
+| Koi | `createKoi` | `count` koi | `feed` drops food; `glyphs: "kanji"` is supported |
+| City | `createCity` | `count` cars | `rush` starts a traffic wave |
+| Servers | `createServers` | `count` servers | `ping` sends a packet |
+
+`count` and `scale` are population and size hints. Each scene clamps them to a
+sensible range. The other ambient scenes ignore `glyphs`.
+
 ## Engines
 
 Each scene has a class and a factory. The factory is the documented path.
@@ -205,6 +251,14 @@ const scene = createSharks(canvas, options);
 | Robots | `dispatch(x, y)` | `"dispatch"` |
 | Jellyfish | `shockwave(x, y)` | `"shockwave"` |
 | Dog | `throwBall(x, y)` | `"throwBall"` |
+| Starlings | — | `"scatter"` |
+| Fireflies | — | `"flare"` |
+| Ants | — | `"crumb"` |
+| Koi | — | `"feed"` |
+| City | — | `"rush"` |
+| Servers | — | `"ping"` |
+
+Lagoon is a passive painter: `trigger()` accepts the shared signature but is a no-op.
 
 Coordinates are canvas-local pixels. Actions are ignored under reduced motion. The same
 methods are available on React handles from `onReady` and custom-element handles from
@@ -215,7 +269,8 @@ methods are available on React handles from `onReady` and custom-element handles
 adaptive quality, calm, interactive, label, and event handlers update without rebuilding.
 
 The scene classes are also exported (`OceanEngine`, `RobotEngine`, `JellyfishEngine`,
-`DogEngine`) for advanced use, but `create*` is the stable surface.
+`DogEngine`, `LagoonEngine`, and `AmbientEngine`) for advanced use, but `create*` is the
+stable surface.
 
 ## Stats
 
@@ -238,12 +293,20 @@ type BaseStats = {
 | Jellyfish | `jellies`, `pulsing`, `plankton`, `rings` |
 | Dog | `dogs`, `charging`, `state` (`DogState`), `ball` |
 | Lagoon | `variant` |
+| Starlings | `birds`, `predators` |
+| Fireflies | `fireflies`, `lit` |
+| Ants | `ants`, `food`, `carrying` |
+| Koi | `koi`, `ripples` |
+| City | `cars`, `buildings`, `lights` |
+| Servers | `servers`, `packets`, `alerts` |
 
 ## Events
 
 `onEvent` receives a discriminated union. Coordinates are canvas-local pixels.
 
 ```ts
+type AmbientEvent = { kind: string; x: number; y: number };
+
 type WorldEvent = { kind: "eat" | "splash"; x: number; y: number };
 
 type RobotWorldEvent =
@@ -293,15 +356,21 @@ See [Custom elements](/guide/custom-elements/) for the full attribute grammar.
 | `<ascii-sharks>` | `ascii-things/element` | shared, `sharks`, `density`, `shark-scale`, `orbit-scale`, `fit-sharks`, `glyphs` |
 | `<ascii-robots>` | `ascii-things/element` | shared, `robots`, `count`, `scale` |
 | `<ascii-jellyfish>` | `ascii-things/element` | shared, `jellies`, `count`, `scale`, `glyphs` |
+| `<ascii-starlings>` | `ascii-things/element` | shared, `count`, `scale` |
+| `<ascii-fireflies>` | `ascii-things/element` | shared, `count`, `scale` |
+| `<ascii-ants>` | `ascii-things/element` | shared, `count`, `scale` |
 | `<ascii-koi>` | `ascii-things/element` | shared, `count`, `scale`, `glyphs` |
+| `<ascii-city>` | `ascii-things/element` | shared, `count`, `scale` |
+| `<ascii-servers>` | `ascii-things/element` | shared, `count`, `scale` |
 | `<ascii-dog>` | `ascii-things/element` | shared, `dogs`, `count`, `scale`, `spread` |
-| `<ascii-lagoon>` | `ascii-things/element` | shared, `variant` |
-| `<ascii-lagoon-day>` … `<ascii-lagoon-tang>` | `ascii-things/element` | shared; fixed variant |
+| `<ascii-lagoon>` | `ascii-things/element` | shared except `columns`, `max-cells`, `adaptive-quality`; `variant` |
+| `<ascii-lagoon-day>` … `<ascii-lagoon-tang>` | `ascii-things/element` | same as lagoon; fixed variant |
 
-Shared attributes: `palette`, `seed`, `speed`, `columns`, `max-cells`, `max-dpr`, `calm`,
-`interactive`, `label`.
+Shared by most tags: `palette`, `seed`, `speed`, `columns`, `max-cells`, `max-dpr`,
+`adaptive-quality`, `aspect-ratio`, `paused`, `font-family`, `calm`, `interactive`, `label`.
 
-Every attribute change remounts the engine.
+Lagoon is a fixed-cell painter, so its elements do not observe `columns`, `max-cells`, or
+`adaptive-quality`. Every attribute change remounts the engine.
 
 ## UI components
 
@@ -329,5 +398,5 @@ import type {
 } from "ascii-things/dog";
 ```
 
-`Palette`, `PaletteName`, `RGB`, `PALETTES`, and `resolvePalette` are available from any scene
-entry or the root.
+`PALETTES`, `resolvePalette`, `Palette`, and `PaletteChoice` are available from any scene
+entry or the root. Import `PaletteName` and `RGB` from `ascii-things/rendering`.

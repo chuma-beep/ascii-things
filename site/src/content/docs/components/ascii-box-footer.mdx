@@ -90,8 +90,9 @@ if (canvas) {
 - `prefers-reduced-motion`, which renders one static frame.
 - A 30fps cap.
 
-Keep the canvas on a monospace family. The lattice is computed from character metrics, so the
-grid follows the font.
+Keep the canvas on a monospace family so the glyph cells line up. The lattice uses fixed cell
+ratios derived from `size`, not measured font metrics, so changing the font family does not
+change the grid.
 
 ## Source
 

@@ -37,11 +37,13 @@ Structural props rebuild the world. In React, a roster or seed that changes iden
 render will remount the scene.
 
 ```tsx
+import type { SharkSpec } from "ascii-things/sharks";
+
 // Bad: a new array every render
-<AsciiSharks sharks={[{ kind: "mako" }]} />
+<AsciiSharks sharks={[{ kind: "mako", size: 1 }]} />
 
 // Good: a stable array
-const SHARKS = [{ kind: "mako" }] as const;
+const SHARKS: SharkSpec[] = [{ kind: "mako", size: 1 }];
 <AsciiSharks sharks={SHARKS} />;
 ```
 

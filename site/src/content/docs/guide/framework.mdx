@@ -28,7 +28,8 @@ import type {
 
 `RuntimeWorld` only requires `step(dt)` and `resize(...)`. Events, pointer state, and simulated
 time are optional. `RuntimeRenderer` only requires canvas sizing, a render call, and font
-updates. Neither contract requires entities, `CellGrid`, or a particular simulation model.
+updates, plus readonly `cellWidth`, `cellHeight`, `cellCount`, `columnCount`, and `rowCount`
+metrics. Neither contract requires entities, `CellGrid`, or a particular simulation model.
 
 ## Create a simulation
 

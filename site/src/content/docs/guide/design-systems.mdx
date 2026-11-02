@@ -152,7 +152,12 @@ export function DitherCard() {
     <Card className="overflow-hidden border-white/10 bg-zinc-950">
       <CardContent className="p-0">
         <div className="h-40">
-          <AsciiDither text="ASCII-THINGS" matrix="bayer8" density={0.12} />
+          <AsciiDither
+            text="ASCII-THINGS"
+            matrix="bayer8"
+            density={0.12}
+            style={{ height: "100%" }}
+          />
         </div>
       </CardContent>
     </Card>
@@ -160,7 +165,8 @@ export function DitherCard() {
 }
 ```
 
-`AsciiDither` defaults to `240px`; the Tailwind `h-40` box overrides it. The
+`AsciiDither` defaults to `240px`; set its height explicitly (for example
+`style={{ height: "100%" }}`) instead of relying on a parent class. The
 same pattern in MUI with the WebGL surface:
 
 ```tsx

@@ -7,11 +7,18 @@ import CardPreview from "@components/CardPreview.astro";
 import { AsciiDither } from "ascii-things/dither/react";
 
 A design surface rather than a scene: an ordered-dither wordmark with a live matrix and a
-configurable density. It drops into the same sized-box pattern as the scenes.
+configurable density. It uses the same sized-box pattern as the scenes; give it `height: 100%`
+so it fills the box — its default height is 240px.
 
 <CardPreview title="Dither field" description="ascii-things/dither · bayer8" badge="canvas">
   <div style="height: 200px">
-    <AsciiDither client:visible text="ASCII-THINGS" matrix="bayer8" density={0.12} />
+    <AsciiDither
+      client:visible
+      text="ASCII-THINGS"
+      matrix="bayer8"
+      density={0.12}
+      style={{ height: "100%" }}
+    />
   </div>
 </CardPreview>
 
@@ -38,7 +45,7 @@ export function Banner() {
 
 ```tsx
 <div className="h-40 w-full bg-black">
-  <AsciiDither text="ASCII-THINGS" matrix="bayer8" density={0.12} />
+  <AsciiDither text="ASCII-THINGS" matrix="bayer8" density={0.12} style={{ height: "100%" }} />
 </div>
 ```
 

@@ -15,7 +15,7 @@ nearby insects, briefly turning the meadow into a field of light before the rhyt
 - **Drift** — slow, independent movement with soft turning.
 - **Blink** — each firefly has a phase and rate; the field never blinks in lockstep.
 - **Flare** — a click wakes nearby fireflies, then each one decays back to its own rhythm.
-- **Calm** — removes the brightest flare rings and quickens the settle.
+- **Calm** — accepted for parity; currently no effect on this scene.
 
 ## Interaction
 
@@ -36,8 +36,8 @@ meadow.flare(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
 | Option | Type | Default | |
 | --- | --- | --- | --- |
 | `count` | `number` | `70` | Fireflies in the meadow |
-| `scale` | `number` | `1` | Scene scale hint, clamped 0.5–2 |
-| `seed` | `number` | random | Reproducible meadow |
+| `scale` | `number` | `1` | Accepted and clamped 0.5–2; currently no visual effect |
+| `seed` | `number` | `1` | Reproducible meadow |
 | `palette` | name \| `Palette` \| `"auto"` | `"abyss"` | Theme |
 | `columns` | `number` | `124` | Art-direction target |
 | `speed` | `number` | `1` | Time scale; `0` freezes |
@@ -45,7 +45,7 @@ meadow.flare(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
 | `maxDpr` | `number` | `2` | Backing-store cap |
 | `maxCells` | `number` | `16000` | Grid cap |
 | `adaptiveQuality` | `boolean` | `true` | Reduce DPR when frames run slow |
-| `calm` | `boolean` | `false` | Remove flare rings and fast flicker |
+| `calm` | `boolean` | `false` | Accepted; currently no effect |
 | `paused` | `boolean` | `false` | Start with the clock stopped |
 | `fontFamily` | `string` | canvas CSS font | Drawing font |
 | `label` | `string` | — | Accessible name |
@@ -53,7 +53,7 @@ meadow.flare(canvas.clientWidth * 0.5, canvas.clientHeight * 0.5);
 
 ## Stats
 
-`FireflyStats` adds `fireflies` and `lit`:
+`FireflyStats` adds optional `fireflies` and `lit` fields:
 
 ```ts
 type FireflyStats = {
@@ -62,11 +62,12 @@ type FireflyStats = {
   cells: number;
   columns: number;
   rows: number;
-  fireflies: number;
-  lit: number;
+  fireflies?: number;
+  lit?: number;
 };
 ```
 
+The exported type is the shared ambient stats shape, so scene-specific fields are optional.
 `lit` counts fireflies currently above a visible flare threshold.
 
 ## React
