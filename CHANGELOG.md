@@ -1,6 +1,8 @@
 # ascii-things
 
-## Unreleased
+## 1.0.0
+
+The first stable release. It includes the changes below.
 
 ### Minor Changes
 

@@ -3,9 +3,12 @@ title: Changelog
 description: Release notes for ascii-things.
 ---
 
-## Unreleased
+## 1.0.0
 
-Everything below ships with 1.0.
+The first stable release. It includes everything below.
+
+- The published package is `ascii-things@1.0.0`.
+- No runtime changes since `1.0.0-rc.0`.
 
 - `ascii-things/image` converts a local image to ASCII text or a canvas. The
   `AsciiImage` React wrapper lives in `ascii-things/image/react`, and the

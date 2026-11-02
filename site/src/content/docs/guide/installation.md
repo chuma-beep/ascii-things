@@ -10,10 +10,9 @@ description: Install ascii-things, pick the right subpath, and load the optional
 - **Node 22 or newer** for building from source. The docs site uses the same version.
 - No runtime dependencies. React and React DOM are optional peers.
 
-:::caution
-The project is prepared for npm as `ascii-things`. The current `1.0.0-rc.0` build is not on
-npm yet, so build the package from this repository or install it from GitHub. The CDN examples
-below describe the published path.
+:::note
+`ascii-things@1.0.0` is published on npm. The CDN examples below load the published
+build.
 :::
 
 ## Install from npm

@@ -27,11 +27,10 @@ site lives in [`site/`](./site/) (Astro + Starlight); it builds to a static site
 landing page at `/`, the guides under `/guide/`, and a page for every scene under
 `/scenes/`.
 
-**Package version:** `1.0.0-rc.0` (unpublished). The public runtime, type, and
-subpath exports are frozen for 1.0. See [`MIGRATION.md`](./MIGRATION.md). The
-image, dither, WebGL, ambient-scene, expanded UI, and docs/component entries are
-under **Unreleased** in [`CHANGELOG.md`](./CHANGELOG.md), so they are on `main`
-rather than in a published release.
+**Package version:** `1.0.0` (published). The public runtime, type, and subpath
+exports are frozen for 1.0. See [`MIGRATION.md`](./MIGRATION.md). The image,
+dither, WebGL, ambient-scene, expanded UI, and docs/component entries shipped in
+`1.0.0`; see [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Install
 
@@ -39,8 +38,8 @@ rather than in a published release.
 npm install ascii-things
 ```
 
-`1.0.0-rc.0` is the release candidate and is not on npm yet. Until the 1.0
-publish, build from this repository or install the tarball from `npm pack`.
+`ascii-things@1.0.0` is published on npm. You can install it directly, or build
+from this repository and install the tarball from `npm pack`.
 
 Or use the custom elements after installing the package. The snippets below assume a
 bundler or an import map:

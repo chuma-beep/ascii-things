@@ -1,7 +1,6 @@
 # Migrating to ascii-things 1.0
 
-**Status: release candidate (`1.0.0-rc.0`).** 1.0.0 has not been published.
-`0.5.0` is the baseline for this guide.
+**Status: published (`1.0.0`).** `0.5.0` is the baseline for this guide.
 
 1.0 freezes the public API described here. The goal is a boring upgrade: if you
 only use documented exports, moving from `0.5.0` to `1.0.0` should not require
@@ -243,7 +242,6 @@ same contract.
 - [x] `npm run check:all` and `npm run test:e2e`.
 - [x] Docs build and migration guide included in the tarball.
 - [x] Clean-install smoke test from `npm pack`.
-- [ ] Version, changelog, and release notes approved.
+- [x] Version, changelog, and release notes approved.
 
-Until those gates are complete, treat this document and the package as a
-release candidate, not a published 1.0.
+All gates are complete. `1.0.0` is the published stable release.
