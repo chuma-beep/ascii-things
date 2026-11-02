@@ -1,8 +1,8 @@
 # ascii-things
 
-![ascii-things landing page with a live ASCII robot dog in a test yard](assets/readme-demo.gif)
+![ascii-things landing page in dark mode with a live ASCII night lagoon](assets/lagoon-night.gif)
 
-*The landing page, live. Type a command and the dog fetches the ball.*
+*The landing page in dark mode, live. The night lagoon and its creatures drift behind the interface.*
 
 **Living ASCII scenes.** A shark tank, robot factory, jellyfish bloom,
 robot dog, starling murmuration, firefly meadow, ant trail, koi pond, city
