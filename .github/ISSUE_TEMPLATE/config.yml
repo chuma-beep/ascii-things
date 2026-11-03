@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://ascii-things.dev/guide/
+    about: Install guides, API reference, scene options, and framework examples.
+  - name: Live playground
+    url: https://ascii-things.dev/playground/
+    about: Try the scenes and copy the setup before filing an issue.
+  - name: npm package
+    url: https://www.npmjs.com/package/ascii-things
+    about: Published versions, changelog links, and package metadata.

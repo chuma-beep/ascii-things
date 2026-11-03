@@ -1,0 +1,68 @@
+name: Feature request
+description: Suggest a new scene, component, API, or docs improvement.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Describe the problem first, then the change you want.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: What is missing, awkward, or limiting today?
+      placeholder: I want a scene that works as a subtle card background without a full viewport.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the API, scene, or component you have in mind.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds, other libraries, or simpler approaches.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Scenes
+        - React wrappers
+        - Custom elements
+        - Image to ASCII
+        - Dither
+        - WebGL
+        - UI components
+        - Docs or site
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Mockups, references, or examples from other projects.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and discussions for this request.
+          required: true

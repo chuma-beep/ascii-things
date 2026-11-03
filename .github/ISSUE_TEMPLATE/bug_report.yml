@@ -1,0 +1,100 @@
+name: Bug report
+description: Report a broken scene, component, package API, or docs page.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please include enough detail to reproduce it.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: A clear and concise description of the problem.
+      placeholder: The sharks scene freezes after resizing the container.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include a minimal code sample or a link to a reproduction when possible.
+      placeholder: |
+        1. Mount <AsciiSharks /> inside a 400px container.
+        2. Resize the container to 200px.
+        3. The canvas stops updating.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: The canvas should reflow and keep animating.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Scenes
+        - React wrappers
+        - Custom elements
+        - Image to ASCII
+        - Dither
+        - WebGL
+        - UI components
+        - Docs or site
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: ascii-things version
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, framework, and bundler where relevant.
+      placeholder: Chrome 142, macOS 15, React 19, Vite 7
+    validations:
+      required: true
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Code sample
+      description: Paste the smallest snippet that shows the issue. Remove private data first.
+      render: tsx
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Screenshots, console errors, or anything else that helps.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I can reproduce this with the latest published version.
+          required: true
