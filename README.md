@@ -1,5 +1,12 @@
 # ascii-things
 
+<p>
+  <a href="https://www.npmjs.com/package/ascii-things"><img src="https://img.shields.io/npm/v/ascii-things?style=flat-square&label=npm&color=ff7a1a" alt="npm version" /></a>
+  <a href="https://github.com/chuma-beep/ascii-things/actions/workflows/ci.yml"><img src="https://github.com/chuma-beep/ascii-things/actions/workflows/ci.yml/badge.svg" alt="CI status" /></a>
+  <a href="https://github.com/chuma-beep/ascii-things/blob/main/LICENSE"><img src="https://img.shields.io/github/license/chuma-beep/ascii-things?style=flat-square&color=ff7a1a" alt="MIT license" /></a>
+  <a href="https://ascii-things.dev"><img src="https://img.shields.io/badge/site-ascii--things.dev-ff7a1a?style=flat-square" alt="ascii-things.dev" /></a>
+</p>
+
 ![ascii-things landing page in dark mode with a live ASCII night lagoon](assets/lagoon-night.gif)
 
 *The landing page in dark mode, live. The night lagoon and its creatures drift behind the interface.*
