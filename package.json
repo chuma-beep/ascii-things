@@ -205,7 +205,7 @@
     "@arethetypeswrong/cli": "^0.18.5",
     "@axe-core/playwright": "^4.14.0",
     "@biomejs/biome": "^2.5.15",
-    "@changesets/cli": "^2.31.1",
+    "@changesets/cli": "^3.0.3",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource/geist-mono": "^5.3.0",
