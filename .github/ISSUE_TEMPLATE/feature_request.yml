@@ -64,5 +64,5 @@ body:
     attributes:
       label: Before submitting
       options:
-        - label: I searched existing issues and discussions for this request.
+        - label: I searched existing issues for this request.
           required: true
