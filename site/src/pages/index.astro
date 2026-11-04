@@ -72,8 +72,13 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
       rel="stylesheet"
     />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    </noscript>
     <meta property="og:title" content="ascii-things — living ASCII scenes for the web" />
     <meta
       property="og:description"
@@ -103,6 +108,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
     />
   </head>
   <body>
+    <a class="skip-link" href="#top">Skip to content</a>
     <header class="site-header">
       <a class="brand" href="#top" aria-label="ascii-things home"><LogoMark /><span class="brand-word">ascii-things<span>®</span></span></a>
       <nav class="site-nav" aria-label="Primary">
@@ -299,7 +305,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
       </a>
     </div>
 
-    <main id="top">
+    <main id="top" tabindex="-1">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-art" data-lagoon-stage>
           <canvas id="hero-canvas" aria-hidden="true"></canvas>

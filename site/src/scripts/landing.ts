@@ -26,6 +26,9 @@ type CardEngine =
   | ReturnType<typeof createLagoon>;
 
 const initialTheme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+const reduceMotion =
+  typeof window.matchMedia === "function" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const heroCanvas = document.querySelector<HTMLCanvasElement>("#hero-canvas");
 const statCells = document.querySelector<HTMLElement>("#stat-cells");
 const statMode = document.querySelector<HTMLElement>("#stat-mode");
@@ -40,6 +43,7 @@ if (heroCanvas) {
   hero = createLagoon(heroCanvas, {
     variant: initialTheme === "light" ? "reef" : "night",
     label: initialTheme === "light" ? "A live ASCII day lagoon" : "A live ASCII night lagoon",
+    calm: reduceMotion,
   });
   (window as unknown as { asciiScene: ReturnType<typeof createLagoon> }).asciiScene = hero;
 
@@ -110,7 +114,7 @@ function startCard(canvas: HTMLCanvasElement) {
         count: 6,
         columns: 110,
         interactive: false,
-        calm: false,
+        calm: reduceMotion,
       });
       break;
     case "jellyfish":
@@ -120,7 +124,7 @@ function startCard(canvas: HTMLCanvasElement) {
         count: 5,
         columns: 110,
         interactive: false,
-        calm: false,
+        calm: reduceMotion,
       });
       break;
     case "dog": {
@@ -135,7 +139,7 @@ function startCard(canvas: HTMLCanvasElement) {
         columns: isComposition ? 72 : 110,
         maxCells: isComposition ? 5200 : undefined,
         interactive: false,
-        calm: isComposition,
+        calm: reduceMotion || isComposition,
       });
       break;
     }
@@ -146,7 +150,7 @@ function startCard(canvas: HTMLCanvasElement) {
         count: 120,
         columns: 110,
         interactive: false,
-        calm: false,
+        calm: reduceMotion,
       });
       break;
     case "fireflies":
@@ -156,7 +160,7 @@ function startCard(canvas: HTMLCanvasElement) {
         count: 70,
         columns: 110,
         interactive: false,
-        calm: false,
+        calm: reduceMotion,
       });
       break;
     case "ants":
@@ -166,7 +170,7 @@ function startCard(canvas: HTMLCanvasElement) {
         count: 45,
         columns: 110,
         interactive: false,
-        calm: false,
+        calm: reduceMotion,
       });
       break;
     case "koi": {
@@ -179,7 +183,7 @@ function startCard(canvas: HTMLCanvasElement) {
         columns: isComposition ? 72 : 110,
         maxCells: isComposition ? 4600 : undefined,
         interactive: false,
-        calm: isComposition,
+        calm: reduceMotion || isComposition,
       });
       break;
     }
@@ -190,7 +194,7 @@ function startCard(canvas: HTMLCanvasElement) {
         count: 18,
         columns: 110,
         interactive: false,
-        calm: false,
+        calm: reduceMotion,
       });
       break;
     case "servers":
@@ -200,7 +204,7 @@ function startCard(canvas: HTMLCanvasElement) {
         count: 8,
         columns: 110,
         interactive: false,
-        calm: false,
+        calm: reduceMotion,
       });
       break;
     case "lagoon":
@@ -208,6 +212,7 @@ function startCard(canvas: HTMLCanvasElement) {
         variant: "reef",
         interactive: false,
         label: "A live ASCII day lagoon",
+        calm: reduceMotion,
       });
       break;
     default:
@@ -217,7 +222,7 @@ function startCard(canvas: HTMLCanvasElement) {
         density: 0.85,
         columns: 110,
         interactive: false,
-        calm: false,
+        calm: reduceMotion,
       });
   }
   cards.set(canvas, engine);

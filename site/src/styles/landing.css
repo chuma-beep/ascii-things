@@ -95,6 +95,26 @@ button {
   outline-offset: 4px;
 }
 
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 14px;
+  border: 1px solid var(--orange);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--orange);
+  font: 600 10px/1.2 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
 /* ---------------------------------------------------------------- header */
 
 .site-header {
