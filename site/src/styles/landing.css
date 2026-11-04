@@ -95,6 +95,26 @@ button {
   outline-offset: 4px;
 }
 
+.skip-link {
+  position: fixed;
+  top: -60px;
+  left: 16px;
+  z-index: 100;
+  padding: 10px 14px;
+  border: 1px solid var(--orange);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--orange);
+  font: 600 10px/1.2 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
 /* ---------------------------------------------------------------- header */
 
 .site-header {
@@ -134,6 +154,21 @@ button {
 .brand-word {
   display: inline-flex;
   align-items: center;
+}
+
+.brand-beta {
+  display: inline-flex;
+  align-items: center;
+  height: 14px;
+  padding: 0 4px;
+  border: 1px solid color-mix(in srgb, var(--muted) 42%, transparent);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 6px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .brand sup {
@@ -260,6 +295,20 @@ button {
   translate: -50% -50%;
 }
 
+.ai-picker-caption {
+  position: absolute;
+  top: calc(100% + 4px);
+  bottom: auto;
+  left: 50%;
+  color: var(--muted);
+  font-size: 0.55rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  translate: -50% 0;
+}
+
 .ai-pick {
   display: grid;
   place-items: center;
@@ -321,6 +370,28 @@ button {
   box-shadow: 0 28px 90px rgba(0, 0, 0, 0.58);
   backdrop-filter: blur(18px);
   animation: ai-panel-in 180ms ease both;
+  scrollbar-color: var(--muted) transparent;
+  scrollbar-width: thin;
+}
+
+.ai-panel::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.ai-panel::-webkit-scrollbar-track {
+  background: transparent;
+  border: 0;
+}
+
+.ai-panel::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted) 72%, transparent);
+  border: 0;
+  border-radius: 0;
+}
+
+.ai-panel::-webkit-scrollbar-thumb:hover {
+  background: var(--orange);
 }
 
 .ai-panel[hidden] {
@@ -517,10 +588,18 @@ button {
 
 @media (min-width: 901px) and (max-width: 1439px) {
   .ai-picker {
-    position: static;
+    position: relative;
+    top: auto;
+    left: auto;
     order: 2;
     margin-left: 24px;
     translate: none;
+  }
+
+  .ai-picker-caption {
+    top: calc(100% + 3px);
+    bottom: auto;
+    font-size: 0.5rem;
   }
 
   .site-nav {
@@ -1654,6 +1733,12 @@ button {
     display: none;
   }
 
+  .brand-beta {
+    height: 12px;
+    padding: 0 3px;
+    font-size: 5.5px;
+  }
+
   .ai-pick {
     width: 24px;
     height: 24px;
@@ -2012,8 +2097,7 @@ html[data-theme="light"] {
 :root[data-theme="light"] .ai-pick img[src$="opencode.svg"],
 :root[data-theme="light"] .ai-tool-icon img[src$="cursor.svg"],
 :root[data-theme="light"] .ai-tool-icon img[src$="opencode.svg"],
-:root[data-theme="light"] .ai-tool-icon img[src$="musecode.svg"],
-:root[data-theme="light"] .ai-tool-icon img[src$="antigravity.svg"] {
+:root[data-theme="light"] .ai-tool-icon img[src$="musecode.svg"] {
   filter: brightness(0.32) saturate(0.8);
 }
 

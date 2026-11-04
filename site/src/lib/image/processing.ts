@@ -26,7 +26,9 @@ export function drawCrop(
   const { canvas, context } = createCanvas(sw * scale, sh * scale);
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
-  context.fillStyle = "#ffffff";
+  // Keep transparent source pixels dark. The ASCII ramp treats black as empty
+  // space, so filling white here turns cut-out PNGs into solid ink blocks.
+  context.fillStyle = "#000000";
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.drawImage(source, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
   return canvas;

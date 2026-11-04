@@ -72,8 +72,13 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
       rel="stylesheet"
     />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    </noscript>
     <meta property="og:title" content="ascii-things — living ASCII scenes for the web" />
     <meta
       property="og:description"
@@ -103,8 +108,9 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
     />
   </head>
   <body>
+    <a class="skip-link" href="#top">Skip to content</a>
     <header class="site-header">
-      <a class="brand" href="#top" aria-label="ascii-things home"><LogoMark /><span class="brand-word">ascii-things<span>®</span></span></a>
+      <a class="brand" href="#top" aria-label="ascii-things home"><LogoMark /><span class="brand-word">ascii-things<span>®</span></span><span class="brand-beta">beta</span></a>
       <nav class="site-nav" aria-label="Primary">
         <details class="nav-library">
           <summary>Library</summary>
@@ -131,6 +137,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         <a href="/playground/">Playground ↗</a>
       </nav>
       <div class="ai-picker" role="group" aria-label="AI tool prompts">
+        <span class="ai-picker-caption">for your agents</span>
         <button
           class="ai-pick"
           type="button"
@@ -140,18 +147,18 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
           aria-controls="ai-panel"
           aria-label="Open the Claude Code prompt"
         >
-          <img src="/assets/ai/claude.svg" alt="" width="17" height="17" />
+          <img src="/assets/ai/claude-code.svg" alt="" width="17" height="17" />
         </button>
         <button
           class="ai-pick"
           type="button"
-          data-ai-tool="chatgpt"
+          data-ai-tool="codex"
           aria-haspopup="dialog"
           aria-expanded="false"
           aria-controls="ai-panel"
-          aria-label="Open the ChatGPT prompt"
+          aria-label="Open the Codex prompt"
         >
-          <img src="/assets/ai/chatgpt.png" alt="" width="18" height="18" />
+          <img src="/assets/ai/codex.svg" alt="" width="18" height="18" />
         </button>
         <button
           class="ai-pick"
@@ -225,7 +232,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         <article class="ai-tool">
           <div class="ai-tool-head">
             <span class="ai-tool-icon" aria-hidden="true">
-              <img src="/assets/ai/claude.svg" alt="" width="14" height="14" />
+              <img src="/assets/ai/claude-code.svg" alt="" width="14" height="14" />
             </span>
             <span class="ai-tool-name">Claude Code</span>
             <span class="ai-tool-meta">TERMINAL</span>
@@ -237,13 +244,13 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         <article class="ai-tool">
           <div class="ai-tool-head">
             <span class="ai-tool-icon" aria-hidden="true">
-              <img src="/assets/ai/chatgpt.png" alt="" width="15" height="15" />
+              <img src="/assets/ai/codex.svg" alt="" width="15" height="15" />
             </span>
-            <span class="ai-tool-name">ChatGPT / Codex</span>
+            <span class="ai-tool-name">Codex</span>
             <span class="ai-tool-meta">AGENT</span>
           </div>
           <p>Good for planning the scene, then handing the implementation to a coding agent.</p>
-          <button class="ai-copy" type="button" data-ai-copy="chatgpt">COPY PROMPT</button>
+          <button class="ai-copy" type="button" data-ai-copy="codex">COPY PROMPT</button>
         </article>
 
         <article class="ai-tool">
@@ -299,7 +306,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
       </a>
     </div>
 
-    <main id="top">
+    <main id="top" tabindex="-1">
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-art" data-lagoon-stage>
           <canvas id="hero-canvas" aria-hidden="true"></canvas>

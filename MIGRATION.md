@@ -209,22 +209,28 @@ same contract.
 | `ascii-things/starlings`, `ascii-things/fireflies`, `ascii-things/ants`, `ascii-things/koi`, `ascii-things/city`, `ascii-things/servers` | `createStarlings`, `createFireflies`, `createAnts`, `createKoi`, `createCity`, `createServers` and their engines, worlds, and renderers | ambient option and stats types |
 | `ascii-things/image` | `imageToAscii`, `pixelsToAscii`, `renderAsciiImage`, `ASCII_CHARSETS` | `AsciiImageOptions`, `AsciiImageResult`, `AsciiImageSource`, `AsciiImageCharset` |
 | `ascii-things/image/react` | `AsciiImage` | `AsciiImageProps` |
+| `ascii-things/image/vue` | `AsciiImage` | `AsciiImageProps` |
 | `ascii-things/image/element` | `AsciiImageElement` | custom-element detail types |
 | `ascii-things/dither` | `DitherField`, `ditherThreshold`, `shouldDither`, `DITHER_MATRICES`, `DITHER_DEFAULTS` | `DitherFieldOptions`, `DitherMatrixName` |
 | `ascii-things/dither/react` | `AsciiDither` | `AsciiDitherProps` |
+| `ascii-things/dither/vue` | `AsciiDither` | `AsciiDitherProps` |
 | `ascii-things/dither/element` | `AsciiDitherElement` | custom-element attributes |
 | `ascii-things/webgl` | `AsciiSurfaceEngine`, `resolveGlyphs`, `glyphIndex`, `parseColor`, `surfaceCell`, `SURFACE_DEFAULTS` | `AsciiSurfaceOptions` |
 | `ascii-things/webgl/react` | `AsciiSurface` | `AsciiSurfaceProps` |
+| `ascii-things/webgl/vue` | `AsciiSurface` | `AsciiSurfaceProps` |
 | `ascii-things/webgl/element` | `AsciiSurfaceElement` | custom-element attributes |
 | `ascii-things/react` | `AsciiSharks`, `AsciiRobots`, `AsciiJellyfish`, `AsciiDog`, `AsciiOcean` | component prop types |
+| `ascii-things/vue` | `AsciiSharks`, `AsciiRobots`, `AsciiJellyfish`, `AsciiDog`, `AsciiOcean`, ambient and lagoon wrappers | component prop types |
+| `ascii-things/core/vue` | `useAsciiScene` | `UseAsciiSceneOptions`, `UseAsciiSceneResult` |
 | `ascii-things/element` | `AsciiSharksElement`, `AsciiRobotsElement`, `AsciiJellyfishElement`, `AsciiDogElement` | custom-element detail types |
 | `ascii-things/ui` | `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, `AsciiSceneTabs`, `AsciiDogHero` | UI prop types |
 | `ascii-things/ui.css` | stylesheet | CSS variables |
 
 ## SSR notes
 
-- `ascii-things/react` and `ascii-things/ui` are safe to import and render on
-  the server. They emit static markup and do not touch `window`.
+- `ascii-things/react`, `ascii-things/ui`, and `ascii-things/vue` are safe to
+  import and render on the server. They emit static markup and do not touch
+  `window`.
 - Engines and custom elements require a browser environment. Register custom
   elements only in client code.
 - `palette="auto"` falls back to `abyss` during SSR, so the first client render

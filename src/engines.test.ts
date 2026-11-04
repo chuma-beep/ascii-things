@@ -7,7 +7,7 @@ import { KanjiJellyfishRenderer } from "./kanji/jellyfish-renderer";
 import { KanjiKoiRenderer } from "./kanji/koi-renderer";
 import { KanjiSharkRenderer } from "./kanji/shark-renderer";
 import { createKoi } from "./koi";
-import { PALETTES, resolvePalette } from "./palette";
+import { PALETTE_META, PALETTE_NAMES, PALETTES, resolvePalette } from "./palette";
 import { AsciiRenderer } from "./renderer";
 import { createRobots, RobotEngine } from "./robots";
 import { OceanEngine } from "./sharks";
@@ -169,6 +169,23 @@ describe("engine migration", () => {
   it("resolves auto palettes from the host colour scheme", () => {
     expect(resolvePalette("auto")).toBe(PALETTES.abyss);
     expect(resolvePalette("paper")).toBe(PALETTES.paper);
+  });
+
+  it("ships complete curated palettes with picker metadata", () => {
+    expect(PALETTE_NAMES).toHaveLength(8);
+    for (const name of PALETTE_NAMES) {
+      const palette = PALETTES[name];
+      expect(palette.name, name).toBe(name);
+      expect(palette.background, name).toMatch(/^#/);
+      expect(palette.fish, name).toHaveLength(5);
+      expect(palette.accents.length, name).toBeGreaterThan(0);
+      expect(PALETTE_META[name].label, name).not.toBe("");
+      expect(PALETTE_META[name].description, name).not.toBe("");
+      expect(resolvePalette(name)).toBe(palette);
+    }
+    expect(PALETTES.amber.dark).toBe(true);
+    expect(PALETTES.newsprint.dark).toBe(false);
+    expect(resolvePalette("unknown" as never)).toBe(PALETTES.abyss);
   });
 
   it("keeps the public create functions and shark roster back-compat", () => {

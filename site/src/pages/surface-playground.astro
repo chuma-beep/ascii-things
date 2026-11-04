@@ -1,0 +1,15 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import SurfacePlayground from "../components/SurfacePlayground";
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Surface playground",
+    description:
+      "Compose a WebGL ASCII surface by variant, density, cell size, speed, glyph ramp, and colour, then share the exact URL.",
+    template: "splash",
+  }}
+>
+  <SurfacePlayground client:load />
+</StarlightPage>

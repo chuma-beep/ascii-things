@@ -94,6 +94,11 @@ test("loads the demo, renders a canvas, and has no critical axe violations", asy
   });
   expect(pixels).toBeGreaterThan(100);
   await expect(page.locator(".studio-stats")).toContainText("960 × 680 source");
+  const demoAspect = await page.locator(".studio-preview canvas").evaluate((element) => {
+    const canvas = element as HTMLCanvasElement;
+    return canvas.width / canvas.height;
+  });
+  expect(demoAspect).toBeCloseTo(960 / 680, 1);
   await expectNoHorizontalOverflow(page);
 
   const results = await new AxeBuilder({ page }).analyze();
@@ -117,6 +122,12 @@ test("uploads an image, updates crop and edge mode, copies text, and exports eve
   await expect(page.locator(".studio-source .studio-panel-title")).toContainText("fixture.svg");
   await expect(page.locator(".studio-stats")).toContainText("420 × 280 source");
   await expect(page.locator(".studio-stats b").first()).toHaveText("96");
+
+  const canvasAspect = await page.locator(".studio-preview canvas").evaluate((element) => {
+    const canvas = element as HTMLCanvasElement;
+    return canvas.width / canvas.height;
+  });
+  expect(canvasAspect).toBeCloseTo(420 / 280, 1);
 
   const crop = page.locator("#studio-crop-zoom");
   await crop.evaluate((element) => {
@@ -166,6 +177,23 @@ test("uploads an image, updates crop and edge mode, copies text, and exports eve
     contentType: "image/png",
   });
   expect(errors).toEqual([]);
+});
+
+test("keeps transparent source pixels empty instead of inking the background", async ({ page }) => {
+  const transparent = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><circle cx="100" cy="100" r="42" fill="#ffffff"/></svg>`;
+  await openStudio(page);
+  await page.locator('input[type="file"]').setInputFiles({
+    name: "transparent.svg",
+    mimeType: "image/svg+xml",
+    buffer: Buffer.from(transparent),
+  });
+  await expect(page.locator(".studio-stats")).toContainText("200 × 200 source");
+  await page.getByRole("tab", { name: "Text" }).click();
+  await expect(page.locator(".studio-text-output")).not.toHaveText("Rendering…");
+  const text = await page.locator(".studio-text-output").textContent();
+  const lines = text?.split("\n") ?? [];
+  expect(lines[0]?.trim()).toBe("");
+  expect(text).toContain("@");
 });
 
 test("batch mode uploads several images and downloads a ZIP with text, PNG, and SVG entries", async ({

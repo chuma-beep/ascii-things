@@ -67,6 +67,21 @@ export interface RampPreset {
  * The studio draws cream glyphs on a dark screen, so ramps run light-to-dense:
  * black pixels become space and white pixels become the fullest glyph.
  */
+export interface StudioPalette {
+  name: string;
+  note: string;
+  foreground: string;
+  background: string;
+}
+
+export const STUDIO_PALETTES: StudioPalette[] = [
+  { name: "Cream", note: "default", foreground: "#ece8df", background: "#070809" },
+  { name: "Amber CRT", note: "phosphor", foreground: "#ffb347", background: "#0a0603" },
+  { name: "Blueprint", note: "drafting", foreground: "#7fbcff", background: "#04121f" },
+  { name: "Newsprint", note: "paper", foreground: "#1a1a1a", background: "#f4f1ea" },
+  { name: "Terminal", note: "green", foreground: "#39ff14", background: "#020803" },
+];
+
 export const RAMPS: RampPreset[] = [
   { name: "Classic", value: " .:-=+*#%@", note: "10 steps" },
   { name: "Fine", value: FINE_LIGHT, note: "70 steps" },
@@ -82,6 +97,18 @@ export const MAX_SOURCE_EDGE = 1800;
 
 export function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
+}
+
+/** Center a crop with a pixel aspect ratio inside the source. */
+export function fitCrop(sourceWidth: number, sourceHeight: number, ratio: number): CropRect {
+  if (sourceWidth <= 0 || sourceHeight <= 0 || ratio <= 0) return { ...FULL_CROP };
+  const sourceRatio = sourceWidth / sourceHeight;
+  if (sourceRatio > ratio) {
+    const w = ratio / sourceRatio;
+    return { x: (1 - w) / 2, y: 0, w, h: 1 };
+  }
+  const h = sourceRatio / ratio;
+  return { x: 0, y: (1 - h) / 2, w: 1, h };
 }
 
 export function normalizeCrop(crop: CropRect): CropRect {

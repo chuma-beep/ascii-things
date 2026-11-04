@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { GlyphStyle, PaletteName } from "ascii-things";
+import { PALETTE_META, PALETTE_NAMES, type GlyphStyle, type PaletteName } from "ascii-things";
 import { createJellyfish } from "ascii-things/jellyfish";
 import type { JellyfishStats } from "ascii-things/jellyfish";
 import { createDog } from "ascii-things/dog";
@@ -16,6 +16,9 @@ import { createKoi } from "ascii-things/koi";
 import { createCity } from "ascii-things/city";
 import { createServers } from "ascii-things/servers";
 import { AsciiPrompt, AsciiReadout, AsciiSceneTabs, AsciiStage } from "ascii-things/ui";
+import { createScenePreset, presetPath, presetUrl } from "../lib/presets";
+import { recordGif } from "../lib/record-gif";
+import { recordVideo } from "../lib/record-video";
 import "ascii-things/ui.css";
 
 export type SceneKey =
@@ -35,12 +38,22 @@ export interface SceneDemoProps {
   scene?: SceneKey;
   /** Starting palette. The tabs update it live. */
   palette?: PaletteName;
+  /** Starting glyph texture for scenes that support kanji. */
+  glyphs?: GlyphStyle;
   /** Fixed world seed so screenshots and docs stay reproducible. */
   seed?: number;
   /** Art-direction target passed to the engine. */
   columns?: number;
+  /** Population multiplier for scenes with a countable cast. */
+  density?: number;
   /** Simulation time scale. `0` freezes the world. */
   speed?: number;
+  /** Disable decorative shimmer, blinking, and sparks. */
+  calm?: boolean;
+  /** Start with the clock stopped. */
+  paused?: boolean;
+  /** Enable pointer interaction. Keyboard and command actions still work. */
+  interactive?: boolean;
   className?: string;
 }
 
@@ -50,6 +63,7 @@ interface DemoOptions {
   palette?: PaletteName;
   calm?: boolean;
   speed?: number;
+  interactive?: boolean;
 }
 
 interface DemoEngine {
@@ -62,12 +76,22 @@ interface DemoEngine {
   trigger?: (action: string, x: number, y: number) => void;
 }
 
-const PALETTES = [
-  { id: "abyss", label: "Abyss", meta: "night" },
-  { id: "paper", label: "Paper", meta: "day" },
-  { id: "neon", label: "Neon", meta: "loud" },
-  { id: "mono", label: "Mono", meta: "quiet" },
-] as const;
+const PALETTE_SHORT: Record<PaletteName, string> = {
+  abyss: "night",
+  paper: "day",
+  neon: "loud",
+  mono: "quiet",
+  amber: "crt",
+  blueprint: "draft",
+  newsprint: "press",
+  terminal: "phosphor",
+};
+
+const PALETTES = PALETTE_NAMES.map((id) => ({
+  id,
+  label: PALETTE_META[id].label,
+  meta: PALETTE_SHORT[id],
+}));
 
 const SCENES: Record<SceneKey, { label: string; stage: string; interaction: string }> = {
   sharks: {
@@ -143,23 +167,34 @@ function buildEngine(
   seed: number,
   columns: number,
   glyphs: GlyphStyle,
+  density: number,
+  interactive: boolean,
 ): DemoEngine {
   const shared = {
     palette,
     seed,
     columns,
     calm,
-    interactive: true,
+    interactive,
     label: labels[scene],
   };
+  const count = (base: number) => Math.max(1, Math.round(base * density));
 
   switch (scene) {
     case "sharks":
-      return createSharks(canvas, { ...shared, density: 0.85, glyphs }) as unknown as DemoEngine;
+      return createSharks(canvas, {
+        ...shared,
+        density: 0.85 * density,
+        glyphs,
+      }) as unknown as DemoEngine;
     case "robots":
-      return createRobots(canvas, { ...shared, count: 6 }) as unknown as DemoEngine;
+      return createRobots(canvas, { ...shared, count: count(6) }) as unknown as DemoEngine;
     case "jellyfish":
-      return createJellyfish(canvas, { ...shared, count: 5, glyphs }) as unknown as DemoEngine;
+      return createJellyfish(canvas, {
+        ...shared,
+        count: count(5),
+        glyphs,
+      }) as unknown as DemoEngine;
     case "dog":
       return createDog(canvas, {
         ...shared,
@@ -168,17 +203,17 @@ function buildEngine(
         spread: [0.62, 0.62],
       }) as unknown as DemoEngine;
     case "starlings":
-      return createStarlings(canvas, { ...shared, count: 120 }) as unknown as DemoEngine;
+      return createStarlings(canvas, { ...shared, count: count(120) }) as unknown as DemoEngine;
     case "fireflies":
-      return createFireflies(canvas, { ...shared, count: 70 }) as unknown as DemoEngine;
+      return createFireflies(canvas, { ...shared, count: count(70) }) as unknown as DemoEngine;
     case "ants":
-      return createAnts(canvas, { ...shared, count: 45 }) as unknown as DemoEngine;
+      return createAnts(canvas, { ...shared, count: count(45) }) as unknown as DemoEngine;
     case "koi":
-      return createKoi(canvas, { ...shared, count: 6, glyphs }) as unknown as DemoEngine;
+      return createKoi(canvas, { ...shared, count: count(6), glyphs }) as unknown as DemoEngine;
     case "city":
-      return createCity(canvas, shared) as unknown as DemoEngine;
+      return createCity(canvas, { ...shared, count: count(18) }) as unknown as DemoEngine;
     case "servers":
-      return createServers(canvas, shared) as unknown as DemoEngine;
+      return createServers(canvas, { ...shared, count: count(8) }) as unknown as DemoEngine;
   }
 }
 
@@ -283,29 +318,74 @@ function numeric(value: number | undefined) {
 export default function SceneDemo({
   scene = "dog",
   palette: initialPalette = "abyss",
+  glyphs: initialGlyphs = "ascii",
   seed = 7,
   columns = 110,
+  density = 1,
   speed = 1,
+  calm: initialCalm = false,
+  paused: initialPaused = false,
+  interactive: initialInteractive = true,
   className,
 }: SceneDemoProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<DemoEngine | null>(null);
   const [palette, setPalette] = useState<PaletteName>(initialPalette);
-  const [glyphs, setGlyphs] = useState<GlyphStyle>("ascii");
-  const [calm, setCalm] = useState(false);
-  const [paused, setPaused] = useState(false);
+  const [glyphs, setGlyphs] = useState<GlyphStyle>(initialGlyphs);
+  const [calm, setCalm] = useState(initialCalm);
+  const [paused, setPaused] = useState(initialPaused);
+  const [interactive, setInteractive] = useState(initialInteractive);
   const [stats, setStats] = useState<DemoStats | null>(null);
   const [echo, setEcho] = useState("yard@04 · awaiting command");
+  const [copied, setCopied] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [recordingGif, setRecordingGif] = useState(false);
   const reducedMotion = useReducedMotion();
   const effectiveCalm = calm || reducedMotion;
   const meta = SCENES[scene];
   const showGlyphSelector = scene === "sharks" || scene === "jellyfish" || scene === "koi";
 
   useEffect(() => {
+    setPalette(initialPalette);
+  }, [initialPalette]);
+
+  useEffect(() => {
+    setGlyphs(initialGlyphs);
+  }, [initialGlyphs]);
+
+  useEffect(() => {
+    setCalm(initialCalm);
+  }, [initialCalm]);
+
+  useEffect(() => {
+    setPaused(initialPaused);
+  }, [initialPaused]);
+
+  useEffect(() => {
+    setInteractive(initialInteractive);
+  }, [initialInteractive]);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = window.setTimeout(() => setCopied(false), 1600);
+    return () => window.clearTimeout(timer);
+  }, [copied]);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const engine = buildEngine(scene, canvas, palette, effectiveCalm, seed, columns, glyphs);
+    const engine = buildEngine(
+      scene,
+      canvas,
+      palette,
+      effectiveCalm,
+      seed,
+      columns,
+      glyphs,
+      density,
+      interactive,
+    );
     engine.setOptions({ speed });
     engineRef.current = engine;
 
@@ -318,13 +398,13 @@ export default function SceneDemo({
       engine.destroy();
       engineRef.current = null;
     };
-    // Palette and calm are applied live below; only the world identity or the
-    // glyph variant remounts.
-  }, [scene, seed, columns, glyphs]);
+    // Palette, speed, and calm are applied live below; world identity,
+    // density, glyph variant, and pointer support rebuild the engine.
+  }, [scene, seed, columns, glyphs, density, interactive]);
 
   useEffect(() => {
-    engineRef.current?.setOptions({ palette, calm: effectiveCalm, speed });
-  }, [palette, effectiveCalm, speed]);
+    engineRef.current?.setOptions({ palette, calm: effectiveCalm, speed, interactive });
+  }, [palette, effectiveCalm, speed, interactive]);
 
   useEffect(() => {
     const engine = engineRef.current;
@@ -433,6 +513,95 @@ export default function SceneDemo({
       ? "Scene paused. Press Resume to start the clock again."
       : meta.interaction;
 
+  const sharePreset = createScenePreset({
+    scene,
+    palette,
+    glyphs,
+    seed,
+    columns,
+    density,
+    speed,
+    calm,
+    paused,
+    interactive,
+  });
+  const sharePath = presetPath(sharePreset);
+
+  const copyShareLink = async () => {
+    const url = presetUrl(sharePreset);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch {
+      window.prompt("Copy this scene link", url);
+    }
+  };
+
+  const downloadPng = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `ascii-${scene}-${seed}.png`;
+      anchor.rel = "noopener";
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, "image/png");
+  };
+
+  const recordClip = async () => {
+    const canvas = canvasRef.current;
+    if (!canvas || recording || recordingGif) return;
+    setRecording(true);
+    setEcho("Recording a 4 second clip…");
+    try {
+      const { blob, extension } = await recordVideo(canvas, 4000);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `ascii-${scene}-${seed}.${extension}`;
+      anchor.rel = "noopener";
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setEcho("Clip downloaded.");
+    } catch (reason) {
+      setEcho(reason instanceof Error ? reason.message : "Could not record this scene.");
+    } finally {
+      setRecording(false);
+    }
+  };
+
+  const recordGifClip = async () => {
+    const canvas = canvasRef.current;
+    if (!canvas || recording || recordingGif) return;
+    setRecordingGif(true);
+    setEcho("Encoding a 3 second GIF…");
+    try {
+      const blob = await recordGif(canvas, { duration: 3000, fps: 12, maxWidth: 640 });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `ascii-${scene}-${seed}.gif`;
+      anchor.rel = "noopener";
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setEcho("GIF downloaded.");
+    } catch (reason) {
+      setEcho(reason instanceof Error ? reason.message : "Could not encode this scene.");
+    } finally {
+      setRecordingGif(false);
+    }
+  };
+
   return (
     <section
       className={["scene-demo", className].filter(Boolean).join(" ")}
@@ -478,6 +647,39 @@ export default function SceneDemo({
           >
             {effectiveCalm ? "Calm on" : "Calm off"}
           </button>
+          <button
+            type="button"
+            className="scene-demo-button"
+            aria-pressed={interactive}
+            onClick={() => setInteractive((value) => !value)}
+          >
+            {interactive ? "Pointer on" : "Pointer off"}
+          </button>
+          <button type="button" className="scene-demo-button" onClick={() => void copyShareLink()}>
+            {copied ? "Copied" : "Copy link"}
+          </button>
+          <button type="button" className="scene-demo-button" onClick={downloadPng}>
+            PNG
+          </button>
+          <button
+            type="button"
+            className="scene-demo-button"
+            onClick={() => void recordClip()}
+            disabled={recording || recordingGif}
+          >
+            {recording ? "Recording…" : "Record video"}
+          </button>
+          <button
+            type="button"
+            className="scene-demo-button"
+            onClick={() => void recordGifClip()}
+            disabled={recording || recordingGif}
+          >
+            {recordingGif ? "Encoding GIF…" : "Record GIF"}
+          </button>
+          <a className="scene-demo-button" href={sharePath}>
+            Open in playground
+          </a>
         </div>
       </div>
 
@@ -511,9 +713,9 @@ export default function SceneDemo({
       />
 
       <p className="scene-demo-note">
-        Seed <code>{seed}</code>, columns <code>{columns}</code>, and speed <code>{speed}</code> are
-        fixed in this demo. The palette and calm controls update the running engine without
-        rebuilding the world.
+        Seed <code>{seed}</code>, columns <code>{columns}</code>, density <code>{density}×</code>,
+        and pointer support rebuild the world. Palette, speed, and calm update the running engine
+        live. The share buttons restore this exact configuration in the playground.
       </p>
     </section>
   );

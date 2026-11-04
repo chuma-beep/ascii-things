@@ -83,6 +83,12 @@ const defaultScene = findCompositionScene(DEFAULT_COMPOSITION_SCENE);
               <button type="button" data-composition-download>
                 Download HTML
               </button>
+              <button type="button" data-composition-share>
+                Copy link
+              </button>
+              <button type="button" data-composition-open>
+                Open in playground
+              </button>
               {surface.id === "immersive" && (
                 <a href="/lagoon-lab/">Open immersive demo <span aria-hidden="true">↗</span></a>
               )}
@@ -111,6 +117,12 @@ const defaultScene = findCompositionScene(DEFAULT_COMPOSITION_SCENE);
     findCompositionScene,
     findCompositionSurface,
   } from "../data/compositions";
+  import {
+    createScenePreset,
+    isSceneId,
+    presetPath,
+    presetUrl,
+  } from "../lib/presets";
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let sceneLoader: Promise<unknown> | undefined;
@@ -287,6 +299,26 @@ const defaultScene = findCompositionScene(DEFAULT_COMPOSITION_SCENE);
     sourceHost.append(source);
   };
 
+  const compositionPreset = (
+    scene: ReturnType<typeof findCompositionScene>,
+    surface: ReturnType<typeof findCompositionSurface>,
+  ) => {
+    if (!isSceneId(scene.id)) return null;
+    const attributes = compositionAttributes(scene, surface);
+    return createScenePreset({
+      scene: scene.id,
+      palette: surface.palette,
+      glyphs: "ascii",
+      seed: Number(attributes.seed ?? 7),
+      columns: Number(attributes.columns ?? 110),
+      density: Number(attributes.density ?? 1),
+      speed: 1,
+      calm: "calm" in scene.attributes,
+      paused: false,
+      interactive: scene.attributes.interactive !== "false",
+    });
+  };
+
   const initStage = (root: HTMLElement) => {
     const panels = [...root.querySelectorAll<HTMLElement>("[data-composition-panel]")];
     const picks = [...root.querySelectorAll<HTMLButtonElement>("[data-composition-pick]")];
@@ -328,7 +360,13 @@ const defaultScene = findCompositionScene(DEFAULT_COMPOSITION_SCENE);
         pick.classList.toggle("is-active", active);
         pick.setAttribute("aria-pressed", active ? "true" : "false");
       }
-      for (const panel of panels) panel.dataset.scene = current;
+      for (const panel of panels) {
+        panel.dataset.scene = current;
+        const share = panel.querySelector<HTMLButtonElement>("[data-composition-share]");
+        const open = panel.querySelector<HTMLButtonElement>("[data-composition-open]");
+        if (share) share.hidden = !isSceneId(current);
+        if (open) open.hidden = !isSceneId(current);
+      }
       if (mounted) mount();
     };
 
@@ -339,7 +377,37 @@ const defaultScene = findCompositionScene(DEFAULT_COMPOSITION_SCENE);
     for (const panel of panels) {
       const prompt = panel.querySelector<HTMLButtonElement>("[data-composition-prompt]");
       const download = panel.querySelector<HTMLButtonElement>("[data-composition-download]");
+      const share = panel.querySelector<HTMLButtonElement>("[data-composition-share]");
+      const open = panel.querySelector<HTMLButtonElement>("[data-composition-open]");
       const surfaceId = panel.dataset.surface ?? COMPOSITION_SURFACES[0].id;
+
+      const syncShare = () => {
+        const preset = compositionPreset(
+          findCompositionScene(panel.dataset.scene ?? current),
+          findCompositionSurface(surfaceId),
+        );
+        if (share) share.hidden = !preset;
+        if (open) open.hidden = !preset;
+      };
+      syncShare();
+
+      share?.addEventListener("click", async () => {
+        const preset = compositionPreset(
+          findCompositionScene(panel.dataset.scene ?? current),
+          findCompositionSurface(surfaceId),
+        );
+        if (!preset) return;
+        const label = share.textContent ?? "Copy link";
+        flash(share, label, (await copyText(presetUrl(preset))) ? "Copied" : "Failed");
+      });
+
+      open?.addEventListener("click", () => {
+        const preset = compositionPreset(
+          findCompositionScene(panel.dataset.scene ?? current),
+          findCompositionSurface(surfaceId),
+        );
+        if (preset) window.location.href = presetPath(preset);
+      });
 
       prompt?.addEventListener("click", async () => {
         const text = compositionPrompt(

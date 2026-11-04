@@ -1,16 +1,25 @@
 ---
 title: Playground
-description: Switch scenes, seed the world, and change columns and speed live.
+description: Compose a scene or surface, save presets, and share the exact configuration as a URL.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 import Playground from "@components/Playground";
 
-This playground is a single React island for the ten classic scenes. It uses the vanilla engines
-so the readout can poll `getStats()` and the scene can be remounted when the seed or column count
-changes.
+This playground composes the ten classic scenes. It uses the vanilla engines so the readout can
+poll `getStats()` and the scene can be remounted when a structural option changes. Every control
+is part of the URL preset, and the generated vanilla, React, and custom-element snippets update
+with it.
 
 <Playground client:load />
+
+The [surface playground](/surface-playground/) is the same idea for the shader-backed WebGL
+family: choose a variant, density, cell size, speed, glyph ramp, and colours. Use the
+[social card studio](/social-card/) to bake any scene into a 1200 × 630 PNG. Scene demos and the
+surface composer also capture a three-second looping GIF and a four-second video from the live
+canvas. Video capture uses a real H.264 MP4 encoded with WebCodecs when the browser supports it,
+then falls back to WebM (or the browser's MP4 MediaRecorder path); the composition tabs expose the
+same Copy link / Open in playground pair as the standalone demos.
 
 ## What the controls do
 
@@ -18,14 +27,34 @@ changes.
 | --- | --- |
 | Scene tabs | Swaps the engine and remounts the demo |
 | Palette tabs | Calls `setOptions({ palette })` on the running engine |
+| Glyph style | Remounts with the ASCII or kanji renderer |
 | Seed | Remounts with a new world |
-| Columns | Remounts with a new art-direction target |
+| Cell size / columns | Remounts with a new art-direction target |
+| Density | Scales the population and remounts |
 | Speed | Calls `setOptions({ speed })` live; `0` freezes |
 | Pause / Resume | Calls `pause()` / `resume()` |
 | Calm | Calls `setOptions({ calm })`; removes flicker and sparkle |
+| Pointer | Enables or disables canvas pointer interaction |
+| Copy link | Copies the current URL preset |
+| Save preset | Stores the configuration in this browser |
 
-The palette and calm controls are inside the demo component; seed, columns, and speed are
-owned by the page-level playground.
+The palette, speed, calm, and pointer controls are applied live; seed, columns, density, glyph
+style, and scene identity remount the engine.
+
+## Share a preset
+
+The URL stores a compact `p=` parameter. It contains the scene, palette, glyph family, seed, cell
+size, density, speed, calm, pause, and pointer state, plus the sampled preset versions used by the
+image and surface labs. Open a copied link and the playground restores the configuration before it
+starts writing new state.
+
+```text
+/playground/?p=eyJ2IjoxLCJraW5kIjoic2NlbmUiLCJzY2VuZSI6ImRvZyIsInBhbGV0dGUiOiJhbWJlciIsInNlZWQiOjd9
+/surface-playground/?p=eyJ2IjoxLCJraW5kIjoic3VyZmFjZSIsInZhcmlhbnQiOiJnbG9iZSIsImRlbnNpdHkiOjAuM30
+```
+
+The older query keys (`scene`, `palette`, `seed`, `columns`, `speed`, `calm`, `interactive`) are
+still accepted when you paste a legacy example URL.
 
 <Aside type="note" title="Reduced motion">
 When your OS asks for reduced motion, the island detects it on the client, turns calm on, and
