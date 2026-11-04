@@ -12,6 +12,7 @@ import { renderAsciiImage, type AsciiImageResult } from "ascii-things/image";
 import ImageCrop from "./ImageCrop";
 import { createDemoCanvas } from "../lib/image/demo";
 import {
+  ansiFromResult,
   buildZip,
   canvasToBlob,
   downloadBlob,
@@ -26,6 +27,8 @@ import {
   MAX_FILES,
   MAX_FILE_BYTES,
   RAMPS,
+  STUDIO_PALETTES,
+  fitCrop,
   normalizeCrop,
   safeBaseName,
   type CropRect,
@@ -225,10 +228,13 @@ export default function ImageStudio() {
   const [exporting, setExporting] = useState<string | null>(null);
   const [batchProgress, setBatchProgress] = useState<string | null>(null);
   const [previewWidth, setPreviewWidth] = useState(900);
+  const [comparing, setComparing] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewWrapRef = useRef<HTMLDivElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const compareARef = useRef<HTMLCanvasElement>(null);
+  const compareBRef = useRef<HTMLCanvasElement>(null);
   const objectUrlsRef = useRef(new Set<string>());
   const initializedRef = useRef(false);
   const sourcesRef = useRef<StudioSource[]>([]);
@@ -455,6 +461,28 @@ export default function ImageStudio() {
   }, [activeSource, options, previewWidth]);
 
   useEffect(() => {
+    if (!comparing || !activeSource) return;
+    const left = compareARef.current;
+    const right = compareBRef.current;
+    if (!left || !right) return;
+    let cancelled = false;
+    const secondDither = options.dither === "none" ? "bayer" : options.dither;
+    void (async () => {
+      try {
+        await Promise.all([
+          renderInto(left, activeSource, { ...options, dither: "none" }, 360, 2),
+          renderInto(right, activeSource, { ...options, dither: secondDither }, 360, 2),
+        ]);
+      } catch (reason) {
+        if (!cancelled) setRenderError(errorMessage(reason));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [comparing, activeSource, options]);
+
+  useEffect(() => {
     return () => {
       for (const source of sourcesRef.current) disposeSource(source);
     };
@@ -658,6 +686,20 @@ export default function ImageStudio() {
     }
   };
 
+  const downloadAnsi = async () => {
+    if (!activeSource) return;
+    setExporting("ansi");
+    try {
+      const { result } = await renderSource(activeSource, options, 1400, 2);
+      downloadText(ansiFromResult(result), `${safeBaseName(activeSource.name)}-ascii.ans`);
+      setNotice("ANSI downloaded.");
+    } catch (reason) {
+      setError(errorMessage(reason));
+    } finally {
+      setExporting(null);
+    }
+  };
+
   const downloadPng = async () => {
     if (!activeSource) return;
     setExporting("png");
@@ -709,6 +751,7 @@ export default function ImageStudio() {
           const { canvas, result } = await renderSource(source, options, 1400, 2);
           const base = uniqueBaseName(`${safeBaseName(source.name)}-ascii`, used);
           files[`text/${base}.txt`] = encoder.encode(result.text);
+          files[`ansi/${base}.ans`] = encoder.encode(ansiFromResult(result));
           const png = await canvasToBlob(canvas);
           files[`png/${base}.png`] = new Uint8Array(await png.arrayBuffer());
           files[`svg/${base}.svg`] = encoder.encode(buildSvg(result, options, source.name));
@@ -840,6 +883,25 @@ export default function ImageStudio() {
                   display={`${cropZoom.toFixed(1)}×`}
                   onChange={setCropZoom}
                 />
+                <div className="studio-preset-row">
+                  {[
+                    { label: "Full", ratio: activeSource.width / activeSource.height },
+                    { label: "Square", ratio: 1 },
+                    { label: "16:9", ratio: 16 / 9 },
+                    { label: "4:5", ratio: 4 / 5 },
+                  ].map((fit) => (
+                    <button
+                      key={fit.label}
+                      type="button"
+                      className="studio-chip"
+                      onClick={() =>
+                        updateCrop(fitCrop(activeSource.width, activeSource.height, fit.ratio))
+                      }
+                    >
+                      {fit.label}
+                    </button>
+                  ))}
+                </div>
                 <div className="studio-source-actions">
                   <button type="button" onClick={() => fileInputRef.current?.click()}>
                     {mode === "batch" ? "Add images" : "Replace image"}
@@ -1118,6 +1180,30 @@ export default function ImageStudio() {
                   onChange={(checked) => updateOption({ transparent: checked })}
                   hint="PNG and SVG exports keep the alpha channel."
                 />
+                <div className="studio-preset-row">
+                  {STUDIO_PALETTES.map((preset) => (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      className="studio-chip"
+                      aria-pressed={
+                        options.foreground === preset.foreground &&
+                        options.background === preset.background
+                      }
+                      onClick={() =>
+                        updateOption({
+                          foreground: preset.foreground,
+                          background: preset.background,
+                          transparent: false,
+                          color: false,
+                        })
+                      }
+                      title={preset.note}
+                    >
+                      {preset.name}
+                    </button>
+                  ))}
+                </div>
               </fieldset>
             </div>
 
@@ -1215,6 +1301,21 @@ export default function ImageStudio() {
                 ) : null}
               </div>
 
+              {comparing ? (
+                <div className="studio-compare">
+                  <figure>
+                    <canvas ref={compareARef} aria-label="No dither preview" />
+                    <figcaption>No dither</figcaption>
+                  </figure>
+                  <figure>
+                    <canvas ref={compareBRef} aria-label="Selected dither preview" />
+                    <figcaption>
+                      {options.dither === "none" ? "Bayer" : options.dither.replace(/-/g, " ")}
+                    </figcaption>
+                  </figure>
+                </div>
+              ) : null}
+
               <div className="studio-stats" aria-live="polite">
                 <span>
                   <b>{activeResult?.columns ?? "—"}</b> cols
@@ -1260,6 +1361,20 @@ export default function ImageStudio() {
                   disabled={!activeSource || !activeResult || rendering || exporting !== null}
                 >
                   {exporting === "svg" ? "Preparing…" : "SVG"}
+                </button>
+                <button
+                  type="button"
+                  onClick={downloadAnsi}
+                  disabled={!activeSource || !activeResult || rendering || exporting !== null}
+                >
+                  {exporting === "ansi" ? "Preparing…" : "ANSI"}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={comparing}
+                  onClick={() => setComparing((value) => !value)}
+                >
+                  {comparing ? "Hide compare" : "Compare dithers"}
                 </button>
               </div>
             </>
@@ -1337,8 +1452,8 @@ export default function ImageStudio() {
           </div>
           {batchProgress ? <p className="studio-busy">{batchProgress}</p> : null}
           <p className="studio-hint">
-            Batch exports one TXT, PNG, and SVG per image inside a ZIP. Settings and crop apply per
-            image.
+            Batch exports one TXT, ANSI, PNG, and SVG per image inside a ZIP. Settings and crop
+            apply per image.
           </p>
         </section>
       ) : null}

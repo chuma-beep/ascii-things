@@ -1,0 +1,195 @@
+---
+title: Vue usage
+description: Use the Vue 3 wrappers or the useAsciiScene composable, with the same scene contract as React.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The optional Vue entry mirrors the React wrappers. It renders a single canvas, starts the
+scene after mount, and keeps the engine out of server rendering. Vue is an optional peer,
+so the package still installs without it.
+
+<Aside type="note" title="Vue 3.3+">
+The wrappers use `MaybeRefOrGetter` and `toValue`. Both are available in Vue 3.3 and newer.
+</Aside>
+
+## Import
+
+```ts
+import {
+  AsciiDog,
+  AsciiJellyfish,
+  AsciiLagoon,
+  AsciiLagoonDay,
+  AsciiLagoonNight,
+  AsciiLagoonTurtle,
+  AsciiLagoonManta,
+  AsciiLagoonSeahorse,
+  AsciiLagoonDolphin,
+  AsciiLagoonHammerhead,
+  AsciiLagoonTang,
+  AsciiRobots,
+  AsciiSharks,
+} from "ascii-things/vue";
+```
+
+`AsciiOcean` is a back-compat alias for `AsciiSharks`. The ambient scenes are exported as
+`AsciiStarlings`, `AsciiFireflies`, `AsciiAnts`, `AsciiKoi`, `AsciiCity`, and
+`AsciiServers`.
+
+```vue
+<script setup lang="ts">
+import { AsciiDog } from "ascii-things/vue";
+</script>
+
+<template>
+  <div style="height: 420px">
+    <AsciiDog
+      palette="paper"
+      :seed="7"
+      label="A live ASCII robot dog test yard"
+      @ready="(scene) => scene.trigger('throwBall', 600, 360)"
+    />
+  </div>
+</template>
+```
+
+The wrappers accept the same options as the vanilla scene factories plus `width`, `height`,
+`aspectRatio`, `id`, `className`, `style`, `onReady`, and the `ready` event. `class` and
+`style` fall through to the canvas. The canvas gets `ascii-things` and `ascii-<scene>`
+classes, so you can target it from CSS.
+
+## Sizing
+
+The canvas fills its parent by default. Give the parent a height or use `aspectRatio`:
+
+```vue
+<div style="aspect-ratio: 16 / 9">
+  <AsciiDog palette="abyss" :seed="7" />
+</div>
+
+<AsciiDog palette="abyss" :seed="7" aspect-ratio="16 / 9" />
+```
+
+`aspectRatio` sets CSS `aspect-ratio` and switches the height to `auto`. Pass `height` when
+the canvas should own the box.
+
+## Live and structural props
+
+The Vue wrappers use the same split as React: palette, speed, quality, labels, and pause
+update the running engine; structural fields such as `seed`, rosters, `variant`, and `scale`
+remount it. Hoist roster arrays in a `ref` or `shallowRef` so a new literal is not created on
+every render.
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { AsciiSharks } from "ascii-things/vue";
+import type { SharkSpec } from "ascii-things/sharks";
+
+const sharks = ref<SharkSpec[]>([
+  { kind: "hammerhead", size: 1 },
+  { kind: "mako", size: 0.8 },
+]);
+</script>
+
+<template>
+  <AsciiSharks :sharks="sharks" :seed="42" palette="abyss" />
+</template>
+```
+
+## The composable
+
+Use `useAsciiScene` when you want to own the canvas element, build a custom control panel, or
+compose a custom simulation. It is the Vue equivalent of `useSimulation`.
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { createDog } from "ascii-things/dog";
+import { useAsciiScene } from "ascii-things/core/vue";
+
+const seed = ref(7);
+const { canvasRef, scene, stats, refresh } = useAsciiScene({
+  create: createDog,
+  options: () => ({ seed: seed.value, palette: "paper" }),
+  remountKey: () => String(seed.value),
+  onReady: (dog) => console.log("ready", dog.getStats()),
+});
+</script>
+
+<template>
+  <canvas ref="canvasRef" style="display: block; width: 100%; height: 420px" />
+  <p>{{ stats?.fps }} fps · {{ stats?.cells }} cells</p>
+</template>
+```
+
+The composable returns:
+
+| Field | Meaning |
+| --- | --- |
+| `canvasRef` | Template ref for the canvas |
+| `scene` | Shallow ref with the live `SceneHandle`, or `null` before mount |
+| `stats` | Latest sampled stats, or `null` |
+| `refresh()` | Sample stats immediately instead of waiting for the interval |
+
+`statsInterval` defaults to `500` milliseconds. Set it to `0` to disable polling. The engine
+is created in `onMounted` and destroyed in `onBeforeUnmount`, so server rendering only emits
+the canvas markup.
+
+## Image, dither, and WebGL
+
+Each surface has its own Vue entry:
+
+```vue
+<script setup lang="ts">
+import { AsciiImage } from "ascii-things/image/vue";
+import { AsciiDither } from "ascii-things/dither/vue";
+import { AsciiSurface } from "ascii-things/webgl/vue";
+</script>
+
+<template>
+  <AsciiImage src="/portrait.png" :columns="96" alt="Portrait in ASCII" />
+
+  <AsciiDither text="ASCII-THINGS" label="A dither field" />
+
+  <AsciiSurface variant="globe" text="ASCII-THINGS" label="A WebGL ASCII globe" />
+</template>
+```
+
+`AsciiImage` emits `render` with the `AsciiImageResult` and `error` if loading or rendering
+fails. `AsciiDither` and `AsciiSurface` accept their vanilla option objects; the surface
+recreates its engine when an option changes, matching the React adapter.
+
+## Custom elements instead
+
+If you do not need Vue state or callbacks, the custom-element entry is smaller and requires no
+adapter:
+
+```vue
+<script setup>
+import "ascii-things/element";
+</script>
+
+<template>
+  <ascii-dog palette="abyss" seed="7" style="display: block; height: 420px"></ascii-dog>
+</template>
+```
+
+Tell the Vue compiler that `ascii-*` tags are custom elements if it warns about unknown tags.
+
+## Server rendering
+
+The components are safe to render on the server. They emit a canvas and create the scene in
+`onMounted`. For Nuxt, render the wrapper inside a client-only boundary if the surrounding
+layout needs the scene to start immediately; otherwise the canvas appears and starts after
+hydration.
+
+A fixed `seed` keeps hydration deterministic. With no seed, the engine chooses a random world
+on the client.
+
+## Next
+
+- [React usage](/guide/react/) for the shared sizing and remount contract.
+- [Custom elements](/guide/custom-elements/) for the framework-free path.
+- [API reference](/api/) for every scene option.

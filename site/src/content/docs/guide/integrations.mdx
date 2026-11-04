@@ -156,7 +156,32 @@ import { AsciiDog } from "ascii-things/react";
 `client:visible` is the right default for scenes below the fold. The scene stays out of the
 hydration path until it is close to the viewport.
 
-## Vue, Svelte, and plain HTML
+## Vue
+
+The optional Vue entry ships typed wrappers and a composable. It uses the same scene
+contract as React, including live versus structural props and a ready event.
+
+```vue title="src/components/ScenePanel.vue"
+<script setup lang="ts">
+import { AsciiDog } from "ascii-things/vue";
+</script>
+
+<template>
+  <div class="h-[420px] rounded-xl border border-white/10 bg-black">
+    <AsciiDog
+      palette="abyss"
+      :seed="7"
+      label="A robot dog in a test yard"
+      @ready="(scene) => scene.trigger('throwBall', 600, 360)"
+    />
+  </div>
+</template>
+```
+
+For custom controls, use `useAsciiScene` from `ascii-things/core/vue`. See
+[Vue usage](/guide/vue/) for the composable and the image, dither, and WebGL entries.
+
+## Svelte and plain HTML
 
 The custom-element entry registers every scene tag and works without a framework runtime.
 
@@ -175,17 +200,18 @@ The custom-element entry registers every scene tag and works without a framework
 </div>
 ```
 
-In Vue or Svelte, import the same module once in the app entry or the component that uses the
-tag. Follow the framework's custom-element configuration if its compiler needs to be told that
-`ascii-*` is a custom element.
+In Svelte, import the module once in the app entry or the component that uses the tag. Follow
+the framework's custom-element configuration if its compiler needs to be told that `ascii-*` is
+a custom element.
 
 ## Choosing the right adapter
 
 | You need | Use |
 | --- | --- |
 | React state, callbacks, and the UI components | `ascii-things/react` + `ascii-things/ui` |
+| Vue state, callbacks, and a composable | `ascii-things/vue` + `ascii-things/core/vue` |
 | Astro islands without a framework runtime | `ascii-things/element` |
-| Vue, Svelte, or static HTML | `ascii-things/element` |
+| Svelte or static HTML | `ascii-things/element` |
 | A vanilla canvas and engine handle | `create*` from a scene subpath, such as `ascii-things/dog` |
 | Image, dither, or WebGL surfaces | `ascii-things/image`, `ascii-things/dither`, `ascii-things/webgl` |
 

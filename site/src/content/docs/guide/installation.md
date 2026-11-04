@@ -7,8 +7,9 @@ description: Install ascii-things, pick the right subpath, and load the optional
 
 - A modern browser with canvas, `ResizeObserver`, and `IntersectionObserver`.
 - **React 18 or newer** only if you use `ascii-things/react` or `ascii-things/ui`.
+- **Vue 3.3 or newer** only if you use `ascii-things/vue` or the Vue surface entries.
 - **Node 22 or newer** for building from source. The docs site uses the same version.
-- No runtime dependencies. React and React DOM are optional peers.
+- No runtime dependencies. React, React DOM, and Vue are optional peers.
 
 :::note
 `ascii-things@1.0.0` is published on npm. The CDN examples below load the published
@@ -32,6 +33,12 @@ copy:
 
 ```sh
 npm install react react-dom
+```
+
+For Vue, install Vue in the host app. The package does not bundle a second copy:
+
+```sh
+npm install vue
 ```
 
 ## Build from this repository
@@ -71,17 +78,22 @@ Import only the scene you need. Every scene has its own subpath, which keeps the
 | `ascii-things/servers` | `createServers`, ambient types |
 | `ascii-things/core` | `createSimulation`, `SceneRuntime`, core types |
 | `ascii-things/core/react` | `useSimulation` |
+| `ascii-things/core/vue` | `useAsciiScene` |
 | `ascii-things/rendering` | `CellGrid`, `paintGrid`, palettes, and math helpers |
 | `ascii-things/image` | `imageToAscii`, `pixelsToAscii`, `renderAsciiImage`, charsets |
 | `ascii-things/image/react` | React image wrapper |
+| `ascii-things/image/vue` | Vue image wrapper |
 | `ascii-things/image/element` | `<ascii-image>` custom element |
 | `ascii-things/dither` | `DitherField`, `ditherThreshold`, `shouldDither`, matrices |
 | `ascii-things/dither/react` | React dither wrapper |
+| `ascii-things/dither/vue` | Vue dither wrapper |
 | `ascii-things/dither/element` | `<ascii-dither>` custom element |
 | `ascii-things/webgl` | `AsciiSurfaceEngine`, surface helpers |
 | `ascii-things/webgl/react` | React WebGL surface wrapper |
+| `ascii-things/webgl/vue` | Vue WebGL surface wrapper |
 | `ascii-things/webgl/element` | `<ascii-surface>` custom element |
 | `ascii-things/react` | React wrappers for every scene |
+| `ascii-things/vue` | Vue wrappers for every scene |
 | `ascii-things/element` | Registers every `<ascii-*>` scene element |
 | `ascii-things/ui` | `AsciiStage`, `AsciiPrompt`, `AsciiReadout`, `AsciiSceneTabs`, `AsciiDogHero` |
 | `ascii-things/ui.css` | Styles for the optional UI layer |
@@ -112,6 +124,24 @@ If you use the first-party UI components, import the stylesheet once:
 ```tsx
 import "ascii-things/ui.css";
 ```
+
+## Vue
+
+```vue
+<script setup lang="ts">
+import { AsciiDog } from "ascii-things/vue";
+</script>
+
+<template>
+  <div style="height: 420px">
+    <AsciiDog palette="paper" :seed="7" label="A live ASCII robot dog test yard" />
+  </div>
+</template>
+```
+
+The Vue wrappers fill their parent, use the same live/structural option split as React, and
+expose a `ready` event plus an `onReady` prop. Use `ascii-things/core/vue` for the
+`useAsciiScene` composable. See [Vue usage](/guide/vue/) for the full contract.
 
 ## Plain HTML / element bundle
 

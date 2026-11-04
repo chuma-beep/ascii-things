@@ -1,3 +1,4 @@
+import type { AsciiImageResult } from "ascii-things/image";
 import { safeBaseName } from "./types";
 
 export function downloadBlob(blob: Blob, filename: string) {
@@ -41,4 +42,46 @@ export async function buildZip(files: Record<string, Uint8Array>): Promise<Blob>
   const { zipSync } = await import("fflate");
   const bytes = zipSync(files, { level: 6 });
   return new Blob([bytes as BlobPart], { type: "application/zip" });
+}
+
+function parseColor(value: string): [number, number, number] | null {
+  const rgb = value.match(/^rgb\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)\s*\)$/i);
+  if (rgb) return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+
+  const hex = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (!hex) return null;
+  const raw = hex[1];
+  if (raw.length === 3) {
+    return [raw[0], raw[1], raw[2]].map((part) => Number.parseInt(part + part, 16)) as [
+      number,
+      number,
+      number,
+    ];
+  }
+  return [
+    Number.parseInt(raw.slice(0, 2), 16),
+    Number.parseInt(raw.slice(2, 4), 16),
+    Number.parseInt(raw.slice(4, 6), 16),
+  ];
+}
+
+/** Truecolor ANSI art, one escape sequence per visible cell and a reset per row. */
+export function ansiFromResult(result: AsciiImageResult): string {
+  let cursor = 0;
+  return result.text
+    .split("\n")
+    .map((line) => {
+      let row = "";
+      for (const character of line) {
+        const color = parseColor(result.colors[cursor] ?? "");
+        cursor += 1;
+        if (!color) {
+          row += character;
+          continue;
+        }
+        row += `\u001b[38;2;${color[0]};${color[1]};${color[2]}m${character}`;
+      }
+      return `${row}\u001b[0m`;
+    })
+    .join("\n");
 }

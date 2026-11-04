@@ -1,0 +1,173 @@
+---
+title: Recipes
+description: Short, copy-paste recipes for heroes, cards, footers, React, custom elements, SSR, theming, and image or dither surfaces.
+---
+
+These are the smallest useful integrations. Every recipe is framework-light: the scene owns a
+canvas, the host owns layout, and nothing starts until the canvas is on screen.
+
+## Hero in five minutes
+
+```tsx
+import { AsciiSharks } from "ascii-things/react";
+import "ascii-things/ui.css";
+
+export function Hero() {
+  return (
+    <section style={{ position: "relative", height: "70vh", background: "#000" }}>
+      <AsciiSharks
+        palette="abyss"
+        seed={42}
+        label="A live ASCII shark tank"
+        style={{ height: "100%" }}
+      />
+    </section>
+  );
+}
+```
+
+Give the canvas a height. `AsciiSharks` fills its parent by default; use `aspectRatio` when the
+parent should derive its height.
+
+## Card
+
+```tsx
+import { AsciiDog } from "ascii-things/react";
+
+export function Card() {
+  return (
+    <article style={{ border: "1px solid #222", background: "#08090a" }}>
+      <div style={{ height: 220 }}>
+        <AsciiDog palette="amber" seed={7} />
+      </div>
+      <div style={{ padding: 16 }}>
+        <h3>Test yard</h3>
+        <p>One robot dog, one ball, one reproducible seed.</p>
+      </div>
+    </article>
+  );
+}
+```
+
+## Footer
+
+Use the zero-dependency box footer from the registry or the `ascii-things/ui` surface primitives.
+The footer example is dependency-free and can be copied into any host:
+
+```ts
+import { mountAsciiBoxFooter } from "./ascii-box-footer";
+
+mountAsciiBoxFooter(document.querySelector("#footer")!);
+```
+
+See [ASCII box footer](/components/ascii-box-footer/) for the registry item.
+
+## React
+
+```tsx
+import { AsciiKoi } from "ascii-things/react";
+
+export function Pond() {
+  return (
+    <div style={{ height: 420 }}>
+      <AsciiKoi palette="paper" seed={19} glyphs="kanji" />
+    </div>
+  );
+}
+```
+
+Live options (`palette`, `speed`, `calm`, label) update the running engine. Structural options
+(`seed`, `count`, rosters, `variant`, `columns`, glyph family) remount it.
+
+## Custom element
+
+```html
+<script type="module">
+  import "ascii-things/element";
+</script>
+
+<ascii-dog
+  palette="blueprint"
+  seed="7"
+  calm
+  label="A robot dog test yard"
+  style="display: block; width: 100%; height: 420px"
+></ascii-dog>
+```
+
+Custom elements are the smallest adapter and work in Vue, Svelte, Astro, and plain HTML.
+See [custom elements](/guide/custom-elements/) for every tag and attribute.
+
+## SSR
+
+The scene and surface wrappers are safe to import and render on the server. Pick a seed so the
+client world is reproducible, then let the engine start after hydration.
+
+```tsx
+import { AsciiJellyfish } from "ascii-things/react";
+
+export function Bloom() {
+  return <AsciiJellyfish seed={11} palette="neon" label="A jellyfish bloom" />;
+}
+```
+
+For a custom simulation, use `useSimulation` from `ascii-things/core/react` or `useAsciiScene`
+from `ascii-things/core/vue`. Both create the engine in an effect/`onMounted`, never during render.
+
+## Theming
+
+Palettes are semantic. Pass a name for the built-in look, or a complete palette object when the
+design system owns the colours.
+
+```ts
+import { PALETTES, resolvePalette } from "ascii-things/rendering";
+
+const palette = resolvePalette("auto"); // follows prefers-color-scheme
+const amber = PALETTES.amber;            // named preset
+```
+
+Named presets: `abyss`, `neon`, `mono`, `paper`, `amber`, `blueprint`, `newsprint`, `terminal`.
+
+## Image to ASCII
+
+```ts
+import { renderAsciiImage } from "ascii-things/image";
+
+const result = await renderAsciiImage(canvas, file, {
+  columns: 96,
+  charset: " .:-=+*#%@",
+  dither: "bayer",
+  foreground: "#ece8df",
+  background: "#070809",
+});
+
+console.log(result.text);
+```
+
+The [image studio](/image/) adds drag-and-drop, crop presets, dither comparison, palette presets,
+TXT/ANSI/PNG/SVG export, and batch ZIP output.
+
+## Dither and WebGL surfaces
+
+```tsx
+import { AsciiDither } from "ascii-things/dither/react";
+import { AsciiSurface } from "ascii-things/webgl/react";
+
+export function Surfaces() {
+  return (
+    <>
+      <AsciiDither text="ASCII-THINGS" matrix="bayer4" speed={0.8} />
+      <AsciiSurface variant="globe" density={0.3} cell={5} />
+    </>
+  );
+}
+```
+
+Both entries have React, Vue, custom-element, and vanilla forms. The WebGL surface falls back to a
+2D glyph field when a context cannot be created.
+
+## Share a configuration
+
+The [playground](/playground/) writes every control into the URL as a base64url `p` parameter.
+Copy the link from any demo, or open `/playground/?p=…` directly. The surface equivalent lives at
+`/surface-playground/?p=…`.

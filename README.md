@@ -18,7 +18,8 @@ canvas. The collection keeps growing. Zero runtime dependencies. MIT.
 
 The optional `ascii-things/ui` subpath adds a framed stage, command input, live
 readout, scene tabs, panels, toolbars, status readouts, and ready-made scene
-heroes for React hosts.
+heroes for React hosts. The optional `ascii-things/vue` entry mirrors the scene,
+image, dither, and WebGL wrappers for Vue 3.3+.
 
 Each scene is a small artificial-life simulation, not a looped animation.
 Sharks hunt fish that spread alarm through the school. Robots patrol, scan,
@@ -338,6 +339,76 @@ Each wrapper also accepts `id`, `aspectRatio` (for example `"16 / 9"` or a
 number), and `onReady(scene)`, which fires after the scene engine mounts. Use
 `paused` to start with the clock stopped and `fontFamily` to override the
 canvas font stack.
+
+## Vue
+
+The optional Vue 3.3+ entry mirrors the React wrappers and ships a composable.
+Vue is an optional peer; the package still installs without it.
+
+```vue
+<script setup lang="ts">
+import { AsciiDog } from "ascii-things/vue";
+</script>
+
+<template>
+  <div style="height: 420px">
+    <AsciiDog
+      palette="paper"
+      :seed="7"
+      label="A live ASCII robot dog test yard"
+      @ready="(scene) => scene.trigger('throwBall', 600, 360)"
+    />
+  </div>
+</template>
+```
+
+The named components are `AsciiSharks`/`AsciiOcean`, `AsciiRobots`,
+`AsciiJellyfish`, `AsciiDog`, `AsciiStarlings`, `AsciiFireflies`, `AsciiAnts`,
+`AsciiKoi`, `AsciiCity`, `AsciiServers`, `AsciiLagoon`, and the eight named
+Lagoon presets. Image, dither, and WebGL wrappers live at
+`ascii-things/image/vue`, `ascii-things/dither/vue`, and
+`ascii-things/webgl/vue`.
+
+For custom controls, use `useAsciiScene` from `ascii-things/core/vue`:
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { createDog } from "ascii-things/dog";
+import { useAsciiScene } from "ascii-things/core/vue";
+
+const seed = ref(7);
+const { canvasRef, stats } = useAsciiScene({
+  create: createDog,
+  options: () => ({ seed: seed.value, palette: "paper" }),
+  remountKey: () => String(seed.value),
+});
+</script>
+
+<template>
+  <canvas ref="canvasRef" style="display: block; width: 100%; height: 420px" />
+  <p>{{ stats?.fps }} fps</p>
+</template>
+```
+
+The composable is SSR-safe: it creates the engine in `onMounted` and destroys it
+in `onBeforeUnmount`. The wrappers follow the same live-versus-structural
+contract as React.
+
+## Playground and share links
+
+The docs playground composes every classic scene: palette, glyph family, seed, cell size,
+density, speed, calm, pause, and pointer state. Each control is part of a base64url `p` preset,
+so **Copy link** restores the exact scene and **Open in playground** opens the composer with it.
+The generated vanilla, React, and custom-element snippets update with the configuration.
+
+```text
+https://ascii-things.dev/playground/?p=…
+```
+
+The WebGL family has its own composer at `/surface-playground/`, with variant, density, cell
+size, speed, glyph ramp, wordmark, and colour controls. The image studio at `/image/` adds
+side-by-side dither comparison, fit presets, palette presets, ANSI export, and batch ZIP output.
 
 ## UI components
 

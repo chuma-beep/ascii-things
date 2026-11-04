@@ -78,6 +78,18 @@
     "gzip": true
   },
   {
+    "name": "core-vue",
+    "path": "dist/core-vue.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "vue",
+    "path": "dist/vue.js",
+    "limit": "78 kB",
+    "gzip": true
+  },
+  {
     "name": "element",
     "path": "dist/element.js",
     "limit": "78 kB",
@@ -102,6 +114,12 @@
     "gzip": true
   },
   {
+    "name": "image-vue",
+    "path": "dist/image-vue.js",
+    "limit": "10 kB",
+    "gzip": true
+  },
+  {
     "name": "image-element",
     "path": "dist/image-element.js",
     "limit": "10 kB",
@@ -120,6 +138,12 @@
     "gzip": true
   },
   {
+    "name": "dither-vue",
+    "path": "dist/dither-vue.js",
+    "limit": "10 kB",
+    "gzip": true
+  },
+  {
     "name": "dither-element",
     "path": "dist/dither-element.js",
     "limit": "10 kB",
@@ -134,6 +158,12 @@
   {
     "name": "webgl-react",
     "path": "dist/webgl-react.js",
+    "limit": "15 kB",
+    "gzip": true
+  },
+  {
+    "name": "webgl-vue",
+    "path": "dist/webgl-vue.js",
     "limit": "15 kB",
     "gzip": true
   },

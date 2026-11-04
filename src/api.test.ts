@@ -19,6 +19,11 @@ import * as servers from "./servers";
 import * as sharks from "./sharks";
 import * as starlings from "./starlings";
 import * as ui from "./ui";
+import * as vue from "./vue";
+import * as vueCore from "./core/vue";
+import * as vueDither from "./vue/dither";
+import * as vueImage from "./vue/image";
+import * as vueWebgl from "./vue/webgl";
 import * as webgl from "./webgl";
 import * as webglElement from "./webgl/element";
 import * as webglReact from "./webgl/react";
@@ -54,6 +59,11 @@ describe("public API surface", () => {
       webgl: Object.keys(webgl).sort(),
       webglReact: Object.keys(webglReact).sort(),
       webglElement: Object.keys(webglElement).sort(),
+      vueCore: Object.keys(vueCore).sort(),
+      vue: Object.keys(vue).sort(),
+      vueImage: Object.keys(vueImage).sort(),
+      vueDither: Object.keys(vueDither).sort(),
+      vueWebgl: Object.keys(vueWebgl).sort(),
     }).toMatchSnapshot();
   });
 });

@@ -1,5 +1,6 @@
 ---
 import { AsciiSurface } from "ascii-things/webgl/react";
+import { createSurfacePreset, presetPath } from "../lib/presets";
 
 const items = [
   {
@@ -122,7 +123,20 @@ interface Props {
 }
 
 const { from = 0, to = items.length } = Astro.props;
-const visible = items.slice(from, to);
+const visible = items.slice(from, to).map((item) => {
+  const preset = createSurfacePreset({
+    variant: item.variant,
+    density: 0.3,
+    cell: item.variant === "globe" ? 5 : 0,
+    fg: item.variant === "globe" ? "#7fbcff" : undefined,
+    accent: item.variant === "globe" ? "#c7e8a4" : undefined,
+    interactive: item.variant === "ripple",
+  });
+  return {
+    ...item,
+    presetLink: presetPath(preset, "/surface-playground/"),
+  };
+});
 ---
 
 <div class="webgl-gallery">
@@ -148,6 +162,12 @@ const visible = items.slice(from, to);
           <h2>{item.title}</h2>
           <p class="webgl-card__description">{item.description}</p>
           <code>{item.code}</code>
+          <div class="webgl-card__actions">
+            <button type="button" data-copy-link={item.presetLink}>
+              Copy link
+            </button>
+            <a href={item.presetLink}>Open in playground</a>
+          </div>
         </div>
       </article>
     ))
@@ -214,6 +234,35 @@ const visible = items.slice(from, to);
     font-size: 0.62rem;
   }
 
+  .webgl-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .webgl-card__actions button,
+  .webgl-card__actions a {
+    padding: 7px 9px;
+    border: 1px solid rgba(236, 232, 223, 0.16);
+    background: transparent;
+    color: rgba(236, 232, 223, 0.66);
+    font: inherit;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .webgl-card__actions button:hover,
+  .webgl-card__actions button:focus-visible,
+  .webgl-card__actions a:hover,
+  .webgl-card__actions a:focus-visible {
+    border-color: #ff7a1a;
+    color: #ffb070;
+  }
+
   @media (max-width: 72rem) {
     .webgl-gallery {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -226,3 +275,22 @@ const visible = items.slice(from, to);
     }
   }
 </style>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy-link]")) {
+    button.addEventListener("click", async () => {
+      const path = button.dataset.copyLink;
+      if (!path) return;
+      const url = new URL(path, window.location.origin).toString();
+      try {
+        await navigator.clipboard.writeText(url);
+        button.textContent = "Copied";
+        window.setTimeout(() => {
+          button.textContent = "Copy link";
+        }, 1600);
+      } catch {
+        window.prompt("Copy this surface link", url);
+      }
+    });
+  }
+</script>

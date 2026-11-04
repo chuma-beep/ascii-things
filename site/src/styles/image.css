@@ -1178,3 +1178,31 @@ main:has(.image-studio) > .content-panel:first-of-type {
     animation-iteration-count: 1 !important;
   }
 }
+
+.studio-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+}
+
+.studio-compare figure {
+  margin: 0;
+  border: 1px solid var(--studio-line);
+  background: var(--studio-screen);
+}
+
+.studio-compare canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.studio-compare figcaption {
+  padding: 0.4rem 0.6rem;
+  border-top: 1px solid var(--studio-line);
+  color: var(--studio-muted);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}

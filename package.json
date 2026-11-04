@@ -48,6 +48,10 @@
       "types": "./dist/core-react.d.ts",
       "import": "./dist/core-react.js"
     },
+    "./core/vue": {
+      "types": "./dist/core-vue.d.ts",
+      "import": "./dist/core-vue.js"
+    },
     "./rendering": {
       "types": "./dist/rendering.d.ts",
       "import": "./dist/rendering.js"
@@ -100,6 +104,10 @@
       "types": "./dist/react.d.ts",
       "import": "./dist/react.js"
     },
+    "./vue": {
+      "types": "./dist/vue.d.ts",
+      "import": "./dist/vue.js"
+    },
     "./element": {
       "types": "./dist/element.d.ts",
       "import": "./dist/element.js"
@@ -116,6 +124,10 @@
       "types": "./dist/image-react.d.ts",
       "import": "./dist/image-react.js"
     },
+    "./image/vue": {
+      "types": "./dist/image-vue.d.ts",
+      "import": "./dist/image-vue.js"
+    },
     "./image/element": {
       "types": "./dist/image-element.d.ts",
       "import": "./dist/image-element.js"
@@ -128,6 +140,10 @@
       "types": "./dist/dither-react.d.ts",
       "import": "./dist/dither-react.js"
     },
+    "./dither/vue": {
+      "types": "./dist/dither-vue.d.ts",
+      "import": "./dist/dither-vue.js"
+    },
     "./dither/element": {
       "types": "./dist/dither-element.d.ts",
       "import": "./dist/dither-element.js"
@@ -139,6 +155,10 @@
     "./webgl/react": {
       "types": "./dist/webgl-react.d.ts",
       "import": "./dist/webgl-react.js"
+    },
+    "./webgl/vue": {
+      "types": "./dist/webgl-vue.d.ts",
+      "import": "./dist/webgl-vue.js"
     },
     "./webgl/element": {
       "types": "./dist/webgl-element.d.ts",
@@ -163,7 +183,8 @@
     "shader",
     "ascii-surface",
     "lagoon",
-    "marine"
+    "marine",
+    "vue"
   ],
   "scripts": {
     "dev": "vite",
@@ -191,13 +212,17 @@
   },
   "peerDependencies": {
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "vue": ">=3.3"
   },
   "peerDependenciesMeta": {
     "react": {
       "optional": true
     },
     "react-dom": {
+      "optional": true
+    },
+    "vue": {
       "optional": true
     }
   },
@@ -227,6 +252,7 @@
     "tsup": "^9.0.0",
     "typescript": "^5.6.0",
     "vite": "^8.3.5",
-    "vitest": "^5.0.5"
+    "vitest": "^5.0.5",
+    "vue": "^3.5.44"
   }
 }

@@ -37,6 +37,11 @@ palette changes the ink, not the behavior. The Lagoon is a fixed painter: it ign
     description="Live props, remount rules, sizing, and the client-component contract."
   />
   <LinkCard
+    title="Vue"
+    href="/guide/vue/"
+    description="Vue wrappers, the useAsciiScene composable, and the shared sizing contract."
+  />
+  <LinkCard
     title="Integrations"
     href="/guide/integrations/"
     description="shadcn/ui, Tailwind, Next.js, Astro, and framework-free recipes."
@@ -53,8 +58,9 @@ palette changes the ink, not the behavior. The Lagoon is a fixed painter: it ign
 - **A shared contract for cell-grid and ambient scenes.** `palette`, `seed`, `speed`,
   `columns`, `maxCells`, `maxDpr`, `calm`, `interactive`, `label`, and `onEvent` are
   accepted across those scenes. The Lagoon has its own passive surface and no `onEvent`.
-- **Framework-ready adapters.** React components from `ascii-things/react`, vanilla
-  `create*` factories from scene subpaths, and `<ascii-*>` custom elements.
+- **Framework-ready adapters.** React components from `ascii-things/react`, Vue components
+  from `ascii-things/vue`, vanilla `create*` factories from scene subpaths, and `<ascii-*>`
+  custom elements.
 - **An optional UI layer.** `ascii-things/ui` adds a framed stage, command input, live
   readout, palette tabs, and a full dog-hero recipe.
 - **Calm defaults.** Decorative canvases are hidden from assistive technology unless you
