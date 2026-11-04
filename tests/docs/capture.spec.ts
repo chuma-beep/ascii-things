@@ -17,3 +17,17 @@ test("scene GIF capture downloads an animated GIF", async ({ page }) => {
   const path = await download.path();
   expect(path).toBeTruthy();
 });
+
+test("scene video capture prefers a real MP4", async ({ page }) => {
+  await page.goto("/playground/", { waitUntil: "networkidle" });
+  await expect(page.locator("canvas.ascii-dog")).toBeVisible();
+
+  const downloadStarted = page.waitForEvent("download", { timeout: 45_000 });
+  await page.getByRole("button", { name: "Record video", exact: true }).click();
+  const download = await downloadStarted;
+
+  // The docs suite runs in Chromium, which ships H.264 WebCodecs support.
+  expect(download.suggestedFilename()).toBe("ascii-dog-7.mp4");
+  const path = await download.path();
+  expect(path).toBeTruthy();
+});

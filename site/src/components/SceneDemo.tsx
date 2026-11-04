@@ -18,7 +18,7 @@ import { createServers } from "ascii-things/servers";
 import { AsciiPrompt, AsciiReadout, AsciiSceneTabs, AsciiStage } from "ascii-things/ui";
 import { createScenePreset, presetPath, presetUrl } from "../lib/presets";
 import { recordGif } from "../lib/record-gif";
-import { recordCanvas } from "../lib/record-webm";
+import { recordVideo } from "../lib/record-video";
 import "ascii-things/ui.css";
 
 export type SceneKey =
@@ -560,11 +560,11 @@ export default function SceneDemo({
     setRecording(true);
     setEcho("Recording a 4 second clip…");
     try {
-      const blob = await recordCanvas(canvas, 4000);
+      const { blob, extension } = await recordVideo(canvas, 4000);
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `ascii-${scene}-${seed}.${blob.type.includes("mp4") ? "mp4" : "webm"}`;
+      anchor.download = `ascii-${scene}-${seed}.${extension}`;
       anchor.rel = "noopener";
       document.body.append(anchor);
       anchor.click();

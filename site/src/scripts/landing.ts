@@ -303,6 +303,8 @@ const aiPrompts: Record<string, string> = {
     "Read https://ascii-things.dev/guide/framework/ and use ascii-things to build a custom ASCII simulation. Install with npm i ascii-things. Start from createSimulation in ascii-things/core; keep CellGrid optional, use ascii-things/rendering only when it helps, and preserve custom action types.",
   chatgpt:
     "Plan a custom ASCII simulation using the ascii-things public framework, then implement it. Read https://ascii-things.dev/guide/framework/ first. Install with npm i ascii-things. Use createSimulation from ascii-things/core and keep the renderer independent of CellGrid unless a grid genuinely fits.",
+  codex:
+    "Use Codex in this project to plan and implement a custom ASCII simulation with ascii-things. Read https://ascii-things.dev/guide/framework/ and install with npm i ascii-things. Start from createSimulation in ascii-things/core, keep CellGrid optional, preserve custom action types, and verify the lifecycle and cleanup.",
   opencode:
     "Use the ascii-things public framework in this repo to build a new simulation. Read https://ascii-things.dev/guide/framework/ and use createSimulation from ascii-things/core. Install with npm i ascii-things. Keep CellGrid optional, preserve custom action types, and verify the lifecycle and cleanup.",
   cursor:
