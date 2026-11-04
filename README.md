@@ -409,6 +409,7 @@ https://ascii-things.dev/playground/?p=…
 The WebGL family has its own composer at `/surface-playground/`, with variant, density, cell
 size, speed, glyph ramp, wordmark, and colour controls. The image studio at `/image/` adds
 side-by-side dither comparison, fit presets, palette presets, ANSI export, and batch ZIP output.
+The social card studio at `/social-card/` bakes a scene and caption into a 1200 × 630 PNG.
 
 ## UI components
 

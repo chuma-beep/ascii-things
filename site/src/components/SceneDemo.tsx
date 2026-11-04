@@ -17,6 +17,7 @@ import { createCity } from "ascii-things/city";
 import { createServers } from "ascii-things/servers";
 import { AsciiPrompt, AsciiReadout, AsciiSceneTabs, AsciiStage } from "ascii-things/ui";
 import { createScenePreset, presetPath, presetUrl } from "../lib/presets";
+import { recordCanvas } from "../lib/record-webm";
 import "ascii-things/ui.css";
 
 export type SceneKey =
@@ -336,6 +337,7 @@ export default function SceneDemo({
   const [stats, setStats] = useState<DemoStats | null>(null);
   const [echo, setEcho] = useState("yard@04 · awaiting command");
   const [copied, setCopied] = useState(false);
+  const [recording, setRecording] = useState(false);
   const reducedMotion = useReducedMotion();
   const effectiveCalm = calm || reducedMotion;
   const meta = SCENES[scene];
@@ -550,6 +552,30 @@ export default function SceneDemo({
     }, "image/png");
   };
 
+  const recordClip = async () => {
+    const canvas = canvasRef.current;
+    if (!canvas || recording) return;
+    setRecording(true);
+    setEcho("Recording a 4 second clip…");
+    try {
+      const blob = await recordCanvas(canvas, 4000);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `ascii-${scene}-${seed}.${blob.type.includes("mp4") ? "mp4" : "webm"}`;
+      anchor.rel = "noopener";
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setEcho("Clip downloaded.");
+    } catch (reason) {
+      setEcho(reason instanceof Error ? reason.message : "Could not record this scene.");
+    } finally {
+      setRecording(false);
+    }
+  };
+
   return (
     <section
       className={["scene-demo", className].filter(Boolean).join(" ")}
@@ -608,6 +634,14 @@ export default function SceneDemo({
           </button>
           <button type="button" className="scene-demo-button" onClick={downloadPng}>
             PNG
+          </button>
+          <button
+            type="button"
+            className="scene-demo-button"
+            onClick={() => void recordClip()}
+            disabled={recording}
+          >
+            {recording ? "Recording…" : "Record 4s"}
           </button>
           <a className="scene-demo-button" href={sharePath}>
             Open in playground

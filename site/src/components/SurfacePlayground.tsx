@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SurfaceVariant } from "ascii-things/webgl";
 import { AsciiSurface } from "ascii-things/webgl/react";
 import {
@@ -10,6 +10,7 @@ import {
   replacePresetInUrl,
   type SharePreset,
 } from "../lib/presets";
+import { recordCanvas } from "../lib/record-webm";
 
 const DEFAULTS = {
   variant: "globe" as SurfaceVariant,
@@ -41,6 +42,8 @@ export default function SurfacePlayground({ initialPreset }: SurfacePlaygroundPr
   const [interactive, setInteractive] = useState(DEFAULTS.interactive);
   const [ready, setReady] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const stageRef = useRef<HTMLDivElement>(null);
 
   const applyPreset = (preset: SharePreset) => {
     if (preset.kind !== "surface") return;
@@ -107,6 +110,28 @@ export default function SurfacePlayground({ initialPreset }: SurfacePlaygroundPr
       setCopied(true);
     } catch {
       window.prompt("Copy this surface link", url);
+    }
+  };
+
+  const recordClip = async () => {
+    const canvas = stageRef.current?.querySelector("canvas");
+    if (!canvas || recording) return;
+    setRecording(true);
+    try {
+      const blob = await recordCanvas(canvas, 4000);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `ascii-surface-${variant}.${blob.type.includes("mp4") ? "mp4" : "webm"}`;
+      anchor.rel = "noopener";
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      // Unsupported browsers simply keep the live canvas.
+    } finally {
+      setRecording(false);
     }
   };
 
@@ -226,12 +251,20 @@ export default function SurfacePlayground({ initialPreset }: SurfacePlaygroundPr
         <a className="scene-demo-button" href={sharePath}>
           Preset URL
         </a>
+        <button
+          type="button"
+          className="scene-demo-button"
+          onClick={() => void recordClip()}
+          disabled={recording}
+        >
+          {recording ? "Recording…" : "Record 4s"}
+        </button>
         <a className="scene-demo-button" href="/playground/">
           Scene playground
         </a>
       </div>
 
-      <div className="surface-playground-stage">
+      <div className="surface-playground-stage" ref={stageRef}>
         <AsciiSurface
           variant={variant}
           density={density}

@@ -8,8 +8,9 @@ ASCII. It is not a living scene: there is no loop, no world, and no canvas
 engine. You give it pixels; it gives you text or a drawn canvas.
 
 It has no runtime dependencies and runs entirely in the browser. The docs also
-include a full studio at [`/image/`](/image/) with crop, tone, dither, edge,
-colour, batch, TXT, PNG, SVG, and ZIP export.
+include a full studio at [`/image/`](/image/) with crop fit presets, tone,
+dither comparison, edge, palette presets, batch, TXT, ANSI, PNG, SVG, and ZIP
+export. The studio also stores its configuration in a shareable URL preset.
 
 ## Install
 
@@ -134,12 +135,17 @@ studio's presets do. Set `invert` when your ramp runs the other way.
 The live page at [`/image/`](/image/) adds controls around the library:
 
 - Drag and drop, file picker, clipboard paste, and a built-in demo
-- Crop and zoom before conversion
+- Crop and zoom before conversion, with Full, Square, 16:9, and 4:5 fit presets
 - Columns, ramps, contrast, brightness, gamma, invert, and dither
+- Source aspect ratio preserved from the live font metrics, and transparent
+  source pixels kept empty instead of inked
+- A side-by-side dither comparison against the undithered source
 - Sobel edge mode, which forces a monochrome contour field
 - Mono or source-coloured glyphs, ink/paper colours, and transparent output
-- TXT, 2× PNG, and vector SVG exports
-- Batch mode with a TXT, PNG, and SVG per image inside a ZIP
+- Palette presets for Cream, Amber CRT, Blueprint, Newsprint, and Terminal green
+- TXT, ANSI truecolor, 2× PNG, and vector SVG exports
+- Batch mode with a TXT, ANSI, PNG, and SVG per image inside a ZIP
+- **Copy preset** stores the current controls in a `/image/?p=…` URL and restores it on load
 - Keyboard crop nudging, reduced-motion support, and light/dark UI
 
 Uploaded files are read locally. They are never uploaded to the site or to the

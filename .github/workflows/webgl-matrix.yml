@@ -1,0 +1,61 @@
+name: WebGL matrix
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  surfaces:
+    name: Surfaces / ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            site/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install site dependencies
+        run: npm --prefix site ci
+
+      - name: Build package and site
+        run: npm --prefix site run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run WebGL matrix
+        run: npx playwright test -c playwright.webgl.config.ts --project=${{ matrix.browser }}
+
+      - name: Upload failure artefacts
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: webgl-${{ matrix.browser }}
+          path: |
+            test-results
+            playwright-report
+          retention-days: 7

@@ -1,0 +1,15 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import SocialCardStudio from "../components/SocialCardStudio";
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Social card",
+    description:
+      "Generate a 1200 × 630 social card from a live ASCII scene, palette, and seed.",
+    template: "splash",
+  }}
+>
+  <SocialCardStudio client:load />
+</StarlightPage>

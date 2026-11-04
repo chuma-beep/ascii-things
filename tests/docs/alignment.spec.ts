@@ -34,3 +34,13 @@ test("composed readout boxes ignore prose divider margins", async ({ page }) => 
   for (const item of items) expect(item.marginTop).toBe("0px");
   expect(new Set(items.map((item) => item.height)).size).toBe(1);
 });
+
+test("playground action rows share one baseline", async ({ page }) => {
+  await page.goto("/surface-playground/", { waitUntil: "networkidle" });
+
+  const actions = await boxLayout(page, ".docs-playground-actions > *");
+  expect(actions.length).toBeGreaterThan(2);
+
+  for (const action of actions) expect(action.marginTop).toBe("0px");
+  expect(new Set(actions.map((action) => action.height)).size).toBe(1);
+});

@@ -41,7 +41,7 @@ export const SURFACE_VARIANTS = [
 
 export type SurfaceVariantId = (typeof SURFACE_VARIANTS)[number];
 
-export type PresetKind = "scene" | "surface" | "dither";
+export type PresetKind = "scene" | "surface" | "image" | "dither";
 export type PresetGlyphs = "ascii" | "kanji";
 
 /**
@@ -69,6 +69,15 @@ export interface SharePreset {
   accent?: string;
   text?: string;
   ramp?: string;
+  dither?: string;
+  invert?: boolean;
+  contrast?: number;
+  brightness?: number;
+  gamma?: number;
+  color?: boolean;
+  transparent?: boolean;
+  edge?: boolean;
+  edgeStrength?: number;
 }
 
 export interface SceneShareState {
@@ -99,6 +108,22 @@ export interface SurfaceShareState {
   accent?: string;
   text?: string;
   ramp?: string;
+}
+
+export interface ImageShareState {
+  columns: number;
+  ramp: string;
+  dither: string;
+  invert: boolean;
+  contrast: number;
+  brightness: number;
+  gamma: number;
+  color: boolean;
+  transparent: boolean;
+  edge: boolean;
+  edgeStrength: number;
+  fg: string;
+  bg: string;
 }
 
 export function isSceneId(value: unknown): value is SceneId {
@@ -142,6 +167,14 @@ function colorValue(value: unknown): string | undefined {
   return /^#[0-9a-f]{3}([0-9a-f]{3})?([0-9a-f]{2})?$/i.test(value) ? value : undefined;
 }
 
+const IMAGE_DITHERS = ["none", "floyd-steinberg", "bayer"] as const;
+
+function ditherValue(value: unknown): string | undefined {
+  return typeof value === "string" && (IMAGE_DITHERS as readonly string[]).includes(value)
+    ? value
+    : undefined;
+}
+
 /**
  * Accepts untrusted input and returns a complete preset. Invalid fields are
  * dropped; numeric fields are clamped to the same ranges as the playground.
@@ -150,7 +183,13 @@ export function normalizePreset(input: unknown): SharePreset | null {
   if (!isRecord(input)) return null;
 
   const kind: PresetKind =
-    input.kind === "surface" ? "surface" : input.kind === "dither" ? "dither" : "scene";
+    input.kind === "surface"
+      ? "surface"
+      : input.kind === "image"
+        ? "image"
+        : input.kind === "dither"
+          ? "dither"
+          : "scene";
   const preset: SharePreset = { v: PRESET_VERSION, kind };
 
   if (kind === "scene") {
@@ -175,6 +214,15 @@ export function normalizePreset(input: unknown): SharePreset | null {
   preset.accent = colorValue(input.accent);
   preset.text = textValue(input.text);
   preset.ramp = textValue(input.ramp, 128);
+  preset.dither = ditherValue(input.dither);
+  preset.invert = booleanValue(input.invert);
+  preset.contrast = numberIn(input.contrast, 0.1, 4);
+  preset.brightness = numberIn(input.brightness, -1, 1);
+  preset.gamma = numberIn(input.gamma, 0.2, 3);
+  preset.color = booleanValue(input.color);
+  preset.transparent = booleanValue(input.transparent);
+  preset.edge = booleanValue(input.edge);
+  preset.edgeStrength = numberIn(input.edgeStrength, 0.5, 4);
 
   return preset;
 }
@@ -195,6 +243,15 @@ export function createSurfacePreset(state: SurfaceShareState): SharePreset {
       v: PRESET_VERSION,
       kind: "surface",
       variant: state.variant,
+    }
+  );
+}
+
+export function createImagePreset(state: ImageShareState): SharePreset {
+  return (
+    normalizePreset({ v: PRESET_VERSION, kind: "image", ...state }) ?? {
+      v: PRESET_VERSION,
+      kind: "image",
     }
   );
 }

@@ -21,6 +21,7 @@ import {
 } from "../lib/image/export";
 import { buildProcessedCanvas } from "../lib/image/processing";
 import { buildSvg } from "../lib/image/svg";
+import { createImagePreset, presetUrl, readPresetFromUrl } from "../lib/presets";
 import {
   DEFAULT_OPTIONS,
   FULL_CROP,
@@ -229,6 +230,7 @@ export default function ImageStudio() {
   const [batchProgress, setBatchProgress] = useState<string | null>(null);
   const [previewWidth, setPreviewWidth] = useState(900);
   const [comparing, setComparing] = useState(false);
+  const [presetCopied, setPresetCopied] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewWrapRef = useRef<HTMLDivElement>(null);
@@ -384,6 +386,34 @@ export default function ImageStudio() {
     initializedRef.current = true;
     loadDemo();
   }, [loadDemo]);
+
+  useEffect(() => {
+    const preset = readPresetFromUrl();
+    if (preset?.kind !== "image") return;
+    setOptions((current) => ({
+      ...current,
+      columns: preset.columns ?? current.columns,
+      ramp: preset.ramp ?? current.ramp,
+      dither: (preset.dither as StudioOptions["dither"]) ?? current.dither,
+      invert: preset.invert ?? current.invert,
+      contrast: preset.contrast ?? current.contrast,
+      brightness: preset.brightness ?? current.brightness,
+      gamma: preset.gamma ?? current.gamma,
+      color: preset.color ?? current.color,
+      transparent: preset.transparent ?? current.transparent,
+      edge: preset.edge ?? current.edge,
+      edgeStrength: preset.edgeStrength ?? current.edgeStrength,
+      foreground: preset.fg ?? current.foreground,
+      background: preset.bg ?? current.background,
+    }));
+    if (preset.ramp) setCustomRamp(preset.ramp);
+  }, []);
+
+  useEffect(() => {
+    if (!presetCopied) return;
+    const timer = window.setTimeout(() => setPresetCopied(false), 1600);
+    return () => window.clearTimeout(timer);
+  }, [presetCopied]);
 
   useEffect(() => {
     const onPaste = (event: ClipboardEvent) => {
@@ -669,6 +699,31 @@ export default function ImageStudio() {
       } finally {
         textarea.remove();
       }
+    }
+  };
+
+  const copyPreset = async () => {
+    const preset = createImagePreset({
+      columns: options.columns,
+      ramp: options.ramp,
+      dither: options.dither,
+      invert: options.invert,
+      contrast: options.contrast,
+      brightness: options.brightness,
+      gamma: options.gamma,
+      color: options.color,
+      transparent: options.transparent,
+      edge: options.edge,
+      edgeStrength: options.edgeStrength,
+      fg: options.foreground,
+      bg: options.background,
+    });
+    const url = presetUrl(preset, "/image/");
+    try {
+      await navigator.clipboard.writeText(url);
+      setPresetCopied(true);
+    } catch {
+      window.prompt("Copy this image preset link", url);
     }
   };
 
@@ -1375,6 +1430,9 @@ export default function ImageStudio() {
                   onClick={() => setComparing((value) => !value)}
                 >
                   {comparing ? "Hide compare" : "Compare dithers"}
+                </button>
+                <button type="button" onClick={() => void copyPreset()}>
+                  {presetCopied ? "Preset copied" : "Copy preset"}
                 </button>
               </div>
             </>

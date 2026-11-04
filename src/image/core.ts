@@ -251,16 +251,18 @@ function dimensions(source: CanvasImageSource) {
   return { width: 0, height: 0 };
 }
 
-async function sample(source: AsciiImageSource, options: AsciiImageOptions) {
+async function sample(source: AsciiImageSource, options: AsciiImageOptions, cellAspect = 2) {
   const drawable = await toDrawable(source);
   const size = dimensions(drawable);
   if (!size.width || !size.height) throw new Error("Could not read the image dimensions.");
   const columns = resolveOptions(options).columns;
-  const rows = Math.max(1, Math.round((size.height / size.width) * columns * 0.5));
+  const rows = Math.max(1, Math.round(((size.height / size.width) * columns) / cellAspect));
   const { context } = createCanvas(columns, rows);
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
-  context.fillStyle = "#ffffff";
+  // Transparent pixels should read as empty space, not as white ink. Opaque
+  // images cover this fill completely.
+  context.fillStyle = "#000000";
   context.fillRect(0, 0, columns, rows);
   context.drawImage(drawable, 0, 0, columns, rows);
   const imageData = context.getImageData(0, 0, columns, rows);
@@ -283,21 +285,28 @@ export async function renderAsciiImage(
   options: AsciiImageRenderOptions = {},
 ): Promise<AsciiImageResult> {
   const resolved = resolveOptions(options);
-  const { imageData } = await sample(source, resolved);
-  const result = pixelsToAscii(imageData.data, imageData.width, imageData.height, resolved);
-
   const width = Math.max(
     1,
     Math.round(options.width ?? canvas.clientWidth ?? canvas.parentElement?.clientWidth ?? 800),
   );
   const dpr = Math.min(2, Math.max(1, options.dpr ?? globalThis.devicePixelRatio ?? 1));
+
+  // The source is sampled at the same cell aspect the canvas will draw. Using a
+  // fixed 0.5 here makes the final image wider than the source whenever the
+  // font's advance width differs from that assumption.
   const probe = canvas.getContext("2d");
   if (!probe) throw new Error("A 2D canvas context is required.");
   probe.font = `600 100px ${resolved.fontFamily}`;
   const charRatio = Math.max(0.35, probe.measureText("M").width / 100);
+  const lineHeightRatio = 1.06;
+  const cellAspect = lineHeightRatio / charRatio;
+
+  const { imageData } = await sample(source, resolved, cellAspect);
+  const result = pixelsToAscii(imageData.data, imageData.width, imageData.height, resolved);
+
   const cellWidth = width / result.columns;
   const fontSize = cellWidth / charRatio;
-  const lineHeight = fontSize * 1.06;
+  const lineHeight = fontSize * lineHeightRatio;
   const height = Math.max(1, Math.round(result.rows * lineHeight));
 
   canvas.width = Math.round(width * dpr);
