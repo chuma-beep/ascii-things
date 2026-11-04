@@ -17,6 +17,7 @@ import { createCity } from "ascii-things/city";
 import { createServers } from "ascii-things/servers";
 import { AsciiPrompt, AsciiReadout, AsciiSceneTabs, AsciiStage } from "ascii-things/ui";
 import { createScenePreset, presetPath, presetUrl } from "../lib/presets";
+import { recordGif } from "../lib/record-gif";
 import { recordCanvas } from "../lib/record-webm";
 import "ascii-things/ui.css";
 
@@ -338,6 +339,7 @@ export default function SceneDemo({
   const [echo, setEcho] = useState("yard@04 · awaiting command");
   const [copied, setCopied] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [recordingGif, setRecordingGif] = useState(false);
   const reducedMotion = useReducedMotion();
   const effectiveCalm = calm || reducedMotion;
   const meta = SCENES[scene];
@@ -554,7 +556,7 @@ export default function SceneDemo({
 
   const recordClip = async () => {
     const canvas = canvasRef.current;
-    if (!canvas || recording) return;
+    if (!canvas || recording || recordingGif) return;
     setRecording(true);
     setEcho("Recording a 4 second clip…");
     try {
@@ -573,6 +575,30 @@ export default function SceneDemo({
       setEcho(reason instanceof Error ? reason.message : "Could not record this scene.");
     } finally {
       setRecording(false);
+    }
+  };
+
+  const recordGifClip = async () => {
+    const canvas = canvasRef.current;
+    if (!canvas || recording || recordingGif) return;
+    setRecordingGif(true);
+    setEcho("Encoding a 3 second GIF…");
+    try {
+      const blob = await recordGif(canvas, { duration: 3000, fps: 12, maxWidth: 640 });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `ascii-${scene}-${seed}.gif`;
+      anchor.rel = "noopener";
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setEcho("GIF downloaded.");
+    } catch (reason) {
+      setEcho(reason instanceof Error ? reason.message : "Could not encode this scene.");
+    } finally {
+      setRecordingGif(false);
     }
   };
 
@@ -639,9 +665,17 @@ export default function SceneDemo({
             type="button"
             className="scene-demo-button"
             onClick={() => void recordClip()}
-            disabled={recording}
+            disabled={recording || recordingGif}
           >
-            {recording ? "Recording…" : "Record 4s"}
+            {recording ? "Recording…" : "Record video"}
+          </button>
+          <button
+            type="button"
+            className="scene-demo-button"
+            onClick={() => void recordGifClip()}
+            disabled={recording || recordingGif}
+          >
+            {recordingGif ? "Encoding GIF…" : "Record GIF"}
           </button>
           <a className="scene-demo-button" href={sharePath}>
             Open in playground

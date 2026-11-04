@@ -10,6 +10,7 @@ import {
   replacePresetInUrl,
   type SharePreset,
 } from "../lib/presets";
+import { recordGif } from "../lib/record-gif";
 import { recordCanvas } from "../lib/record-webm";
 
 const DEFAULTS = {
@@ -43,6 +44,7 @@ export default function SurfacePlayground({ initialPreset }: SurfacePlaygroundPr
   const [ready, setReady] = useState(false);
   const [copied, setCopied] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [recordingGif, setRecordingGif] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
 
   const applyPreset = (preset: SharePreset) => {
@@ -115,7 +117,7 @@ export default function SurfacePlayground({ initialPreset }: SurfacePlaygroundPr
 
   const recordClip = async () => {
     const canvas = stageRef.current?.querySelector("canvas");
-    if (!canvas || recording) return;
+    if (!canvas || recording || recordingGif) return;
     setRecording(true);
     try {
       const blob = await recordCanvas(canvas, 4000);
@@ -132,6 +134,28 @@ export default function SurfacePlayground({ initialPreset }: SurfacePlaygroundPr
       // Unsupported browsers simply keep the live canvas.
     } finally {
       setRecording(false);
+    }
+  };
+
+  const recordGifClip = async () => {
+    const canvas = stageRef.current?.querySelector("canvas");
+    if (!canvas || recording || recordingGif) return;
+    setRecordingGif(true);
+    try {
+      const blob = await recordGif(canvas, { duration: 3000, fps: 12, maxWidth: 640 });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `ascii-surface-${variant}.gif`;
+      anchor.rel = "noopener";
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      // Unsupported browsers simply keep the live canvas.
+    } finally {
+      setRecordingGif(false);
     }
   };
 
@@ -255,9 +279,17 @@ export default function SurfacePlayground({ initialPreset }: SurfacePlaygroundPr
           type="button"
           className="scene-demo-button"
           onClick={() => void recordClip()}
-          disabled={recording}
+          disabled={recording || recordingGif}
         >
-          {recording ? "Recording…" : "Record 4s"}
+          {recording ? "Recording…" : "Record video"}
+        </button>
+        <button
+          type="button"
+          className="scene-demo-button"
+          onClick={() => void recordGifClip()}
+          disabled={recording || recordingGif}
+        >
+          {recordingGif ? "Encoding GIF…" : "Record GIF"}
         </button>
         <a className="scene-demo-button" href="/playground/">
           Scene playground
