@@ -64,7 +64,8 @@ to fill the box while trying to stay near it.
 ## Pause off-screen and in modals
 
 The runtime uses `IntersectionObserver` and stops scheduling while the canvas is outside the
-viewport. It also stops when the document is hidden because `requestAnimationFrame` does.
+viewport. It also listens for `visibilitychange`, cancels the loop when the document is hidden,
+clears queued events, and restarts when the tab becomes visible again.
 
 Use the engine when you know the surface is dormant:
 

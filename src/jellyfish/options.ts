@@ -39,6 +39,8 @@ export interface AsciiJellyfishOptions {
   fontFamily?: string;
   /** If set, the canvas becomes role="img" with this label. */
   label?: string;
+  /** Static text description exposed to assistive technology. */
+  fallback?: string;
   /** Called when a jellyfish pulses or the pointer sends a shockwave. */
   onEvent?: (event: JellyfishWorldEvent) => void;
 }

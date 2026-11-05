@@ -64,6 +64,7 @@ export class OceanEngine {
       maxDpr: opts.maxDpr,
       adaptiveQuality: opts.adaptiveQuality,
       label: opts.label,
+      fallback: opts.fallback,
       paused: opts.paused,
       fontFamily: opts.fontFamily,
       timing: "scaled",
@@ -104,6 +105,7 @@ export class OceanEngine {
     if (partial.adaptiveQuality !== undefined)
       this.runtime.setAdaptiveQuality(partial.adaptiveQuality);
     if (partial.label !== undefined) this.runtime.setLabel(partial.label);
+    if (partial.fallback !== undefined) this.runtime.setFallback(partial.fallback);
     if (partial.paused !== undefined) this.runtime.setPaused(partial.paused);
     if (partial.fontFamily !== undefined) this.runtime.setFontFamily(partial.fontFamily);
 

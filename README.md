@@ -9,9 +9,9 @@
 
 ![ascii-things landing page in dark mode with a live ASCII night lagoon](assets/lagoon-night.gif)
 
-*The landing page in dark mode, live. The night lagoon and its creatures drift behind the interface.*
+*The landing page in dark mode, live. The night lagoon and its creatures drift behind the page.*
 
-**Living ASCII scenes.** A shark tank, robot factory, jellyfish bloom,
+**ASCII scenes for the web.** A shark tank, robot factory, jellyfish bloom,
 robot dog, starling murmuration, firefly meadow, ant trail, koi pond, city
 grid, server room, and a full-canvas lagoon family — drawn as glyphs on a
 canvas. The collection keeps growing. Zero runtime dependencies. MIT.
@@ -21,7 +21,7 @@ readout, scene tabs, panels, toolbars, status readouts, and ready-made scene
 heroes for React hosts. The optional `ascii-things/vue` entry mirrors the scene,
 image, dither, and WebGL wrappers for Vue 3.3+.
 
-Each scene is a small artificial-life simulation, not a looped animation.
+Each scene is a small simulation with its own rules, not a looped animation.
 Sharks hunt fish that spread alarm through the school. Robots patrol, scan,
 haul cargo, and queue for a charging bay. Jellyfish pulse through a current,
 trailing tentacles and leaving rings of light. A robot dog trots, sniffs, sits,
@@ -668,7 +668,7 @@ and motion controls.
 
 ## WebGL surface
 
-`ascii-things/webgl` renders a living ASCII glyph field with an optional
+`ascii-things/webgl` renders an animated ASCII glyph field with an optional
 wordmark, an accent scan, and pointer response. It uses a WebGL fragment shader
 with a generated glyph atlas and falls back to a 2D glyph field when WebGL is
 unavailable. It is a separate tree-shakeable entry with no runtime

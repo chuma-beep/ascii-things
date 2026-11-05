@@ -60,6 +60,7 @@ export function createSimulation<
     maxDpr: options.maxDpr,
     adaptiveQuality: options.adaptiveQuality,
     label: options.label,
+    fallback: options.fallback,
     paused: options.paused,
     fontFamily: options.fontFamily,
     timing: options.timing,
@@ -95,6 +96,7 @@ export function createSimulation<
         runtime.setAdaptiveQuality(partial.adaptiveQuality);
       }
       if (partial.label !== undefined) runtime.setLabel(partial.label);
+      if (partial.fallback !== undefined) runtime.setFallback(partial.fallback);
       if (partial.paused !== undefined) runtime.setPaused(partial.paused);
       if (partial.fontFamily !== undefined) runtime.setFontFamily(partial.fontFamily);
       if (resize) runtime.resize();

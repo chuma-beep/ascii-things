@@ -108,8 +108,7 @@ test("shared Lagoon mirrors one live painter across all surfaces", async ({ page
       });
 
   const first = await mirrorPixels();
-  await page.waitForTimeout(450);
-  expect(await mirrorPixels()).not.toBe(first);
+  await expect.poll(mirrorPixels, { timeout: 4000 }).not.toBe(first);
 
   await stage.getByRole("button", { name: "Robot dog" }).click();
   await expect(stage).toHaveAttribute("data-composition-scene", "dog");

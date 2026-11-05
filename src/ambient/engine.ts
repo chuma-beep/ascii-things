@@ -70,6 +70,7 @@ export class AmbientEngine {
       maxDpr: options.maxDpr,
       adaptiveQuality: options.adaptiveQuality,
       label: options.label,
+      fallback: options.fallback,
       paused: options.paused,
       fontFamily: options.fontFamily,
       timing: "fixed",
@@ -108,6 +109,7 @@ export class AmbientEngine {
     }
     if (partial.paused !== undefined) this.runtime.setPaused(partial.paused);
     if (partial.label !== undefined) this.runtime.setLabel(partial.label);
+    if (partial.fallback !== undefined) this.runtime.setFallback(partial.fallback);
     if (partial.fontFamily !== undefined) this.runtime.setFontFamily(partial.fontFamily);
 
     this.renderer.setOptions({
