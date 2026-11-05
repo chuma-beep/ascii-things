@@ -30,12 +30,12 @@ test("AI picker opens the matching prompt and copies it", async ({ page }) => {
 test("AI picker closes on outside click", async ({ page }) => {
   await page.goto("/");
 
-  const trigger = page.locator('.ai-picker [data-ai-tool="chatgpt"]');
+  const trigger = page.locator('.ai-picker [data-ai-tool="codex"]');
   const panel = page.locator("#ai-panel");
 
   await trigger.click();
   await expect(panel).toBeVisible();
-  await expect(panel.locator(".ai-tool.is-active")).toContainText("ChatGPT / Codex");
+  await expect(panel.locator(".ai-tool.is-active")).toContainText("Codex");
 
   await page.mouse.click(24, 500);
   await expect(panel).toBeHidden();

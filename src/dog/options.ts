@@ -34,6 +34,8 @@ export interface AsciiDogOptions {
   fontFamily?: string;
   /** If set, the canvas becomes role="img" with this label. */
   label?: string;
+  /** Static text description exposed to assistive technology. */
+  fallback?: string;
   /** Called when the ball is thrown, nudged, the dog sits, or charges. */
   onEvent?: (event: DogWorldEvent) => void;
 }

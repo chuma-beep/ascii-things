@@ -46,10 +46,17 @@ class TestRenderer implements RuntimeRenderer<TestWorld> {
 
 function makeCanvas(width = 800, height = 450) {
   const attrs = new Map<string, string>();
+  const listeners = new Map<string, Set<(event: unknown) => void>>();
   return {
     attrs,
+    listeners,
     width: 0,
     height: 0,
+    addEventListener: (type: string, listener: (event: unknown) => void) =>
+      addListener(listeners, type, listener),
+    removeEventListener: (type: string, listener: (event: unknown) => void) =>
+      removeListener(listeners, type, listener),
+    dispatch: (type: string, event: unknown) => dispatch(listeners, type, event),
     getBoundingClientRect: () =>
       ({
         width,
@@ -155,6 +162,7 @@ function makeRuntime(
     interactive?: boolean;
     maxDpr?: number;
     label?: string;
+    fallback?: string;
     onPointerDown?: (x: number, y: number) => void;
     flushEvents?: () => void;
   } = {},
@@ -202,7 +210,12 @@ beforeEach(() => {
   };
 
   const fakeDocument = {
+    visibilityState: "visible" as DocumentVisibilityState,
     fonts: { load: () => new Promise(() => {}) },
+    addEventListener: (type: string, listener: (event: unknown) => void) =>
+      addListener(documentListeners, type, listener),
+    removeEventListener: (type: string, listener: (event: unknown) => void) =>
+      removeListener(documentListeners, type, listener),
     documentElement: {
       addEventListener: (type: string, listener: (event: unknown) => void) =>
         addListener(documentListeners, type, listener),
@@ -288,6 +301,21 @@ describe("SceneRuntime", () => {
     expect(frames.size).toBe(1);
   });
 
+  it("stops scheduling in a hidden document and resumes when visible", () => {
+    const { world } = makeRuntime();
+    world.events.push({ kind: "test" });
+
+    const doc = document as unknown as { visibilityState: DocumentVisibilityState };
+    doc.visibilityState = "hidden";
+    dispatch(documentListeners, "visibilitychange", {});
+    expect(frames.size).toBe(0);
+    expect(world.events).toHaveLength(0);
+
+    doc.visibilityState = "visible";
+    dispatch(documentListeners, "visibilitychange", {});
+    expect(frames.size).toBe(1);
+  });
+
   it("tracks pointer position and dispatches inside presses only", () => {
     const presses: Array<[number, number]> = [];
     const { world, runtime } = makeRuntime({
@@ -316,6 +344,47 @@ describe("SceneRuntime", () => {
     expect(presses).toHaveLength(1);
   });
 
+  it("drives a virtual pointer and primary action from the keyboard", () => {
+    const presses: Array<[number, number]> = [];
+    const { canvas, world, runtime } = makeRuntime({
+      label: "A keyboard-controlled scene",
+      onPointerDown: (x, y) => presses.push([x, y]),
+    });
+    const key = (value: string) =>
+      ({
+        key: value,
+        altKey: false,
+        ctrlKey: false,
+        metaKey: false,
+        preventDefault: vi.fn(),
+      }) as unknown as KeyboardEvent;
+
+    expect(canvas.attrs.get("tabindex")).toBe("0");
+    expect(canvas.attrs.get("aria-keyshortcuts")).toContain("ArrowRight");
+
+    canvas.dispatch("keydown", key("ArrowRight"));
+    expect(world.pointer).toEqual({ x: 440, y: 225, active: true });
+
+    canvas.dispatch("keydown", key("ArrowUp"));
+    expect(world.pointer).toEqual({ x: 440, y: 202.5, active: true });
+
+    const press = key(" ");
+    canvas.dispatch("keydown", press);
+    expect(presses).toEqual([[440, 202.5]]);
+    expect(press.preventDefault).toHaveBeenCalled();
+
+    reduced = true;
+    const blocked = key("ArrowLeft");
+    canvas.dispatch("keydown", blocked);
+    expect(world.pointer.x).toBe(440);
+    expect(blocked.preventDefault).not.toHaveBeenCalled();
+
+    reduced = false;
+    runtime.setInteractive(false);
+    expect(canvas.attrs.has("tabindex")).toBe(false);
+    expect(canvas.listeners.get("keydown")?.size ?? 0).toBe(0);
+  });
+
   it("updates the accessibility label in both directions", () => {
     const { canvas, runtime } = makeRuntime();
     runtime.setLabel("A live scene");
@@ -326,6 +395,36 @@ describe("SceneRuntime", () => {
     runtime.setLabel(undefined);
     expect(canvas.attrs.get("aria-hidden")).toBe("true");
     expect(canvas.attrs.has("role")).toBe(false);
+  });
+
+  it("exposes a static fallback as a description without replacing a label", () => {
+    const { canvas, runtime } = makeRuntime({ label: "A live scene" });
+    runtime.setFallback("A calm reef with three fish and a passing turtle.");
+    expect(canvas.attrs.get("aria-label")).toBe("A live scene");
+    expect(canvas.attrs.get("aria-description")).toBe(
+      "A calm reef with three fish and a passing turtle.",
+    );
+    expect(canvas.attrs.get("data-ascii-fallback")).toBe(
+      "A calm reef with three fish and a passing turtle.",
+    );
+
+    runtime.setFallback(undefined);
+    expect(canvas.attrs.has("aria-description")).toBe(false);
+    expect(canvas.attrs.has("data-ascii-fallback")).toBe(false);
+    expect(canvas.attrs.get("aria-label")).toBe("A live scene");
+  });
+
+  it("uses a fallback as the accessible name when no label is set", () => {
+    const { canvas, runtime } = makeRuntime({ fallback: "A still ASCII reef." });
+    expect(canvas.attrs.get("role")).toBe("img");
+    expect(canvas.attrs.get("aria-label")).toBe("A still ASCII reef.");
+    expect(canvas.attrs.get("aria-description")).toBe("A still ASCII reef.");
+    expect(canvas.attrs.has("aria-hidden")).toBe(false);
+
+    runtime.setFallback(undefined);
+    expect(canvas.attrs.get("aria-hidden")).toBe("true");
+    expect(canvas.attrs.has("role")).toBe(false);
+    expect(canvas.attrs.has("aria-label")).toBe(false);
   });
 
   it("flushes events before rendering and reports base stats", () => {
@@ -355,13 +454,17 @@ describe("SceneRuntime", () => {
   });
 
   it("tears down observers, listeners, and queued events", () => {
-    const { world, runtime } = makeRuntime();
+    const { canvas, world, runtime } = makeRuntime();
     world.events.push({ kind: "test" });
     runtime.destroy();
     expect(resizeObservers[0].disconnected).toBe(true);
     expect(intersectionObservers[0].disconnected).toBe(true);
     expect(frames.size).toBe(0);
     expect(world.events).toHaveLength(0);
+    expect(documentListeners.get("visibilitychange")?.size ?? 0).toBe(0);
+    expect(canvas.listeners.get("keydown")?.size ?? 0).toBe(0);
+    expect(canvas.attrs.has("tabindex")).toBe(false);
+    expect(canvas.attrs.has("aria-keyshortcuts")).toBe(false);
 
     dispatchWindow("pointermove", { clientX: 110, clientY: 70, pointerType: "mouse" });
     expect(world.pointer.active).toBe(false);

@@ -78,8 +78,8 @@ export default function SocialCardStudio() {
   const [seed, setSeed] = useState(42);
   const [columns, setColumns] = useState(124);
   const [glyphs, setGlyphs] = useState<GlyphStyle>("ascii");
-  const [title, setTitle] = useState("Your interface, but alive.");
-  const [subtitle, setSubtitle] = useState("Living ASCII scenes · ascii-things.dev");
+  const [title, setTitle] = useState("ASCII scenes. One canvas.");
+  const [subtitle, setSubtitle] = useState("React, Vue, or plain HTML · ascii-things.dev");
   const [notice, setNotice] = useState("");
 
   useEffect(() => {

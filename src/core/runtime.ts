@@ -8,6 +8,7 @@ export interface RuntimeOptions {
   maxDpr?: number;
   adaptiveQuality?: boolean;
   label?: string;
+  fallback?: string;
   paused?: boolean;
   fontFamily?: string;
 }
@@ -73,9 +74,13 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
   private last = 0;
   private acc = 0;
   private visible = true;
+  private documentHidden = typeof document !== "undefined" && document.visibilityState === "hidden";
   private paused = false;
   private disposed = false;
   private pointerBound = false;
+  private keyboardBound = false;
+  private keyboardX: number | undefined;
+  private keyboardY: number | undefined;
   private reducedMotion: MediaQueryList;
   private resizeObserver: ResizeObserver;
   private intersectionObserver: IntersectionObserver;
@@ -87,6 +92,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
   private slowFrames = 0;
   private fastFrames = 0;
   private label: string | undefined;
+  private fallback: string | undefined;
   private fontFamily: string | undefined;
   private frameMs = 16.7;
   private timing: "fixed" | "scaled";
@@ -101,6 +107,7 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     this.maxDpr = config.maxDpr;
     this.adaptiveQuality = config.adaptiveQuality ?? true;
     this.label = config.label;
+    this.fallback = config.fallback;
     this.fontFamily = config.fontFamily;
     this.paused = config.paused ?? false;
     this.timing = config.timing ?? "fixed";
@@ -121,7 +128,13 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
 
     this.applyLabel();
     this.reducedMotion.addEventListener("change", this.onMotionPreference);
-    if (this.interactive) this.bindPointer();
+    if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+      document.addEventListener("visibilitychange", this.onVisibilityChange);
+    }
+    if (this.interactive) {
+      this.bindPointer();
+      this.bindKeyboard();
+    }
 
     this.resize();
     // Canvas text can't trigger a webfont load; once the mono face is in, redraw.
@@ -159,7 +172,15 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
   /** Re-evaluate whether the loop should run. */
   schedule() {
     cancelAnimationFrame(this.raf);
-    if (this.disposed || !this.visible || this.paused || this.reducedMotion.matches) return;
+    if (
+      this.disposed ||
+      !this.visible ||
+      this.documentHidden ||
+      this.paused ||
+      this.reducedMotion.matches
+    ) {
+      return;
+    }
     if (this.speed <= 0) {
       this.renderer.render(this.world, FIXED_STEP);
       return;
@@ -188,8 +209,13 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     const wasInteractive = this.interactive;
     this.interactive = interactive;
     if (this.interactive !== wasInteractive) {
-      if (this.interactive) this.bindPointer();
-      else this.unbindPointer();
+      if (this.interactive) {
+        this.bindPointer();
+        this.bindKeyboard();
+      } else {
+        this.unbindPointer();
+        this.unbindKeyboard();
+      }
     }
   }
 
@@ -209,6 +235,11 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
 
   setLabel(label: string | undefined) {
     this.label = label;
+    this.applyLabel();
+  }
+
+  setFallback(fallback: string | undefined) {
+    this.fallback = fallback;
     this.applyLabel();
   }
 
@@ -257,7 +288,11 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     this.resizeObserver.disconnect();
     this.intersectionObserver.disconnect();
     this.reducedMotion.removeEventListener("change", this.onMotionPreference);
+    if (typeof document !== "undefined" && typeof document.removeEventListener === "function") {
+      document.removeEventListener("visibilitychange", this.onVisibilityChange);
+    }
     this.unbindPointer();
+    this.unbindKeyboard();
     if (this.config.world.events) this.config.world.events.length = 0;
   }
 
@@ -271,14 +306,23 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
 
   private applyLabel() {
     const { canvas } = this.config;
-    if (this.label) {
+    const accessibleLabel = this.label ?? this.fallback;
+    if (accessibleLabel) {
       canvas.setAttribute("role", "img");
-      canvas.setAttribute("aria-label", this.label);
+      canvas.setAttribute("aria-label", accessibleLabel);
       canvas.removeAttribute("aria-hidden");
     } else {
       canvas.setAttribute("aria-hidden", "true");
       canvas.removeAttribute("role");
       canvas.removeAttribute("aria-label");
+    }
+
+    if (this.fallback) {
+      canvas.setAttribute("aria-description", this.fallback);
+      canvas.setAttribute("data-ascii-fallback", this.fallback);
+    } else {
+      canvas.removeAttribute("aria-description");
+      canvas.removeAttribute("data-ascii-fallback");
     }
   }
 
@@ -299,6 +343,83 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     document.documentElement.removeEventListener("pointerleave", this.onPointerLeave);
     window.removeEventListener("blur", this.onPointerLeave);
   }
+
+  private bindKeyboard() {
+    if (this.keyboardBound) return;
+    const { canvas } = this.config;
+    if (
+      typeof canvas.addEventListener !== "function" ||
+      typeof canvas.removeEventListener !== "function"
+    ) {
+      return;
+    }
+    this.keyboardBound = true;
+    canvas.setAttribute("tabindex", "0");
+    canvas.setAttribute("aria-keyshortcuts", "Enter Space ArrowUp ArrowDown ArrowLeft ArrowRight");
+    canvas.addEventListener("keydown", this.onKeyDown);
+  }
+
+  private unbindKeyboard() {
+    if (!this.keyboardBound) return;
+    this.keyboardBound = false;
+    const { canvas } = this.config;
+    canvas.removeEventListener("keydown", this.onKeyDown);
+    canvas.removeAttribute("tabindex");
+    canvas.removeAttribute("aria-keyshortcuts");
+  }
+
+  private onKeyDown = (event: KeyboardEvent) => {
+    if (!this.interactive || this.reducedMotion.matches) return;
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+    const rect = this.config.canvas.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) return;
+
+    const stepX = Math.max(4, rect.width * 0.05);
+    const stepY = Math.max(4, rect.height * 0.05);
+    const clampX = (value: number) => Math.min(rect.width, Math.max(0, value));
+    const clampY = (value: number) => Math.min(rect.height, Math.max(0, value));
+
+    let x = clampX(this.keyboardX ?? rect.width / 2);
+    let y = clampY(this.keyboardY ?? rect.height / 2);
+    let handled = true;
+
+    switch (event.key) {
+      case "ArrowLeft":
+        x = clampX(x - stepX);
+        break;
+      case "ArrowRight":
+        x = clampX(x + stepX);
+        break;
+      case "ArrowUp":
+        y = clampY(y - stepY);
+        break;
+      case "ArrowDown":
+        y = clampY(y + stepY);
+        break;
+      case "Enter":
+      case " ":
+        break;
+      default:
+        handled = false;
+    }
+
+    if (!handled) return;
+    event.preventDefault();
+
+    this.keyboardX = x;
+    this.keyboardY = y;
+    const pointer = this.world.pointer;
+    if (pointer) {
+      pointer.x = x;
+      pointer.y = y;
+      pointer.active = true;
+    }
+    this.onPointerMoveHandler?.(x, y, true);
+    if (event.key === "Enter" || event.key === " ") {
+      this.onPointerDown?.(x, y);
+    }
+  };
 
   private frame = (now: number) => {
     const raw = Math.min(0.1, (now - this.last) / 1000);
@@ -369,6 +490,18 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     }
   };
 
+  private onVisibilityChange = () => {
+    this.documentHidden = document.visibilityState === "hidden";
+    if (this.documentHidden) {
+      cancelAnimationFrame(this.raf);
+      if (this.world.events) this.world.events.length = 0;
+      return;
+    }
+    this.last = performance.now();
+    this.acc = 0;
+    this.schedule();
+  };
+
   private toLocal(e: PointerEvent) {
     const rect = this.config.canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -381,6 +514,10 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
     if (!this.interactive) return;
     const { x, y, inside } = this.toLocal(e);
     const pointer = this.world.pointer;
+    if (inside) {
+      this.keyboardX = x;
+      this.keyboardY = y;
+    }
     if (pointer) {
       pointer.x = x;
       pointer.y = y;
@@ -392,7 +529,11 @@ export class SceneRuntime<W extends RuntimeWorld, R extends RuntimeRenderer<W>> 
   private onPointerDownHandler = (e: PointerEvent) => {
     if (!this.interactive || this.reducedMotion.matches) return;
     const { x, y, inside } = this.toLocal(e);
-    if (inside) this.onPointerDown?.(x, y);
+    if (inside) {
+      this.keyboardX = x;
+      this.keyboardY = y;
+      this.onPointerDown?.(x, y);
+    }
   };
 
   private onPointerLeave = () => {

@@ -43,6 +43,8 @@ export interface AsciiSharksOptions {
   fontFamily?: string;
   /** If set, the canvas becomes role="img" with this label. */
   label?: string;
+  /** Static text description exposed to assistive technology. */
+  fallback?: string;
   /** Called for eat / splash events. */
   onEvent?: (event: WorldEvent) => void;
 }

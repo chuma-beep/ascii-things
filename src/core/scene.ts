@@ -25,6 +25,8 @@ export interface SceneOptions {
   palette?: PaletteChoice;
   /** If set, the canvas becomes role="img" with this label. */
   label?: string;
+  /** Static text description exposed to assistive technology. */
+  fallback?: string;
   /** Start with the clock stopped. Default false. */
   paused?: boolean;
   /** Font family used for the ASCII canvas. Defaults to the canvas CSS font. */

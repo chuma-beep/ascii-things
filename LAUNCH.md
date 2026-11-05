@@ -13,7 +13,7 @@ Assets
 
 ascii-things 1.0.0 is live.
 
-Living ASCII scenes for the web: a night lagoon, sharks, robots, jellyfish,
+ASCII scenes for the web: a night lagoon, sharks, robots, jellyfish,
 ambient flocks, image-to-ASCII, dither, and 19 WebGL ASCII surfaces.
 
 Zero runtime dependencies. One canvas per scene. MIT.
@@ -24,7 +24,7 @@ https://ascii-things.dev
 
 1/ ascii-things 1.0.0 is live.
 
-Living ASCII scenes you can drop behind any UI: a night lagoon, sharks, robots,
+ASCII scenes you can mount inside any interface: a night lagoon, sharks, robots,
 jellyfish, a robot dog, ambient flocks, and more.
 
 Zero runtime dependencies. One canvas per scene. MIT.
@@ -51,7 +51,7 @@ Source: https://github.com/chuma-beep/ascii-things
 
 ascii-things 1.0.0 is live.
 
-It is a small library for living ASCII scenes on the web: a night lagoon,
+It is a small library for ASCII scenes on the web: a night lagoon,
 sharks, robots, jellyfish, ambient flocks, image-to-ASCII, dither, and 19 WebGL
 ASCII surfaces. The scenes are dependency-free, render to a single canvas, and
 work in vanilla TypeScript, React, or as custom elements.
@@ -66,7 +66,7 @@ Source: https://github.com/chuma-beep/ascii-things
 
 ## Show HN
 
-Title: Show HN: ascii-things – living ASCII scenes for the web
+Title: Show HN: ascii-things – ASCII scene components for the web
 
 Body:
 

@@ -44,6 +44,34 @@ image. If the scene carries meaning — for example, "our demo is a robot dog fe
 — put that sentence in the host page as real text.
 :::
 
+## Static description
+
+`fallback` adds a short, static description for assistive technology without rendering visible
+text. The runtime exposes it as `aria-description` and `data-ascii-fallback`, and uses it as the
+accessible name when `label` is absent:
+
+```tsx
+<AsciiDog
+  palette="paper"
+  seed={7}
+  label="Robot dog demo"
+  fallback="A robot dog waits in a test yard, then fetches a thrown ball."
+/>
+```
+
+```html
+<canvas
+  role="img"
+  aria-label="Robot dog demo"
+  aria-description="A robot dog waits in a test yard, then fetches a thrown ball."
+  data-ascii-fallback="A robot dog waits in a test yard, then fetches a thrown ball."
+></canvas>
+```
+
+Fallback text is for screen readers only. Sighted users still need a visible sentence or
+caption in the host page. When both `label` and `fallback` are present, `label` is the
+accessible name and `fallback` supplies the longer description.
+
 ## Reduced motion
 
 The runtime observes `prefers-reduced-motion: reduce` and handles it without host code:
@@ -118,6 +146,27 @@ The `DogEngine` exposes `throwBall(x, y)` for this. Each engine also exposes
 jellyfish `shockwave`, and dog `throwBall`. Ambient scenes use `scatter`, `flare`, `crumb`,
 `feed`, `rush`, or `ping` through `trigger()`. Pointer clicks remain optional enhancements.
 
+## Keyboard controls
+
+When `interactive` is on, the runtime makes the canvas focusable and adds
+`aria-keyshortcuts`. Tab to the scene, move the virtual pointer with the arrow keys, and press
+Enter or Space to trigger the scene's primary pointer action. The same action runs through
+`onPointerDown`, so custom scenes receive it without extra wiring.
+
+```html
+<canvas
+  tabindex="0"
+  aria-keyshortcuts="Enter Space ArrowUp ArrowDown ArrowLeft ArrowRight"
+  role="img"
+  aria-label="A live ASCII robot dog test yard"
+></canvas>
+```
+
+Keyboard actions are disabled under `prefers-reduced-motion: reduce`, just like pointer
+actions. They are an enhancement, not a replacement for real controls. If an action is
+essential, put a visible `<button>` in the DOM and call the engine's named action or
+`trigger()` method.
+
 ## Pause controls
 
 For long-running pages, offer a pause control next to a scene. The engine supports it:
@@ -169,6 +218,7 @@ motion is reduced.
 
 - [ ] Decorative scene: no label, `aria-hidden="true"`.
 - [ ] Meaningful scene: `label` plus a sentence of real text nearby.
+- [ ] Longer scene meaning: `fallback` plus a visible caption for sighted readers.
 - [ ] Reduced motion tested at the OS level.
 - [ ] `calm` considered for text-heavy pages.
 - [ ] No essential control inside the canvas.

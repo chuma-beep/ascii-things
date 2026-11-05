@@ -50,10 +50,10 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ascii-things — living ASCII scenes for the web</title>
+    <title>ascii-things — ASCII scene components for the web</title>
     <meta
       name="description"
-      content="Living ASCII scenes you can drop behind any UI: a night lagoon, a shark tank, a robot floor, and a jellyfish bloom. Zero dependencies. One canvas. MIT."
+      content="ASCII scenes rendered on canvas: lagoon, sharks, robots, jellyfish, and more. React, Vue, or plain HTML. Zero runtime dependencies. MIT."
     />
     <meta name="theme-color" content="#070809" />
     <script is:inline>
@@ -79,10 +79,10 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
     <noscript>
       <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
     </noscript>
-    <meta property="og:title" content="ascii-things — living ASCII scenes for the web" />
+    <meta property="og:title" content="ascii-things — ASCII scene components for the web" />
     <meta
       property="og:description"
-      content="A night lagoon, a shark tank, a robot floor, and a jellyfish bloom. Zero dependencies. One canvas."
+      content="A lagoon, shark tank, robot floor, and jellyfish bloom rendered as glyphs on one canvas."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://ascii-things.dev/" />
@@ -92,19 +92,19 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
     <meta property="og:image:height" content="640" />
     <meta
       property="og:image:alt"
-      content="ascii-things landing page with the headline Your interface, but alive."
+      content="ascii-things landing page with the headline ASCII scenes, ready to mount."
     />
     <link rel="canonical" href="https://ascii-things.dev/" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="ascii-things — living ASCII scenes for the web" />
+    <meta name="twitter:title" content="ascii-things — ASCII scene components for the web" />
     <meta name="twitter:image" content="https://ascii-things.dev/social-preview.png" />
     <meta
       name="twitter:image:alt"
-      content="ascii-things landing page with the headline Your interface, but alive."
+      content="ascii-things landing page with the headline ASCII scenes, ready to mount."
     />
     <meta
       name="twitter:description"
-      content="A night lagoon, a shark tank, a robot floor, and a jellyfish bloom. Zero dependencies. One canvas."
+      content="A lagoon, shark tank, robot floor, and jellyfish bloom rendered as glyphs on one canvas."
     />
   </head>
   <body>
@@ -314,11 +314,11 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         <div class="hero-shade"></div>
 
         <div class="hero-copy">
-          <p class="eyebrow"><i class="live-dot"></i> LIVING ASCII SCENES · {version}</p>
-          <h1 id="hero-title">Your interface,<br /><em>but alive.</em></h1>
+          <p class="eyebrow"><i class="live-dot"></i> ASCII SCENE LIBRARY · {version}</p>
+          <h1 id="hero-title">ASCII scenes,<br /><em>ready to mount.</em></h1>
           <p class="hero-lede">
-            Drop a night lagoon, a shark tank, a robot floor, or a jellyfish bloom behind
-            your UI. Zero dependencies. One canvas.
+            A lagoon, shark tank, robot floor, and jellyfish bloom rendered as glyphs on one
+            canvas. React, Vue, or plain HTML. Zero runtime dependencies.
           </p>
 
           <div class="install-pill">
@@ -373,17 +373,17 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <a class="composition-mini" data-surface="paper" href="/design-ideas/#compositions">
               <canvas data-scene="dog" data-composition="true" aria-hidden="true"></canvas>
               <span>Paper / editorial</span>
-              <strong>A quieter interface.</strong>
+              <strong>A quieter surface.</strong>
             </a>
             <a class="composition-mini" data-surface="abyss" href="/design-ideas/#compositions">
               <canvas data-scene="dog" data-composition="true" aria-hidden="true"></canvas>
               <span>Abyss / product</span>
-              <strong>Make it move.</strong>
+              <strong>A product hero.</strong>
             </a>
             <a class="composition-mini" data-surface="immersive" href="/design-ideas/#compositions">
               <canvas data-scene="dog" data-composition="true" aria-hidden="true"></canvas>
               <span>Immersive / Lagoon</span>
-              <strong>Let it fill the room.</strong>
+              <strong>A full-bleed world.</strong>
             </a>
           </div>
         </div>
@@ -393,7 +393,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         <div class="wrap">
           <div class="section-head">
             <p class="eyebrow">01 / HABITATS</p>
-            <h2 id="scenes-title">Living scenes.<br />One tiny runtime.</h2>
+            <h2 id="scenes-title">Eleven scenes.<br />One tiny runtime.</h2>
             <p class="section-lede">
               Each one is a small ecosystem, not a looped animation. Seeded, themeable,
               and capped so it stays fast on a real page.
@@ -620,13 +620,13 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <p class="eyebrow">03 / INTEGRATE</p>
             <h2 id="install-title">One install.<br />Anywhere you render.</h2>
             <p class="section-lede">
-              React, plain HTML, Astro, Vue, Svelte, or a static page. Canvas in, life out.
+              React, plain HTML, Astro, Vue, Svelte, or a static page. A canvas in, a scene out.
               The host app keeps its own UI.
             </p>
             <ul class="check-list">
               <li>Zero runtime dependencies</li>
               <li>ESM, tree-shakeable subpath exports</li>
-              <li>Optional React ≥ 18 peer</li>
+              <li>Optional React or Vue peer</li>
               <li>Works with your design system — or ours</li>
             </ul>
           </div>
@@ -693,14 +693,14 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
       <section class="section features" aria-labelledby="features-title">
         <div class="wrap">
           <div class="section-head">
-            <p class="eyebrow">04 / WHY IT FEELS ALIVE</p>
+            <p class="eyebrow">04 / WHAT YOU GET</p>
             <h2 id="features-title">Small simulations.<br />Serious defaults.</h2>
           </div>
           <div class="feature-grid">
             <article class="feature">
               <span class="feature-num">01</span>
               <h3>Zero dependencies</h3>
-              <p>One canvas, no WebGL, no image pipeline. The whole runtime is yours to read.</p>
+              <p>One canvas, no image pipeline. The scene runtime is yours to read.</p>
             </article>
             <article class="feature">
               <span class="feature-num">02</span>
@@ -710,7 +710,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             <article class="feature">
               <span class="feature-num">03</span>
               <h3>Themeable</h3>
-              <p>Abyss, paper, neon, mono, or a palette of your own. The scene follows your ink.</p>
+              <p>Eight built-in palettes or a palette of your own. The scene follows your ink.</p>
             </article>
             <article class="feature">
               <span class="feature-num">04</span>
@@ -719,7 +719,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
             </article>
             <article class="feature">
               <span class="feature-num">05</span>
-              <h3>Built for 60fps</h3>
+              <h3>Built for real pages</h3>
               <p>Cell caps and adaptive columns keep 4K pages from turning into a particle furnace.</p>
             </article>
             <article class="feature">
@@ -734,7 +734,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
       <section class="manifesto" aria-label="Design principle">
         <div class="wrap">
           <p class="eyebrow">THE PRINCIPLE</p>
-          <p class="manifesto-line">Not an animation.<br /><em>A habitat.</em></p>
+          <p class="manifesto-line">Not a loop.<br /><em>A small world.</em></p>
           <p class="manifesto-sub">
             Every scene runs on its own small rules. No two loads are quite the same.
           </p>
@@ -748,7 +748,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
         <div class="footer-top">
           <a class="footer-brand" href="#top">ascii-things<span>®</span></a>
           <p class="footer-credit">
-            Living ASCII for the web. Built from the original <span class="footer-credit-keep">ascii-sharks.</span>
+            ASCII scenes for the web. Built from the original <span class="footer-credit-keep">ascii-sharks.</span>
           </p>
         </div>
         <div class="footer-socials">
