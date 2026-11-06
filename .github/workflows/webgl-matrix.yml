@@ -20,6 +20,8 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.64.1-noble
       options: --ipc=host
+    env:
+      HOME: /root
     strategy:
       fail-fast: false
       matrix:
