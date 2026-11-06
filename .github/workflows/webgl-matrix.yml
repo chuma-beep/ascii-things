@@ -17,6 +17,9 @@ jobs:
     name: Surfaces / ${{ matrix.browser }}
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
     strategy:
       fail-fast: false
       matrix:
@@ -43,17 +46,6 @@ jobs:
 
       - name: Build package and site
         run: npm --prefix site run build
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json', 'site/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-      - name: Install Playwright browser
-        timeout-minutes: 25
-        run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run WebGL matrix
         run: npx playwright test -c playwright.webgl.config.ts --project=${{ matrix.browser }}
