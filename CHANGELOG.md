@@ -1,5 +1,25 @@
 # ascii-things
 
+## 1.1.0
+
+### Minor Changes
+
+- d75abf4: Add four curated palettes: `amber`, `blueprint`, `newsprint`, and `terminal`, plus
+  `PALETTE_NAMES` and `PALETTE_META` for building pickers. The new names are available from the
+  root entry, `ascii-things/sharks`, and `ascii-things/rendering`.
+- d75abf4: Add optional Vue 3.3+ adapters: scene components for every built-in scene, the
+  `useAsciiScene` composable, and image, dither, and WebGL wrappers at
+  `ascii-things/image/vue`, `ascii-things/dither/vue`, and `ascii-things/webgl/vue`.
+  Vue remains an optional peer dependency, so the package still installs without it.
+
+### Patch Changes
+
+- 97aecd9: Add keyboard controls to interactive scene canvases: arrow keys move a virtual pointer, and Enter or Space triggers the primary pointer action.
+- 97aecd9: Add a static `fallback` scene option that exposes an accessible description through
+  `aria-description` and `data-ascii-fallback`, and use it as the accessible name when
+  `label` is absent.
+- 97aecd9: Pause scene loops when the document becomes hidden and resume them when the tab is visible again.
+
 ## 1.0.0
 
 The first stable release. It includes the changes below.
