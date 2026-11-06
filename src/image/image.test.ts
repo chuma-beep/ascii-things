@@ -101,6 +101,29 @@ describe("pixelsToAscii", () => {
     expect(darker).not.toBe(base);
   });
 
+  it("stretches a low-contrast image with auto levels", () => {
+    const lowContrast = pixels([
+      [100, 100, 100],
+      [120, 120, 120],
+    ]);
+
+    expect(pixelsToAscii(lowContrast, 2, 1, { charset: "@ " }).text).toBe("@ ");
+    expect(pixelsToAscii(lowContrast, 2, 1, { charset: "@ ", autoLevels: false }).text).toBe("@@");
+  });
+
+  it("keeps transparent pixels empty while stretching the rest", () => {
+    const data = new Uint8ClampedArray(8);
+    data[4] = 255;
+    data[5] = 255;
+    data[6] = 255;
+    data[7] = 255;
+
+    const result = pixelsToAscii(data, 2, 1, { charset: " @", autoLevels: true });
+
+    expect(result.text[0]).toBe(" ");
+    expect(result.text[1]).toBe("@");
+  });
+
   it("rejects empty dimensions", () => {
     expect(() => pixelsToAscii(new Uint8ClampedArray(), 0, 1)).toThrow();
   });

@@ -17,6 +17,7 @@ export interface StudioOptions {
   contrast: number;
   brightness: number;
   gamma: number;
+  autoLevels: boolean;
   color: boolean;
   foreground: string;
   background: string;
@@ -47,6 +48,7 @@ export const DEFAULT_OPTIONS: StudioOptions = {
   contrast: 1,
   brightness: 0,
   gamma: 1,
+  autoLevels: true,
   color: false,
   foreground: "#ece8df",
   background: "#070809",
