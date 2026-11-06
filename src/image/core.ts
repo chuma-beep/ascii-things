@@ -19,6 +19,11 @@ export interface AsciiImageOptions {
   brightness?: number;
   /** Gamma correction. Values above 1 lift the midtones. Default 1. */
   gamma?: number;
+  /**
+   * Stretch the tonal range to the image's near-black and near-white
+   * percentiles before applying contrast. Default true.
+   */
+  autoLevels?: boolean;
   /** Colour the drawn canvas from the source pixels. */
   color?: boolean;
   /** Monochrome ink. Default #ece8df. */
@@ -78,6 +83,7 @@ function resolveOptions(options: AsciiImageOptions = {}) {
     contrast: clamp(options.contrast ?? 1, 0.1, 4),
     brightness: clamp(options.brightness ?? 0, -1, 1),
     gamma: clamp(options.gamma ?? 1, 0.2, 4),
+    autoLevels: options.autoLevels ?? true,
     color: options.color ?? false,
     foreground: options.foreground ?? "#ece8df",
     background: options.background ?? "#070809",
@@ -96,12 +102,59 @@ function grayscale(
   contrast: number,
   brightness: number,
   gamma: number,
+  autoLevels: boolean,
 ) {
   const values = new Float32Array(width * height);
+  let low = 0;
+  let high = 255;
+
+  if (autoLevels) {
+    const histogram = new Uint32Array(256);
+    let opaque = 0;
+    for (let i = 0; i < values.length; i++) {
+      const offset = i * 4;
+      if (data[offset + 3] === 0) continue;
+      histogram[Math.round(luminance(data[offset], data[offset + 1], data[offset + 2]))]++;
+      opaque++;
+    }
+
+    if (opaque > 0) {
+      const lowTarget = opaque * 0.01;
+      const highTarget = opaque * 0.99;
+      let cumulative = 0;
+      for (let value = 0; value < histogram.length; value++) {
+        cumulative += histogram[value];
+        if (cumulative >= lowTarget) {
+          low = value;
+          break;
+        }
+      }
+      cumulative = 0;
+      for (let value = 0; value < histogram.length; value++) {
+        cumulative += histogram[value];
+        if (cumulative >= highTarget) {
+          high = value;
+          break;
+        }
+      }
+      // A flat or nearly flat image has no range worth stretching.
+      if (high - low < 4) {
+        low = 0;
+        high = 255;
+      }
+    }
+  }
+
+  const range = Math.max(1, high - low);
   for (let i = 0; i < values.length; i++) {
     const offset = i * 4;
+    if (data[offset + 3] === 0) {
+      values[i] = 0;
+      continue;
+    }
     const raw = luminance(data[offset], data[offset + 1], data[offset + 2]);
-    const adjusted = clamp((raw / 255 - 0.5) * contrast + 0.5 + brightness, 0, 1);
+    const normalized = clamp((raw - low) / range, 0, 1);
+    const adjusted = clamp((normalized - 0.5) * contrast + 0.5 + brightness, 0, 1);
     values[i] = Math.pow(adjusted, 1 / gamma) * 255;
   }
   return values;
@@ -155,6 +208,7 @@ export function pixelsToAscii(
     resolved.contrast,
     resolved.brightness,
     resolved.gamma,
+    resolved.autoLevels,
   );
   dither(values, width, height, resolved.dither);
 

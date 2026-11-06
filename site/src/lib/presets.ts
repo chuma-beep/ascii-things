@@ -74,6 +74,7 @@ export interface SharePreset {
   contrast?: number;
   brightness?: number;
   gamma?: number;
+  autoLevels?: boolean;
   color?: boolean;
   transparent?: boolean;
   edge?: boolean;
@@ -118,6 +119,7 @@ export interface ImageShareState {
   contrast: number;
   brightness: number;
   gamma: number;
+  autoLevels: boolean;
   color: boolean;
   transparent: boolean;
   edge: boolean;
@@ -219,6 +221,7 @@ export function normalizePreset(input: unknown): SharePreset | null {
   preset.contrast = numberIn(input.contrast, 0.1, 4);
   preset.brightness = numberIn(input.brightness, -1, 1);
   preset.gamma = numberIn(input.gamma, 0.2, 3);
+  preset.autoLevels = booleanValue(input.autoLevels);
   preset.color = booleanValue(input.color);
   preset.transparent = booleanValue(input.transparent);
   preset.edge = booleanValue(input.edge);

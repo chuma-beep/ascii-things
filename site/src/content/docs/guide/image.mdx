@@ -113,6 +113,7 @@ events. The ready event carries `{ result }`; the error event carries `{ error }
 | `contrast` | `number` | `1` | Multiplier around mid-grey; clamped to 0.1–4 |
 | `brightness` | `number` | `0` | Luminance offset; clamped to -1–1 |
 | `gamma` | `number` | `1` | Gamma correction; clamped to 0.2–4 |
+| `autoLevels` | `boolean` | `true` | Stretch low-contrast photos to the 1st–99th luminance percentiles before tone mapping |
 | `color` | `boolean` | `false` | Draw glyphs from the source pixels |
 | `foreground` | `string` | `"#ece8df"` | Monochrome ink |
 | `background` | `string` | `"#070809"` | Canvas background; `"transparent"` keeps alpha |
@@ -136,7 +137,9 @@ The live page at [`/image/`](/image/) adds controls around the library:
 
 - Drag and drop, file picker, clipboard paste, and a built-in demo
 - Crop and zoom before conversion, with Full, Square, 16:9, and 4:5 fit presets
-- Columns, ramps, contrast, brightness, gamma, invert, and dither
+- Columns, ramps, contrast, brightness, gamma, auto levels, invert, and dither
+- Auto levels is on by default. It stretches a low-contrast photo across the
+  full ramp before tone mapping; turn it off when you need an exact tonal match
 - Source aspect ratio preserved from the live font metrics, and transparent
   source pixels kept empty instead of inked
 - A side-by-side dither comparison against the undithered source

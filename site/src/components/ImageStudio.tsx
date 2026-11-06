@@ -165,6 +165,7 @@ function coreOptions(options: StudioOptions) {
     contrast: options.contrast,
     brightness: options.brightness,
     gamma: options.gamma,
+    autoLevels: options.autoLevels,
     color: options.color && !options.edge,
     foreground: options.foreground,
     background: options.transparent ? "transparent" : options.background,
@@ -399,6 +400,7 @@ export default function ImageStudio() {
       contrast: preset.contrast ?? current.contrast,
       brightness: preset.brightness ?? current.brightness,
       gamma: preset.gamma ?? current.gamma,
+      autoLevels: preset.autoLevels ?? current.autoLevels,
       color: preset.color ?? current.color,
       transparent: preset.transparent ?? current.transparent,
       edge: preset.edge ?? current.edge,
@@ -711,6 +713,7 @@ export default function ImageStudio() {
       contrast: options.contrast,
       brightness: options.brightness,
       gamma: options.gamma,
+      autoLevels: options.autoLevels,
       color: options.color,
       transparent: options.transparent,
       edge: options.edge,
@@ -1165,6 +1168,12 @@ export default function ImageStudio() {
                   step={0.05}
                   display={options.gamma.toFixed(2)}
                   onChange={(value) => updateOption({ gamma: value })}
+                />
+                <CheckField
+                  label="Auto levels"
+                  checked={options.autoLevels}
+                  onChange={(checked) => updateOption({ autoLevels: checked })}
+                  hint="Stretch the tonal range before mapping to the ramp."
                 />
                 <CheckField
                   label="Invert ramp"
