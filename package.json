@@ -1,6 +1,6 @@
 {
   "name": "ascii-things",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "ASCII scene components and image-to-ASCII tools for the web, with a zero-dependency renderer.",
   "license": "MIT",
   "publishConfig": {
