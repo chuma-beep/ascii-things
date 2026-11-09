@@ -1,0 +1,30 @@
+---
+interface Props {
+  light?: string;
+  dark?: string;
+}
+
+const { light = "#f3eee4", dark = "#070809" } = Astro.props;
+---
+
+<script is:inline define:vars={{ lightColor: light, darkColor: dark }}>
+  (() => {
+    try {
+      const stored = localStorage.getItem("starlight-theme");
+      const legacy = localStorage.getItem("ascii-things-theme");
+      let choice = stored;
+      if (choice === null) choice = legacy;
+      if (choice !== "light" && choice !== "dark") {
+        choice = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      }
+
+      document.documentElement.dataset.theme = choice;
+      document.documentElement.style.colorScheme = choice;
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", choice === "light" ? lightColor : darkColor);
+    } catch {
+      document.documentElement.dataset.theme = "dark";
+      document.documentElement.style.colorScheme = "dark";
+    }
+  })();
+</script>

@@ -118,6 +118,9 @@ a:focus-visible {
 }
 
 .di-header__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: var(--di-faint);
   white-space: nowrap;
 }
@@ -1559,4 +1562,25 @@ a:focus-visible {
     height: 54px;
     font-size: 12px;
   }
+}
+
+/* Shared theme: dark counterpart for the field-note page. */
+html[data-theme="dark"] {
+  --di-paper: #070809;
+  --di-paper-deep: #0b0d0f;
+  --di-ink: #ece8df;
+  --di-muted: rgba(236, 232, 223, 0.64);
+  --di-faint: rgba(236, 232, 223, 0.42);
+  --di-line: rgba(236, 232, 223, 0.16);
+  --di-line-strong: rgba(236, 232, 223, 0.42);
+  --di-orange: #ff7a1a;
+}
+html[data-theme="dark"] body {
+  background-image:
+    linear-gradient(rgba(236, 232, 223, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(236, 232, 223, 0.035) 1px, transparent 1px);
+}
+html[data-theme="dark"] .di-header {
+  background: rgba(7, 8, 9, 0.88);
+  border-color: var(--di-line);
 }

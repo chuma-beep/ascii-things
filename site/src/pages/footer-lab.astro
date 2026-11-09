@@ -1,4 +1,7 @@
 ---
+import ThemeInit from "../components/ThemeInit.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
+
 const variants = [
   {
     id: "original",
@@ -89,6 +92,7 @@ const variants = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Footer wordmark lab — ascii-things</title>
     <meta name="robots" content="noindex" />
+    <ThemeInit />
     <style is:inline>
       :root {
         color-scheme: dark;
@@ -1053,7 +1057,23 @@ const variants = [
           color: var(--orange) !important;
         }
       }
-    </style>
+    /* Shared theme: light counterpart for the lab. */
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3eee4;
+  --panel: #fbf8f1;
+  --line: rgba(24, 21, 18, 0.18);
+  --ink: #181512;
+  --muted: #6f6558;
+  --dim: rgba(24, 21, 18, 0.2);
+  --orange: #b84a12;
+}
+html[data-theme="light"] body {
+  background:
+    radial-gradient(circle at 16% 0%, rgba(184, 74, 18, 0.06), transparent 32rem),
+    var(--bg);
+}
+</style>
   </head>
   <body>
     <main class="shell">
@@ -1067,10 +1087,13 @@ const variants = [
             stays here for future components.
           </p>
         </div>
-        <p class="lab-note">
-          <b>10 is live.</b> The field treatment is in the real footer. 00–09 stay here as
-          component variants for the project.
-        </p>
+        <div class="lab-note">
+          <p>
+            <b>10 is live.</b> The field treatment is in the real footer. 00–09 stay here as
+            component variants for the project.
+          </p>
+          <ThemeToggle />
+        </div>
       </header>
 
       <section class="preview" data-preview aria-labelledby="preview-title">

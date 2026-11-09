@@ -678,3 +678,26 @@ h1 em {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Shared theme: dark counterpart for the paper 404 page. */
+html[data-theme="dark"] {
+  --paper: #070809;
+  --paper-deep: #0b0d0f;
+  --ink: #ece8df;
+  --muted: rgba(236, 232, 223, 0.64);
+  --faint: rgba(236, 232, 223, 0.4);
+  --line: rgba(236, 232, 223, 0.22);
+  --line-soft: rgba(236, 232, 223, 0.1);
+  --orange: #ff7a1a;
+  --orange-soft: rgba(255, 122, 26, 0.14);
+}
+html[data-theme="dark"] body {
+  background-image:
+    linear-gradient(rgba(236, 232, 223, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(236, 232, 223, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 50% 12%, rgba(255, 122, 26, 0.06), transparent 34rem);
+}
+html[data-theme="dark"] .sheet,
+html[data-theme="dark"] .rail {
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.24);
+}

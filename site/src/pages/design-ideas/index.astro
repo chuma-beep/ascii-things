@@ -2,6 +2,8 @@
 import CompositionStage from "../../components/CompositionStage.astro";
 import DesignIdeaPreview from "../../components/DesignIdeaPreview.astro";
 import LogoMark from "../../components/LogoMark.astro";
+import ThemeInit from "../../components/ThemeInit.astro";
+import ThemeToggle from "../../components/ThemeToggle.astro";
 import { DESIGN_IDEAS, UNIVERSAL_PROMPT } from "../../data/design-ideas";
 import "../../styles/design-ideas.css";
 import "../../styles/compositions.css";
@@ -36,6 +38,7 @@ const searchText = (idea: (typeof DESIGN_IDEAS)[number]) =>
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#f3eee4" />
+    <ThemeInit />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -70,7 +73,7 @@ const searchText = (idea: (typeof DESIGN_IDEAS)[number]) =>
         <a href="/image/">Image studio</a>
         <a href="/guide/">Docs</a>
       </nav>
-      <span class="di-header__meta">06 recipes / {sceneCount} scenes</span>
+      <div class="di-header__meta"><ThemeToggle /><span>06 recipes / {sceneCount} scenes</span></div>
     </header>
 
     <main>

@@ -1,5 +1,7 @@
 ---
 import LagoonStage from "../components/LagoonStage.astro";
+import ThemeInit from "../components/ThemeInit.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
 import LogoMark from "../components/LogoMark.astro";
 
 const links = [
@@ -129,6 +131,7 @@ const embed = modes[3];
       content="Four uses for one ASCII lagoon — Day lagoon, Night reef, Turtle close-up, Manta flyby, Seahorse, Dolphin pod, Hammerhead pass, and Tang school — as an ambient hero, search overlay, chat overlay, and embedded card."
     />
     <meta name="theme-color" content="#031820" />
+    <ThemeInit light="#f3eee4" dark="#031820" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script is:inline src="/favicon-motion.js" type="module"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1544,7 +1547,24 @@ const embed = modes[3];
       }
       .search-results { scrollbar-width: none; }
       .search-results::-webkit-scrollbar { display: none; }
-    </style>
+    /* Shared theme: light counterpart for the immersive lab. */
+html[data-theme="light"] {
+  color-scheme: light;
+  --lab-bg: #f3eee4;
+  --lab-ink: #181512;
+  --lab-muted: #6f6558;
+  --lab-line: rgba(24, 21, 18, 0.18);
+  --lab-accent: #2f6f73;
+  --lab-coral: #b84a12;
+  --lagoon-ink: #e8dfd0;
+  --lagoon-soft: #d6c9b8;
+}
+html[data-theme="light"] body {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(184, 74, 18, 0.08), transparent 40rem),
+    var(--lab-bg);
+}
+</style>
   </head>
   <body>
     <a class="skip-link" href="#lagoon-stage">Skip to the lagoon</a>
@@ -1578,6 +1598,8 @@ const embed = modes[3];
           ))
         }
       </div>
+
+      <ThemeToggle />
 
       <fieldset class="scene-switch">
         <legend class="visually-hidden">Lagoon scene</legend>

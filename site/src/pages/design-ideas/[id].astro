@@ -1,6 +1,8 @@
 ---
 import type { DesignIdea } from "../../data/design-ideas";
 import { DESIGN_IDEAS } from "../../data/design-ideas";
+import ThemeInit from "../../components/ThemeInit.astro";
+import ThemeToggle from "../../components/ThemeToggle.astro";
 
 export function getStaticPaths() {
   return DESIGN_IDEAS.map((idea) => ({
@@ -32,6 +34,7 @@ const demoCode = idea.code.replace(
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content={paper ? "#e8dfd0" : "#070809"} />
+    <ThemeInit light={paper ? "#e8dfd0" : "#f3eee4"} dark="#070809" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -77,6 +80,20 @@ const demoCode = idea.code.replace(
         --demo-ink: #181512;
         --demo-line: rgba(24, 21, 18, 0.2);
         --demo-orange: #b84a12;
+      }
+
+      html[data-theme="light"] body {
+        --demo-bg: #f3eee4;
+        --demo-ink: #181512;
+        --demo-line: rgba(24, 21, 18, 0.2);
+        --demo-orange: #b84a12;
+      }
+
+      html[data-theme="dark"] body {
+        --demo-bg: #070809;
+        --demo-ink: #ece8df;
+        --demo-line: rgba(236, 232, 223, 0.16);
+        --demo-orange: #ff7a1a;
       }
 
       .demo-bar {
@@ -211,6 +228,7 @@ const demoCode = idea.code.replace(
       <a class="demo-bar__back" href="/design-ideas/">← All ideas</a>
       <span class="demo-bar__title">{idea.number} / {idea.title}</span>
       <div class="demo-bar__actions">
+        <ThemeToggle />
         <a href={`/design-ideas/#${idea.id}`}>Recipe</a>
         <button
           type="button"
