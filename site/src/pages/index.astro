@@ -3,6 +3,7 @@ import "../styles/landing.css";
 import KanjiMarks from "../components/KanjiMarks.astro";
 import LogoMark from "../components/LogoMark.astro";
 import MobileNav from "../components/MobileNav.astro";
+import ThemeInit from "../components/ThemeInit.astro";
 import pkg from "../../../package.json";
 
 const version = `v${pkg.version}`;
@@ -56,16 +57,7 @@ scene.<span class="tok-fn">throwBall</span>(canvas.clientWidth * <span class="to
       content="ASCII scenes rendered on canvas: lagoon, sharks, robots, jellyfish, and more. React, Vue, or plain HTML. Zero runtime dependencies. MIT."
     />
     <meta name="theme-color" content="#070809" />
-    <script is:inline>
-      (() => {
-        try {
-          const stored = localStorage.getItem("ascii-things-theme");
-          document.documentElement.dataset.theme = stored === "light" ? "light" : "dark";
-        } catch {
-          document.documentElement.dataset.theme = "dark";
-        }
-      })();
-    </script>
+    <ThemeInit />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script is:inline src="/favicon-motion.js" type="module"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />

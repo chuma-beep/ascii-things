@@ -59,12 +59,15 @@ if (heroCanvas) {
   window.setInterval(refresh, 500);
 }
 
-function applyTheme(theme: "light" | "dark") {
+function applyTheme(theme: "light" | "dark", persist = true) {
   document.documentElement.dataset.theme = theme;
-  try {
-    localStorage.setItem("ascii-things-theme", theme);
-  } catch {
-    // Storage can be unavailable in private or restricted contexts.
+  if (persist) {
+    try {
+      localStorage.setItem("starlight-theme", theme);
+      localStorage.setItem("ascii-things-theme", theme);
+    } catch {
+      // Storage can be unavailable in private or restricted contexts.
+    }
   }
 
   const day = theme === "light";
@@ -92,7 +95,7 @@ themeToggle?.addEventListener("click", () => {
   const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
   applyTheme(next);
 });
-applyTheme(initialTheme);
+applyTheme(initialTheme, false);
 
 const header = document.querySelector<HTMLElement>(".site-header");
 const onScroll = () => header?.classList.toggle("is-scrolled", window.scrollY > 16);

@@ -572,3 +572,28 @@ button {
     transition: none;
   }
 }
+
+/* Shared theme: light counterpart for the archive. */
+html[data-theme="light"] {
+  --bg: #f3eee4;
+  --panel: #fbf8f1;
+  --ink: #181512;
+  --muted: rgba(24, 21, 18, 0.64);
+  --faint: rgba(24, 21, 18, 0.42);
+  --line: rgba(24, 21, 18, 0.16);
+  --line-soft: rgba(24, 21, 18, 0.08);
+  --orange: #b84a12;
+  --orange-soft: rgba(184, 74, 18, 0.1);
+}
+html[data-theme="light"] .showcase-header {
+  background: rgba(243, 238, 228, 0.9);
+  border-color: var(--line);
+}
+html[data-theme="light"] .showcase-main {
+  background: var(--bg);
+}
+html[data-theme="light"] .showcase-card,
+html[data-theme="light"] .showcase-piece {
+  background: var(--panel);
+  border-color: var(--line);
+}
