@@ -39,10 +39,23 @@ falls back to the platform monospace face.
 Reports are written to `playwright-report/`; traces and failure screenshots go to
 `test-results/` (both ignored by git). On CI failures, the workflow uploads both.
 
-## Release secrets
+## Release publishing
 
 `.github/workflows/release.yml` uses `changesets/action` on pushes to `main`. It opens
 a version PR when changesets exist and publishes with `changeset publish` after that PR
-merges. Configure a repository secret named `NPM_TOKEN` (an npm automation token) and
-keep the workflow's `id-token: write` permission for provenance. `GITHUB_TOKEN` is the
-built-in Actions token; no hardcoded credentials are needed.
+merges.
+
+Publishing uses npm Trusted Publishing (OIDC), so no `NPM_TOKEN` secret is stored. The
+package must have a trusted publisher on npmjs.com for `chuma-beep/ascii-things`,
+workflow `release.yml`, with `npm publish` allowed. The workflow requests
+`id-token: write` so npm can exchange the GitHub OIDC token for a short-lived publish
+credential and generate provenance. `GITHUB_TOKEN` is the built-in Actions token; no
+hardcoded credentials are needed.
+
+One-time setup with npm 11.15 or later and 2FA enabled:
+
+```sh
+npm login
+npm trust github ascii-things --repo chuma-beep/ascii-things --file release.yml --allow-publish --yes
+npm trust list ascii-things
+```
