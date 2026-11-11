@@ -1,7 +1,10 @@
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  X-Frame-Options: SAMEORIGIN
+  # Allow embedding in a portfolio or other demo. Narrow the source list
+  # (for example `frame-ancestors https://example.com`) if clickjacking
+  # protection matters more than broad embeddability.
+  Content-Security-Policy: frame-ancestors *
 
 /designs
   Cache-Control: no-store
