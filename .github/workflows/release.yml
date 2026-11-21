@@ -14,7 +14,7 @@ on:
 #   Environment name:     (blank)
 #   Allowed actions:      npm publish (and npm dist-tag if needed)
 # GITHUB_TOKEN is provided by Actions and needs the write permissions below to
-# open/update the version PR and create GitHub releases.
+# open/update the version PR, push release tags, and create GitHub releases.
 
 permissions:
   contents: write
@@ -32,8 +32,11 @@ jobs:
     outputs:
       prerelease: ${{ steps.check.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v7
-      - id: check
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Check version
+        id: check
         shell: bash
         run: |
           version="$(node -p "require('./package.json').version")"
@@ -48,7 +51,7 @@ jobs:
     needs: guard
     if: needs.guard.outputs.prerelease != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -72,6 +75,7 @@ jobs:
         run: npm ci
 
       - name: Create release PR or publish
+        id: changesets
         uses: changesets/action@v1
         with:
           version: npm run version
@@ -81,3 +85,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
+
+      # changesets/action can miss the remote tag and GitHub release when the
+      # registry is still propagating immediately after publish. The publish
+      # itself succeeds, so backfill those artifacts deterministically.
+      - name: Ensure release tags and GitHub releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        run: node scripts/ensure-release.mjs

@@ -52,6 +52,12 @@ workflow `release.yml`, with `npm publish` allowed. The workflow requests
 credential and generate provenance. `GITHUB_TOKEN` is the built-in Actions token; no
 hardcoded credentials are needed.
 
+Immediately after publishing, the registry can take a few minutes to expose the new
+version. `scripts/ensure-release.mjs` waits for each published version to resolve, then
+pushes any missing `v<version>` tag and creates any missing GitHub release. This keeps
+the publish and its release artifacts in sync even when the registry is still
+propagating.
+
 One-time setup with npm 11.15 or later and 2FA enabled:
 
 ```sh
