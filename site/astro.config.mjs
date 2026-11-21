@@ -94,6 +94,7 @@ export default defineConfig({
             { label: "Image to ASCII", link: "guide/image/" },
             { label: "Dither field", link: "guide/dither/" },
             { label: "WebGL surface", link: "guide/webgl-surface/" },
+            { label: "Embed a scene", link: "guide/embedding/" },
           ],
         },
         {

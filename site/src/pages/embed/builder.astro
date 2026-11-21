@@ -1,0 +1,436 @@
+---
+import { PALETTE_META, PALETTE_NAMES } from "ascii-things";
+
+const scenes = [
+  {
+    key: "lagoon",
+    label: "Lagoon",
+    variants: ["reef", "night", "turtle", "manta", "seahorse", "dolphin", "hammerhead", "tang"],
+  },
+  { key: "sharks", label: "Shark tank", variants: [] },
+  { key: "robots", label: "Robot floor", variants: [] },
+  { key: "jellyfish", label: "Jellyfish bloom", variants: [] },
+  { key: "dog", label: "Robot dog", variants: [] },
+  { key: "starlings", label: "Starlings", variants: [] },
+  { key: "fireflies", label: "Fireflies", variants: [] },
+  { key: "ants", label: "Ants", variants: [] },
+  { key: "koi", label: "Koi", variants: [] },
+  { key: "city", label: "City", variants: [] },
+  { key: "servers", label: "Servers", variants: [] },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Embed builder — ascii-things</title>
+    <meta
+      name="description"
+      content="Build an iframe snippet for any ascii-things scene."
+    />
+    <style>
+      :root {
+        --bg: #070809;
+        --panel: #0b0d0f;
+        --panel-2: #101317;
+        --line: rgba(236, 232, 223, 0.12);
+        --line-strong: rgba(236, 232, 223, 0.24);
+        --ink: #ece8df;
+        --muted: rgba(236, 232, 223, 0.58);
+        --faint: rgba(236, 232, 223, 0.36);
+        --orange: #ff7a1a;
+        --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        height: 52px;
+        padding: 0 20px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(7, 8, 9, 0.92);
+      }
+
+      .brand {
+        color: var(--ink);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      .brand span {
+        color: var(--faint);
+      }
+
+      .topbar a:last-child {
+        color: var(--muted);
+        font-size: 11px;
+        text-decoration: none;
+      }
+
+      .topbar a:last-child:hover {
+        color: var(--ink);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 340px minmax(0, 1fr);
+        min-height: calc(100vh - 52px);
+      }
+
+      .panel {
+        padding: 22px 20px;
+        border-right: 1px solid var(--line);
+      }
+
+      h1 {
+        margin: 0 0 4px;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+      }
+
+      .lede {
+        margin: 0 0 20px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .field {
+        display: grid;
+        gap: 5px;
+        margin-bottom: 12px;
+        color: var(--muted);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .field input,
+      .field select {
+        width: 100%;
+        padding: 7px 8px;
+        border: 1px solid var(--line);
+        background: var(--panel-2);
+        color: var(--ink);
+        font-family: inherit;
+        font-size: 12px;
+      }
+
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--orange);
+        outline: none;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .check {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        color: var(--muted);
+        font-size: 11px;
+        letter-spacing: 0.04em;
+      }
+
+      .check input {
+        accent-color: var(--orange);
+      }
+
+      .preview {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        padding: 22px 24px 24px;
+        gap: 14px;
+      }
+
+      .preview-head,
+      .code-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--faint);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .preview-head a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+
+      .preview-head a:hover {
+        color: var(--ink);
+      }
+
+      iframe {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border: 1px solid var(--line-strong);
+        background: #000;
+      }
+
+      .code {
+        display: grid;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .code-head button {
+        padding: 4px 9px;
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        font-family: inherit;
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .code-head button:hover {
+        border-color: var(--orange);
+        color: var(--ink);
+      }
+
+      pre {
+        margin: 0;
+        padding: 14px;
+        overflow: auto;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--ink);
+        font-family: inherit;
+        font-size: 11px;
+        line-height: 1.6;
+        white-space: pre;
+      }
+
+      @media (max-width: 860px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .panel {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">ascii-things <span>/ embed builder</span></a>
+      <a href="/guide/embedding/">Embedding guide</a>
+    </header>
+
+    <main class="layout">
+      <section class="panel">
+        <h1>Embed a scene</h1>
+        <p class="lede">Pick a scene and copy the iframe snippet.</p>
+
+        <label class="field">
+          <span>Scene</span>
+          <select id="scene">
+            {
+              scenes.map((scene) => (
+                <option value={scene.key}>{scene.label}</option>
+              ))
+            }
+          </select>
+        </label>
+
+        <label class="field" id="variantField">
+          <span>Variant</span>
+          <select id="variant"></select>
+        </label>
+
+        <label class="field">
+          <span>Palette</span>
+          <select id="palette">
+            {
+              PALETTE_NAMES.map((name) => (
+                <option value={name} selected={name === "abyss"}>
+                  {PALETTE_META[name].label}
+                </option>
+              ))
+            }
+          </select>
+        </label>
+
+        <div class="row">
+          <label class="field">
+            <span>Columns</span>
+            <input id="columns" type="number" min="40" max="240" step="1" value="120" />
+          </label>
+          <label class="field">
+            <span>Speed</span>
+            <input id="speed" type="number" min="0.2" max="2" step="0.1" value="1" />
+          </label>
+        </div>
+
+        <label class="check">
+          <input id="paused" type="checkbox" />
+          Start paused
+        </label>
+        <label class="check">
+          <input id="interactive" type="checkbox" checked />
+          Interactive
+        </label>
+
+        <label class="field">
+          <span>Label</span>
+          <input id="label" type="text" placeholder="ASCII lagoon scene" />
+        </label>
+      </section>
+
+      <section class="preview">
+        <div class="preview-head">
+          <span>Preview</span>
+          <a href="/embed/" target="_blank" rel="noreferrer">Open standalone</a>
+        </div>
+        <iframe id="preview" title="ASCII scene preview" loading="lazy"></iframe>
+
+        <div class="code">
+          <div class="code-head">
+            <span>iframe snippet</span>
+            <button id="copy" type="button">Copy</button>
+          </div>
+          <pre><code id="snippet"></code></pre>
+        </div>
+      </section>
+    </main>
+
+    <script type="application/json" id="scene-data" set:html={JSON.stringify(scenes)}></script>
+
+    <script>
+      const scenes = JSON.parse(document.getElementById("scene-data")?.textContent || "[]");
+      const sceneEl = document.getElementById("scene");
+      const variantEl = document.getElementById("variant");
+      const variantField = document.getElementById("variantField");
+      const paletteEl = document.getElementById("palette");
+      const columnsEl = document.getElementById("columns");
+      const speedEl = document.getElementById("speed");
+      const pausedEl = document.getElementById("paused");
+      const interactiveEl = document.getElementById("interactive");
+      const labelEl = document.getElementById("label");
+      const previewEl = document.getElementById("preview");
+      const snippetEl = document.getElementById("snippet");
+      const copyEl = document.getElementById("copy");
+
+      const byKey = new Map(scenes.map((scene) => [scene.key, scene]));
+
+      function escapeAttr(value) {
+        return value
+          .replaceAll("&", "&amp;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("<", "&lt;");
+      }
+
+      function syncVariants() {
+        const scene = byKey.get(sceneEl.value) || scenes[0];
+        const variants = scene?.variants || [];
+        variantEl.replaceChildren(
+          ...variants.map((variant) => {
+            const option = document.createElement("option");
+            option.value = variant;
+            option.textContent = variant;
+            return option;
+          }),
+        );
+        variantField.hidden = variants.length === 0;
+      }
+
+      function currentParams() {
+        const params = new URLSearchParams();
+        const scene = sceneEl.value;
+        params.set("scene", scene);
+        if (scene === "lagoon") params.set("variant", variantEl.value);
+        params.set("palette", paletteEl.value);
+        params.set("columns", columnsEl.value);
+        params.set("speed", speedEl.value);
+        params.set("interactive", interactiveEl.checked ? "1" : "0");
+        if (pausedEl.checked) params.set("paused", "1");
+        const label = labelEl.value.trim();
+        if (label) params.set("label", label);
+        return params;
+      }
+
+      function update() {
+        const params = currentParams();
+        previewEl.src = `/embed/?${params.toString()}`;
+
+        const scene = byKey.get(sceneEl.value) || scenes[0];
+        const label = params.get("label") || `ASCII ${scene?.label || "scene"} scene`;
+        const aspect = sceneEl.value === "lagoon" ? "1944 / 1760" : "16 / 9";
+        const src = `https://ascii-things.dev/embed/?${params.toString()}`;
+        snippetEl.textContent = `<iframe
+  src="${src}"
+  title="${escapeAttr(label)}"
+  loading="lazy"
+  style="width:100%;aspect-ratio:${aspect};border:0"
+></iframe>`;
+      }
+
+      sceneEl.addEventListener("change", () => {
+        syncVariants();
+        update();
+      });
+      for (const control of [variantEl, paletteEl, columnsEl, speedEl, pausedEl, interactiveEl, labelEl]) {
+        control.addEventListener("input", update);
+        control.addEventListener("change", update);
+      }
+
+      copyEl.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(snippetEl.textContent || "");
+        copyEl.textContent = "Copied";
+        window.setTimeout(() => {
+          copyEl.textContent = "Copy";
+        }, 1400);
+      });
+
+      syncVariants();
+      update();
+    </script>
+  </body>
+</html>
