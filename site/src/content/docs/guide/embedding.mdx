@@ -1,0 +1,69 @@
+---
+title: Embed a scene
+description: Put a live ascii-things scene in a portfolio, blog, or docs page with one iframe.
+---
+
+Every scene ships as a custom element, and the docs site exposes a chrome-free
+embed page. Point an iframe at `https://ascii-things.dev/embed/` and choose the
+scene with query parameters.
+
+## Quick start
+
+```html
+<iframe
+  src="https://ascii-things.dev/embed/?scene=lagoon&variant=turtle&palette=abyss"
+  title="A live ASCII lagoon scene"
+  loading="lazy"
+  style="width: 100%; aspect-ratio: 1944 / 1760; border: 0"
+></iframe>
+```
+
+Use the [embed builder](/embed/builder/) to preview a scene and copy a
+ready-made snippet.
+
+## Parameters
+
+| Parameter | Default | Description |
+| --- | --- | --- |
+| `scene` | `lagoon` | `lagoon`, `sharks`, `robots`, `jellyfish`, `dog`, `starlings`, `fireflies`, `ants`, `koi`, `city`, or `servers`. |
+| `variant` | `reef` | Lagoon only: `reef`, `night`, `turtle`, `manta`, `seahorse`, `dolphin`, `hammerhead`, or `tang`. |
+| `palette` | `abyss` | `abyss`, `neon`, `mono`, `paper`, `amber`, `blueprint`, `newsprint`, or `terminal`. |
+| `columns` | scene default | Target glyph columns where the scene supports them. |
+| `speed` | `1` | Time scale. `0` freezes. |
+| `paused` | `0` | `1` starts paused. |
+| `interactive` | `1` | `0` disables pointer input. |
+| `label` | generated | Accessible name for the canvas. |
+| `glyphs` | `ascii` | `kanji` for the scenes that support kanji glyphs. |
+| `seed` | random | Reproducible scene. |
+| `calm` | `0` | Reduces optional shimmer where supported. |
+
+## Sizing
+
+Set the iframe's aspect ratio in CSS. Lagoon is composed at `1944 / 1760`;
+the other scenes work well at `16 / 9`.
+
+```html
+<style>
+  .ascii-embed {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 0;
+  }
+</style>
+<iframe
+  class="ascii-embed"
+  src="https://ascii-things.dev/embed/?scene=sharks&palette=paper"
+  title="A live ASCII shark tank"
+  loading="lazy"
+></iframe>
+```
+
+## Embedding policy
+
+The docs site sends `Content-Security-Policy: frame-ancestors *`, so any origin
+can embed it. If you need clickjacking protection, restrict that directive to
+your own origin in `site/public/_headers`.
+
+## Reduced motion
+
+Scenes respect `prefers-reduced-motion`. Use `paused=1` for a still frame.
